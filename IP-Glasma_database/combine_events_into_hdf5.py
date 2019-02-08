@@ -31,7 +31,11 @@ for ievent, event_path in enumerate(event_list):
     for ifile, file_path in enumerate(file_list):
         file_name = file_path.split("/")[-1]
         dtemp = np.loadtxt(file_path)
-        gtemp.create_dataset("{0}".format(file_name), data=dtemp,
-                             compression="gzip", compression_opts=9)
+        dset = gtemp.create_dataset("{0}".format(file_name), data=dtemp,
+                                    compression="gzip", compression_opts=9)
+        if "epsilon-u-Hydro" in file_name:
+            f = open(file_path)
+            header = f.readline()
+            dset.attrs.create("header", np.string_(header))
 
 hf.close()
