@@ -45,9 +45,27 @@ def prepare_surface_files_for_UrQMD(final_results_folder, hydro_folder_name,
         shutil.copy(path.join(final_results_folder, hydro_folder_name,
                               "music_input"), hydro_surface_folder)
 
-
 def run_UrQMD_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
+
+def run_UrQMD_shell(n_threads, final_results_folder, event_id):
+    print("Running UrQMD ... ")
+    with Pool(processes=n_threads) as pool:
+        pool.map(run_UrQMD_event, range(n_threads))
+
+    for iev in range(1, n_threads):
+        call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
+             + "UrQMDev_0/UrQMD_results/particle_list.gz "
+             + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+             shell=True)
+    UrQMD_results_name = "particle_list_{}.gz".format(event_id)
+    shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz",
+                path.join(final_results_folder, UrQMD_results_name))
+    return(UrQMD_results_name)
+
+
+def run_spvn_analysis(pid):
+    call("bash ./run_analysis_spvn.sh {0:d}".format(pid), shell=True)
 
 
 def main(initial_condition_database, n_hydro_events, hydro_event_id0,
@@ -70,20 +88,14 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
                                         hydro_folder_name, n_threads)
 
         # then run UrQMD events in parallel
-        print("Running UrQMD ... ")
-        with Pool(processes=n_threads) as pool:
-            pool.map(run_UrQMD_event, range(n_threads))
-
-        for iev in range(1, n_threads):
-            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
-                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
-                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
-                 shell=True)
-        shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz",
-                    path.join(final_results_folder,
-                              "particle_list_{}.gz".format(event_id)))
+        UrQMD_filename = run_UrQMD_shell(n_threads, final_results_folder,
+                                         event_id)
 
         # finally collect results
+        print("Running spvn analysis ... ")
+        with Pool(processes=n_threads) as pool:
+            pool.map(run_spvn_analysis,
+                     [9999, 211, -211, 321, -321, 2212, -2212])
 
 
 if __name__ == "__main__":
