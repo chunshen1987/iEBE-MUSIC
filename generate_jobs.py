@@ -65,7 +65,7 @@ cd {2:s}
         exit(1)
 
 def generate_script(cluster_name, folder_name):
-    working_folder = path.join(path.abspath('./'), folder_name)
+    working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
 
@@ -85,25 +85,20 @@ def generate_event_folders(initial_condition_database, working_folder,
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
     generate_script(cluster_name, event_folder)
-    shutil.copytree('codes/MUSIC', 
-                    path.join(path.abspath(event_folder), 'MUSIC'))
+    shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'))
     copy_IPGlasma_initial_condition(initial_condition_database, event_id, 
-                                    path.join(path.abspath(event_folder),
+                                    path.join(event_folder,
                                               'MUSIC', 'initial'))
     for iev in range(nsubev):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
-                                     'subev_{0:d}'.format(iev))
+                                     'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
-        shutil.copytree('codes/iSS', 
-                        path.join(path.abspath(sub_event_folder), 'iSS'))
-        shutil.copytree('codes/osc2u', 
-                        path.join(path.abspath(sub_event_folder), 'osc2u'))
-        shutil.copytree('codes/urqmd', 
-                        path.join(path.abspath(sub_event_folder), 'urqmd'))
+        shutil.copytree('codes/iSS',   path.join(sub_event_folder, 'iSS'  ))
+        shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
+        shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
-                    path.join(path.abspath(event_folder), 
-                    'hadronic_afterburner_toolkit'))
+                    path.join(event_folder, 'hadronic_afterburner_toolkit'))
 
 def print_Usage():
     print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
@@ -120,6 +115,7 @@ if __name__ == "__main__":
         print_Usage()
         exit(0)
 
+    working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_hydro_ev):
         generate_event_folders(initial_condition_database, working_folder_name,
