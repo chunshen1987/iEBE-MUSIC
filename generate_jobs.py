@@ -70,14 +70,12 @@ def generate_script_hydro(cluster_name, folder_name, nsubev):
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
 
-    script = open(path.join(working_folder, "submit_job.pbs"), "w")
-    write_script_header(cluster_name, script, event_id, walltime,
-                        working_folder)
+    script = open(path.join(working_folder, "run_hydro.sh"), "w")
 
     hydro_results_folder = 'results'
     ppn = nsubev
     script.write(
-"""
+"""#!/usr/bin/env bash
 
 results_folder={0:s}
 
@@ -110,11 +108,15 @@ def generate_script_afterburner(cluster_name, folder_name):
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
 
-    script = open(path.join(working_folder, "submit_job.pbs"), "w")
-    write_script_header(cluster_name, script, event_id, walltime,
-                        working_folder)
+    script = open(path.join(working_folder, "run_afterburner.sh"), "w")
     script.write(
-"""
+"""#!/usr/bin/env bash
+
+SubEventId=$1
+
+(
+cd UrQMDev_$SubEventId
+
 mkdir UrQMD_results
 for iev in `ls hydro_events --color=none | grep "surface"`
 do
@@ -144,6 +146,7 @@ do
     ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list_$event_id.dat
     rm -fr UrQMD_results/particle_list_$event_id.dat
 done
+)
 """)
     script.close()
 
@@ -162,6 +165,8 @@ def generate_event_folders(initial_condition_database, working_folder,
     copy_IPGlasma_initial_condition(initial_condition_database, event_id, 
                                     path.join(event_folder,
                                               'MUSIC', 'initial'))
+    shutil.copy('hydro_plus_UrQMD_driver.py', event_folder)
+    generate_script_afterburner(cluster_name, event_folder)
     for iev in range(nsubev):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
@@ -170,7 +175,6 @@ def generate_event_folders(initial_condition_database, working_folder,
         shutil.copytree('codes/iSS',   path.join(sub_event_folder, 'iSS'  ))
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
-        generate_script_afterburner(cluster_name, sub_event_folder)
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
 
