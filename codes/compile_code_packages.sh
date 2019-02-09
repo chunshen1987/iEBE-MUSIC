@@ -64,9 +64,12 @@ echo "compile hadronic afterburner toolkit ... "
     cd ../ebe_scripts
     g++ convert_to_binary.cpp -lz -o convert_to_binary.e
     mv convert_to_binary.e ../
+    g++ concatenate_binary_files.cpp -lz -o concatenate_binary_files.e
+    mv concatenate_binary_files.e ../
 )
 mkdir -p hadronic_afterburner_toolkit
 cp hadronic_afterburner_toolkit_code/hadronic_afterburner_tools.e hadronic_afterburner_toolkit/
 cp -r hadronic_afterburner_toolkit_code/EOS hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/convert_to_binary.e hadronic_afterburner_toolkit/
+cp hadronic_afterburner_toolkit_code/concatenate_binary_files.e hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/parameters.dat hadronic_afterburner_toolkit/

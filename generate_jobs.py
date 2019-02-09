@@ -64,7 +64,8 @@ cd {2:s}
         print("Available options: nersc, wsugrid, local, guillimin, McGill")
         exit(1)
 
-def generate_script(cluster_name, folder_name):
+
+def generate_script_hydro(cluster_name, folder_name, nsubev):
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
@@ -72,6 +73,78 @@ def generate_script(cluster_name, folder_name):
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, event_id, walltime,
                         working_folder)
+
+    hydro_results_folder = 'results'
+    ppn = nsubev
+    script.write(
+"""
+
+results_folder={0:s}
+
+export OMP_NUM_THREADS={1:d}
+export OMP_PROC_BIND=spread
+export OMP_PLACES=threads
+
+(
+cd MUSIC
+# hydro evolution
+#for iev in `ls initial | grep "strings_event"`
+for iev in `ls initial | grep "epsilon-u-Hydro"`
+do
+    #event_id=`echo $iev | sed 's/.dat//' | sed 's/strings_event_//'`
+    #mv initial/$iev initial/string_event.dat
+    event_id=`echo $iev | sed 's/.dat//' | cut -f 5 -d "-"`
+    mv initial/$iev initial/epsilon-u-Hydro.dat
+    ./mpihydro music_input_mode_2 1> mode_2.log 2> mode_2.err
+    ./sweeper.sh $results_folder\_$event_id
+    #mv initial/QCD_strings_Hydro_decelerate.dat initial/$iev
+    mv initial/epsilon-u-Hydro.dat initial/$iev
+done
+)
+""".format(hydro_results_folder, ppn))
+    script.close()
+
+
+def generate_script_afterburner(cluster_name, folder_name):
+    working_folder = folder_name
+    event_id = working_folder.split('/')[-1]
+    walltime = '35:00:00'
+
+    script = open(path.join(working_folder, "submit_job.pbs"), "w")
+    write_script_header(cluster_name, script, event_id, walltime,
+                        working_folder)
+    script.write(
+"""
+mkdir UrQMD_results
+for iev in `ls hydro_events --color=none | grep "surface"`
+do
+    event_id=`echo $iev | cut -f 3 -d _ | cut -f 1 -d .`
+    cd iSS
+    if [ -d "results" ]; then
+        rm -fr results
+    fi
+    mkdir results
+    mv ../hydro_events/$iev results/surface.dat
+    cp ../hydro_events/music_input_event_$event_id results/music_input
+    ./iSS.e >> ../output.log
+    mv results/surface.dat ../hydro_events/$iev
+    #rm -fr results/sample*
+    # turn on global momentum conservation
+    ./correct_momentum_conservation.py OSCAR.DAT
+    mv OSCAR_w_GMC.DAT OSCAR.DAT
+    cd ../osc2u
+    ./osc2u.e < ../iSS/OSCAR.DAT >> ../output.log
+    mv fort.14 ../urqmd/OSCAR.input
+    cd ../urqmd
+    ./runqmd.sh >> ../output.log
+    mv particle_list.dat ../UrQMD_results/particle_list_$event_id.dat
+    rm -fr ../iSS/OSCAR.DAT
+    rm -fr OSCAR.input
+    cd ..
+    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list_$event_id.dat
+    rm -fr UrQMD_results/particle_list_$event_id.dat
+done
+""")
     script.close()
 
 def copy_IPGlasma_initial_condition(database, event_id, folder):
@@ -84,7 +157,7 @@ def generate_event_folders(initial_condition_database, working_folder,
                            cluster_name, event_id, nsubev):
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
-    generate_script(cluster_name, event_folder)
+    generate_script_hydro(cluster_name, event_folder, nsubev)
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'))
     copy_IPGlasma_initial_condition(initial_condition_database, event_id, 
                                     path.join(event_folder,
@@ -97,6 +170,7 @@ def generate_event_folders(initial_condition_database, working_folder,
         shutil.copytree('codes/iSS',   path.join(sub_event_folder, 'iSS'  ))
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
+        generate_script_afterburner(cluster_name, sub_event_folder)
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
 
