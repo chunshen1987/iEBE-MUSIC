@@ -65,15 +65,15 @@ cd {2:s}
         exit(1)
 
 
-def generate_script_hydro(cluster_name, folder_name, nsubev):
+def generate_script_hydro(cluster_name, folder_name, nthreads):
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
 
     script = open(path.join(working_folder, "run_hydro.sh"), "w")
 
-    hydro_results_folder = 'results'
-    ppn = nsubev
+    hydro_results_folder = 'hydro_results'
+    ppn = nthreads
     script.write(
 """#!/usr/bin/env bash
 
@@ -86,18 +86,8 @@ export OMP_PLACES=threads
 (
 cd MUSIC
 # hydro evolution
-#for iev in `ls initial | grep "strings_event"`
-for iev in `ls initial | grep "epsilon-u-Hydro"`
-do
-    #event_id=`echo $iev | sed 's/.dat//' | sed 's/strings_event_//'`
-    #mv initial/$iev initial/string_event.dat
-    event_id=`echo $iev | sed 's/.dat//' | cut -f 5 -d "-"`
-    mv initial/$iev initial/epsilon-u-Hydro.dat
-    ./mpihydro music_input_mode_2 1> mode_2.log 2> mode_2.err
-    ./sweeper.sh $results_folder\_$event_id
-    #mv initial/QCD_strings_Hydro_decelerate.dat initial/$iev
-    mv initial/epsilon-u-Hydro.dat initial/$iev
-done
+./mpihydro music_input_mode_2 1> mode_2.log 2> mode_2.err
+./sweeper.sh $results_folder
 )
 """.format(hydro_results_folder, ppn))
     script.close()
@@ -157,17 +147,22 @@ def copy_IPGlasma_initial_condition(database, event_id, folder):
 
         
 def generate_event_folders(initial_condition_database, working_folder,
-                           cluster_name, event_id, nsubev):
+                           cluster_name, event_id,
+                           n_hydro_per_job, n_UrQMD_per_hydro):
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
-    generate_script_hydro(cluster_name, event_folder, nsubev)
+    shutil.copy('codes/hydro_plus_UrQMD_driver.py', event_folder)
+    shutil.copy('IPGlasma_database/fetch_IPGlasma_event_from_hdf5_database.py',
+                event_folder)
+    initial_folder = path.join(event_folder, 'Initial')
+    mkdir(initial_folder)
+    for iev in range(event_id*n_hydro_per_job, (event_id + 1)*n_hydro_per_job):
+        copy_IPGlasma_initial_condition(initial_condition_database, iev,
+                                        initial_folder)
+    generate_script_hydro(cluster_name, event_folder, n_UrQMD_per_hydro)
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'))
-    copy_IPGlasma_initial_condition(initial_condition_database, event_id, 
-                                    path.join(event_folder,
-                                              'MUSIC', 'initial'))
-    shutil.copy('hydro_plus_UrQMD_driver.py', event_folder)
     generate_script_afterburner(cluster_name, event_folder)
-    for iev in range(nsubev):
+    for iev in range(n_UrQMD_per_hydro):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
                                      'UrQMDev_{0:d}'.format(iev))
@@ -180,22 +175,24 @@ def generate_event_folders(initial_condition_database, working_folder,
 
 def print_Usage():
     print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
-          + "cluster_name n_hydro_ev n_UrQMD_per_hydro")
+          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro")
                     
 if __name__ == "__main__":
     try:
         initial_condition_database = str(sys.argv[1])
         working_folder_name        = str(sys.argv[2])
         cluster_name               = str(sys.argv[3])
-        n_hydro_ev                 = int(sys.argv[4])
-        n_UrQMD_per_hydro          = int(sys.argv[5])
+        n_jobs                     = int(sys.argv[4])
+        n_hydro_per_job            = int(sys.argv[5])
+        n_UrQMD_per_hydro          = int(sys.argv[6])
     except IndexError:
         print_Usage()
         exit(0)
 
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
-    for iev in range(n_hydro_ev):
+    for iev in range(n_jobs):
         generate_event_folders(initial_condition_database, working_folder_name,
-                               cluster_name, iev, n_UrQMD_per_hydro)
+                               cluster_name, iev,
+                               n_hydro_per_job, n_UrQMD_per_hydro)
 
