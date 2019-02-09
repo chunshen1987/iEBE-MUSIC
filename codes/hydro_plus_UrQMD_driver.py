@@ -74,6 +74,17 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
         with Pool(processes=n_threads) as pool:
             pool.map(run_UrQMD_event, range(n_threads))
 
+        for iev in range(1, n_threads):
+            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
+                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
+                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+                 shell=True)
+        shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz",
+                    path.join(final_results_folder,
+                              "particle_list_{}.gz".format(event_id)))
+
+        # finally collect results
+
 
 if __name__ == "__main__":
     try:
