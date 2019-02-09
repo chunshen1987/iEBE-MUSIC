@@ -8,6 +8,7 @@ import sys
 import shutil
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
 
+
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
           + "n_hydro_events hydro_event_id n_threads")
@@ -19,6 +20,31 @@ def get_initial_condition(database, nev, idx0):
         file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
         yield(file_name)
     
+
+def run_hydro_event(final_results_folder, event_id):
+    print("Playing MUSIC ... ")
+    call("bash ./run_hydro.sh", shell=True)
+
+    # collect hydro results
+    hydro_folder_name = "hydro_results_{}".format(event_id)
+    shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
+                                                 hydro_folder_name))
+    return(hydro_folder_name)
+
+
+def prepare_surface_files_for_UrQMD(final_results_folder, hydro_folder_name,
+                                    n_threads):
+    surface_file = glob(path.join(final_results_folder, hydro_folder_name,
+                                  "surface*.dat"))
+    for iev in range(n_threads):
+        hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
+        mkdir(hydro_surface_folder)
+        call("ln -s {0:s} {1:s}".format(
+            path.abspath(surface_file[0]),
+            path.join(hydro_surface_folder, "surface.dat")), shell=True)
+        shutil.copy(path.join(final_results_folder, hydro_folder_name,
+                              "music_input"), hydro_surface_folder)
+
 
 def run_UrQMD_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
@@ -38,24 +64,10 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
         shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
 
         # first run hydro
-        print("Playing MUSIC ... ")
-        call("bash ./run_hydro.sh", shell=True)
+        hydro_folder_name = run_hydro_event(final_results_folder, event_id)
 
-        # collect hydro results
-        hydro_folder_name = "hydro_results_{}".format(event_id)
-        shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
-                                                     hydro_folder_name))
-        
-        surface_file = glob(path.join(final_results_folder, hydro_folder_name,
-                                      "surface*.dat"))
-        for iev in range(n_threads):
-            hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
-            mkdir(hydro_surface_folder)
-            call("ln -s {0:s} {1:s}".format(
-                path.abspath(surface_file[0]),
-                path.join(hydro_surface_folder, "surface.dat")), shell=True)
-            shutil.copy(path.join(final_results_folder, hydro_folder_name,
-                                  "music_input"), hydro_surface_folder)
+        prepare_surface_files_for_UrQMD(final_results_folder,
+                                        hydro_folder_name, n_threads)
 
         # then run UrQMD events in parallel
         print("Running UrQMD ... ")
