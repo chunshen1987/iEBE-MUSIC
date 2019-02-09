@@ -61,7 +61,7 @@ def run_UrQMD_shell(n_threads, final_results_folder, event_id):
     UrQMD_results_name = "particle_list_{}.gz".format(event_id)
     shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz",
                 path.join(final_results_folder, UrQMD_results_name))
-    return(UrQMD_results_name)
+    return(path.join(final_results_folder, UrQMD_results_name))
 
 
 def run_spvn_analysis(pid):
@@ -88,14 +88,23 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
                                         hydro_folder_name, n_threads)
 
         # then run UrQMD events in parallel
-        UrQMD_filename = run_UrQMD_shell(n_threads, final_results_folder,
-                                         event_id)
+        UrQMD_file_path = run_UrQMD_shell(n_threads, final_results_folder,
+                                          event_id)
 
+        spvn_folder = "hadronic_afterburner_toolkit/results"
+        mkdir(spvn_folder)
+        call("ln -s {0:s} {1:s}".format(
+             path.abspath(UrQMD_file_path),
+             path.join(spvn_folder, "particle_list.dat")), shell=True)
         # finally collect results
         print("Running spvn analysis ... ")
         with Pool(processes=n_threads) as pool:
             pool.map(run_spvn_analysis,
                      [9999, 211, -211, 321, -321, 2212, -2212])
+
+        shutil.move(spvn_folder,
+                    path.join(final_results_folder,
+                              "spvn_results_{0:s}".format(event_id)))
 
 
 if __name__ == "__main__":
