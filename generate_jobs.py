@@ -93,10 +93,11 @@ def generate_script_hydro(folder_name, nthreads):
 
 results_folder={0:s}
 
-export OMP_NUM_THREADS={1:d}
-
 (
 cd MUSIC
+
+export OMP_NUM_THREADS={1:d}
+
 # hydro evolution
 ./mpihydro music_input_mode_2
 ./sweeper.sh $results_folder
@@ -112,40 +113,41 @@ def generate_script_afterburner(folder_name):
     script.write(
 """#!/usr/bin/env bash
 
+unalias ls
+
 SubEventId=$1
 
 (
 cd UrQMDev_$SubEventId
 
-mkdir UrQMD_results
-for iev in `ls hydro_events --color=none | grep "surface"`
+mkdir -p UrQMD_results
+rm -fr UrQMD_results/*
+
+for iev in `ls hydro_event | grep "surface"`
 do
-    event_id=`echo $iev | cut -f 3 -d _ | cut -f 1 -d .`
     cd iSS
-    if [ -d "results" ]; then
-        rm -fr results
-    fi
-    mkdir results
-    mv ../hydro_events/$iev results/surface.dat
-    cp ../hydro_events/music_input_event_$event_id results/music_input
+    mkdir -p results
+    rm -fr results/*
+    mv ../hydro_event/$iev results/surface.dat
+    mv ../hydro_event/music_input results/music_input
     ./iSS.e
-    mv results/surface.dat ../hydro_events/$iev
-    #rm -fr results/sample*
     # turn on global momentum conservation
-    ./correct_momentum_conservation.py OSCAR.DAT
-    mv OSCAR_w_GMC.DAT OSCAR.DAT
+    #./correct_momentum_conservation.py OSCAR.DAT
+    #mv OSCAR_w_GMC.DAT OSCAR.DAT
     cd ../osc2u
     ./osc2u.e < ../iSS/OSCAR.DAT
     mv fort.14 ../urqmd/OSCAR.input
     cd ../urqmd
     ./runqmd.sh
-    mv particle_list.dat ../UrQMD_results/particle_list_$event_id.dat
+    mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr ../iSS/OSCAR.DAT
     rm -fr OSCAR.input
     cd ..
-    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list_$event_id.dat
-    rm -fr UrQMD_results/particle_list_$event_id.dat
+    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat
+    rm -fr UrQMD_results/particle_list.dat
 done
+
+rm -fr hydro_event
 )
 """)
     script.close()

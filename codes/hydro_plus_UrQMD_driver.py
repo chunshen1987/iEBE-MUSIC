@@ -46,6 +46,17 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
         shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
                                                      hydro_folder_name))
         
+        surface_file = glob(path.join(final_results_folder, hydro_folder_name,
+                                      "surface*.dat"))
+        for iev in range(n_threads):
+            hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
+            mkdir(hydro_surface_folder)
+            call("ln -s {0:s} {1:s}".format(
+                path.abspath(surface_file[0]),
+                path.join(hydro_surface_folder, "surface.dat")), shell=True)
+            shutil.copy(path.join(final_results_folder, hydro_folder_name,
+                                  "music_input"), hydro_surface_folder)
+
         # then run UrQMD events in parallel
         print("Running UrQMD ... ")
         with Pool(processes=n_threads) as pool:
