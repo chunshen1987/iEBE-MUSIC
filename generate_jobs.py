@@ -6,6 +6,7 @@ import shutil
 from glob import glob
 import subprocess
 import random
+from IPGlasma_database.fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
 
 
 def write_script_header(cluster, script, event_id, walltime, working_folder):
@@ -72,13 +73,23 @@ def generate_script(cluster_name, folder_name):
     write_script_header(cluster_name, script, event_id, walltime,
                         working_folder)
     script.close()
+
+def copy_IPGlasma_initial_condition(database, event_id, folder):
+    time_stamp_str = "0.4"
+    file_name = fecth_an_IPGlasma_event(database, time_stamp_str, event_id)
+    shutil.move(file_name, folder)
+
         
-def generate_event_folders(cluster_name, working_folder, event_id, nsubev):
+def generate_event_folders(initial_condition_database, working_folder,
+                           cluster_name, event_id, nsubev):
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
     generate_script(cluster_name, event_folder)
     shutil.copytree('codes/MUSIC', 
                     path.join(path.abspath(event_folder), 'MUSIC'))
+    copy_IPGlasma_initial_condition(initial_condition_database, event_id, 
+                                    path.join(path.abspath(event_folder),
+                                              'MUSIC', 'initial'))
     for iev in range(nsubev):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
@@ -95,22 +106,22 @@ def generate_event_folders(cluster_name, working_folder, event_id, nsubev):
                     'hadronic_afterburner_toolkit'))
 
 def print_Usage():
-    print("Usage:")
-    print("  %s input_folder working_folder cluster_name num_of_cores nsubev"
-          % str(sys.argv[0]))
-    print("")
+    print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
+          + "cluster_name n_hydro_ev n_UrQMD_per_hydro")
                     
 if __name__ == "__main__":
     try:
-        from_folder = str(sys.argv[1])
-        folder_name = str(sys.argv[2])
-        cluster_name = str(sys.argv[3])
-        ncore = int(sys.argv[4])
-        nsubev = int(sys.argv[5])
+        initial_condition_database = str(sys.argv[1])
+        working_folder_name        = str(sys.argv[2])
+        cluster_name               = str(sys.argv[3])
+        n_hydro_ev                 = int(sys.argv[4])
+        n_UrQMD_per_hydro          = int(sys.argv[5])
     except IndexError:
         print_Usage()
         exit(0)
 
-    mkdir(folder_name)
-    for icore in range(ncore):
-        generate_event_folders(cluster_name, folder_name, icore, nsubev)
+    mkdir(working_folder_name)
+    for iev in range(n_hydro_ev):
+        generate_event_folders(initial_condition_database, working_folder_name,
+                               cluster_name, iev, n_UrQMD_per_hydro)
+

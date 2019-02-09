@@ -25,6 +25,7 @@ def fecth_an_IPGlasma_event(database_path, time_stamp, event_idx):
     temp_data   = event_group.get(file_name)
     data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
     np.savetxt(file_name, temp_data, fmt='%.6e', header=data_header)
+    return(file_name)
 
 if __name__ == "__main__":
     try:
