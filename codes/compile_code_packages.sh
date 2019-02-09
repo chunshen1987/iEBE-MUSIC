@@ -4,7 +4,7 @@
 echo "compile MUSIC ... "
 (
     cd MUSIC_code
-    mkdir build
+    mkdir -p build
     cd build
     cmake ..
     make -j 4
@@ -26,7 +26,7 @@ cp MUSIC_code/utilities/sweeper.sh MUSIC/
 echo "compile iSS ... "
 (
     cd iSS_code
-    mkdir build
+    mkdir -p build
     cd build
     cmake ..
     make -j 4
@@ -47,7 +47,7 @@ mkdir -p osc2u
 cp urqmd_code/osc2u/osc2u.e osc2u/
 mkdir -p urqmd
 cp urqmd_code/urqmd/runqmd.sh urqmd/
-cp urqmd_code/urqmd/runqmd.sh urqmd
+cp urqmd_code/urqmd/urqmd.e urqmd/
 cp urqmd_code/urqmd/uqmd.burner urqmd/
 
 
@@ -55,7 +55,7 @@ cp urqmd_code/urqmd/uqmd.burner urqmd/
 echo "compile hadronic afterburner toolkit ... "
 (
     cd hadronic_afterburner_toolkit_code
-    mkdir build
+    mkdir -p build
     cd build
     cmake ..
     make -j 4
