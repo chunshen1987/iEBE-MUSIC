@@ -15,7 +15,7 @@ def write_script_header(cluster, script, n_threads,
 """#!/bin/bash -l
 #SBATCH -p shared
 #SBATCH -n 1
-#SBATCH -J event_{0:s}
+#SBATCH -J {0:s}
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
 #SBATCH -C haswell
@@ -23,7 +23,7 @@ def write_script_header(cluster, script, n_threads,
     elif cluster == "guillimin":
         script.write(
 """#!/usr/bin/env bash
-#PBS -N event_{0:s}
+#PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}
 #PBS -l walltime={2:s}
 #PBS -S /bin/bash
@@ -36,7 +36,7 @@ def write_script_header(cluster, script, n_threads,
     elif cluster == "McGill":
         script.write(
 """#!/usr/bin/env bash
-#PBS -N event_{0:s}
+#PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}:irulan
 #PBS -l walltime={2:s}
 #PBS -S /bin/bash
@@ -47,7 +47,7 @@ def write_script_header(cluster, script, n_threads,
     elif cluster == "wsugrid":
         script.write(
 """#!/usr/bin/env bash
-#PBS -N event_{0:s}
+#PBS -N {0:s}
 #PBS -l select=1:ncpus={1:d}:mem=5GB
 #PBS -l walltime={2:s}
 #PBS -S /bin/bash
