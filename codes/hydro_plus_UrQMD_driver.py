@@ -95,7 +95,7 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
         print("Run simulations with {} ... ".format(ifile))
         event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
 
-        final_results_folder="EVENT_RESLUTS_{}".format(event_id)
+        final_results_folder="EVENT_RESULTS_{}".format(event_id)
         mkdir(final_results_folder)
         
         shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
