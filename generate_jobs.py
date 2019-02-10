@@ -216,10 +216,6 @@ def generate_event_folders(initial_condition_database, working_folder,
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
 
-    if cluster_name == "nersc":
-        shutil.copy('NERSC_supports/job_MPI_wrapper.py', working_folder)
-        shutil.copy('NERSC_supports/submit_MPI_jobs.pbs', working_folder)
-
 
 def print_Usage():
     print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
@@ -249,6 +245,15 @@ def main():
     script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
     shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    
+    if cluster_name == "nersc":
+        shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
+                    working_folder_name)
+        shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs.pbs',
+                    working_folder_name)
+    
+    if cluster_name == "wsugrid":
+        shutil.copy('Cluster_supports/WSUgrid/submit_all_jobs.sh', pwd)
                     
 if __name__ == "__main__":
     main()
