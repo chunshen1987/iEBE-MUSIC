@@ -216,6 +216,11 @@ def generate_event_folders(initial_condition_database, working_folder,
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
 
+    if cluster_name == "nersc":
+        shutil.copy('NERSC_supports/job_MPI_wrapper.py', working_folder)
+        shutil.copy('NERSC_supports/submit_MPI_jobs.pbs', working_folder)
+
+
 def print_Usage():
     print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
           + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro")
