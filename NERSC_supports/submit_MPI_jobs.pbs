@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#SBATCH --qos=debug
+#SBATCH -N 1
+#SBATCH -A m1820
+#SBATCH -J music
+#SBATCH -t 00:30:00
+#SBATCH -L SCRATCH
+#SBATCH -C haswell
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+
+num_of_nodes=1
+# run all the job
+for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
+do
+    export OMP_NUM_THREADS=16
+    srun -N 1 -n 4 -c 16 python job_MPI_wrapper.py 4 $nodeid &
+done
+wait
