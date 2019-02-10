@@ -65,7 +65,7 @@ def run_UrQMD_shell(n_threads, final_results_folder, event_id):
 
 
 def run_spvn_analysis(pid):
-    call("bash ./run_analysis_spvn.sh {0:d}".format(pid), shell=True)
+    call("bash ./run_analysis_spvn.sh {0:s}".format(pid), shell=True)
 
 def run_spvn_analysis_shell(UrQMD_file_path, final_results_folder, event_id):
     spvn_folder = "hadronic_afterburner_toolkit/results"
