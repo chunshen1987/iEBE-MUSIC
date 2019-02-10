@@ -224,8 +224,8 @@ def generate_event_folders(initial_condition_database, working_folder,
 def print_Usage():
     print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
           + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro")
-                    
-if __name__ == "__main__":
+
+def main():
     try:
         initial_condition_database = str(sys.argv[1])
         working_folder_name        = str(sys.argv[2])
@@ -244,4 +244,13 @@ if __name__ == "__main__":
         generate_event_folders(initial_condition_database, working_folder_name,
                                cluster_name, iev,
                                n_hydro_per_job, n_UrQMD_per_hydro)
+    # copy script to collect final results
+    pwd = path.abspath(".")
+    script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
+    shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
+    shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+                    
+if __name__ == "__main__":
+    main()
 
+    
