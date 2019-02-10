@@ -76,7 +76,7 @@ def generate_full_job_script(cluster_name, folder_name,
                         working_folder)
     script.write(
 """
-./hydro_plus_UrQMD_driver.py {0:s} {1:d} {2:d} {3:d}
+./hydro_plus_UrQMD_driver.py {0:s} {1:d} {2:d} {3:d} > run.log
 """.format(database, n_hydro, ev0_id, n_threads))
     script.close()
 
