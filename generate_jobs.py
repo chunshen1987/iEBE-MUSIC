@@ -249,6 +249,7 @@ def main():
     script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
     shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    shutil.copy(path.join(script_path, 'average_event_spvn_h5.py'), pwd)
                     
 if __name__ == "__main__":
     main()
