@@ -65,8 +65,8 @@ cd {3:s}
         exit(1)
 
 
-def generate_full_job_script(cluster_name, folder_name,
-                             database, n_hydro, ev0_id, n_threads):
+def generate_full_job_script(cluster_name, folder_name, database, initial_type,
+                             n_hydro, ev0_id, n_threads):
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '35:00:00'
@@ -76,8 +76,8 @@ def generate_full_job_script(cluster_name, folder_name,
                         working_folder)
     script.write(
 """
-./hydro_plus_UrQMD_driver.py {0:s} {1:d} {2:d} {3:d} > run.log
-""".format(database, n_hydro, ev0_id, n_threads))
+./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} > run.log
+""".format(database, initial_type, n_hydro, ev0_id, n_threads))
     script.close()
 
 
@@ -190,16 +190,22 @@ def copy_IPGlasma_initial_condition(database, event_id, folder):
     shutil.move(file_name, folder)
 
         
-def generate_event_folders(initial_condition_database, working_folder,
+def generate_event_folders(initial_condition_database,
+                           initial_condition_type, working_folder,
                            cluster_name, event_id,
                            n_hydro_per_job, n_UrQMD_per_hydro):
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
     shutil.copy('codes/hydro_plus_UrQMD_driver.py', event_folder)
-    shutil.copy('IPGlasma_database/fetch_IPGlasma_event_from_hdf5_database.py',
+    shutil.copy(path.join('IPGlasma_database',
+                          'fetch_IPGlasma_event_from_hdf5_database.py'),
+                event_folder)
+    shutil.copy(path.join('3DMCGlauber_database',
+                          'fetch_3DMCGlauber_event_from_hdf5_database.py'),
                 event_folder)
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database, n_hydro_per_job,
+                             initial_condition_database,
+                             initial_condition_type, n_hydro_per_job,
                              event_id*n_hydro_per_job, n_UrQMD_per_hydro)
     generate_script_hydro(event_folder, n_UrQMD_per_hydro)
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'))
@@ -218,26 +224,37 @@ def generate_event_folders(initial_condition_database, working_folder,
 
 
 def print_Usage():
-    print("Usage: {} initial_condition working_folder ".format(sys.argv[0])
+    print("Usage: {} ".format(sys.argv[0]) 
+          + "initial_condition_filename initial_condition_type working_folder "
           + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro")
+    print("initial_condition_type: IPGlasma, 3DMCGlauber")
+    print("cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
 def main():
     try:
         initial_condition_database = str(sys.argv[1])
-        working_folder_name        = str(sys.argv[2])
-        cluster_name               = str(sys.argv[3])
-        n_jobs                     = int(sys.argv[4])
-        n_hydro_per_job            = int(sys.argv[5])
-        n_UrQMD_per_hydro          = int(sys.argv[6])
+        initial_condition_type     = str(sys.argv[2])
+        working_folder_name        = str(sys.argv[3])
+        cluster_name               = str(sys.argv[4])
+        n_jobs                     = int(sys.argv[5])
+        n_hydro_per_job            = int(sys.argv[6])
+        n_UrQMD_per_hydro          = int(sys.argv[7])
     except IndexError:
         print_Usage()
         exit(0)
+
+    if (initial_condition_type != "IPGlasma"
+        and initial_condition_type != "3DMCGlauber"):
+        print("Do not recognize the initial condition type: {}".format(
+                                                    initial_condition_type))
+        exit(1)
 
     initial_condition_database = path.abspath(initial_condition_database)
     working_folder_name        = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_jobs):
-        generate_event_folders(initial_condition_database, working_folder_name,
+        generate_event_folders(initial_condition_database,
+                               initial_condition_type,working_folder_name,
                                cluster_name, iev,
                                n_hydro_per_job, n_UrQMD_per_hydro)
     # copy script to collect final results

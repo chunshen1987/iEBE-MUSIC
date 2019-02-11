@@ -7,18 +7,28 @@ from glob import glob
 import sys
 import shutil
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
+from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
 
 
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
-          + "n_hydro_events hydro_event_id n_threads")
+          + "initial_condition_type n_hydro_events hydro_event_id n_threads")
 
 
-def get_initial_condition(database, nev, idx0):
-    time_stamp_str = "0.4"
-    for iev in range(idx0, idx0 + nev):
-        file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
-        yield(file_name)
+def get_initial_condition(database, initial_type, nev, idx0):
+    if initial_type == "IPGlasma":
+        time_stamp_str = "0.4"
+        for iev in range(idx0, idx0 + nev):
+            file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
+            yield(file_name)
+    elif initial_type == "3DMCGlauber":
+        for iev in range(idx0, idx0 + nev):
+            file_name = fecth_an_3DMCGlauber_event(database, iev)
+            yield(file_name)
+    else:
+        print("Do not recognize the initial condition type: {}".format(
+                                                            initial_type))
+        exit(1)
     
 
 def run_hydro_event(final_results_folder, event_id):
@@ -87,20 +97,24 @@ def run_spvn_analysis_shell(UrQMD_file_path, final_results_folder, event_id):
                           "spvn_results_{0:s}".format(event_id)))
 
 
-def main(initial_condition_database, n_hydro_events, hydro_event_id0,
-         n_threads) :
+def main(initial_condition_database, initial_condition_type,
+         n_hydro_events, hydro_event_id0, n_threads) :
     print("Number of processors: ", cpu_count())
     
     for ifile in get_initial_condition(initial_condition_database,
+                                       initial_condition_type,
                                        n_hydro_events, hydro_event_id0):
         print("Run simulations with {} ... ".format(ifile))
-        event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
+        if initial_condition_type == "IPGlasma":
+            event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
+            shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
+        elif initial_condition_type == "3DMCGlauber":
+            event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
+            shutil.move(ifile, "MUSIC/initial/strings.dat")
 
         final_results_folder="EVENT_RESULTS_{}".format(event_id)
         mkdir(final_results_folder)
         
-        shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
-
         # first run hydro
         hydro_folder_name = run_hydro_event(final_results_folder, event_id)
 
@@ -119,12 +133,19 @@ def main(initial_condition_database, n_hydro_events, hydro_event_id0,
 if __name__ == "__main__":
     try:
         initial_condition_database = str(sys.argv[1])
-        n_hydro_events             = int(sys.argv[2])
-        hydro_event_id0            = int(sys.argv[3])
-        n_threads                  = int(sys.argv[4])
+        initial_condition_type     = str(sys.argv[2])
+        n_hydro_events             = int(sys.argv[3])
+        hydro_event_id0            = int(sys.argv[4])
+        n_threads                  = int(sys.argv[5])
     except IndexError:
         print_Usage()
         exit(0)
 
-    main(initial_condition_database, n_hydro_events, hydro_event_id0,
-         n_threads)
+    if (initial_condition_type != "IPGlasma"
+        and initial_condition_type != "3DMCGlauber"):
+        print("Do not recognize the initial condition type: {}".format(
+                                                    initial_condition_type))
+        exit(1)
+
+    main(initial_condition_database, initial_condition_type,
+         n_hydro_events, hydro_event_id0, n_threads)
