@@ -80,7 +80,8 @@ def run_spvn_analysis_shell(UrQMD_file_path, final_results_folder, event_id):
     print("Running spvn analysis ... ")
     with Pool(processes=n_threads) as pool:
         pool.map(run_spvn_analysis, particle_list)
-
+    
+    shutil.rmtree("{}/particle_list.dat".format(spvn_folder))
     shutil.move(spvn_folder,
                 path.join(final_results_folder,
                           "spvn_results_{0:s}".format(event_id)))
