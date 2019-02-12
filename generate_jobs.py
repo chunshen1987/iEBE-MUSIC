@@ -253,6 +253,7 @@ def main():
     working_folder_name        = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_jobs):
+        print("generating job {}/{} ... ".format(iev + 1, n_jobs))
         generate_event_folders(initial_condition_database,
                                initial_condition_type,working_folder_name,
                                cluster_name, iev,

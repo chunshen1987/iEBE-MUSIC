@@ -29,7 +29,7 @@ hf = h5py.File("{0}.h5".format(results_name), "w")
 
 nev = len(event_list)
 for ievent, event_path in enumerate(event_list):
-    print("processing {0:d}/{1:d} {2} ... ".format(ievent, nev, event_path))
+    print("processing {0:d}/{1:d} {2} ... ".format(ievent+1, nev, event_path))
     event_name = event_path.split("/")[-1]
     gtemp = hf.create_group("{0}".format(event_name))
     file_list = glob(path.join(event_path, "*"))
