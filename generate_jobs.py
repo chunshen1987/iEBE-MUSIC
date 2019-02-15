@@ -166,18 +166,18 @@ pid=$1
     cd hadronic_afterburner_toolkit
     if [ "$pid" == "9999" ]; then
         # charged hadrons
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=-0.1
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=0.1 rap_max=1.0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=0.5 rap_max=2.0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=-0.5
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=-0.1 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=0.1 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=0.5 rap_max=2.0 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=-0.5 compute_correlation=0 flag_charge_dependence=0
         ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0 compute_correlation=1 flag_charge_dependence=1 pT_min=0.2 pT_max=2.0
         ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0 compute_correlation=1 flag_charge_dependence=1 pT_min=0.2 pT_max=2.0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0 compute_correlation=0 flag_charge_dependence=0
     else
-        #./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=1 rap_type=0
-        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=1 rap_type=1
+        #./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=1 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0
+        ./hadronic_afterburner_tools.e run_mode=0 read_in_mode=2 particle_monval=$pid resonance_feed_down_flag=0 distinguish_isospin=1 rap_type=1 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0
     fi
 )
 """)
