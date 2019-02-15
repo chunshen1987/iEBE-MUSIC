@@ -208,7 +208,8 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id*n_hydro_per_job, n_UrQMD_per_hydro)
     generate_script_hydro(event_folder, n_UrQMD_per_hydro)
-    shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'))
+    shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
+                    symlinks=True)
     generate_script_afterburner(event_folder)
     generate_script_analyze_spvn(event_folder)
     for iev in range(n_UrQMD_per_hydro):

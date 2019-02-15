@@ -15,9 +15,9 @@ cp MUSIC_code/mpihydro MUSIC/
 mkdir -p MUSIC/EOS
 (
     cd MUSIC/EOS
-    ln -s ../../../codes/MUSIC_code/EOS/hotQCD hotQCD
-    ln -s ../../../codes/MUSIC_code/EOS/s95p-v1.2 s95p-v1.2
-    ln -s ../../../codes/MUSIC_code/EOS/pdg-urqmd_v3.3+.dat pdg-urqmd_v3.3+.dat
+    ln -s ../../../../codes/MUSIC_code/EOS/hotQCD hotQCD
+    ln -s ../../../../codes/MUSIC_code/EOS/s95p-v1.2 s95p-v1.2
+    ln -s ../../../../codes/MUSIC_code/EOS/pdg-urqmd_v3.3+.dat pdg-urqmd_v3.3+.dat
 )
 cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
 cp MUSIC_code/utilities/sweeper.sh MUSIC/
