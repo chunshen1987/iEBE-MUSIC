@@ -210,6 +210,9 @@ def generate_event_folders(initial_condition_database,
     generate_script_hydro(event_folder, n_UrQMD_per_hydro)
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
+    subprocess.call("ln -s {0:s} {1:s}".format(
+         path.abspath('codes/MUSIC_code/EOS'),
+         path.join(event_folder, "MUSIC/EOS")), shell=True)
     generate_script_afterburner(event_folder)
     generate_script_analyze_spvn(event_folder)
     for iev in range(n_UrQMD_per_hydro):
@@ -218,6 +221,9 @@ def generate_event_folders(initial_condition_database,
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
         shutil.copytree('codes/iSS',   path.join(sub_event_folder, 'iSS'  ))
+        subprocess.call("ln -s {0:s} {1:s}".format(
+             path.abspath('codes/iSS_code/iSS_tables'),
+             path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
