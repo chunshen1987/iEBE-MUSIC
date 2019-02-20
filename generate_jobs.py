@@ -99,7 +99,7 @@ cd MUSIC
 export OMP_NUM_THREADS={1:d}
 
 # hydro evolution
-./mpihydro music_input_mode_2
+./mpihydro music_input_mode_2 1> run.log 2> run.err 
 ./sweeper.sh $results_folder
 )
 """.format(hydro_results_folder, ppn))
