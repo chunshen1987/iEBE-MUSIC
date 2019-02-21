@@ -233,7 +233,7 @@ def generate_event_folders(initial_condition_database,
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-             path.abspath('codes/urqmd_code/urqmd.e'),
+             path.abspath('codes/urqmd_code/urqmd/urqmd.e'),
              path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
@@ -242,6 +242,10 @@ def generate_event_folders(initial_condition_database,
                                 'hadronic_afterburner_tools.e')),
          path.join(event_folder, "hadronic_afterburner_toolkit",
                    "hadronic_afterburner_tools.e")), shell=True)
+    subprocess.call("ln -s {0:s} {1:s}".format(
+         path.abspath('codes/hadronic_afterburner_toolkit_code/EOS'),
+         path.join(event_folder, "hadronic_afterburner_toolkit/EOS")),
+         shell=True)
 
 
 def print_Usage():
