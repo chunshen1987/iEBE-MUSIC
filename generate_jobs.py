@@ -239,9 +239,9 @@ def generate_event_folders(initial_condition_database,
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
     subprocess.call("ln -s {0:s} {1:s}".format(
          path.abspath(path.join('codes', 'hadronic_afterburner_toolkit_code',
-                                'hadronic_afterburner_toolkit.e')),
+                                'hadronic_afterburner_tools.e')),
          path.join(event_folder, "hadronic_afterburner_toolkit",
-                   "hadronic_afterburner_toolkit.e")), shell=True)
+                   "hadronic_afterburner_tools.e")), shell=True)
 
 
 def print_Usage():
