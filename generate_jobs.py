@@ -213,6 +213,9 @@ def generate_event_folders(initial_condition_database,
     subprocess.call("ln -s {0:s} {1:s}".format(
          path.abspath('codes/MUSIC_code/EOS'),
          path.join(event_folder, "MUSIC/EOS")), shell=True)
+    subprocess.call("ln -s {0:s} {1:s}".format(
+         path.abspath('codes/MUSIC_code/mpihydro'),
+         path.join(event_folder, "MUSIC/mpihydro")), shell=True)
     generate_script_afterburner(event_folder)
     generate_script_analyze_spvn(event_folder)
     for iev in range(n_UrQMD_per_hydro):
@@ -224,10 +227,21 @@ def generate_event_folders(initial_condition_database,
         subprocess.call("ln -s {0:s} {1:s}".format(
              path.abspath('codes/iSS_code/iSS_tables'),
              path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
+        subprocess.call("ln -s {0:s} {1:s}".format(
+             path.abspath('codes/iSS_code/iSS.e'),
+             path.join(sub_event_folder, "iSS/iSS.e")), shell=True)
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
+        subprocess.call("ln -s {0:s} {1:s}".format(
+             path.abspath('codes/urqmd_code/urqmd.e'),
+             path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
     shutil.copytree('codes/hadronic_afterburner_toolkit', 
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
+    subprocess.call("ln -s {0:s} {1:s}".format(
+         path.abspath(path.join('codes', 'hadronic_afterburner_toolkit_code',
+                                'hadronic_afterburner_toolkit.e')),
+         path.join(event_folder, "hadronic_afterburner_toolkit",
+                   "hadronic_afterburner_toolkit.e")), shell=True)
 
 
 def print_Usage():
