@@ -61,7 +61,7 @@ echo "compile hadronic afterburner toolkit ... "
 )
 mkdir -p hadronic_afterburner_toolkit
 #cp hadronic_afterburner_toolkit_code/hadronic_afterburner_tools.e hadronic_afterburner_toolkit/
-cp -r hadronic_afterburner_toolkit_code/EOS hadronic_afterburner_toolkit/
+#cp -r hadronic_afterburner_toolkit_code/EOS hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/convert_to_binary.e hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/concatenate_binary_files.e hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/parameters.dat hadronic_afterburner_toolkit/
