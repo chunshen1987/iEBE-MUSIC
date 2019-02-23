@@ -77,7 +77,8 @@ def run_UrQMD_shell(n_threads, final_results_folder, event_id):
 def run_spvn_analysis(pid):
     call("bash ./run_analysis_spvn.sh {0:s}".format(pid), shell=True)
 
-def run_spvn_analysis_shell(UrQMD_file_path, final_results_folder, event_id):
+def run_spvn_analysis_shell(UrQMD_file_path, n_threads,
+                            final_results_folder, event_id):
     spvn_folder = "hadronic_afterburner_toolkit/results"
     mkdir(spvn_folder)
     call("ln -s {0:s} {1:s}".format(
@@ -126,8 +127,8 @@ def main(initial_condition_database, initial_condition_type,
                                           event_id)
 
         # finally collect results
-        run_spvn_analysis_shell(UrQMD_file_path, final_results_folder,
-                                event_id)
+        run_spvn_analysis_shell(UrQMD_file_path, n_threads,
+                                final_results_folder, event_id)
 
 
 if __name__ == "__main__":
