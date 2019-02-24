@@ -57,11 +57,12 @@ def write_script_header(cluster, script, n_threads,
 
 cd {3:s}
 """.format(event_id, n_threads, walltime, working_folder))
-    elif cluster == "local":
+    elif cluster == "local" or cluster == "nerscKNL":
         script.write("#!/usr/bin/env bash")
     else:
         print("Error: unrecoginzed cluster name :", cluster)
-        print("Available options: nersc, wsugrid, local, guillimin, McGill")
+        print("Available options: nersc, nerscKNL, wsugrid, local, guillimin, "
+              + "McGill")
         exit(1)
 
 
@@ -87,7 +88,6 @@ def generate_script_hydro(folder_name, nthreads):
     script = open(path.join(working_folder, "run_hydro.sh"), "w")
 
     hydro_results_folder = 'hydro_results'
-    ppn = nthreads
     script.write(
 """#!/usr/bin/env bash
 
@@ -96,13 +96,22 @@ results_folder={0:s}
 (
 cd MUSIC
 
+""".format(hydro_results_folder))
+
+    if nthreads > 0:
+        script.write(
+"""
 export OMP_NUM_THREADS={1:d}
+""".format(nthreads))
+
+    script.write(
+"""
 
 # hydro evolution
 ./mpihydro music_input_mode_2 1> run.log 2> run.err 
 ./sweeper.sh $results_folder
 )
-""".format(hydro_results_folder, ppn))
+""")
     script.close()
 
 
@@ -207,7 +216,11 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id*n_hydro_per_job, n_UrQMD_per_hydro)
-    generate_script_hydro(event_folder, n_UrQMD_per_hydro)
+    if cluster_name == "nerscKNL":
+        generate_script_hydro(event_folder, -1)
+    else:
+        generate_script_hydro(event_folder, n_UrQMD_per_hydro)
+
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
@@ -294,6 +307,12 @@ def main():
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
         shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs.pbs',
+                    working_folder_name)
+
+    if cluster_name == "nerscKNL":
+        shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
+                    working_folder_name)
+        shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs_KNL.pbs',
                     working_folder_name)
     
     if cluster_name == "wsugrid":
