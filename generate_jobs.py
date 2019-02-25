@@ -101,7 +101,7 @@ cd MUSIC
     if nthreads > 0:
         script.write(
 """
-export OMP_NUM_THREADS={1:d}
+export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
     script.write(
