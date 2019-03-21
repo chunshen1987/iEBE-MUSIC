@@ -24,7 +24,24 @@ def fecth_an_IPGlasma_event(database_path, time_stamp, event_idx):
                                                             event_idx)
     temp_data   = event_group.get(file_name)
     data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
-    np.savetxt(file_name, temp_data, fmt='%.6e', header=data_header)
+    x_size      = temp_data.attrs["x_size"]
+    y_size      = temp_data.attrs["y_size"]
+    dx          = temp_data.attrs["dx"]
+    dy          = temp_data.attrs["dy"]
+    nx          = temp_data.attrs["nx"]
+    ny          = temp_data.attrs["ny"]
+
+    output_data = np.zeros([len(temp_data[:, 0]), 18])
+    output_data[:, 3:] = temp_data
+    idx = 0
+    for ix in range(nx):
+        x_local = -x_size/2. + ix*dx
+        for iy in range(ny):
+            y_local = -y_size/2. + iy*dy
+            output_data[idx, 1] = x_local
+            output_data[idx, 2] = y_local
+            idx += 1
+    np.savetxt(file_name, output_data, fmt='%.6e', header=data_header)
     return(file_name)
 
 if __name__ == "__main__":
