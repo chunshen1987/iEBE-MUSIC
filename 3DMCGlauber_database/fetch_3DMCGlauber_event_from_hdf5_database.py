@@ -16,11 +16,10 @@ def fecth_an_3DMCGlauber_event(database_path, event_idx):
            + "event id: {} from {}".format(event_idx, database_path))
     )
     hf          = h5py.File(database_path, "r")
-    event_name  = "event-{0:d}".format(event_idx)
-    event_group = hf.get(event_name)
     file_name   = "strings_event_{0:d}.dat".format(event_idx)
-    temp_data   = event_group.get(file_name)
-    np.savetxt(file_name, temp_data, fmt='%.6e')
+    temp_data   = hf.get(file_name)
+    data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
+    np.savetxt(file_name, temp_data, fmt='%.6e', header=data_header)
     return(file_name)
 
 if __name__ == "__main__":
