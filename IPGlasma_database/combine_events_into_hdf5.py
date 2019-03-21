@@ -19,10 +19,6 @@ except IndexError:
     print_help()
     exit(1)
 
-timestamp_files_list = ["epsilon-u-Hydro-t",
-                         #"NpartdNdy-t",
-                        ]
-
 results_name = results_folder.split("/")[-1]
 if results_name == "":
     results_name = results_folder.split("/")[-2]
