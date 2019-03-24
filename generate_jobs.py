@@ -66,6 +66,37 @@ cd {3:s}
         exit(1)
 
 
+def generate_nersc_MPI_job_script(folder_name, n_nodes, n_threads):
+    working_folder = folder_name
+    walltime = '10:00:00'
+
+    n_jobs_per_node = int(64/n_threads)
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
+    script.write(
+"""#!/bin/bash -l
+#SBATCH --qos=regular
+#SBATCH -N {0:d}
+#SBATCH -A m1820
+#SBATCH -J music
+#SBATCH -t {1:s}
+#SBATCH -L SCRATCH
+#SBATCH -C haswell
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+
+num_of_nodes={0:d}
+# run all the job
+for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
+do
+    export OMP_NUM_THREADS={2:d}
+    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
+done
+wait
+""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
+    script.close()
+
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                              n_hydro, ev0_id, n_threads):
     working_folder = folder_name
@@ -306,8 +337,9 @@ def main():
     if cluster_name == "nersc":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
-        shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs.pbs',
-                    working_folder_name)
+        n_nodes = int(n_jobs*n_UrQMD_per_hydro/64)
+        generate_nersc_MPI_job_script(working_folder_name,
+                                      n_nodes, n_UrQMD_per_hydro)
 
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
