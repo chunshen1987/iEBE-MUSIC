@@ -98,18 +98,18 @@ wait
     script.close()
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_threads):
+                             n_hydro, ev0_id, n_UrQMD, n_threads):
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
-    walltime = '35:00:00'
+    walltime = '50:00:00'
 
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write(
 """
-./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} > run.log
-""".format(database, initial_type, n_hydro, ev0_id, n_threads))
+./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} > run.log
+""".format(database, initial_type, n_hydro, ev0_id, n_UrQMD, n_threads))
     script.close()
 
 
@@ -233,7 +233,7 @@ def copy_IPGlasma_initial_condition(database, event_id, folder):
 def generate_event_folders(initial_condition_database,
                            initial_condition_type, working_folder,
                            cluster_name, event_id,
-                           n_hydro_per_job, n_UrQMD_per_hydro):
+                           n_hydro_per_job, n_UrQMD_per_hydro, n_threads):
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
     shutil.copy('codes/hydro_plus_UrQMD_driver.py', event_folder)
@@ -246,11 +246,12 @@ def generate_event_folders(initial_condition_database,
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
-                             event_id*n_hydro_per_job, n_UrQMD_per_hydro)
+                             event_id*n_hydro_per_job, n_UrQMD_per_hydro,
+                             n_threads)
     if cluster_name == "nerscKNL":
         generate_script_hydro(event_folder, -1)
     else:
-        generate_script_hydro(event_folder, n_UrQMD_per_hydro)
+        generate_script_hydro(event_folder, n_threads)
 
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
@@ -295,7 +296,7 @@ def generate_event_folders(initial_condition_database,
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) 
           + "initial_condition_filename initial_condition_type working_folder "
-          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro")
+          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro n_threads")
     print("initial_condition_type: IPGlasma, 3DMCGlauber")
     print("cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
@@ -308,6 +309,7 @@ def main():
         n_jobs                     = int(sys.argv[5])
         n_hydro_per_job            = int(sys.argv[6])
         n_UrQMD_per_hydro          = int(sys.argv[7])
+        n_threads                  = int(sys.argv[8])
     except IndexError:
         print_Usage()
         exit(0)
@@ -326,7 +328,7 @@ def main():
         generate_event_folders(initial_condition_database,
                                initial_condition_type,working_folder_name,
                                cluster_name, iev,
-                               n_hydro_per_job, n_UrQMD_per_hydro)
+                               n_hydro_per_job, n_UrQMD_per_hydro, n_threads)
     # copy script to collect final results
     pwd = path.abspath(".")
     script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"

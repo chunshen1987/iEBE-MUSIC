@@ -12,7 +12,8 @@ from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_even
 
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
-          + "initial_condition_type n_hydro_events hydro_event_id n_threads")
+          + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
+          + "n_threads")
 
 
 def get_initial_condition(database, initial_type, nev, idx0):
@@ -43,10 +44,10 @@ def run_hydro_event(final_results_folder, event_id):
 
 
 def prepare_surface_files_for_UrQMD(final_results_folder, hydro_folder_name,
-                                    n_threads):
+                                    n_UrQMD):
     surface_file = glob(path.join(final_results_folder, hydro_folder_name,
                                   "surface*.dat"))
-    for iev in range(n_threads):
+    for iev in range(n_UrQMD):
         hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
         mkdir(hydro_surface_folder)
         call("ln -s {0:s} {1:s}".format(
@@ -58,12 +59,12 @@ def prepare_surface_files_for_UrQMD(final_results_folder, hydro_folder_name,
 def run_UrQMD_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
 
-def run_UrQMD_shell(n_threads, final_results_folder, event_id):
+def run_UrQMD_shell(n_UrQMD, final_results_folder, event_id):
     print("Running UrQMD ... ")
-    with Pool(processes=n_threads) as pool:
-        pool.map(run_UrQMD_event, range(n_threads))
+    with Pool(processes=n_UrQMD) as pool:
+        pool.map(run_UrQMD_event, range(n_UrQMD))
 
-    for iev in range(1, n_threads):
+    for iev in range(1, n_UrQMD):
         call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
              + "UrQMDev_0/UrQMD_results/particle_list.gz "
              + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
@@ -99,8 +100,8 @@ def run_spvn_analysis_shell(UrQMD_file_path, n_threads,
 
 
 def main(initial_condition_database, initial_condition_type,
-         n_hydro_events, hydro_event_id0, n_threads) :
-    print("Number of processors: ", cpu_count())
+         n_hydro_events, hydro_event_id0, n_UrQMD, n_threads):
+    print("Number of threads: {}".format(n_threads))
     
     for ifile in get_initial_condition(initial_condition_database,
                                        initial_condition_type,
@@ -120,10 +121,10 @@ def main(initial_condition_database, initial_condition_type,
         hydro_folder_name = run_hydro_event(final_results_folder, event_id)
 
         prepare_surface_files_for_UrQMD(final_results_folder,
-                                        hydro_folder_name, n_threads)
+                                        hydro_folder_name, n_UrQMD)
 
         # then run UrQMD events in parallel
-        UrQMD_file_path = run_UrQMD_shell(n_threads, final_results_folder,
+        UrQMD_file_path = run_UrQMD_shell(n_UrQMD, final_results_folder,
                                           event_id)
 
         # finally collect results
@@ -137,7 +138,8 @@ if __name__ == "__main__":
         initial_condition_type     = str(sys.argv[2])
         n_hydro_events             = int(sys.argv[3])
         hydro_event_id0            = int(sys.argv[4])
-        n_threads                  = int(sys.argv[5])
+        n_UrQMD                    = int(sys.argv[5])
+        n_threads                  = int(sys.argv[6])
     except IndexError:
         print_Usage()
         exit(0)
@@ -149,4 +151,4 @@ if __name__ == "__main__":
         exit(1)
 
     main(initial_condition_database, initial_condition_type,
-         n_hydro_events, hydro_event_id0, n_threads)
+         n_hydro_events, hydro_event_id0, n_UrQMD, n_threads)
