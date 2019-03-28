@@ -296,7 +296,7 @@ def generate_event_folders(initial_condition_database,
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) 
           + "initial_condition_filename initial_condition_type working_folder "
-          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro n_threads")
+          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro [n_threads]")
     print("initial_condition_type: IPGlasma, 3DMCGlauber")
     print("cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
@@ -309,10 +309,14 @@ def main():
         n_jobs                     = int(sys.argv[5])
         n_hydro_per_job            = int(sys.argv[6])
         n_UrQMD_per_hydro          = int(sys.argv[7])
-        n_threads                  = int(sys.argv[8])
     except IndexError:
         print_Usage()
         exit(0)
+
+    if len(sys.argv) > 8:
+        n_threads = int(sys.argv[8])
+    else:
+        n_threads = n_UrQMD_per_hydro
 
     if n_threads < n_UrQMD_per_hydro:
         print("Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
