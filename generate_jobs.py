@@ -48,7 +48,7 @@ def write_script_header(cluster, script, n_threads,
         script.write(
 """#!/usr/bin/env bash
 #PBS -N {0:s}
-#PBS -l select=1:ncpus={1:d}:mem=10GB
+#PBS -l select=1:ncpus={1:d}:mem=10GB:cpu_type=Intel
 #PBS -l walltime={2:s}
 #PBS -S /bin/bash
 #PBS -e test.err
