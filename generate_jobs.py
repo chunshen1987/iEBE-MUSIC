@@ -314,6 +314,10 @@ def main():
         print_Usage()
         exit(0)
 
+    if n_threads < n_UrQMD_per_hydro:
+        print("Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
+                                                n_threads, n_UrQMD_per_hydro))
+
     if (initial_condition_type != "IPGlasma"
         and initial_condition_type != "3DMCGlauber"):
         print("Do not recognize the initial condition type: {}".format(
