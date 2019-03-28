@@ -321,6 +321,8 @@ def main():
     if n_threads < n_UrQMD_per_hydro:
         print("Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
                                                 n_threads, n_UrQMD_per_hydro))
+        print("reset n_UrQMD to n_threads.")
+        n_UrQMD_per_hydro = n_threads
 
     if (initial_condition_type != "IPGlasma"
         and initial_condition_type != "3DMCGlauber"):
