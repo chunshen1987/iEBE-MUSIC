@@ -6,6 +6,8 @@ from os import path, mkdir
 from glob import glob
 import sys
 import shutil
+import h5py
+import numpy as np
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
 from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
 
@@ -98,6 +100,28 @@ def run_spvn_analysis_shell(UrQMD_file_path, n_threads,
                 path.join(final_results_folder,
                           "spvn_results_{0:s}".format(event_id)))
 
+def zip_results_into_hdf5(final_results_folder, event_id):
+    results_name = "spvn_results_{}".format(event_id)
+    hydro_info_filelist = ["eccentricities_evo_eta_-0.5_0.5.dat",
+                           "momentum_anisotropy_eta_-0.5_0.5.dat"]
+    hydrofolder = path.join(final_results_folder,
+                            "hydro_results_{}".format(event_id))
+    spvnfolder  = path.join(final_results_folder, results_name)
+
+    for ihydrofile in hydro_info_filelist:
+        shutil.move(path.join(hydrofolder, ihydrofile), spvnfolder)
+
+    hf = h5py.File("{0}.h5".format(results_name), "w")
+    gtemp = hf.create_group("{0}".format(results_name))
+    file_list = glob(path.join(spvnfolder, "*"))
+    for ifile, file_path in enumerate(file_list):
+        file_name = file_path.split("/")[-1]
+        dtemp = np.loadtxt(file_path)
+        gtemp.create_dataset("{0}".format(file_name), data=dtemp,
+                             compression="gzip", compression_opts=9)
+    hf.close()
+    shutil.move("{}.h5".format(results_name), final_results_folder)
+
 
 def main(initial_condition_database, initial_condition_type,
          n_hydro_events, hydro_event_id0, n_UrQMD, n_threads):
@@ -130,6 +154,9 @@ def main(initial_condition_database, initial_condition_type,
         # finally collect results
         run_spvn_analysis_shell(UrQMD_file_path, n_threads,
                                 final_results_folder, event_id)
+
+        # zip results into a hdf5 database
+        zip_results_into_hdf5(final_results_folder, event_id)
 
 
 if __name__ == "__main__":

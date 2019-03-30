@@ -341,9 +341,10 @@ def main():
                                n_hydro_per_job, n_UrQMD_per_hydro, n_threads)
     # copy script to collect final results
     pwd = path.abspath(".")
-    script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
+    script_path = "utilities"
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
     shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
     shutil.copy(path.join(script_path, 'average_event_spvn_h5.py'), pwd)
     
     if cluster_name == "nersc":
