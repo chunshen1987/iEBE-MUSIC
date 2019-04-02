@@ -19,6 +19,7 @@ def fecth_an_3DMCGlauber_event(database_path, event_idx):
     file_name   = "strings_event_{0:d}.dat".format(event_idx)
     temp_data   = hf.get(file_name)
     data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
+    temp_data   = np.array(temp_data).reshape(-1, 21)
     np.savetxt(file_name, temp_data, fmt='%.6e', header=data_header)
     return(file_name)
 

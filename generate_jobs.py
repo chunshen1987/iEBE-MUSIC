@@ -53,7 +53,7 @@ def write_script_header(cluster, script, n_threads,
 #PBS -S /bin/bash
 #PBS -e test.err
 #PBS -o test.log
-#PBS -q wsuq
+#PBS -q mwsuq
 
 cd {3:s}
 """.format(event_id, n_threads, walltime, working_folder))
