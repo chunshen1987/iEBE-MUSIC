@@ -102,23 +102,20 @@ def run_spvn_analysis_shell(UrQMD_file_path, n_threads,
 
 def zip_results_into_hdf5(final_results_folder, event_id):
     results_name = "spvn_results_{}".format(event_id)
-    hydro_info_filelist = ["eccentricities_evo_eta_-0.5_0.5.dat",
-                           "momentum_anisotropy_eta_-0.5_0.5.dat"]
+    hydro_info_filepattern = ["eccentricities_evo_eta_*.dat",
+                              "momentum_anisotropy_eta_*.dat",
+                              "inverse_Reynolds_number_eta_*.dat",
+                              "averaged_phase_diagram_trajectory_eta_*.dat"]
+
     hydrofolder = path.join(final_results_folder,
                             "hydro_results_{}".format(event_id))
     spvnfolder  = path.join(final_results_folder, results_name)
 
-    for ihydrofile in hydro_info_filelist:
-        filepath = path.join(hydrofolder, ihydrofile)
-        if path.isfile(filepath):
-            shutil.move(filepath, spvnfolder)
-
-    hydro_info_list2 = glob(path.join(hydrofolder,
-                            "averaged_phase_diagram_trajectory_eta_*.dat"))
-    for ihydrofile in hydro_info_list2:
-        if path.isfile(ihydrofile):
-            shutil.move(ihydrofile, spvnfolder)
-
+    for ipattern in hydro_info_filepattern:
+        hydro_info_list = glob(path.join(hydrofolder, ipattern))
+        for ihydrofile in hydro_info_list:
+            if path.isfile(ihydrofile):
+                shutil.move(ihydrofile, spvnfolder)
 
     hf = h5py.File("{0}.h5".format(results_name), "w")
     gtemp = hf.create_group("{0}".format(results_name))
