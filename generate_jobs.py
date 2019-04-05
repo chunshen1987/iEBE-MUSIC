@@ -351,9 +351,9 @@ def main():
     if cluster_name == "nersc":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
-        n_nodes = int(n_jobs*n_UrQMD_per_hydro/64)
+        n_nodes = int(n_jobs*n_threads/64)
         generate_nersc_MPI_job_script(working_folder_name,
-                                      n_nodes, n_UrQMD_per_hydro)
+                                      n_nodes, n_threads)
 
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
