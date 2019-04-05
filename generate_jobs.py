@@ -10,6 +10,7 @@ import random
 
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
+    mem = 4*n_threads
     if cluster == "nersc":
         script.write(
 """#!/bin/bash -l
@@ -48,15 +49,15 @@ def write_script_header(cluster, script, n_threads,
         script.write(
 """#!/usr/bin/env bash
 #PBS -N {0:s}
-#PBS -l select=1:ncpus={1:d}:mem=10GB:cpu_type=Intel
-#PBS -l walltime={2:s}
+#PBS -l select=1:ncpus={1:d}:mem={2:.0f}GB:cpu_type=Intel
+#PBS -l walltime={3:s}
 #PBS -S /bin/bash
 #PBS -e test.err
 #PBS -o test.log
 #PBS -q mwsuq
 
-cd {3:s}
-""".format(event_id, n_threads, walltime, working_folder))
+cd {4:s}
+""".format(event_id, n_threads, mem, walltime, working_folder))
     elif cluster == "local" or cluster == "nerscKNL":
         script.write("#!/usr/bin/env bash")
     else:
