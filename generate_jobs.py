@@ -83,6 +83,8 @@ def generate_nersc_MPI_job_script(folder_name, n_nodes, n_threads):
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
 #SBATCH -C haswell
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=chunshen1987@gmail.com
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
