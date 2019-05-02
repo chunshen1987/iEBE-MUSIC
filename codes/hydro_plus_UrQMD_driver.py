@@ -38,11 +38,19 @@ def run_hydro_event(final_results_folder, event_id):
     print("Playing MUSIC ... ")
     call("bash ./run_hydro.sh", shell=True)
 
-    # collect hydro results
-    hydro_folder_name = "hydro_results_{}".format(event_id)
-    shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
-                                                 hydro_folder_name))
-    return(hydro_folder_name)
+    # check hydro finishes properly
+    ftmp = open("MUSIC/hydro_results/run.log", 'r')
+    hydro_status = ftmp.readlines()[-1].split()[3]
+    hydro_success = False
+    if hydro_status == "Finished.":
+        hydro_success = True
+
+    if hydro_success:
+        # collect hydro results
+        hydro_folder_name = "hydro_results_{}".format(event_id)
+        shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
+                                                     hydro_folder_name))
+    return(hydro_success, hydro_folder_name)
 
 
 def prepare_surface_files_for_UrQMD(final_results_folder, hydro_folder_name,
@@ -148,8 +156,16 @@ def main(initial_condition_database, initial_condition_type,
         mkdir(final_results_folder)
         
         # first run hydro
-        hydro_folder_name = run_hydro_event(final_results_folder, event_id)
+        hydro_success, hydro_folder_name = run_hydro_event(
+                                        final_results_folder, event_id)
+        
+        if !hydro_success:
+            # if hydro didn't finish properly, just skip this event
+            print("{} did not finsh properly, skipped.".format(
+                                        hydro_folder_name))
+            continue
 
+        # if hydro finishes properly, we continue to do hadronic transport
         prepare_surface_files_for_UrQMD(final_results_folder,
                                         hydro_folder_name, n_UrQMD)
 
