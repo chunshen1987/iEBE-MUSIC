@@ -112,7 +112,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write(
 """
 ./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} > run.log
-""".format(database, initial_type, n_hydro, ev0_id, n_UrQMD, n_threads))
+""".format(initial_type, database, n_hydro, ev0_id, n_UrQMD, n_threads))
     script.close()
 
 
@@ -246,6 +246,14 @@ def generate_event_folders(initial_condition_database,
     shutil.copy(path.join('3DMCGlauber_database',
                           'fetch_3DMCGlauber_event_from_hdf5_database.py'),
                 event_folder)
+    if initial_condition_database == "self":
+        shutil.copytree('codes/3dMCGlauber',
+                        path.join(event_folder, '3dMCGlauber'), symlinks=True)
+        subprocess.call("ln -s {0:s} {1:s}".format(
+                        path.abspath('codes/3dMCGlauber_code/3dMCGlb.e'),
+                        path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
+                        shell=True)
+
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
@@ -298,15 +306,15 @@ def generate_event_folders(initial_condition_database,
 
 def print_Usage():
     print("Usage: {} ".format(sys.argv[0]) 
-          + "initial_condition_filename initial_condition_type working_folder "
+          + "initial_condition_type initial_condition_filename working_folder "
           + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro [n_threads]")
     print("initial_condition_type: IPGlasma, 3DMCGlauber")
     print("cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
 def main():
     try:
-        initial_condition_database = str(sys.argv[1])
-        initial_condition_type     = str(sys.argv[2])
+        initial_condition_type     = str(sys.argv[1])
+        initial_condition_database = str(sys.argv[2])
         working_folder_name        = str(sys.argv[3])
         cluster_name               = str(sys.argv[4])
         n_jobs                     = int(sys.argv[5])
@@ -333,8 +341,13 @@ def main():
                                                     initial_condition_type))
         exit(1)
 
-    initial_condition_database = path.abspath(initial_condition_database)
-    working_folder_name        = path.abspath(working_folder_name)
+    if initial_condition_database == "self":
+        print("Generate initial condition on the fly ... ")
+    else:
+        initial_condition_database = path.abspath(initial_condition_database)
+        print("Pre-generated initial conditions from {} ...".format(
+                                                initial_condition_database))
+    working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_jobs):
         print("generating job {}/{} ... ".format(iev + 1, n_jobs))

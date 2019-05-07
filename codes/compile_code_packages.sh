@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# compile 3dMCGlauber
+echo "compile 3dMCGlauber ... "
+(
+    cd 3dMCGlauber_code
+    ./get_LHAPDF.sh
+    mkdir -p build
+    cd build
+    cmake ..
+    make -j 4
+    make install
+)
+mkdir -p 3dMCGlauber
+cp 3dMCGlauber_code/input 3dMCGlauber/
+
 # compile MUSIC
 echo "compile MUSIC ... "
 (

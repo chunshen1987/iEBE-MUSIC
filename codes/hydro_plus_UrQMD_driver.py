@@ -26,7 +26,13 @@ def get_initial_condition(database, initial_type, nev, idx0):
             yield(file_name)
     elif initial_type == "3DMCGlauber":
         for iev in range(idx0, idx0 + nev):
-            file_name = fecth_an_3DMCGlauber_event(database, iev)
+            file_name = "strings_event_{}.dat".format(iev)
+            if database == "self":
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1;)", shell=True)
+                call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
+                     shell=True)
+            else:
+                file_name = fecth_an_3DMCGlauber_event(database, iev)
             yield(file_name)
     else:
         print("Do not recognize the initial condition type: {}".format(
@@ -45,6 +51,7 @@ def run_hydro_event(final_results_folder, event_id):
     if hydro_status == "Finished.":
         hydro_success = True
 
+    hydro_folder_name = ""
     if hydro_success:
         # collect hydro results
         hydro_folder_name = "hydro_results_{}".format(event_id)
@@ -159,7 +166,7 @@ def main(initial_condition_database, initial_condition_type,
         hydro_success, hydro_folder_name = run_hydro_event(
                                         final_results_folder, event_id)
         
-        if !hydro_success:
+        if not hydro_success:
             # if hydro didn't finish properly, just skip this event
             print("{} did not finsh properly, skipped.".format(
                                         hydro_folder_name))
@@ -183,8 +190,8 @@ def main(initial_condition_database, initial_condition_type,
 
 if __name__ == "__main__":
     try:
-        initial_condition_database = str(sys.argv[1])
-        initial_condition_type     = str(sys.argv[2])
+        initial_condition_type     = str(sys.argv[1])
+        initial_condition_database = str(sys.argv[2])
         n_hydro_events             = int(sys.argv[3])
         hydro_event_id0            = int(sys.argv[4])
         n_UrQMD                    = int(sys.argv[5])

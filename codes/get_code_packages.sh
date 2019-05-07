@@ -2,6 +2,8 @@
 
 # download the code package
 
+# download 3DMCGlauber
+git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
 # download MUSIC
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC MUSIC_code
 
