@@ -61,7 +61,7 @@ cd {4:s}
     elif cluster == "local" or cluster == "nerscKNL":
         script.write("#!/usr/bin/env bash")
     else:
-        print("Error: unrecoginzed cluster name :", cluster)
+        print("\U0001F6AB  unrecoginzed cluster name :", cluster)
         print("Available options: nersc, nerscKNL, wsugrid, local, guillimin, "
               + "McGill")
         exit(1)
@@ -305,11 +305,11 @@ def generate_event_folders(initial_condition_database,
 
 
 def print_Usage():
-    print("Usage: {} ".format(sys.argv[0]) 
+    print("\U0000269B  Usage: {} ".format(sys.argv[0]) 
           + "initial_condition_type initial_condition_filename working_folder "
           + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro [n_threads]")
-    print("initial_condition_type: IPGlasma, 3DMCGlauber")
-    print("cluster_name: nersc, wsugrid, local, guillimin, McGill")
+    print("\U0000269B  initial_condition_type: IPGlasma, 3DMCGlauber")
+    print("\U0000269B  cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
 def main():
     try:
@@ -330,27 +330,30 @@ def main():
         n_threads = n_UrQMD_per_hydro
 
     if n_threads < n_UrQMD_per_hydro:
-        print("Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
+        print("\U000026A0  "
+              + "Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
                                                 n_threads, n_UrQMD_per_hydro))
         print("reset n_UrQMD to n_threads.")
         n_UrQMD_per_hydro = n_threads
 
     if (initial_condition_type != "IPGlasma"
         and initial_condition_type != "3DMCGlauber"):
-        print("Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                                                     initial_condition_type))
         exit(1)
 
     if initial_condition_database == "self":
-        print("Generate initial condition on the fly ... ")
+        print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
-        print("Pre-generated initial conditions from {} ...".format(
+        print("\U0001F375  "
+              + "Pre-generated initial conditions from {} ...".format(
                                                 initial_condition_database))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_jobs):
-        print("generating job {}/{} ... ".format(iev + 1, n_jobs))
+        print("\U0001F375  generating job {}/{} ... ".format(iev + 1, n_jobs))
         generate_event_folders(initial_condition_database,
                                initial_condition_type,working_folder_name,
                                cluster_name, iev,
