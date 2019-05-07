@@ -13,7 +13,8 @@ from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_even
 
 
 def print_Usage():
-    print("Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
+    print("\U0001F3B6  "
+          + "Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
           + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
           + "n_threads")
 
@@ -35,13 +36,14 @@ def get_initial_condition(database, initial_type, nev, idx0):
                 file_name = fecth_an_3DMCGlauber_event(database, iev)
             yield(file_name)
     else:
-        print("Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                                                             initial_type))
         exit(1)
     
 
 def run_hydro_event(final_results_folder, event_id):
-    print("Playing MUSIC ... ")
+    print("\U0001F3B6  Playing MUSIC ... ")
     call("bash ./run_hydro.sh", shell=True)
 
     # check hydro finishes properly
@@ -77,7 +79,7 @@ def run_UrQMD_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
 
 def run_UrQMD_shell(n_UrQMD, final_results_folder, event_id):
-    print("Running UrQMD ... ")
+    print("\U0001F5FF  Running UrQMD ... ")
     with Pool(processes=n_UrQMD) as pool:
         pool.map(run_UrQMD_event, range(n_UrQMD))
 
@@ -106,7 +108,7 @@ def run_spvn_analysis_shell(UrQMD_file_path, n_threads,
     particle_list = [
             '9999', '211', '-211', '321', '-321', '2212', '-2212',
             '3122', '-3122', '3312', '-3312', '3334', '-3334', '333']
-    print("Running spvn analysis ... ")
+    print("\U0001F3CD Running spvn analysis ... ")
     with Pool(processes=n_threads) as pool:
         pool.map(run_spvn_analysis, particle_list)
     
@@ -146,12 +148,12 @@ def zip_results_into_hdf5(final_results_folder, event_id):
 
 def main(initial_condition_database, initial_condition_type,
          n_hydro_events, hydro_event_id0, n_UrQMD, n_threads):
-    print("Number of threads: {}".format(n_threads))
+    print("\U0001F3CE  Number of threads: {}".format(n_threads))
     
     for ifile in get_initial_condition(initial_condition_database,
                                        initial_condition_type,
                                        n_hydro_events, hydro_event_id0):
-        print("Run simulations with {} ... ".format(ifile))
+        print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_condition_type == "IPGlasma":
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
@@ -168,7 +170,7 @@ def main(initial_condition_database, initial_condition_type,
         
         if not hydro_success:
             # if hydro didn't finish properly, just skip this event
-            print("{} did not finsh properly, skipped.".format(
+            print("\U000026D4  {} did not finsh properly, skipped.".format(
                                         hydro_folder_name))
             continue
 
@@ -202,7 +204,8 @@ if __name__ == "__main__":
 
     if (initial_condition_type != "IPGlasma"
         and initial_condition_type != "3DMCGlauber"):
-        print("Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                                                     initial_condition_type))
         exit(1)
 
