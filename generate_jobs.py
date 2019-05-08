@@ -1,19 +1,19 @@
 #!/usr/bin/env python
+"""This script generate all the running jobs."""
 
 import sys
 from os import path, mkdir
 import shutil
-from glob import glob
 import subprocess
-import random
 
 
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
+    """This function write the header of the job submission script"""
     mem = 4*n_threads
     if cluster == "nersc":
         script.write(
-"""#!/bin/bash -l
+            """#!/bin/bash -l
 #SBATCH -p shared
 #SBATCH -n 1
 #SBATCH -J {0:s}
@@ -23,7 +23,7 @@ def write_script_header(cluster, script, n_threads,
 """.format(event_id, walltime))
     elif cluster == "guillimin":
         script.write(
-"""#!/usr/bin/env bash
+            """#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}
 #PBS -l walltime={2:s}
@@ -36,7 +36,7 @@ def write_script_header(cluster, script, n_threads,
 """.format(event_id, n_threads, walltime, working_folder))
     elif cluster == "McGill":
         script.write(
-"""#!/usr/bin/env bash
+            """#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}:irulan
 #PBS -l walltime={2:s}
@@ -47,7 +47,7 @@ def write_script_header(cluster, script, n_threads,
 """.format(event_id, n_threads, walltime, working_folder))
     elif cluster == "wsugrid":
         script.write(
-"""#!/usr/bin/env bash
+            """#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l select=1:ncpus={1:d}:mem={2:.0f}GB:cpu_type=Intel
 #PBS -l walltime={3:s}
@@ -58,7 +58,7 @@ def write_script_header(cluster, script, n_threads,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster == "local" or cluster == "nerscKNL":
+    elif cluster in ("local", "nerscKNL"):
         script.write("#!/usr/bin/env bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -67,7 +67,8 @@ cd {4:s}
         exit(1)
 
 
-def generate_nersc_MPI_job_script(folder_name, n_nodes, n_threads):
+def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads):
+    """This function generates job script for NERSC"""
     working_folder = folder_name
     walltime = '10:00:00'
 
@@ -75,7 +76,7 @@ def generate_nersc_MPI_job_script(folder_name, n_nodes, n_threads):
 
     script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
     script.write(
-"""#!/bin/bash -l
+        """#!/bin/bash -l
 #SBATCH --qos=regular
 #SBATCH -N {0:d}
 #SBATCH -A m1820
@@ -101,7 +102,8 @@ wait
     script.close()
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_UrQMD, n_threads):
+                             n_hydro, ev0_id, n_urqmd, n_threads):
+    """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '50:00:00'
@@ -110,20 +112,21 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write(
-"""
+        """
 ./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} > run.log
-""".format(initial_type, database, n_hydro, ev0_id, n_UrQMD, n_threads))
+""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads))
     script.close()
 
 
 def generate_script_hydro(folder_name, nthreads):
+    """This function generates script for hydro simulation"""
     working_folder = folder_name
 
     script = open(path.join(working_folder, "run_hydro.sh"), "w")
 
     hydro_results_folder = 'hydro_results'
     script.write(
-"""#!/usr/bin/env bash
+        """#!/usr/bin/env bash
 
 results_folder={0:s}
 
@@ -134,15 +137,15 @@ cd MUSIC
 
     if nthreads > 0:
         script.write(
-"""
+            """
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
     script.write(
-"""
+        """
 
 # hydro evolution
-./mpihydro music_input_mode_2 1> run.log 2> run.err 
+./mpihydro music_input_mode_2 1> run.log 2> run.err
 ./sweeper.sh $results_folder
 )
 """)
@@ -150,11 +153,12 @@ export OMP_NUM_THREADS={0:d}
 
 
 def generate_script_afterburner(folder_name):
+    """This function generates script for hadronic afterburner"""
     working_folder = folder_name
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
     script.write(
-"""#!/usr/bin/env bash
+        """#!/usr/bin/env bash
 
 unalias ls
 
@@ -197,11 +201,12 @@ rm -fr hydro_event
 
 
 def generate_script_analyze_spvn(folder_name):
+    """This function generates script for analysis"""
     working_folder = folder_name
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
     script.write(
-"""#!/usr/bin/env bash
+        """#!/usr/bin/env bash
 
 pid=$1
 
@@ -227,16 +232,11 @@ pid=$1
     script.close()
 
 
-def copy_IPGlasma_initial_condition(database, event_id, folder):
-    time_stamp_str = "0.4"
-    file_name = fecth_an_IPGlasma_event(database, time_stamp_str, event_id)
-    shutil.move(file_name, folder)
-
-        
 def generate_event_folders(initial_condition_database,
                            initial_condition_type, working_folder,
                            cluster_name, event_id,
-                           n_hydro_per_job, n_UrQMD_per_hydro, n_threads):
+                           n_hydro_per_job, n_urqmd_per_hydro, n_threads):
+    """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
     shutil.copy('codes/hydro_plus_UrQMD_driver.py', event_folder)
@@ -257,7 +257,7 @@ def generate_event_folders(initial_condition_database,
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
-                             event_id*n_hydro_per_job, n_UrQMD_per_hydro,
+                             event_id*n_hydro_per_job, n_urqmd_per_hydro,
                              n_threads)
     if cluster_name == "nerscKNL":
         generate_script_hydro(event_folder, -1)
@@ -267,80 +267,81 @@ def generate_event_folders(initial_condition_database,
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-         path.abspath('codes/MUSIC_code/EOS'),
-         path.join(event_folder, "MUSIC/EOS")), shell=True)
+        path.abspath('codes/MUSIC_code/EOS'),
+        path.join(event_folder, "MUSIC/EOS")), shell=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-         path.abspath('codes/MUSIC_code/mpihydro'),
-         path.join(event_folder, "MUSIC/mpihydro")), shell=True)
+        path.abspath('codes/MUSIC_code/mpihydro'),
+        path.join(event_folder, "MUSIC/mpihydro")), shell=True)
     generate_script_afterburner(event_folder)
     generate_script_analyze_spvn(event_folder)
-    for iev in range(n_UrQMD_per_hydro):
+    for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
-        shutil.copytree('codes/iSS',   path.join(sub_event_folder, 'iSS'  ))
+        shutil.copytree('codes/iSS', path.join(sub_event_folder, 'iSS'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-             path.abspath('codes/iSS_code/iSS_tables'),
-             path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
+            path.abspath('codes/iSS_code/iSS_tables'),
+            path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
         subprocess.call("ln -s {0:s} {1:s}".format(
-             path.abspath('codes/iSS_code/iSS.e'),
-             path.join(sub_event_folder, "iSS/iSS.e")), shell=True)
+            path.abspath('codes/iSS_code/iSS.e'),
+            path.join(sub_event_folder, "iSS/iSS.e")), shell=True)
         shutil.copytree('codes/osc2u', path.join(sub_event_folder, 'osc2u'))
         shutil.copytree('codes/urqmd', path.join(sub_event_folder, 'urqmd'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-             path.abspath('codes/urqmd_code/urqmd/urqmd.e'),
-             path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
-    shutil.copytree('codes/hadronic_afterburner_toolkit', 
+            path.abspath('codes/urqmd_code/urqmd/urqmd.e'),
+            path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
+    shutil.copytree('codes/hadronic_afterburner_toolkit',
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
     subprocess.call("ln -s {0:s} {1:s}".format(
-         path.abspath(path.join('codes', 'hadronic_afterburner_toolkit_code',
-                                'hadronic_afterburner_tools.e')),
-         path.join(event_folder, "hadronic_afterburner_toolkit",
-                   "hadronic_afterburner_tools.e")), shell=True)
+        path.abspath(path.join('codes', 'hadronic_afterburner_toolkit_code',
+                               'hadronic_afterburner_tools.e')),
+        path.join(event_folder, "hadronic_afterburner_toolkit",
+                  "hadronic_afterburner_tools.e")), shell=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-         path.abspath('codes/hadronic_afterburner_toolkit_code/EOS'),
-         path.join(event_folder, "hadronic_afterburner_toolkit/EOS")),
-         shell=True)
+        path.abspath('codes/hadronic_afterburner_toolkit_code/EOS'),
+        path.join(event_folder, "hadronic_afterburner_toolkit/EOS")),
+                    shell=True)
 
 
-def print_Usage():
-    print("\U0000269B  Usage: {} ".format(sys.argv[0]) 
+def print_usage():
+    """This function prints out help message"""
+    print("\U0000269B  Usage: {} ".format(sys.argv[0])
           + "initial_condition_type initial_condition_filename working_folder "
-          + "cluster_name n_jobs n_hydro_per_job n_UrQMD_per_hydro [n_threads]")
+          + "cluster_name n_jobs n_hydro_per_job n_urqmd_per_hydro [n_threads]")
     print("\U0000269B  initial_condition_type: IPGlasma, 3DMCGlauber")
     print("\U0000269B  cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
 def main():
+    """This is the main funciton"""
     try:
-        initial_condition_type     = str(sys.argv[1])
+        initial_condition_type = str(sys.argv[1])
         initial_condition_database = str(sys.argv[2])
-        working_folder_name        = str(sys.argv[3])
-        cluster_name               = str(sys.argv[4])
-        n_jobs                     = int(sys.argv[5])
-        n_hydro_per_job            = int(sys.argv[6])
-        n_UrQMD_per_hydro          = int(sys.argv[7])
+        working_folder_name = str(sys.argv[3])
+        cluster_name = str(sys.argv[4])
+        n_jobs = int(sys.argv[5])
+        n_hydro_per_job = int(sys.argv[6])
+        n_urqmd_per_hydro = int(sys.argv[7])
     except IndexError:
-        print_Usage()
+        print_usage()
         exit(0)
 
     if len(sys.argv) > 8:
         n_threads = int(sys.argv[8])
     else:
-        n_threads = n_UrQMD_per_hydro
+        n_threads = n_urqmd_per_hydro
 
-    if n_threads < n_UrQMD_per_hydro:
+    if n_threads < n_urqmd_per_hydro:
         print("\U000026A0  "
-              + "Warning: n_threads = {} < n_UrQMD_per_hydro = {}!".format(
-                                                n_threads, n_UrQMD_per_hydro))
+              + "Warning: n_threads = {} < n_urqmd_per_hydro = {}!".format(
+                  n_threads, n_urqmd_per_hydro))
         print("reset n_UrQMD to n_threads.")
-        n_UrQMD_per_hydro = n_threads
+        n_urqmd_per_hydro = n_threads
 
-    if (initial_condition_type != "IPGlasma"
-        and initial_condition_type != "3DMCGlauber"):
+    if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
-                                                    initial_condition_type))
+                  initial_condition_type))
         exit(1)
 
     if initial_condition_database == "self":
@@ -349,15 +350,15 @@ def main():
         initial_condition_database = path.abspath(initial_condition_database)
         print("\U0001F375  "
               + "Pre-generated initial conditions from {} ...".format(
-                                                initial_condition_database))
+                  initial_condition_database))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     for iev in range(n_jobs):
         print("\U0001F375  generating job {}/{} ... ".format(iev + 1, n_jobs))
         generate_event_folders(initial_condition_database,
-                               initial_condition_type,working_folder_name,
+                               initial_condition_type, working_folder_name,
                                cluster_name, iev,
-                               n_hydro_per_job, n_UrQMD_per_hydro, n_threads)
+                               n_hydro_per_job, n_urqmd_per_hydro, n_threads)
     # copy script to collect final results
     pwd = path.abspath(".")
     script_path = "utilities"
@@ -365,12 +366,12 @@ def main():
     shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
     script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
     shutil.copy(path.join(script_path, 'average_event_spvn_h5.py'), pwd)
-    
+
     if cluster_name == "nersc":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
         n_nodes = int(n_jobs*n_threads/64)
-        generate_nersc_MPI_job_script(working_folder_name,
+        generate_nersc_mpi_job_script(working_folder_name,
                                       n_nodes, n_threads)
 
     if cluster_name == "nerscKNL":
@@ -378,11 +379,9 @@ def main():
                     working_folder_name)
         shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs_KNL.pbs',
                     working_folder_name)
-    
+
     if cluster_name == "wsugrid":
         shutil.copy('Cluster_supports/WSUgrid/submit_all_jobs.sh', pwd)
-                    
+
 if __name__ == "__main__":
     main()
-
-    
