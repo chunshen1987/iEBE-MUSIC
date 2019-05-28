@@ -353,12 +353,24 @@ def main():
                   initial_condition_database))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
+
+    toolbar_width = 40
+    sys.stdout.write("\U0001F375 generating {} events [{}]".format(
+        n_jobs, " " * toolbar_width))
+    sys.stdout.flush()
+    sys.stdout.write("\b" * (toolbar_width+1))
     for iev in range(n_jobs):
-        print("\U0001F375  generating job {}/{} ... ".format(iev + 1, n_jobs))
+        progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
+                      - int(float(iev)/n_jobs*toolbar_width))
+        for ii in range(progress_i):
+            sys.stdout.write("#")
+            sys.stdout.flush()
         generate_event_folders(initial_condition_database,
                                initial_condition_type, working_folder_name,
                                cluster_name, iev,
                                n_hydro_per_job, n_urqmd_per_hydro, n_threads)
+    sys.stdout.write("\n")
+    sys.stdout.flush()
     # copy script to collect final results
     pwd = path.abspath(".")
     script_path = "utilities"
