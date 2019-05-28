@@ -355,7 +355,7 @@ def main():
     mkdir(working_folder_name)
 
     toolbar_width = 40
-    sys.stdout.write("\U0001F375 generating {} events [{}]".format(
+    sys.stdout.write("\U0001F375  Generating {} jobs [{}]".format(
         n_jobs, " " * toolbar_width))
     sys.stdout.flush()
     sys.stdout.write("\b" * (toolbar_width+1))
