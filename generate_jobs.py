@@ -54,7 +54,7 @@ def write_script_header(cluster, script, n_threads,
 #PBS -S /bin/bash
 #PBS -e test.err
 #PBS -o test.log
-#PBS -q mwsuq
+#PBS -q wsuq
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
@@ -106,7 +106,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
-    walltime = '50:00:00'
+    walltime = '100:00:00'
 
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
@@ -252,6 +252,10 @@ def generate_event_folders(initial_condition_database,
         subprocess.call("ln -s {0:s} {1:s}".format(
                         path.abspath('codes/3dMCGlauber_code/3dMCGlb.e'),
                         path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
+                        shell=True)
+        subprocess.call("ln -s {0:s} {1:s}".format(
+                        path.abspath('codes/3dMCGlauber_code/eps09'),
+                        path.join(event_folder, "3dMCGlauber/eps09")),
                         shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
