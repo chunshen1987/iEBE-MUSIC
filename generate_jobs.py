@@ -145,7 +145,7 @@ export OMP_NUM_THREADS={0:d}
         """
 
 # hydro evolution
-./mpihydro music_input_mode_2 1> run.log 2> run.err
+./MUSIChydro music_input_mode_2 1> run.log 2> run.err
 ./sweeper.sh $results_folder
 )
 """)
@@ -274,8 +274,8 @@ def generate_event_folders(initial_condition_database,
         path.abspath('codes/MUSIC_code/EOS'),
         path.join(event_folder, "MUSIC/EOS")), shell=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-        path.abspath('codes/MUSIC_code/mpihydro'),
-        path.join(event_folder, "MUSIC/mpihydro")), shell=True)
+        path.abspath('codes/MUSIC_code/MUSIChydro'),
+        path.join(event_folder, "MUSIC/MUSIChydro")), shell=True)
     generate_script_afterburner(event_folder)
     generate_script_analyze_spvn(event_folder)
     for iev in range(n_urqmd_per_hydro):
