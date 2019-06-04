@@ -132,7 +132,8 @@ def zip_results_into_hdf5(final_results_folder, event_id):
     hydro_info_filepattern = ["eccentricities_evo_eta_*.dat",
                               "momentum_anisotropy_eta_*.dat",
                               "inverse_Reynolds_number_eta_*.dat",
-                              "averaged_phase_diagram_trajectory_eta_*.dat"]
+                              "averaged_phase_diagram_trajectory_eta_*.dat",
+                              "strings_*.dat"]
 
     hydrofolder = path.join(final_results_folder,
                             "hydro_results_{}".format(event_id))
@@ -150,8 +151,12 @@ def zip_results_into_hdf5(final_results_folder, event_id):
     for file_path in file_list:
         file_name = file_path.split("/")[-1]
         dtemp = np.loadtxt(file_path)
-        gtemp.create_dataset("{0}".format(file_name), data=dtemp,
+        h5data = gtemp.create_dataset("{0}".format(file_name), data=dtemp,
                              compression="gzip", compression_opts=9)
+        ftemp = open(file_path, "r")
+        header_text = str(ftemp.readline())
+        ftemp.close()
+        h5data.attrs.create("header", np.string_(header_text))
     hf.close()
     shutil.move("{}.h5".format(results_name), final_results_folder)
 
@@ -184,6 +189,12 @@ def main(initial_condition, initial_type,
             print("\U000026D4  {} did not finsh properly, skipped.".format(
                 hydro_folder_name))
             continue
+
+        if initial_type == "3DMCGlauber" and initial_condition == "self":
+            # save the initial condition
+            shutil.move("MUSIC/initial/strings.dat",
+                        path.join(final_results_folder, hydro_folder_name,
+                                  "strings_{}.dat".format(event_id)))
 
         # if hydro finishes properly, we continue to do hadronic transport
         prepare_surface_files_for_urqmd(final_results_folder,
