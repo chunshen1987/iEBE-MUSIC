@@ -22,6 +22,8 @@ if RESULTS_NAME == "":
 RESULTS_PATH = path.abspath(path.join(".", RESULTS_FOLDER))
 EVENT_LIST = glob(path.join(RESULTS_PATH, "*.h5"))
 
+exist_group_keys = []
+
 for ievent, event_path in enumerate(EVENT_LIST):
     print("processing {0} ... ".format(event_path))
     event_name = event_path.split("/")[-1]
@@ -29,5 +31,11 @@ for ievent, event_path in enumerate(EVENT_LIST):
     glist = list(hftemp.keys())
     hftemp.close()
     for igroup, gtemp in enumerate(glist):
-        system('h5copy -i {0} -o {1}.h5 -s {2} -d {2}'.format(
-            event_path, RESULTS_NAME, gtemp))
+        gtemp2 = gtemp
+        if gtemp2 in exist_group_keys:
+            gtemp2 = "{}a".format(gtemp)
+            print("Conflict in mergeing {0}, use {1}".format(gtemp, gtemp2))
+        exist_group_keys.append(gtemp2)
+        system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
+            event_path, RESULTS_NAME, gtemp, gtemp2))
+
