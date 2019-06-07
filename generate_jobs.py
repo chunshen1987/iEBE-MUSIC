@@ -21,6 +21,16 @@ def write_script_header(cluster, script, n_threads,
 #SBATCH -L SCRATCH
 #SBATCH -C haswell
 """.format(event_id, walltime))
+    elif cluster == "nerscKNL":
+        script.write(
+            """#!/bin/bash -l
+#SBATCH -p shared
+#SBATCH -n 1
+#SBATCH -J {0:s}
+#SBATCH -t {1:s}
+#SBATCH -L SCRATCH
+#SBATCH -C knl,quad,cache
+""".format(event_id, walltime))
     elif cluster == "guillimin":
         script.write(
             """#!/usr/bin/env bash
@@ -58,7 +68,7 @@ def write_script_header(cluster, script, n_threads,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in ("local", "nerscKNL"):
+    elif cluster in "local":
         script.write("#!/usr/bin/env bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -67,12 +77,11 @@ cd {4:s}
         exit(1)
 
 
-def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads):
+def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
+                                  n_jobs_per_node):
     """This function generates job script for NERSC"""
     working_folder = folder_name
     walltime = '10:00:00'
-
-    n_jobs_per_node = int(64/n_threads)
 
     script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
     script.write(
@@ -100,6 +109,41 @@ done
 wait
 """.format(n_nodes, walltime, n_threads, n_jobs_per_node))
     script.close()
+
+
+def generate_nerscKNL_mpi_job_script(folder_name, n_nodes, n_threads,
+                                     n_jobs_per_node):
+    """This function generates job script for NERSC KNL"""
+    working_folder = folder_name
+    walltime = '10:00:00'
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
+    script.write(
+        """#!/bin/bash -l
+#SBATCH --qos=regular
+#SBATCH -N {0:d}
+#SBATCH -A m1820
+#SBATCH -J music
+#SBATCH -t {1:s}
+#SBATCH -L SCRATCH
+#SBATCH -C knl,quad,cache
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=chunshen1987@gmail.com
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=cores
+
+num_of_nodes={0:d}
+# run all the job
+for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
+do
+    export OMP_NUM_THREADS={2:d}
+    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
+done
+wait
+""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
+    script.close()
+
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                              n_hydro, ev0_id, n_urqmd, n_threads):
@@ -262,10 +306,8 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id*n_hydro_per_job, n_urqmd_per_hydro,
                              n_threads)
-    if cluster_name == "nerscKNL":
-        generate_script_hydro(event_folder, -1)
-    else:
-        generate_script_hydro(event_folder, n_threads)
+
+    generate_script_hydro(event_folder, n_threads)
 
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
@@ -387,13 +429,14 @@ def main():
                     working_folder_name)
         n_nodes = int(n_jobs*n_threads/64)
         generate_nersc_mpi_job_script(working_folder_name,
-                                      n_nodes, n_threads)
+                                      n_nodes, n_threads, n_jobs)
 
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
-        shutil.copy('Cluster_supports/NERSC/submit_MPI_jobs_KNL.pbs',
-                    working_folder_name)
+        n_nodes = int(n_jobs*n_threads/68)
+        generate_nerscKNL_mpi_job_script(working_folder_name,
+                                         n_nodes, n_threads, n_jobs)
 
     if cluster_name == "wsugrid":
         shutil.copy('Cluster_supports/WSUgrid/submit_all_jobs.sh', pwd)
