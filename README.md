@@ -39,7 +39,14 @@ initial\_condition\_type:
 2. If initial\_condition\_filename == database_file, the code package will use the pre-generated initial coniditions stored in the database (HDF5).
 
 
+## Settings on NERSC:
 
+The clusters on NERSC does not use utf-8 as default. To run the script properly, one needs to add the following commands in the ~/.bashrc.ext file,
+
+```
+export PYTHONIOENCODING=utf-8
+export LC_CTYPE=en_US.UTF8
+```
 
 
 
