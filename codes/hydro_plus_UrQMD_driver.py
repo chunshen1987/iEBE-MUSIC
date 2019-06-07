@@ -118,7 +118,7 @@ def run_spvn_analysis_shell(urqmd_file_path, n_threads,
         '9999', '211', '-211', '321', '-321', '2212', '-2212',
         '3122', '-3122', '3312', '-3312', '3334', '-3334', '333']
     print("\U0001F3CD Running spvn analysis ... ")
-    with Pool(processes=n_threads) as pool:
+    with Pool(processes=min(10, n_threads)) as pool:
         pool.map(run_spvn_analysis, particle_list)
 
     call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
