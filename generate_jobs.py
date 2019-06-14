@@ -429,14 +429,15 @@ def main():
                     working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/64))
         generate_nersc_mpi_job_script(working_folder_name,
-                                      n_nodes, n_threads, n_jobs)
+                                      n_nodes, n_threads, int(n_jobs/n_nodes))
 
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/136))
         generate_nerscKNL_mpi_job_script(working_folder_name,
-                                         n_nodes, n_threads, n_jobs)
+                                         n_nodes, n_threads,
+                                         int(n_jobs/n_nodes))
 
     if cluster_name == "wsugrid":
         shutil.copy('Cluster_supports/WSUgrid/submit_all_jobs.sh', pwd)
