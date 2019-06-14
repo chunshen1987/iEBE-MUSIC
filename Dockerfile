@@ -15,11 +15,12 @@ less \
 libxpm-dev \
 libgsl-dev \
 libhdf5-dev \
-python-h5py \
 rsync \
 vim \
 zlib1g-dev \
 && rm -rf /var/lib/apt/lists/*
+
+RUN pip install numpy h5py
 
 # Set up a user group
 ARG username=iEBE-MUSIC-user
