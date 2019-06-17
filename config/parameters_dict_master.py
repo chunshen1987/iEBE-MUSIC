@@ -3,6 +3,12 @@
     This script contains all the default parameters in the iEBE-MUSIC package.
 """
 
+from os import path
+import sys
+sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+import parameters_dict_user
+
+
 # 3DMCGlauber model
 mcglauber_dict = {
     'Projectile':  "Pb",         # projectile nucleus name
@@ -304,11 +310,20 @@ hadronic_afterburner_toolkit_dict = {
 
 
 Parameters_lists = [
-    (mcglauber_dict, "3dMCGlauber_input", 0),
+    (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 0),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
 ]
+
+
+def update_parameters_dict():
+    """This function update the parameters dictionaries with user's settings"""
+    mcglauber_dict.update(parameters_dict_user.mcglauber_dict)
+    music_dict.update(parameters_dict_user.music_dict)
+    iss_dict.update(parameters_dict_user.iss_dict)
+    hadronic_afterburner_toolkit_dict.update(
+        parameters_dict_user.hadronic_afterburner_toolkit_dict)
 
 
 def output_parameters_to_files():
@@ -328,4 +343,5 @@ def output_parameters_to_files():
 
 
 if __name__ == "__main__":
+    update_parameters_dict()
     output_parameters_to_files()
