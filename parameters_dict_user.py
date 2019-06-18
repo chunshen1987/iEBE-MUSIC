@@ -19,7 +19,7 @@ ipglasma = {
 # 3DMCGlauber model
 mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
-    'Projectile':  "Pb",         # projectile nucleus name
+    'Projectile':  "Au",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
     'roots'     :   17.3,        # collision energy (GeV)
     'seed'      :   -1,          # random seed (-1: system)
