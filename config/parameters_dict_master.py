@@ -6,7 +6,9 @@
 from os import path
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
+import shutil
 import parameters_dict_user
+
 
 
 # 3DMCGlauber model
@@ -309,11 +311,18 @@ hadronic_afterburner_toolkit_dict = {
 }
 
 
-Parameters_lists = [
+Parameters_list = [
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 0),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
+]
+
+path_list = [
+    '../codes/3dMCGlauber/',
+    '../codes/MUSIC/',
+    '../codes/iSS/',
+    '../codes/hadronic_afterburner_toolkit/'
 ]
 
 
@@ -328,7 +337,7 @@ def update_parameters_dict():
 
 def output_parameters_to_files():
     """This function outputs parameters in dictionaries to files"""
-    for idict, (parameters_dict, fname, itype) in enumerate(Parameters_lists):
+    for idict, (parameters_dict, fname, itype) in enumerate(Parameters_list):
         f = open(fname, "w")
         for key_name in parameters_dict:
             if itype == 0:
@@ -340,6 +349,8 @@ def output_parameters_to_files():
                     parameter_name=key_name,
                     parameter_value=parameters_dict[key_name]))
         f.close()
+        shutil.move(path.join(path.abspath('.'), fname),
+                    path.join(path.abspath(path_list[idict]), fname))
 
 
 if __name__ == "__main__":
