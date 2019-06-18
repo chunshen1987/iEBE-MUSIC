@@ -5,6 +5,7 @@ import sys
 from os import path, mkdir
 import shutil
 import subprocess
+import parameters_dict_user
 
 
 def write_script_header(cluster, script, n_threads,
@@ -352,27 +353,24 @@ def generate_event_folders(initial_condition_database,
 def print_usage():
     """This function prints out help message"""
     print("\U0000269B  Usage: {} ".format(sys.argv[0])
-          + "initial_condition_type initial_condition_filename working_folder "
-          + "cluster_name n_jobs n_hydro_per_job n_urqmd_per_hydro [n_threads]")
-    print("\U0000269B  initial_condition_type: IPGlasma, 3DMCGlauber")
+          + "working_folder cluster_name n_jobs n_hydro_per_job "
+          + "n_urqmd_per_hydro [n_threads]")
     print("\U0000269B  cluster_name: nersc, wsugrid, local, guillimin, McGill")
 
 def main():
     """This is the main funciton"""
     try:
-        initial_condition_type = str(sys.argv[1])
-        initial_condition_database = str(sys.argv[2])
-        working_folder_name = str(sys.argv[3])
-        cluster_name = str(sys.argv[4])
-        n_jobs = int(sys.argv[5])
-        n_hydro_per_job = int(sys.argv[6])
-        n_urqmd_per_hydro = int(sys.argv[7])
+        working_folder_name = str(sys.argv[1])
+        cluster_name = str(sys.argv[2])
+        n_jobs = int(sys.argv[3])
+        n_hydro_per_job = int(sys.argv[4])
+        n_urqmd_per_hydro = int(sys.argv[5])
     except IndexError:
         print_usage()
         exit(0)
 
-    if len(sys.argv) > 8:
-        n_threads = int(sys.argv[8])
+    if len(sys.argv) > 6:
+        n_threads = int(sys.argv[6])
     else:
         n_threads = n_urqmd_per_hydro
 
@@ -383,11 +381,21 @@ def main():
         print("reset n_UrQMD to n_threads.")
         n_urqmd_per_hydro = n_threads
 
+    initial_condition_type = (
+                    parameters_dict_user.initial_dict['initial_state_type'])
     if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   initial_condition_type))
         exit(1)
+
+    initial_condition_database = ""
+    if initial_condition_type == "IPGlasma":
+        initial_condition_database = (
+                parameters_dict_user.ipglasma['database_name'])
+    else:
+        initial_condition_database = (
+                parameters_dict_user.mcglauber_dict['database_name'])
 
     subprocess.call("(cd config; python3 parameters_dict_master.py;)",
                     shell=True)

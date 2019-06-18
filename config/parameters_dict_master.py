@@ -9,10 +9,21 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
 import parameters_dict_user
 
+# initial condition
+initial_dict = {
+    'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
+}
+
+
+# IPGlasma
+ipglasma = {
+    'database_name': "IPGlasma_database/AuAu_C0-5.h5",  # path for the database file
+}
 
 
 # 3DMCGlauber model
 mcglauber_dict = {
+    'database_name': "self",     # self: generate initial condition on the fly
     'Projectile':  "Pb",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
     'roots'     :   17.3,        # collision energy (GeV)
