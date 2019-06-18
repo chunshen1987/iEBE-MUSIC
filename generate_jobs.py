@@ -389,6 +389,9 @@ def main():
                   initial_condition_type))
         exit(1)
 
+    subprocess.call("(cd config; python3 parameters_dict_master.py;)",
+                    shell=True)
+
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
