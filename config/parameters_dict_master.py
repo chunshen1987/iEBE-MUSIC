@@ -348,7 +348,7 @@ def update_parameters_dict():
 
 def output_parameters_to_files():
     """This function outputs parameters in dictionaries to files"""
-    print("\U0001F375 output input parameter files ...")
+    print("\U0001F375  Output input parameter files ...")
     for idict, (parameters_dict, fname, itype) in enumerate(Parameters_list):
         f = open(fname, "w")
         for key_name in parameters_dict:
