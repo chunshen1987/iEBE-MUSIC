@@ -324,7 +324,7 @@ hadronic_afterburner_toolkit_dict = {
 
 Parameters_list = [
     (mcglauber_dict, "input", 0),
-    (music_dict, "music_input_mode_2", 0),
+    (music_dict, "music_input_mode_2", 2),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
 ]
@@ -352,7 +352,7 @@ def output_parameters_to_files():
     for idict, (parameters_dict, fname, itype) in enumerate(Parameters_list):
         f = open(fname, "w")
         for key_name in parameters_dict:
-            if itype == 0:
+            if itype in (0, 2):
                 f.write("{parameter_name}  {parameter_value}\n".format(
                     parameter_name=key_name,
                     parameter_value=parameters_dict[key_name]))
@@ -360,6 +360,8 @@ def output_parameters_to_files():
                 f.write("{parameter_name} = {parameter_value}\n".format(
                     parameter_name=key_name,
                     parameter_value=parameters_dict[key_name]))
+        if itype == 2:
+            f.write("EndOfData")
         f.close()
         shutil.move(path.join(path.abspath('.'), fname),
                     path.join(path.abspath(path_list[idict]), fname))
