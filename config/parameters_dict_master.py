@@ -92,6 +92,7 @@ music_dict = {
     'T_dependent_Shear_to_S_ratio': 0,     # flag to use temperature dep. \eta/s(T)
     'Include_Bulk_Visc_Yes_1_No_0': 1,     # include bulk viscous effect
     'Include_second_order_terms': 1,       # include second order non-linear coupling terms
+    'Include_vorticity_terms': 0,          # include vorticity coupling terms
     'Include_Rhob_Yes_1_No_0': 0,
     'turn_on_baryon_diffusion': 0,
     'kappa_coefficient': 0.4,
