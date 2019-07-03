@@ -14,7 +14,7 @@ echo "submit jobs in " $workFolder
 
 Numjobs=0
 cd $workFolder
-for ijob in `ls --color=none`;
+for ijob in `ls --color=none | grep "event"`;
 do 
     echo "submit job in " $workFolder/$ijob
     cd $ijob
