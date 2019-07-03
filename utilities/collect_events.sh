@@ -21,6 +21,7 @@ echo "collecting events from " $fromFolder " to " $toFolder
 folderName=$fromFolder
 target_folder=$toFolder/$folderName
 mkdir -p $target_folder
+cp $fromFolder/parameters_dict_user.py $target_folder/
 target_hydro_folder=$target_folder/HYDRO_RESULTS
 mkdir -p $target_hydro_folder
 target_urqmd_folder=$target_folder/URQMD_RESULTS
