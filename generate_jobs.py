@@ -409,6 +409,7 @@ def main():
                   initial_condition_database))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
+    shutil.copy('parameters_dict_user.py', working_folder_name)
 
     toolbar_width = 40
     sys.stdout.write("\U0001F375  Generating {} jobs [{}]".format(
