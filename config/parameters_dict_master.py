@@ -98,6 +98,7 @@ music_dict = {
     'kappa_coefficient': 0.4,
 
     # switches to output evolution information
+    'output_hydro_debug_info': 0,   # flag to output debug information
     'output_evolution_data': 0,     # flag to output evolution history to file
     'output_movie_flag': 0,
     'output_evolution_T_cut': 0.145,
