@@ -86,11 +86,13 @@ music_dict = {
                                 # 14: neos_BQS lattice EoS at finite mu_B
                                 # 17: BEST lattice EoS at finite mu_B
     # transport coefficients
+    'quest_revert_strength': 1.0,          # the strength of the viscous regulation
     'Viscosity_Flag_Yes_1_No_0': 1,        # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,    # include shear viscous effect
     'Shear_to_S_ratio': 0.12,              # value of \eta/s
     'T_dependent_Shear_to_S_ratio': 0,     # flag to use temperature dep. \eta/s(T)
     'Include_Bulk_Visc_Yes_1_No_0': 1,     # include bulk viscous effect
+    'T_dependent_zeta_over_s': 7,          # parameterization of \zeta/s(T)
     'Include_second_order_terms': 1,       # include second order non-linear coupling terms
     'Include_vorticity_terms': 0,          # include vorticity coupling terms
     'Include_Rhob_Yes_1_No_0': 0,
