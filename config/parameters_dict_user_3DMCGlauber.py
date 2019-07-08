@@ -4,15 +4,10 @@
     the iEBE-MUSIC package.
 """
 
+
 # initial condition
 initial_dict = {
-    'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
-}
-
-
-# IPGlasma
-ipglasma = {
-    'database_name': "IPGlasma_database/AuAu_C0-5.h5",  # path for the database file
+    'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
 }
 
 
@@ -47,10 +42,9 @@ music_dict = {
                             # 13: dynamical initialization (3dMCGlauber)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
     's_factor': 1.400,      # normalization factor read in initial data file
-    'Initial_time_tau_0': 0.4,  # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.010,         # time step to use in the evolution [fm/c]
-    'boost_invariant':  0,  # whether the simulation is boost-invariant 
-    'Eta_grid_size': 12.0,  # spatial rapidity range 
+    'boost_invariant':  1,  # whether the simulation is boost-invariant 
+    'Eta_grid_size': 10.0,  # spatial rapidity range 
                             # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
     'Grid_size_in_eta': 64,  # number of the grid points in spatial rapidity direction
     'X_grid_size_in_fm': 24.0,  # spatial range along x direction in the transverse plane 

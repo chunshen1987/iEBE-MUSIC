@@ -62,6 +62,7 @@ music_dict = {
                             #   -- 92: e only,
                             #   -- 93: e, u^\mu, and pi^\munu
                             # 13: dynamical initialization (3dMCGlauber)
+                            #   -- 131: 3dMCGlauber with zero nucleus thickness
     # read in initial conditions from external file
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
@@ -86,7 +87,7 @@ music_dict = {
                                 # 14: neos_BQS lattice EoS at finite mu_B
                                 # 17: BEST lattice EoS at finite mu_B
     # transport coefficients
-    'quest_revert_strength': 1.0,          # the strength of the viscous regulation
+    'quest_revert_strength': 10.0,         # the strength of the viscous regulation
     'Viscosity_Flag_Yes_1_No_0': 1,        # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,    # include shear viscous effect
     'Shear_to_S_ratio': 0.12,              # value of \eta/s
@@ -344,6 +345,30 @@ path_list = [
 def update_parameters_dict():
     """This function update the parameters dictionaries with user's settings"""
     mcglauber_dict.update(parameters_dict_user.mcglauber_dict)
+    ipglasma.update(parameters_dict_user.ipglasma)
+    initial_condition_type = (
+                    parameters_dict_user.initial_dict['initial_state_type'])
+    if initial_condition_type == "IPGlasma":
+        if 'Initial_profile' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['Initial_profile'] = 9
+        if 'Initial_Distribution_input_filename' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict[
+                'Initial_Distribution_input_filename'] = (
+                        'initial/epsilon-u-Hydro.dat')
+        if 'boost_invariant' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['boost_invariant'] = 0
+        if 'Include_Rhob_Yes_1_No_0' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['Include_Rhob_Yes_1_No_0'] = 0
+    else:
+        if 'Initial_profile' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['Initial_profile'] = 13
+        if 'Initial_Distribution_input_filename' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict[
+                'Initial_Distribution_input_filename'] = 'initial/strings.dat'
+        if 'boost_invariant' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['boost_invariant'] = 1
+        if 'Include_Rhob_Yes_1_No_0' not in parameters_dict_user.music_dict:
+            parameters_dict_user.music_dict['Include_Rhob_Yes_1_No_0'] = 1
     music_dict.update(parameters_dict_user.music_dict)
     iss_dict.update(parameters_dict_user.iss_dict)
     hadronic_afterburner_toolkit_dict.update(
