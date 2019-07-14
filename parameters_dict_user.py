@@ -4,24 +4,19 @@
     the iEBE-MUSIC package.
 """
 
+
 # initial condition
 initial_dict = {
-    'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
-}
-
-
-# IPGlasma
-ipglasma = {
-    'database_name': "IPGlasma_database/AuAu_C0-5.h5",  # path for the database file
+    'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
 }
 
 
 # 3DMCGlauber model
 mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
-    'Projectile':  "Pb",         # projectile nucleus name
-    'Target'    :  "Pb",         # target nucleus name
-    'roots'     :   17.3,        # collision energy (GeV)
+    'Projectile':  "Au",         # projectile nucleus name
+    'Target'    :  "Au",         # target nucleus name
+    'roots'     :   200.,        # collision energy (GeV)
     'seed'      :   -1,          # random seed (-1: system)
     'baryon_junctions': 1,       # 0: baryon number assumed to be at string end
                                  # 1: baryon number transported assuming baryon
@@ -47,18 +42,17 @@ music_dict = {
                             # 13: dynamical initialization (3dMCGlauber)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
     's_factor': 1.400,      # normalization factor read in initial data file
-    'Initial_time_tau_0': 0.4,  # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.010,         # time step to use in the evolution [fm/c]
     'boost_invariant':  0,  # whether the simulation is boost-invariant 
-    'Eta_grid_size': 12.0,  # spatial rapidity range 
+    'Eta_grid_size': 3.2,  # spatial rapidity range 
                             # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
-    'Grid_size_in_eta': 64,  # number of the grid points in spatial rapidity direction
+    'Grid_size_in_eta': 16,  # number of the grid points in spatial rapidity direction
     'X_grid_size_in_fm': 24.0,  # spatial range along x direction in the transverse plane 
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
     'Y_grid_size_in_fm': 24.0,  # spatial range along x direction in the transverse plane 
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
-    'Grid_size_in_x': 256,      # number of the grid points in x direction
-    'Grid_size_in_y': 256,      # number of the grid points in y direction
+    'Grid_size_in_x': 128,      # number of the grid points in x direction
+    'Grid_size_in_y': 128,      # number of the grid points in y direction
     'EOS_to_use': 14,           # type of the equation of state
                                 # 0: ideal gas
                                 # 1: EOS-Q from azhydro

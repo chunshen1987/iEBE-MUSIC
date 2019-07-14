@@ -43,7 +43,7 @@ music_dict = {
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
     's_factor': 1.400,      # normalization factor read in initial data file
     'Delta_Tau': 0.010,         # time step to use in the evolution [fm/c]
-    'boost_invariant':  1,  # whether the simulation is boost-invariant 
+    'boost_invariant':  0,  # whether the simulation is boost-invariant 
     'Eta_grid_size': 10.0,  # spatial rapidity range 
                             # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
     'Grid_size_in_eta': 64,  # number of the grid points in spatial rapidity direction
