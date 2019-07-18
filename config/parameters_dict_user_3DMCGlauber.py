@@ -35,15 +35,11 @@ mcglauber_dict = {
 # MUSIC
 music_dict = {
     'Initial_profile': 13,  # type of initial condition 
-                            # 9: IPGlasma (full Tmunu),
-                            #   -- 91: e and u^\mu,
-                            #   -- 92: e only,
-                            #   -- 93: e, u^\mu, and pi^\munu
                             # 13: dynamical initialization (3dMCGlauber)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
     's_factor': 1.400,      # normalization factor read in initial data file
-    'Delta_Tau': 0.010,         # time step to use in the evolution [fm/c]
-    'boost_invariant':  0,  # whether the simulation is boost-invariant 
+    'Delta_Tau': 0.010,     # time step to use in the evolution [fm/c]
+    'boost_invariant':  0,  # whether the simulation is boost-invariant
     'Eta_grid_size': 10.0,  # spatial rapidity range 
                             # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
     'Grid_size_in_eta': 64,  # number of the grid points in spatial rapidity direction
@@ -54,10 +50,6 @@ music_dict = {
     'Grid_size_in_x': 256,      # number of the grid points in x direction
     'Grid_size_in_y': 256,      # number of the grid points in y direction
     'EOS_to_use': 14,           # type of the equation of state
-                                # 0: ideal gas
-                                # 1: EOS-Q from azhydro
-                                # 7: lattice EOS s95p-v1.2 for UrQMD
-                                # 9: hotQCD EOS with UrQMD
                                 # 14: neos_BQS lattice EoS at finite mu_B
                                 # 17: BEST lattice EoS at finite mu_B
     # transport coefficients
