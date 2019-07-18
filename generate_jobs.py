@@ -5,7 +5,7 @@ import sys
 from os import path, mkdir
 import shutil
 import subprocess
-import parameters_dict_user
+import argparse
 
 
 def write_script_header(cluster, script, n_threads,
@@ -350,39 +350,63 @@ def generate_event_folders(initial_condition_database,
                     shell=True)
 
 
-def print_usage():
-    """This function prints out help message"""
-    print("\U0000269B  Usage: {} ".format(sys.argv[0])
-          + "working_folder cluster_name n_jobs n_hydro_per_job "
-          + "n_urqmd_per_hydro [n_threads]")
-    print("\U0000269B  cluster_name: nersc, wsugrid, local, guillimin, McGill")
-
 def main():
     """This is the main funciton"""
-    try:
-        working_folder_name = str(sys.argv[1])
-        cluster_name = str(sys.argv[2])
-        n_jobs = int(sys.argv[3])
-        n_hydro_per_job = int(sys.argv[4])
-        n_urqmd_per_hydro = int(sys.argv[5])
-    except IndexError:
-        print_usage()
-        exit(0)
+    parser = argparse.ArgumentParser(
+            description='\U0000269B Welcome to iEBE-MUSIC package',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-w', '--working_folder_name', metavar='',
+                        type=str, default='playground',
+                        help='working folder path')
+    parser.add_argument('-c', '--cluster_name', metavar='', type=str,
+                        choices=['nersc', 'wsugrid', 'local',
+                                 'guillimin', 'McGill'],
+                        default='local', help='name of the cluster')
+    parser.add_argument('-n', '--n_jobs', metavar='',
+                        type=int, default=1, help='number of jobs')
+    parser.add_argument('-n_hydro', '--n_hydro_per_job', metavar='',
+                        type=int, default=1,
+                        help='number of hydro events per job to run')
+    parser.add_argument('-n_urqmd', '--n_urqmd_per_hydro', metavar='',
+                        type=int, default=1,
+                        help=('number of oversampled UrQMD events '
+                              + 'per hydro to run'))
+    parser.add_argument('-n_th', '--n_threads', metavar='',
+                        type=int, default=1,
+                        help='number of threads used for each job')
+    parser.add_argument('-par', '--par_dict', metavar='',
+                        type=str, default='parameters_dict_user.py',
+                        help='user-defined parameter dictionary file')
+    args = parser.parse_args()
+    # print out all the arguments
+    print("="*40)
+    print("\U0000269B   Input parameters")
+    print("="*40)
+    for iarg in vars(args):
+        print("\U0000269B   {}: {}".format(iarg, getattr(args, iarg)))
+    print("="*40)
 
-    if len(sys.argv) > 6:
-        n_threads = int(sys.argv[6])
-    else:
-        n_threads = n_urqmd_per_hydro
+    try:
+        working_folder_name = args.working_folder_name
+        cluster_name = args.cluster_name
+        n_jobs = args.n_jobs
+        n_hydro_per_job = args.n_hydro_per_job
+        n_urqmd_per_hydro = args.n_urqmd_per_hydro
+        n_threads = args.n_threads
+    except:
+        parser.print_help()
+        exit(0)
 
     if n_threads < n_urqmd_per_hydro:
         print("\U000026A0  "
               + "Warning: n_threads = {} < n_urqmd_per_hydro = {}!".format(
                   n_threads, n_urqmd_per_hydro))
-        print("reset n_UrQMD to n_threads.")
-        n_urqmd_per_hydro = n_threads
+        print("reset n_threads to {}".format(n_urqmd_per_hydro))
+        n_threads = n_urqmd_per_hydro
 
+    parameter_dict = __import__(args.par_dict.split('.')[0])
     initial_condition_type = (
-                    parameters_dict_user.initial_dict['initial_state_type'])
+                    parameter_dict.initial_dict['initial_state_type'])
     if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
@@ -392,13 +416,14 @@ def main():
     initial_condition_database = ""
     if initial_condition_type == "IPGlasma":
         initial_condition_database = (
-                parameters_dict_user.ipglasma['database_name'])
+                parameter_dict.ipglasma['database_name'])
     else:
         initial_condition_database = (
-                parameters_dict_user.mcglauber_dict['database_name'])
+                parameter_dict.mcglauber_dict['database_name'])
 
-    subprocess.call("(cd config; python3 parameters_dict_master.py;)",
-                    shell=True)
+    subprocess.call(
+        "(cd config; python3 parameters_dict_master.py {};)".format(
+            args.par_dict.split(".")[0]), shell=True)
 
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
@@ -409,7 +434,7 @@ def main():
                   initial_condition_database))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
-    shutil.copy('parameters_dict_user.py', working_folder_name)
+    shutil.copy(args.par_dict, working_folder_name)
 
     toolbar_width = 40
     sys.stdout.write("\U0001F375  Generating {} jobs [{}]".format(
