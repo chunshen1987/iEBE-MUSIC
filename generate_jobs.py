@@ -423,8 +423,9 @@ def main():
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
 
-    subprocess.call("(cd config; python3 parameters_dict_master.py;)",
-                    shell=True)
+    subprocess.call(
+        "(cd config; python3 parameters_dict_master.py {};)".format(
+            args.par_dict.split(".")[0]), shell=True)
 
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
