@@ -356,28 +356,26 @@ def main():
             description='\U0000269B Welcome to iEBE-MUSIC package',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-w', '--working_folder_name', metavar='',
-                        type=str, nargs=1, default='playground',
+                        type=str, default='playground',
                         help='working folder path')
-    parser.add_argument('-c', '--cluster_name', metavar='',
-                        type=str, nargs=1,
+    parser.add_argument('-c', '--cluster_name', metavar='', type=str,
                         choices=['nersc', 'wsugrid', 'local',
                                  'guillimin', 'McGill'],
                         default='local', help='name of the cluster')
     parser.add_argument('-n', '--n_jobs', metavar='',
-                        type=int, nargs=1, default=1,
-                        help='number of jobs')
+                        type=int, default=1, help='number of jobs')
     parser.add_argument('-n_hydro', '--n_hydro_per_job', metavar='',
-                        type=int, nargs=1, default=1,
+                        type=int, default=1,
                         help='number of hydro events per job to run')
     parser.add_argument('-n_urqmd', '--n_urqmd_per_hydro', metavar='',
-                        type=int, nargs=1, default=1,
+                        type=int, default=1,
                         help=('number of oversampled UrQMD events '
                               + 'per hydro to run'))
     parser.add_argument('-n_th', '--n_threads', metavar='',
-                        type=int, nargs=1, default=1,
+                        type=int, default=1,
                         help='number of threads used for each job')
     parser.add_argument('-par', '--par_dict', metavar='',
-                        type=str, nargs=1, default='parameters_dict_user.py',
+                        type=str, default='parameters_dict_user.py',
                         help='user-defined parameter dictionary file')
     args = parser.parse_args()
     # print out all the arguments
