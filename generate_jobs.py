@@ -401,8 +401,8 @@ def main():
         print("\U000026A0  "
               + "Warning: n_threads = {} < n_urqmd_per_hydro = {}!".format(
                   n_threads, n_urqmd_per_hydro))
-        print("reset n_UrQMD to n_threads.")
-        n_urqmd_per_hydro = n_threads
+        print("reset n_threads to {}".format(n_urqmd_per_hydro))
+        n_threads = n_urqmd_per_hydro
 
     parameter_dict = __import__(args.par_dict.split('.')[0])
     initial_condition_type = (
