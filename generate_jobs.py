@@ -6,6 +6,7 @@ from os import path, mkdir
 import shutil
 import subprocess
 import parameters_dict_user
+import argparse
 
 
 def write_script_header(cluster, script, n_threads,
@@ -359,6 +360,17 @@ def print_usage():
 
 def main():
     """This is the main funciton"""
+    parser = argparse.ArgumentParser(
+            description='Welcome to iEBE-MUSIC package')
+    parser.add_argument('working_folder_name', metavar='working_folder_name',
+                        type=str, nargs=1,
+                        help='working folder path')
+    parser.add_argument('cluster_name', metavar='cluster_name',
+                        type=str, nargs=1,
+                        choices=['nersc', 'wsugrid', 'local',
+                            'guillimin', 'McGill'],
+                        help='name of the cluster')
+    parser.print_help()
     try:
         working_folder_name = str(sys.argv[1])
         cluster_name = str(sys.argv[2])
