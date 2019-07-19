@@ -26,12 +26,6 @@ RUN pip install numpy h5py
 # Install packages
 ARG software_path=/home/
 
-# 3dMCGlauber
-RUN cd ${software_path} \
-&& git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC \
-&& cd iEBE-MUSIC/codes && ./get_code_packages.sh \
-&& ./compile_code_packages.sh
-
 # Set up a user group
 ARG username=iEBE-MUSIC-user
 ARG id=1234
@@ -39,6 +33,13 @@ RUN groupadd -g ${id} ${username} \
 && useradd --create-home --home-dir /home/${username} -u ${id} -g ${username} ${username}
 USER ${username}
 ENV HOME /home/${username}
-WORKDIR ${HOME}
+
+# download and compile the iEBE-MUSIC framework
+RUN cd ${HOME} \
+&& git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC \
+&& cd iEBE-MUSIC/codes && ./get_code_packages.sh \
+&& ./compile_code_packages.sh
+
+WORKDIR ${HOME}/iEBE-MUSIC
 
 ENTRYPOINT /bin/bash
