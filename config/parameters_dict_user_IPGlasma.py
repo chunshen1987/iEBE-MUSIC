@@ -49,7 +49,7 @@ music_dict = {
 
 # iSS
 iss_dict = {
-    'hydro_mode': 2,    # mode for reading in freeze out information 
+    'hydro_mode': 1,    # mode for reading in freeze out information 
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
     'sample_upto_desired_particle_number': 1,  # 1: flag to run sampling until desired

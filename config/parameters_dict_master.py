@@ -357,6 +357,12 @@ def update_parameters_dict(par_dict):
                         'initial/epsilon-u-Hydro.dat')
         if 'boost_invariant' not in parameters_dict.music_dict:
             parameters_dict.music_dict['boost_invariant'] = 1
+
+        if parameters_dict.music_dict['boost_invariant'] == 1:
+            parameters_dict.iss_dict['hydro_mode'] = 1
+        else:
+            parameters_dict.iss_dict['hydro_mode'] = 2
+
         if 'Include_Rhob_Yes_1_No_0' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Include_Rhob_Yes_1_No_0'] = 0
     else:
@@ -368,6 +374,7 @@ def update_parameters_dict(par_dict):
                 'Initial_Distribution_input_filename'] = 'initial/strings.dat'
         if 'boost_invariant' not in parameters_dict.music_dict:
             parameters_dict.music_dict['boost_invariant'] = 0
+        parameters_dict.iss_dict['hydro_mode'] = 2
         if 'Include_Rhob_Yes_1_No_0' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Include_Rhob_Yes_1_No_0'] = 1
     music_dict.update(parameters_dict.music_dict)
