@@ -7,7 +7,6 @@ from os import path
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
-import parameters_dict_user
 
 # initial condition
 initial_dict = {
