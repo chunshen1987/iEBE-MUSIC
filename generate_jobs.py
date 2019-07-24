@@ -377,6 +377,9 @@ def main():
     parser.add_argument('-par', '--par_dict', metavar='',
                         type=str, default='parameters_dict_user.py',
                         help='user-defined parameter dictionary file')
+    parser.add_argument('-b', '--bayes_file', metavar='',
+                        type=str, default='',
+                        help='parameters from bayesian analysis')
     args = parser.parse_args()
     # print out all the arguments
     print("="*40)
@@ -421,9 +424,11 @@ def main():
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
 
+    if args.bayes_file != "":
+        args.bayes_file = path.join(path.abspath("."), args.bayes_file)
     subprocess.call(
-        "(cd config; python3 parameters_dict_master.py {};)".format(
-            args.par_dict.split(".")[0]), shell=True)
+        "(cd config; python3 parameters_dict_master.py -par {} -b {};)".format(
+            args.par_dict.split(".")[0], args.bayes_file), shell=True)
 
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")

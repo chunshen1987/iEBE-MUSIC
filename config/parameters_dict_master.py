@@ -7,6 +7,7 @@ from os import path
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
+import argparse
 
 # initial condition
 initial_dict = {
@@ -341,9 +342,9 @@ path_list = [
 ]
 
 
-def update_parameters_dict(par_dict):
+def update_parameters_dict(par_dict_name):
     """This function update the parameters dictionaries with user's settings"""
-    parameters_dict = __import__(par_dict)
+    parameters_dict = __import__(par_dict_name)
     initial_condition_type = (
                     parameters_dict.initial_dict['initial_state_type'])
     if initial_condition_type == "IPGlasma":
@@ -382,6 +383,16 @@ def update_parameters_dict(par_dict):
         parameters_dict.hadronic_afterburner_toolkit_dict)
 
 
+def update_parameters_bayesian(bayes_file):
+    parfile = open(bayes_file, "r")
+    for line in parfile:
+        key, val = line.split()
+        if key in mcglauber_dict.keys():
+            mcglauber_dict[key] = float(val)
+        if key in music_dict.keys():
+            music_dict[key] = float(val)
+
+
 def output_parameters_to_files():
     """This function outputs parameters in dictionaries to files"""
     print("\U0001F375  Output input parameter files ...")
@@ -404,9 +415,17 @@ def output_parameters_to_files():
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        par_dict = str(sys.argv[1])
-    else:
-        par_dict = "parameters_dict_user"
-    update_parameters_dict(par_dict)
+    parser = argparse.ArgumentParser(
+            description='\U0000269B Welcome to iEBE-MUSIC parameter master',
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-par', '--par_dict', metavar='',
+                        type=str, default='parameters_dict_user',
+                        help='user-defined parameter dictionary filename')
+    parser.add_argument('-b', '--bayes_file', metavar='',
+                        type=str, default='',
+                        help='parameters from bayesian analysis')
+    args = parser.parse_args()
+    update_parameters_dict(args.par_dict)
+    if args.bayes_file != "":
+        update_parameters_bayesian(args.bayes_file)
     output_parameters_to_files()
