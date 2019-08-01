@@ -426,9 +426,13 @@ def main():
 
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
-    subprocess.call(
-        "(cd config; python3 parameters_dict_master.py -par {} -b {};)".format(
-            args.par_dict.split(".")[0], args.bayes_file), shell=True)
+        subprocess.call(
+            "(cd config; python3 parameters_dict_master.py -par {} -b {};)".format(
+                args.par_dict.split(".")[0], args.bayes_file), shell=True)
+    else:
+        subprocess.call(
+            "(cd config; python3 parameters_dict_master.py -par {};)".format(
+                args.par_dict.split(".")[0]), shell=True)
 
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
