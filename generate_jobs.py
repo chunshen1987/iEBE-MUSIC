@@ -285,7 +285,7 @@ pid=$1
 
 def generate_event_folders(initial_condition_database,
                            initial_condition_type, working_folder,
-                           cluster_name, event_id,
+                           cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
@@ -312,7 +312,7 @@ def generate_event_folders(initial_condition_database,
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
-                             event_id*n_hydro_per_job, n_urqmd_per_hydro,
+                             event_id_offset, n_urqmd_per_hydro,
                              n_threads)
 
     generate_script_hydro(event_folder, n_threads)
@@ -443,6 +443,7 @@ def main():
                 args.par_dict.split(".")[0]), shell=True)
 
     cent_label = "XXX"
+    cent_label_pre = cent_label
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
@@ -459,6 +460,7 @@ def main():
         n_jobs, " " * toolbar_width))
     sys.stdout.flush()
     sys.stdout.write("\b" * (toolbar_width+1))
+    event_id_offset = 0
     for iev in range(n_jobs):
         progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
                       - int(float(iev)/n_jobs*toolbar_width))
@@ -471,11 +473,15 @@ def main():
             for cen_min, cen_max, cen_label in centrality_list:
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
+                    if cent_label != cent_label_pre:
+                        cent_label_pre = cent_label
+                        event_id_offset = 0
                     break
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, working_folder_name,
-                               cluster_name, iev,
+                               cluster_name, iev, event_id_offset,
                                n_hydro_per_job, n_urqmd_per_hydro, n_threads)
+        event_id_offset += n_hydro_per_job
     sys.stdout.write("\n")
     sys.stdout.flush()
     # copy script to collect final results
