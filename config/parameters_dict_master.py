@@ -17,7 +17,8 @@ initial_dict = {
 
 # IPGlasma
 ipglasma = {
-    'database_name': "IPGlasma_database/AuAu_C0-5.h5",  # path for the database file
+    'type': "minimumbias",  # minimumbias or fixed
+    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
 }
 
 

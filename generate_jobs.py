@@ -8,6 +8,13 @@ import subprocess
 import argparse
 
 
+centrality_list = [
+    (0, 0.05, '0-5'), (0.05, 0.1, '5-10'), (0.1, 0.2, '10-20'),
+    (0.2, 0.3, '20-30'), (0.3, 0.4, '30-40'), (0.4, 0.5, '40-50'),
+    (0.5, 0.6, '50-60'), (0.6, 0.7, '60-70'), (0.7, 0.8, '70-80'),
+    (0.8, 0.9, '80-90'), (0.9, 1.0, '90-100')
+]
+
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
     """This function write the header of the job submission script"""
@@ -417,9 +424,10 @@ def main():
         exit(1)
 
     initial_condition_database = ""
+    initial_condition_database_name_pattern = ""
     if initial_condition_type == "IPGlasma":
         initial_condition_database = (
-                parameter_dict.ipglasma['database_name'])
+                parameter_dict.ipglasma['database_name_pattern'])
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
@@ -434,13 +442,14 @@ def main():
             "(cd config; python3 parameters_dict_master.py -par {};)".format(
                 args.par_dict.split(".")[0]), shell=True)
 
+    cent_label = "XXX"
     if initial_condition_database == "self":
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
         print("\U0001F375  "
               + "Pre-generated initial conditions from {} ...".format(
-                  initial_condition_database))
+              initial_condition_database.format(cent_label)))
     working_folder_name = path.abspath(working_folder_name)
     mkdir(working_folder_name)
     shutil.copy(args.par_dict, working_folder_name)
@@ -456,7 +465,14 @@ def main():
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
-        generate_event_folders(initial_condition_database,
+        if (initial_condition_type == 'IPGlasma'
+                and parameter_dict.ipglasma['type'] == 'minimumbias'):
+            precent_local = float(iev)/float(n_jobs)
+            for cen_min, cen_max, cen_label in centrality_list:
+                if precent_local >= cen_min and precent_local < cen_max:
+                    cent_label = cen_label
+                    break
+        generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, working_folder_name,
                                cluster_name, iev,
                                n_hydro_per_job, n_urqmd_per_hydro, n_threads)
