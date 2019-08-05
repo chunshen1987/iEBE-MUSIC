@@ -5,7 +5,13 @@ import sys
 from os import path, system
 from glob import glob
 import h5py
+import string
+import random
 
+def randomString(stringLength=1):
+    """Generate a random string of fixed length """
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(stringLength))
 
 def print_help():
     """This function outpus help messages"""
@@ -32,8 +38,16 @@ for ievent, event_path in enumerate(EVENT_LIST):
     hftemp.close()
     for igroup, gtemp in enumerate(glist):
         gtemp2 = gtemp
-        if gtemp2 in exist_group_keys:
-            gtemp2 = "{}a".format(gtemp)
+        random_string_len = 1
+        tol = 0
+        while gtemp2 in exist_group_keys:
+            randomlabel = randomString(random_string_len)
+            gtemp2 = "{0}{1}".format(gtemp, randomlabel)
+            tol += 1
+            if tol > 30:
+                random_string_len += 1
+                tol = 0
+        if gtemp2 != gtemp:
             print("Conflict in mergeing {0}, use {1}".format(gtemp, gtemp2))
         exist_group_keys.append(gtemp2)
         system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
