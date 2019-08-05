@@ -18,7 +18,7 @@ fi
 
 echo "collecting events from " $fromFolder " to " $toFolder
 
-folderName=$fromFolder
+folderName=`echo $fromFolder | rev | cut -d "/" -f 1 | rev`
 target_folder=$toFolder/$folderName
 mkdir -p $target_folder
 cp $fromFolder/parameters_dict_user.py $target_folder/
