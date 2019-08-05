@@ -161,6 +161,22 @@ def zip_results_into_hdf5(final_results_folder, event_id):
     shutil.move("{}.h5".format(results_name), final_results_folder)
 
 
+def remove_unwanted_outputs(final_results_folder, event_id):
+    """
+        This function removes all hydro surface file and UrQMD results
+        if they are unwanted to save space
+
+    """
+    SAVE_HYDRO_SURFACE = True
+    SAVE_URQMD_FILES = True
+    if not SAVE_HYDRO_SURFACE:
+        hydrofolder = path.join(final_results_folder,
+                                "hydro_results_{}".format(event_id))
+        shutil.rmtree(hydrofolder)
+    if not SAVE_URQMD_FILES:
+        urqmd_results_name = "particle_list_{}.gz".format(event_id)
+        shutil.rmtree(path.join(final_results_folder, urqmd_results_name))
+
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads):
     """This is the main function"""
@@ -210,6 +226,9 @@ def main(initial_condition, initial_type,
 
         # zip results into a hdf5 database
         zip_results_into_hdf5(final_results_folder, event_id)
+
+        # remove the unwanted outputs
+        remove_unwanted_outputs(final_results_folder, event_id)
 
 
 if __name__ == "__main__":
