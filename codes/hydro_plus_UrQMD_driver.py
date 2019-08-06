@@ -3,7 +3,7 @@
 
 from multiprocessing import Pool
 from subprocess import call
-from os import path, mkdir
+from os import path, mkdir, remove
 from glob import glob
 import sys
 import shutil
@@ -175,7 +175,7 @@ def remove_unwanted_outputs(final_results_folder, event_id):
         shutil.rmtree(hydrofolder)
     if not SAVE_URQMD_FILES:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
-        shutil.rmtree(path.join(final_results_folder, urqmd_results_name))
+        remove(path.join(final_results_folder, urqmd_results_name))
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads):
