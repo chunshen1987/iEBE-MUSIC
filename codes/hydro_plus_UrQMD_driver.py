@@ -187,8 +187,11 @@ def main(initial_condition, initial_type,
                                        n_hydro, hydro_id0):
         print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_type == "IPGlasma":
+            initial_database_name = (
+                    initial_condition.split("/")[-1].split(".h5")[0])
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
+            event_id = initial_database_name + "_" + event_id
         elif initial_type == "3DMCGlauber":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
