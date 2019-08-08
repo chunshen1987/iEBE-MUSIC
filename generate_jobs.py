@@ -154,7 +154,7 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads):
+                             n_hydro, ev0_id, n_urqmd, n_threads, time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -165,8 +165,9 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write(
         """
-./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} > run.log
-""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads))
+./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
+""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
+           time_stamp))
     script.close()
 
 
@@ -286,7 +287,8 @@ pid=$1
 def generate_event_folders(initial_condition_database,
                            initial_condition_type, working_folder,
                            cluster_name, event_id, event_id_offset,
-                           n_hydro_per_job, n_urqmd_per_hydro, n_threads):
+                           n_hydro_per_job, n_urqmd_per_hydro, n_threads,
+                           time_stamp):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     mkdir(event_folder)
@@ -313,7 +315,7 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id_offset, n_urqmd_per_hydro,
-                             n_threads)
+                             n_threads, time_stamp)
 
     generate_script_hydro(event_folder, n_threads)
 
@@ -425,9 +427,12 @@ def main():
 
     initial_condition_database = ""
     initial_condition_database_name_pattern = ""
+    IPGlasma_time_stamp = "0.4"
     if initial_condition_type == "IPGlasma":
         initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
+        IPGlasma_time_stamp = str(
+                parameter_dict.music_dict['Initial_time_tau_0'])
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
@@ -480,7 +485,8 @@ def main():
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, working_folder_name,
                                cluster_name, iev, event_id_offset,
-                               n_hydro_per_job, n_urqmd_per_hydro, n_threads)
+                               n_hydro_per_job, n_urqmd_per_hydro, n_threads,
+                               IPGlasma_time_stamp)
         event_id_offset += n_hydro_per_job
     sys.stdout.write("\n")
     sys.stdout.flush()

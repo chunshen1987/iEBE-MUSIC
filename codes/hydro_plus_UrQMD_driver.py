@@ -18,13 +18,13 @@ def print_usage():
     print("\U0001F3B6  "
           + "Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
           + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
-          + "n_threads")
+          + "n_threads tau0")
 
 
-def get_initial_condition(database, initial_type, nev, idx0):
+def get_initial_condition(database, initial_type, nev, idx0,
+                          time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     if initial_type == "IPGlasma":
-        time_stamp_str = "0.4"
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
             yield file_name
@@ -178,13 +178,13 @@ def remove_unwanted_outputs(final_results_folder, event_id):
         remove(path.join(final_results_folder, urqmd_results_name))
 
 def main(initial_condition, initial_type,
-         n_hydro, hydro_id0, n_urqmd, num_threads):
+         n_hydro, hydro_id0, n_urqmd, num_threads, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
 
     for ifile in get_initial_condition(initial_condition,
                                        initial_type,
-                                       n_hydro, hydro_id0):
+                                       n_hydro, hydro_id0, time_stamp_str):
         print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_type == "IPGlasma":
             initial_database_name = (
@@ -242,6 +242,7 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
+        TIME_STAMP = str(sys.argv[7])
     except IndexError:
         print_usage()
         exit(0)
@@ -253,4 +254,4 @@ if __name__ == "__main__":
         exit(1)
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
-         N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS)
+         N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS, TIME_STAMP)

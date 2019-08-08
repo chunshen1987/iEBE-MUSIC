@@ -51,6 +51,6 @@ if __name__ == "__main__":
     except IndexError:
         print_help()
         exit(1)
-    
+
     time_stamp_str = "0.4"
     fecth_an_IPGlasma_event(database_filename, time_stamp_str, event_id)
