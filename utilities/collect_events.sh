@@ -49,9 +49,6 @@ do
             if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-0.5_0.5.dat ]; then
                 mv $eventsPath/$iev/$hydro_folder_name*$event_id $target_hydro_folder
                 mv $eventsPath/$iev/$UrQMD_file_name*$event_id.gz $target_urqmd_folder
-                #mv $eventsPath/$iev/$spvn_folder_name$event_id $target_spvn_folder
-                #mv $target_hydro_folder/$hydro_folder_name$event_id/eccentricities_evo_eta_-0.5_0.5.dat $target_spvn_folder/$spvn_folder_name$event_id
-                #mv $target_hydro_folder/$hydro_folder_name$event_id/momentum_anisotropy_eta_-0.5_0.5.dat $target_spvn_folder/$spvn_folder_name$event_id
                 mv $eventsPath/$iev/$spvn_folder_name*$event_id.h5 $target_spvn_folder
                 ((collected_eventNum++))
             fi
