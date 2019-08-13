@@ -15,3 +15,9 @@ git clone --depth=1 https://Chunshen1987@bitbucket.org/Chunshen1987/urqmd_afterb
 
 # download hadronic afterner
 git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit hadronic_afterburner_toolkit_code
+
+# download neos_bqs
+wget https://s3.amazonaws.com/qcdneos/neosBQS-v0.11.tar.gz && \
+tar -zxf neosBQS-v0.11.tar.gz -C MUSIC_code/EOS/ && \
+mv MUSIC_code/EOS/neosBQS-v0.11 MUSIC_code/EOS/neos_bqs && \
+rm neosBQS-v0.11.tar.gz
