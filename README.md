@@ -19,14 +19,7 @@ Particlization & hadronic transport:
 
 ## Usage:
 
-./generate\_jobs.py working\_folder cluster\_name n\_jobs n\_hydro_per\_job n\_urqmd\_per\_hydro \[n\_threads\]
-
-	cluster_name:
-		- nersc
-		- wsugrid
-		- local
-		- guillimin
-		- McGill
+type ./generate_jobs.py -h for help information
 
 ## Parameters:
 Users can pass model parameters through a python script `parameters_dict_user.py`. It contains multiple dictionaries, which are related to each code module inside the iEBE-MUSIC framework. This script will update the master parameters dictionaries in `config/parameters_dict_master.py`. One can read `config/parameters_dict_master.py` for all the available parameters options for each module. If a user want to modify any parameters, he can add it in the `parameters_dict_user.py`.
