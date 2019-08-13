@@ -261,13 +261,14 @@ hadronic_afterburner_toolkit_dict = {
     'particle_monval': 211,     # particle Monte-Carlo number
     'distinguish_isospin': 1,   # flag whether to distinguish the isospin of particles
     'event_buffer_size': 100,       # the number of events read in at once
+    'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
     'resonance_feed_down_flag': 0,  # perform resonance feed down
                                     # (will read in all hadrons and filter particle
                                     #  after decays are performed)
     'select_resonances_flag': 0,    # perform resonance decays only for selected particle species
-    'resonance_weak_feed_down_flag': 0,    # include weak feed down contribution
-                                           # turn on only for Lambda (monval=3122)
-                                           # for Sigma^0 -> Lambda + gamma
+    'resonance_weak_feed_down_Sigma_to_Lambda_flag': 0,    # include weak feed down contribution
+                                                           # turn on only for Lambda (monval=3122)
+                                                           # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
