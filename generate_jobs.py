@@ -416,7 +416,7 @@ def main():
         print("reset n_threads to {}".format(n_urqmd_per_hydro))
         n_threads = n_urqmd_per_hydro
 
-    parameter_dict = __import__(args.par_dict.split('.')[0])
+    parameter_dict = __import__(args.par_dict.split('.py')[0])
     initial_condition_type = (
                     parameter_dict.initial_dict['initial_state_type'])
     if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
