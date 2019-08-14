@@ -368,7 +368,7 @@ def main():
                         type=str, default='playground',
                         help='working folder path')
     parser.add_argument('-c', '--cluster_name', metavar='', type=str,
-                        choices=['nersc', 'wsugrid', 'local',
+                        choices=['nersc', 'nerscKNL', 'wsugrid', 'local',
                                  'guillimin', 'McGill'],
                         default='local', help='name of the cluster')
     parser.add_argument('-n', '--n_jobs', metavar='',
@@ -508,7 +508,7 @@ def main():
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/136))
+        n_nodes = max(1, int(n_jobs*n_threads/272))
         generate_nerscKNL_mpi_job_script(working_folder_name,
                                          n_nodes, n_threads,
                                          int(n_jobs/n_nodes))
