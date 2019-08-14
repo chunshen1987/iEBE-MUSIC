@@ -5,9 +5,10 @@
 """
 
 
-# initial condition
-initial_dict = {
+# control parameters
+control_dict = {
     'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
+    'walltime': "10:00:00",  # walltime to run
 }
 
 

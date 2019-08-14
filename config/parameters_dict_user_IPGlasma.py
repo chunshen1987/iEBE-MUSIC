@@ -4,9 +4,10 @@
     the iEBE-MUSIC package.
 """
 
-# initial condition
-initial_dict = {
+# control parameters
+control_dict = {
     'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
+    'walltime': "10:00:00",  # walltime to run
 }
 
 

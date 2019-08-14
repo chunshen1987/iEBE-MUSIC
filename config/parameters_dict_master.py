@@ -9,9 +9,10 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
 import argparse
 
-# initial condition
-initial_dict = {
+# control parameters
+control_dict = {
     'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
+    'walltime': "10:00:00",  # walltime to run
 }
 
 
@@ -348,7 +349,7 @@ def update_parameters_dict(par_dict_name):
     """This function update the parameters dictionaries with user's settings"""
     parameters_dict = __import__(par_dict_name)
     initial_condition_type = (
-                    parameters_dict.initial_dict['initial_state_type'])
+                    parameters_dict.control_dict['initial_state_type'])
     if initial_condition_type == "IPGlasma":
         ipglasma.update(parameters_dict.ipglasma)
         if 'Initial_profile' not in parameters_dict.music_dict:

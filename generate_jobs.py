@@ -86,10 +86,9 @@ cd {4:s}
 
 
 def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
-                                  n_jobs_per_node):
+                                  n_jobs_per_node, walltime):
     """This function generates job script for NERSC"""
     working_folder = folder_name
-    walltime = '10:00:00'
 
     script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
     script.write(
@@ -120,10 +119,9 @@ wait
 
 
 def generate_nerscKNL_mpi_job_script(folder_name, n_nodes, n_threads,
-                                     n_jobs_per_node):
+                                     n_jobs_per_node, walltime):
     """This function generates job script for NERSC KNL"""
     working_folder = folder_name
-    walltime = '10:00:00'
 
     script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
     script.write(
@@ -418,7 +416,7 @@ def main():
 
     parameter_dict = __import__(args.par_dict.split('.py')[0])
     initial_condition_type = (
-                    parameter_dict.initial_dict['initial_state_type'])
+                    parameter_dict.control_dict['initial_state_type'])
     if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
@@ -498,12 +496,16 @@ def main():
     script_path = "codes/hadronic_afterburner_toolkit_code/ebe_scripts"
     shutil.copy(path.join(script_path, 'average_event_spvn_h5.py'), pwd)
 
+    walltime = '10:00:00'
+    if "walltime" in parameter_dict.control_dict.keys():
+        walltime = parameter_dict.control_dict["walltime"]
     if cluster_name == "nersc":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
                     working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/64))
         generate_nersc_mpi_job_script(working_folder_name,
-                                      n_nodes, n_threads, int(n_jobs/n_nodes))
+                                      n_nodes, n_threads, int(n_jobs/n_nodes),
+                                      walltime)
 
     if cluster_name == "nerscKNL":
         shutil.copy('Cluster_supports/NERSC/job_MPI_wrapper.py',
@@ -511,7 +513,7 @@ def main():
         n_nodes = max(1, int(n_jobs*n_threads/272))
         generate_nerscKNL_mpi_job_script(working_folder_name,
                                          n_nodes, n_threads,
-                                         int(n_jobs/n_nodes))
+                                         int(n_jobs/n_nodes), walltime)
 
     if cluster_name == "wsugrid":
         shutil.copy('Cluster_supports/WSUgrid/submit_all_jobs.sh', pwd)
