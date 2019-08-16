@@ -3,7 +3,7 @@
     This script contains all the default parameters in the iEBE-MUSIC package.
 """
 
-from os import path
+from os import path, makedirs
 import sys
 sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
@@ -338,10 +338,10 @@ Parameters_list = [
 ]
 
 path_list = [
-    '../codes/3dMCGlauber/',
-    '../codes/MUSIC/',
-    '../codes/iSS/',
-    '../codes/hadronic_afterburner_toolkit/'
+    'model_parameters/3dMCGlauber/',
+    'model_parameters/MUSIC/',
+    'model_parameters/iSS/',
+    'model_parameters/hadronic_afterburner_toolkit/'
 ]
 
 
@@ -396,9 +396,11 @@ def update_parameters_bayesian(bayes_file):
             music_dict[key] = float(val)
 
 
-def output_parameters_to_files():
+def output_parameters_to_files(workfolder="."):
     """This function outputs parameters in dictionaries to files"""
-    print("\U0001F375  Output input parameter files ...")
+    workfolder = path.abspath(workfolder)
+    print("\U0001F375  Output input parameter files to {}...".format(
+                                                                workfolder))
     for idict, (parameters_dict, fname, itype) in enumerate(Parameters_list):
         f = open(fname, "w")
         for key_name in parameters_dict:
@@ -413,14 +415,20 @@ def output_parameters_to_files():
         if itype == 2:
             f.write("EndOfData")
         f.close()
+        output_folder = path.join(workfolder, path_list[idict])
+        if not path.exists(output_folder):
+            makedirs(output_folder)
         shutil.move(path.join(path.abspath('.'), fname),
-                    path.join(path.abspath(path_list[idict]), fname))
+                    path.join(output_folder, fname))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
             description='\U0000269B Welcome to iEBE-MUSIC parameter master',
             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('-path', '--path', metavar='',
+                        type=str, default='.',
+                        help='output folder path')
     parser.add_argument('-par', '--par_dict', metavar='',
                         type=str, default='parameters_dict_user',
                         help='user-defined parameter dictionary filename')
@@ -431,4 +439,4 @@ if __name__ == "__main__":
     update_parameters_dict(args.par_dict)
     if args.bayes_file != "":
         update_parameters_bayesian(args.bayes_file)
-    output_parameters_to_files()
+    output_parameters_to_files(args.path)
