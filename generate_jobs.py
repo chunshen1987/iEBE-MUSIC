@@ -163,7 +163,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write(
         """
-./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            time_stamp))
     script.close()
