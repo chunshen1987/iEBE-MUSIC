@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """This script generate all the running jobs."""
 
 import sys
@@ -163,7 +163,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write(
         """
-./hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            time_stamp))
     script.close()
@@ -289,6 +289,7 @@ def generate_event_folders(initial_condition_database,
                            time_stamp):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
+    param_folder = path.join(working_folder, 'model_parameters')
     mkdir(event_folder)
     shutil.copy('codes/hydro_plus_UrQMD_driver.py', event_folder)
     shutil.copy(path.join('IPGlasma_database',
@@ -300,6 +301,8 @@ def generate_event_folders(initial_condition_database,
     if initial_condition_database == "self":
         shutil.copytree('codes/3dMCGlauber',
                         path.join(event_folder, '3dMCGlauber'), symlinks=True)
+        shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
+                        path.join(event_folder, '3dMCGlauber/input'))
         subprocess.call("ln -s {0:s} {1:s}".format(
                         path.abspath('codes/3dMCGlauber_code/3dMCGlb.e'),
                         path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
@@ -319,6 +322,8 @@ def generate_event_folders(initial_condition_database,
 
     shutil.copytree('codes/MUSIC', path.join(event_folder, 'MUSIC'),
                     symlinks=True)
+    shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
+                    path.join(event_folder, 'MUSIC/music_input_mode_2'))
     subprocess.call("ln -s {0:s} {1:s}".format(
         path.abspath('codes/MUSIC_code/EOS'),
         path.join(event_folder, "MUSIC/EOS")), shell=True)
@@ -333,6 +338,8 @@ def generate_event_folders(initial_condition_database,
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
         shutil.copytree('codes/iSS', path.join(sub_event_folder, 'iSS'))
+        shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
+                        path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
         subprocess.call("ln -s {0:s} {1:s}".format(
             path.abspath('codes/iSS_code/iSS_tables'),
             path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
@@ -346,6 +353,10 @@ def generate_event_folders(initial_condition_database,
             path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
     shutil.copytree('codes/hadronic_afterburner_toolkit',
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
+    shutil.copyfile(path.join(param_folder,
+                              'hadronic_afterburner_toolkit/parameters.dat'),
+                    path.join(event_folder,
+                              'hadronic_afterburner_toolkit/parameters.dat'))
     subprocess.call("ln -s {0:s} {1:s}".format(
         path.abspath(path.join('codes', 'hadronic_afterburner_toolkit_code',
                                'hadronic_afterburner_tools.e')),
@@ -435,15 +446,21 @@ def main():
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
 
+    working_folder_name = path.abspath(working_folder_name)
+    mkdir(working_folder_name)
+    shutil.copy(args.par_dict, working_folder_name)
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
-        subprocess.call(
-            "(cd config; python3 parameters_dict_master.py -par {} -b {};)".format(
-                args.par_dict.split(".")[0], args.bayes_file), shell=True)
+        subprocess.call("(cd config; python3 parameters_dict_master.py "
+                        + "-path {} -par {} -b {};)".format(
+                            working_folder_name,
+                            args.par_dict.split(".")[0], args.bayes_file),
+                        shell=True)
     else:
-        subprocess.call(
-            "(cd config; python3 parameters_dict_master.py -par {};)".format(
-                args.par_dict.split(".")[0]), shell=True)
+        subprocess.call("(cd config; python3 parameters_dict_master.py "
+                        + "-path {} -par {};)".format(
+                            working_folder_name, args.par_dict.split(".")[0]),
+                        shell=True)
 
     cent_label = "XXX"
     cent_label_pre = cent_label
@@ -454,9 +471,6 @@ def main():
         print("\U0001F375  "
               + "Pre-generated initial conditions from {} ...".format(
               initial_condition_database.format(cent_label)))
-    working_folder_name = path.abspath(working_folder_name)
-    mkdir(working_folder_name)
-    shutil.copy(args.par_dict, working_folder_name)
 
     toolbar_width = 40
     sys.stdout.write("\U0001F375  Generating {} jobs [{}]".format(

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """This is a drive script to run hydro + hadronic cascade simulation"""
 
 from multiprocessing import Pool

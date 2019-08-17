@@ -1,38 +1,34 @@
-# Build from the official docker python base image, based on Debian
-FROM python:3.6-stretch
+FROM ubuntu:bionic
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
-# Install pre-reqs (commented ones are already in base image)
-RUN apt-get update && apt-get install -y \
-cmake \
-doxygen \
-g++ \
-gfortran \
-gsl-bin \
-hdf5-tools \
-less \
-libxpm-dev \
-libgsl-dev \
-libhdf5-dev \
-rsync \
-vim \
-zlib1g-dev \
-&& rm -rf /var/lib/apt/lists/*
+RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
+    apt-get update && apt-get install -y --no-install-recommends \
+        cmake \
+        g++ \
+        gcc \
+        gfortran \
+        git \
+        hdf5-tools \
+        libfftw3-dev \
+        libgsl-dev \
+        libhdf5-dev \
+        libz-dev \
+        make \
+        pkg-config \
+        python3 \
+        python3-pip \
+        vim \
+        wget \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install pre-reqs python packages
-RUN pip install numpy h5py
+RUN pip3 install --upgrade && \
+    pip3 install numpy h5py
 
-# Install packages
-ARG software_path=/home/
-
-# Set up a user group
-ARG username=iEBE-MUSIC-user
-ARG id=1234
-RUN groupadd -g ${id} ${username} \
-&& useradd --create-home --home-dir /home/${username} -u ${id} -g ${username} ${username}
-USER ${username}
-ENV HOME /home/${username}
+ENV HOME /home/
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} \
@@ -41,5 +37,3 @@ RUN cd ${HOME} \
 && ./compile_code_packages.sh
 
 WORKDIR ${HOME}/iEBE-MUSIC
-
-ENTRYPOINT /bin/bash
