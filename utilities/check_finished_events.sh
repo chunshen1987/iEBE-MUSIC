@@ -25,12 +25,12 @@ do
     eventsPath=$fromFolder/$ijob
     for iev in `ls --color=none $eventsPath | grep $event_folder_name`
     do 
-        event_id=`echo $iev | cut -f 3 -d "_"`
-        hydrotime=`tail -n 3 $eventsPath/$iev/$hydro_folder_name$event_id/run.log 2>/dev/null | head -n 1 | cut -f 8 -d " "`
-        hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name$event_id/run.log 2>/dev/null | cut -f 4 -d " "`
+        event_id=`echo $iev | rev | cut -f 1 -d "_" | rev`
+        hydrotime=`tail -n 3 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | head -n 1 | cut -f 8 -d " "`
+        hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | cut -f 4 -d " "`
         if [ "$hydrostatus" == "Finished." ]; then
             echo $iev $hydrostatus $hydrotime
-            if [ -a $eventsPath/$iev/$spvn_folder_name$event_id/particle_9999_vndata_eta_-0.5_0.5.dat ]; then
+            if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-0.5_0.5.dat ]; then
                 ((collected_eventNum++))
             fi
         fi
