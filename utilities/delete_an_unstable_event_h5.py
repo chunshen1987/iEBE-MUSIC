@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
     This script delete an unstable event in the final collected hdf5 database
 """

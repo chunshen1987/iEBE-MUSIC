@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
      This script fectches individual IP-Glasma event from the hdf5 database.
      It outputs the input file for MUSIC fluid dynamic simulation.

@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
      This script fectches individual 3D MC-Glauber event from the hdf5 database.
      It outputs the input file for MUSIC fluid dynamic simulation.

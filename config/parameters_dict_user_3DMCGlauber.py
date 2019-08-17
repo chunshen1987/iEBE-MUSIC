@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
     This script contains all the user modified parameters in
     the iEBE-MUSIC package.
