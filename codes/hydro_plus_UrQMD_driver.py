@@ -51,7 +51,7 @@ def run_hydro_event(final_results_folder, event_id):
     call("bash ./run_hydro.sh", shell=True)
 
     # check hydro finishes properly
-    ftmp = open("MUSIC/hydro_results/run.log", 'r')
+    ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
     hydro_status = ftmp.readlines()[-1].split()[3]
     hydro_success = False
     if hydro_status == "Finished.":
