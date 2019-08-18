@@ -402,7 +402,10 @@ def output_parameters_to_files(workfolder="."):
     print("\U0001F375  Output input parameter files to {}...".format(
                                                                 workfolder))
     for idict, (parameters_dict, fname, itype) in enumerate(Parameters_list):
-        f = open(fname, "w")
+        output_folder = path.join(workfolder, path_list[idict])
+        if not path.exists(output_folder):
+            makedirs(output_folder)
+        f = open(path.join(output_folder, fname), "w")
         for key_name in parameters_dict:
             if itype in (0, 2):
                 f.write("{parameter_name}  {parameter_value}\n".format(
@@ -415,11 +418,6 @@ def output_parameters_to_files(workfolder="."):
         if itype == 2:
             f.write("EndOfData")
         f.close()
-        output_folder = path.join(workfolder, path_list[idict])
-        if not path.exists(output_folder):
-            makedirs(output_folder)
-        shutil.move(path.join(path.abspath('.'), fname),
-                    path.join(output_folder, fname))
 
 
 if __name__ == "__main__":
