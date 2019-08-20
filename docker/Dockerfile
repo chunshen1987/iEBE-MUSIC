@@ -15,7 +15,7 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
         libhdf5-dev \
         libz-dev \
         make \
-        pkg-config \
+        #pkg-config \
         python3 \
         python3-pip \
         vim \
@@ -26,7 +26,7 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
 
 # Install pre-reqs python packages
 RUN pip3 install --upgrade && \
-    pip3 install numpy h5py
+    pip3 install numpy h5py scipy
 
 ENV HOME /home/
 
