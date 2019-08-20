@@ -274,8 +274,13 @@ pid=$1
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0 >> run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0 >> run.log
     else
-        #./hadronic_afterburner_tools.e particle_monval=$pid rap_type=0
-        ./hadronic_afterburner_tools.e particle_monval=$pid >> run.log
+        if [ "$pid" == 3122 -o "$pid" == -3122 -o "$pid" == 3312 -o "$pid" == -3312 -o "$pid" == 3334 -o "$pid" == -3334 ]; then
+            #./hadronic_afterburner_tools.e particle_monval=$pid rap_type=0 resonance_weak_feed_down_flag=0 >> run.log
+            ./hadronic_afterburner_tools.e particle_monval=$pid resonance_weak_feed_down_flag=0 >> run.log
+        else
+            #./hadronic_afterburner_tools.e particle_monval=$pid rap_type=0 >> run.log
+            ./hadronic_afterburner_tools.e particle_monval=$pid >> run.log
+        fi
     fi
 )
 """)
