@@ -15,9 +15,9 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
         libhdf5-dev \
         libz-dev \
         make \
-        #pkg-config \
         python3 \
         python3-pip \
+        time \
         vim \
         wget \
         && \
@@ -35,5 +35,7 @@ RUN cd ${HOME} \
 && git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC \
 && cd iEBE-MUSIC/codes && ./get_code_packages.sh \
 && ./compile_code_packages.sh
+
+ENV PYTHONIOENCODING utf-8
 
 WORKDIR ${HOME}/iEBE-MUSIC
