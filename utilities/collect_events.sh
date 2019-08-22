@@ -22,6 +22,7 @@ folderName=`echo $fromFolder | rev | cut -d "/" -f 1 | rev`
 target_folder=$toFolder/$folderName
 mkdir -p $target_folder
 cp $fromFolder/parameters_dict_*.py $target_folder/
+cp -r $fromFolder/model_parameters $target_folder/
 target_hydro_folder=$target_folder/HYDRO_RESULTS
 mkdir -p $target_hydro_folder
 target_urqmd_folder=$target_folder/URQMD_RESULTS
@@ -37,10 +38,10 @@ spvn_folder_name="spvn_results_"
 total_eventNum=0
 collected_eventNum=0
 for ijob in `ls --color=none $fromFolder | grep "event" `;
-do 
+do
     eventsPath=$fromFolder/$ijob
     for iev in `ls --color=none $eventsPath | grep $event_folder_name`
-    do 
+    do
         echo $iev
         event_id=`echo $iev | rev | cut -f 1 -d "_" | rev`
         hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log | cut -f 4 -d " "`
