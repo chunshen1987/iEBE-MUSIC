@@ -5,7 +5,6 @@
 
 from os import path, makedirs
 import sys
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 import shutil
 import argparse
 
@@ -345,9 +344,12 @@ path_list = [
 ]
 
 
-def update_parameters_dict(par_dict_name):
+def update_parameters_dict(par_dict_path):
     """This function update the parameters dictionaries with user's settings"""
-    parameters_dict = __import__(par_dict_name)
+    par_diretory = path.dirname(par_dict_path)
+    sys.path.insert(0, par_diretory)
+    print(par_diretory)
+    parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
     initial_condition_type = (
                     parameters_dict.control_dict['initial_state_type'])
     if initial_condition_type == "IPGlasma":
@@ -434,7 +436,7 @@ if __name__ == "__main__":
                         type=str, default='',
                         help='parameters from bayesian analysis')
     args = parser.parse_args()
-    update_parameters_dict(args.par_dict)
+    update_parameters_dict(path.abspath(args.par_dict))
     if args.bayes_file != "":
         update_parameters_bayesian(args.bayes_file)
     output_parameters_to_files(args.path)
