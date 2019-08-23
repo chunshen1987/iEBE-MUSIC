@@ -41,11 +41,10 @@ ENV PYTHONIOENCODING utf-8
 WORKDIR ${HOME}/iEBE-MUSIC
 
 # some extra singularity stuff
-COPY .singularity.d /.singularity.d
 RUN cd / && \
-    ln -s .singularity.d/actions/exec .exec && \
-    ln -s .singularity.d/actions/run .run && \
-    ln -s .singularity.d/actions/test .shell && \
-    ln -s .singularity.d/runscript singularity
+    ln -s /home/iEBE-MUSIC/.singularity.d/actions/exec .exec && \
+    ln -s /home/iEBE-MUSIC/.singularity.d/actions/run .run && \
+    ln -s /home/iEBE-MUSIC/.singularity.d/actions/test .shell && \
+    ln -s /home/iEBE-MUSIC/.singularity.d/runscript singularity
 
 CMD /bin/bash
