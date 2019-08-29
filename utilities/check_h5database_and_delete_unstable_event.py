@@ -17,9 +17,15 @@ def check_an_event_is_good(h5_event):
         'particle_211_vndata_diff_y_-0.5_0.5.dat',
         'particle_321_vndata_diff_y_-0.5_0.5.dat',
         'particle_2212_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-211_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-321_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-2212_vndata_diff_y_-0.5_0.5.dat',
         'particle_3122_vndata_diff_y_-0.5_0.5.dat',
         'particle_3312_vndata_diff_y_-0.5_0.5.dat',
         'particle_3334_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3122_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3312_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3334_vndata_diff_y_-0.5_0.5.dat',
         'particle_333_vndata_diff_y_-0.5_0.5.dat',
     ]
     event_file_list = list(h5_event.keys())
