@@ -161,9 +161,10 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
-    script.write(
+    script.write("\nseed_add=${1:-0}\n"
+            +
         """
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} $seed_add {6:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            time_stamp))
     script.close()

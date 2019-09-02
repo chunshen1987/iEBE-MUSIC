@@ -18,11 +18,11 @@ def print_usage():
     print("\U0001F3B6  "
           + "Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
           + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
-          + "n_threads tau0")
+          + "n_threads seed_add tau0")
 
 
 def get_initial_condition(database, initial_type, nev, idx0,
-                          time_stamp_str="0.4"):
+                          seed_add, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     if initial_type == "IPGlasma":
         for iev in range(idx0, idx0 + nev):
@@ -32,7 +32,8 @@ def get_initial_condition(database, initial_type, nev, idx0,
         for iev in range(idx0, idx0 + nev):
             file_name = "strings_event_{}.dat".format(iev)
             if database == "self":
-                call("(cd 3dMCGlauber; ./3dMCGlb.e 1;)", shell=True)
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
+                                                    seed_add), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
             else:
@@ -215,13 +216,15 @@ def remove_unwanted_outputs(final_results_folder, event_id):
 
 
 def main(initial_condition, initial_type,
-         n_hydro, hydro_id0, n_urqmd, num_threads, time_stamp_str="0.4"):
+         n_hydro, hydro_id0, n_urqmd, num_threads,
+         seed_add=0, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
 
     for ifile in get_initial_condition(initial_condition,
                                        initial_type,
-                                       n_hydro, hydro_id0, time_stamp_str):
+                                       n_hydro, hydro_id0, seed_add,
+                                       time_stamp_str):
         print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_type == "IPGlasma":
             initial_database_name = (
@@ -279,7 +282,8 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        TIME_STAMP = str(sys.argv[7])
+        SEED_ADD = int(sys.argv[7])
+        TIME_STAMP = str(sys.argv[8])
     except IndexError:
         print_usage()
         exit(0)
@@ -291,4 +295,5 @@ if __name__ == "__main__":
         exit(1)
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
-         N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS, TIME_STAMP)
+         N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
+         SEED_ADD, TIME_STAMP)
