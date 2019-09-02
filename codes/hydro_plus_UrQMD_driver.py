@@ -74,6 +74,8 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
                                   "surface*.dat"))
     for iev in range(n_urqmd):
         hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
+        if path.exists(hydro_surface_folder):
+            shutil.rmtree(hydro_surface_folder)
         mkdir(hydro_surface_folder)
         call("ln -s {0:s} {1:s}".format(
             path.abspath(surface_file[0]),
@@ -110,6 +112,8 @@ def run_spvn_analysis_shell(urqmd_file_path, n_threads,
                             final_results_folder, event_id):
     """This function runs analysis in parallel"""
     spvn_folder = "hadronic_afterburner_toolkit/results"
+    if path.exists(spvn_folder):
+        shutil.rmtree(spvn_folder)
     mkdir(spvn_folder)
     call("ln -s {0:s} {1:s}".format(
         path.abspath(urqmd_file_path),
@@ -237,6 +241,8 @@ def main(initial_condition, initial_type,
             shutil.move(ifile, "MUSIC/initial/strings.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
+        if path.exists(final_results_folder):
+            shutil.rmtree(final_results_folder)
         mkdir(final_results_folder)
 
         # first run hydro
