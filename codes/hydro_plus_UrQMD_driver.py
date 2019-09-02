@@ -126,6 +126,36 @@ def run_spvn_analysis_shell(urqmd_file_path, n_threads,
                 path.join(final_results_folder,
                           "spvn_results_{0:s}".format(event_id)))
 
+
+def check_an_event_is_good(event_folder):
+    """This function checks the given event contains all required files"""
+    required_files_list = [
+        'particle_9999_vndata_eta_-0.5_0.5.dat',
+        'particle_9999_vndata_diff_eta_0.5_2.dat',
+        'particle_9999_vndata_eta_-2_2.dat',
+        'particle_211_vndata_diff_y_-0.5_0.5.dat',
+        'particle_321_vndata_diff_y_-0.5_0.5.dat',
+        'particle_2212_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-211_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-321_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-2212_vndata_diff_y_-0.5_0.5.dat',
+        'particle_3122_vndata_diff_y_-0.5_0.5.dat',
+        'particle_3312_vndata_diff_y_-0.5_0.5.dat',
+        'particle_3334_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3122_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3312_vndata_diff_y_-0.5_0.5.dat',
+        'particle_-3334_vndata_diff_y_-0.5_0.5.dat',
+        'particle_333_vndata_diff_y_-0.5_0.5.dat',
+    ]
+    event_file_list = glob(path.join(event_folder, "*"))
+    for ifile in required_files_list:
+        if ifile not in event_file_list:
+            print("event {} is bad, missing {} ...".format(
+                                                        event_folder, ifile))
+            return False
+    return True
+
+
 def zip_results_into_hdf5(final_results_folder, event_id):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
@@ -140,26 +170,31 @@ def zip_results_into_hdf5(final_results_folder, event_id):
                             "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
 
-    for ipattern in hydro_info_filepattern:
-        hydro_info_list = glob(path.join(hydrofolder, ipattern))
-        for ihydrofile in hydro_info_list:
-            if path.isfile(ihydrofile):
-                shutil.move(ihydrofile, spvnfolder)
+    status = check_an_event_is_good(spvnfolder)
+    if status:
+        print("{} is good, converting results to hdf5".format(spvnfolder))
+        for ipattern in hydro_info_filepattern:
+            hydro_info_list = glob(path.join(hydrofolder, ipattern))
+            for ihydrofile in hydro_info_list:
+                if path.isfile(ihydrofile):
+                    shutil.move(ihydrofile, spvnfolder)
 
-    hf = h5py.File("{0}.h5".format(results_name), "w")
-    gtemp = hf.create_group("{0}".format(results_name))
-    file_list = glob(path.join(spvnfolder, "*"))
-    for file_path in file_list:
-        file_name = file_path.split("/")[-1]
-        dtemp = np.loadtxt(file_path)
-        h5data = gtemp.create_dataset("{0}".format(file_name), data=dtemp,
-                             compression="gzip", compression_opts=9)
-        ftemp = open(file_path, "r")
-        header_text = str(ftemp.readline())
-        ftemp.close()
-        h5data.attrs.create("header", np.string_(header_text))
-    hf.close()
-    shutil.move("{}.h5".format(results_name), final_results_folder)
+        hf = h5py.File("{0}.h5".format(results_name), "w")
+        gtemp = hf.create_group("{0}".format(results_name))
+        file_list = glob(path.join(spvnfolder, "*"))
+        for file_path in file_list:
+            file_name = file_path.split("/")[-1]
+            dtemp = np.loadtxt(file_path)
+            h5data = gtemp.create_dataset("{0}".format(file_name), data=dtemp,
+                                 compression="gzip", compression_opts=9)
+            ftemp = open(file_path, "r")
+            header_text = str(ftemp.readline())
+            ftemp.close()
+            h5data.attrs.create("header", np.string_(header_text))
+        hf.close()
+        shutil.move("{}.h5".format(results_name), final_results_folder)
+    else:
+        print("{} is broken, skipped".format(spvnfolder))
 
 
 def remove_unwanted_outputs(final_results_folder, event_id):
@@ -177,6 +212,7 @@ def remove_unwanted_outputs(final_results_folder, event_id):
     if not SAVE_URQMD_FILES:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
+
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads, time_stamp_str="0.4"):
