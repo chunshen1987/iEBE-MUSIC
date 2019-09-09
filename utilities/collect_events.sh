@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage="./collect_events.sh fromFolder toFolder"
+usage="./collect_events_onlyh5.sh fromFolder toFolder"
 
 fromFolder=$1
 toFolder=$2
@@ -44,15 +44,29 @@ do
     do
         echo $iev
         event_id=`echo $iev | rev | cut -f 1 -d "_" | rev`
-        hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log | cut -f 4 -d " "`
-        echo $hydrostatus
-        if [ "$hydrostatus" == "Finished." ]; then
-            if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-2_2.dat ]; then
-                mv $eventsPath/$iev/$hydro_folder_name*$event_id $target_hydro_folder
-                mv $eventsPath/$iev/$UrQMD_file_name*$event_id.gz $target_urqmd_folder
-                mv $eventsPath/$iev/$spvn_folder_name*$event_id.h5 $target_spvn_folder
-                ((collected_eventNum++))
+        hydro_folder=`$eventsPath/$iev/$hydro_folder_name*$event_id/`
+        urqmd_file=`$eventsPath/$iev/$UrQMD_file_name*$event_id.gz`
+        hydrostatus=false
+        urqmdstatus=false
+        if [ -d $hydro_folder ]; then
+            hydrostatus1=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log | cut -f 4 -d " "`
+            echo $hydrostatus1
+            if [ "$hydrostatus1" == "Finished." ]; then
+                hydrostatus=true
             fi
+        fi
+        if [ -e $urqmd_file ]; then
+            urqmdstatus=true
+        fi
+        if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-2_2.dat ]; then
+            if [ "$hydrostatus" = true ]; then
+                mv $eventsPath/$iev/$hydro_folder_name*$event_id $target_hydro_folder
+            fi
+            if [ "$urqmdstatus" = true ]; then
+                mv $eventsPath/$iev/$UrQMD_file_name*$event_id.gz $target_urqmd_folder
+            fi
+            mv $eventsPath/$iev/$spvn_folder_name*$event_id.h5 $target_spvn_folder
+            ((collected_eventNum++))
         fi
         ((total_eventNum++))
     done
