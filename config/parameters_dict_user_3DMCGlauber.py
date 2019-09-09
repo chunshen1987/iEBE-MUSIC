@@ -82,12 +82,13 @@ iss_dict = {
                                                # particle numbers is reached
     'number_of_particles_needed': 100000,      # number of hadrons to sample
     'local_charge_conservation': 0,  # flag to impose local charge conservation
+    'global_momentum_conservation': 0,  # flag to impose GMC
 }
 
 
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
-    'event_buffer_size': 100,       # the number of events read in at once
+    'event_buffer_size': 100000,       # the number of events read in at once
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution

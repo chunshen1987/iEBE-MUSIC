@@ -170,7 +170,8 @@ iss_dict = {
 
     'perform_decays': 0,             # flag to perform resonance decay
     'local_charge_conservation': 0,  # flag to impose local charge conservation
-    
+    'global_momentum_conservation': 0,  # flag to impose GMC
+
     'y_LB': -5.0,       # lower bound for y-sampling; 
     'y_RB': 5.0,        # upper bound for y-sampling;
 
@@ -260,7 +261,7 @@ hadronic_afterburner_toolkit_dict = {
     'randomSeed': -1,
     'particle_monval': 211,     # particle Monte-Carlo number
     'distinguish_isospin': 1,   # flag whether to distinguish the isospin of particles
-    'event_buffer_size': 100,       # the number of events read in at once
+    'event_buffer_size': 100000,       # the number of events read in at once
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
     'resonance_feed_down_flag': 0,  # perform resonance feed down
                                     # (will read in all hadrons and filter particle
