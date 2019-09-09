@@ -152,7 +152,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, hydro_flag,
+                             urqmd_flag, time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -164,9 +165,9 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write("\nseed_add=${1:-0}\n"
             +
         """
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} $seed_add {6:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} $seed_add {8:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           time_stamp))
+           hydro_flag, urqmd_flag, time_stamp))
     script.close()
 
 
@@ -307,7 +308,8 @@ def generate_event_folders(initial_condition_database,
                            code_package_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, GMC_flag, corr_flag):
+                           time_stamp,
+                           hydro_flag, urqmd_flag, GMC_flag, corr_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -343,7 +345,7 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id_offset, n_urqmd_per_hydro,
-                             n_threads, time_stamp)
+                             n_threads, hydro_flag, urqmd_flag, time_stamp)
 
     generate_script_hydro(event_folder, n_threads)
 
@@ -557,14 +559,17 @@ def main():
                         event_id_offset = 0
                     break
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
-        corr_flag = (parameter_dict.hadronic_afterburner_toolkit_dict[
-                                                    'compute_correlation'])
+        corr_flag = parameter_dict.hadronic_afterburner_toolkit_dict[
+                                                    'compute_correlation']
+        hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
+        urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type,
                                code_package_path, working_folder_name,
                                cluster_name, iev, event_id_offset,
                                n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, GMC_flag, corr_flag)
+                               IPGlasma_time_stamp,
+                               hydro_flag, urqmd_flag, GMC_flag, corr_flag)
         event_id_offset += n_hydro_per_job
     sys.stdout.write("\n")
     sys.stdout.flush()

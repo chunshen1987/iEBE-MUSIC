@@ -12,6 +12,8 @@ import argparse
 control_dict = {
     'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
     'walltime': "10:00:00",  # walltime to run
+    'save_hydro_surfaces': False,   # flag to save hydro surfaces
+    'save_UrQMD_files': False,      # flag to save UrQMD files
 }
 
 

@@ -18,7 +18,7 @@ def print_usage():
     print("\U0001F3B6  "
           + "Usage: {} ".format(sys.argv[0]) + "initial_condition_database "
           + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
-          + "n_threads seed_add tau0")
+          + "n_threads save_hydro_flag save_urqmd_flag seed_add tau0")
 
 
 def get_initial_condition(database, initial_type, nev, idx0,
@@ -202,25 +202,25 @@ def zip_results_into_hdf5(final_results_folder, event_id):
         print("{} is broken, skipped".format(spvnfolder))
 
 
-def remove_unwanted_outputs(final_results_folder, event_id):
+def remove_unwanted_outputs(final_results_folder, event_id,
+                            save_hydro=True, save_urqmd=True):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
 
     """
-    SAVE_HYDRO_SURFACE = True
-    SAVE_URQMD_FILES = True
-    if not SAVE_HYDRO_SURFACE:
+    if not save_hydro:
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder)
-    if not SAVE_URQMD_FILES:
+    if not save_urqmd:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
 
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads,
+         save_hydro=True, save_urqmd=True,
          seed_add=0, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
@@ -277,7 +277,8 @@ def main(initial_condition, initial_type,
         zip_results_into_hdf5(final_results_folder, event_id)
 
         # remove the unwanted outputs
-        remove_unwanted_outputs(final_results_folder, event_id)
+        remove_unwanted_outputs(final_results_folder, event_id,
+                                save_hydro, save_urqmd)
 
 
 if __name__ == "__main__":
@@ -288,8 +289,10 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        SEED_ADD = int(sys.argv[7])
-        TIME_STAMP = str(sys.argv[8])
+        SAVE_HYDRO = bool(sys.argv[7])
+        SAVE_URQMD = bool(sys.argv[8])
+        SEED_ADD = int(sys.argv[9])
+        TIME_STAMP = str(sys.argv[10])
     except IndexError:
         print_usage()
         exit(0)
@@ -302,4 +305,4 @@ if __name__ == "__main__":
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
          N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
-         SEED_ADD, TIME_STAMP)
+         SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
