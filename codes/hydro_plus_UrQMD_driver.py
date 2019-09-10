@@ -292,8 +292,8 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        SAVE_HYDRO = bool(sys.argv[7])
-        SAVE_URQMD = bool(sys.argv[8])
+        SAVE_HYDRO = (sys.argv[7].lower() == "true")
+        SAVE_URQMD = (sys.argv[8].lower() == "true")
         SEED_ADD = int(sys.argv[9])
         TIME_STAMP = str(sys.argv[10])
     except IndexError:
