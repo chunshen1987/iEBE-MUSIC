@@ -22,6 +22,7 @@ def print_usage():
 
 
 def get_initial_condition(database, initial_type, nev, idx0,
+                          num_finished_events,
                           seed_add, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     if initial_type == "IPGlasma":
@@ -29,16 +30,19 @@ def get_initial_condition(database, initial_type, nev, idx0,
             file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
             yield file_name
     elif initial_type == "3DMCGlauber":
-        for iev in range(idx0, idx0 + nev):
-            file_name = "strings_event_{}.dat".format(iev)
-            if database == "self":
+        if database == "self":
+            if num_finished_events < nev:
+                iev = idx0 + num_finished_events
+                file_name = "strings_event_{}.dat".format(iev)
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
                                                     seed_add), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-            else:
+                yield file_name
+        else:
+            for iev in range(idx0, idx0 + nev):
                 file_name = fecth_an_3DMCGlauber_event(database, iev)
-            yield file_name
+                yield file_name
     else:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
@@ -228,10 +232,11 @@ def main(initial_condition, initial_type,
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
 
+    num_finished_events = 0
     for ifile in get_initial_condition(initial_condition,
                                        initial_type,
-                                       n_hydro, hydro_id0, seed_add,
-                                       time_stamp_str):
+                                       n_hydro, hydro_id0, num_finished_events,
+                                       seed_add, time_stamp_str):
         print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_type == "IPGlasma":
             initial_database_name = (
@@ -282,6 +287,8 @@ def main(initial_condition, initial_type,
         # remove the unwanted outputs
         remove_unwanted_outputs(final_results_folder, event_id,
                                 save_hydro, save_urqmd)
+
+        num_finished_events += 1
 
 
 if __name__ == "__main__":
