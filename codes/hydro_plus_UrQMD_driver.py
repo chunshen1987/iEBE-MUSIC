@@ -126,6 +126,8 @@ def run_spvn_analysis_shell(urqmd_file_path, n_threads,
     with Pool(processes=min(10, n_threads)) as pool:
         pool.map(run_spvn_analysis, particle_list)
 
+    print("\U0001F3CD Finished spvn analysis ... ")
+
     call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
     shutil.move(spvn_folder,
                 path.join(final_results_folder,
@@ -154,9 +156,10 @@ def check_an_event_is_good(event_folder):
     ]
     event_file_list = glob(path.join(event_folder, "*"))
     for ifile in required_files_list:
-        if ifile not in event_file_list:
-            print("event {} is bad, missing {} ...".format(
-                                                        event_folder, ifile))
+        filename = path.join(event_folder, ifile)
+        if filename not in event_file_list:
+            print("event {} is bad, missing {} ...".format(event_folder,
+                                                           filename))
             return False
     return True
 
