@@ -82,6 +82,35 @@ def collect_one_IPGlasma_event(results_path, event_path, hf):
         dset.attrs.create("nx", nx)
         dset.attrs.create("ny", ny)
 
+    file_name_pattern = "Tmunu-t"
+    filelist = glob(path.join(results_path, "{0}*-{1}.dat".format(
+                                                file_name_pattern, event_id)))
+    for ifile, filepath in enumerate(filelist):
+        filename = filepath.split("/")[-1]
+        dtemp    = np.loadtxt(filepath)
+        dtemp    = np.nan_to_num(dtemp)
+        x_size   = abs(dtemp[0, 1])*2.
+        y_size   = abs(dtemp[0, 2])*2.
+        data_cut = dtemp[:, 2:]
+        dset     = gtemp.create_dataset("{0}".format(filename),
+                                        data=data_cut,
+                                        compression="gzip", compression_opts=9)
+        f = open(filepath)
+        header = f.readline().strip('\n')
+        dset.attrs.create("header", np.string_(header))
+        tmp = header.split()
+        dx = float(tmp[12])
+        dy = float(tmp[14])
+        nx = int(tmp[6])
+        ny = int(tmp[8])
+        dset.attrs.create("x_size", x_size)
+        dset.attrs.create("y_size", y_size)
+        dset.attrs.create("dx", dx)
+        dset.attrs.create("dy", dy)
+        dset.attrs.create("nx", nx)
+        dset.attrs.create("ny", ny)
+
+
 def collect_IPGlasma_events(results_folder):
     results_name = results_folder.split("/")[-1]
     if results_name == "":

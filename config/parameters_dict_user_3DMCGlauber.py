@@ -27,6 +27,7 @@ mcglauber_dict = {
                                  # see arXiv:nucl-th/9602027
     'lambdaB': 0.4,              # parameter the controls the strength of
                                  # the baryon junction stopping
+    'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'evolve_QCD_string_mode': 2,        # string evolution mode
                                         # 1: deceleration with fixed rapidity loss (m/sigma = 1 fm, dtau = 0.5 fm)
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
@@ -40,7 +41,7 @@ music_dict = {
     'Initial_profile': 13,  # type of initial condition 
                             # 13: dynamical initialization (3dMCGlauber)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
-    's_factor': 1.400,      # normalization factor read in initial data file
+    's_factor': 1.000,      # normalization factor read in initial data file
     'Delta_Tau': 0.010,     # time step to use in the evolution [fm/c]
     'boost_invariant':  0,  # whether the simulation is boost-invariant
     'Eta_grid_size': 10.0,  # spatial rapidity range 

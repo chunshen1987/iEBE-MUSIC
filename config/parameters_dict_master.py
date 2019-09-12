@@ -42,6 +42,7 @@ mcglauber_dict = {
                                  # see arXiv:nucl-th/9602027
     'lambdaB': 0.4,              # parameter the controls the strength of
                                  # the baryon junction stopping
+    'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'QCD_string_production_mode': 1,    # string production mode
                                         # 1: strings are produced randomly in the binary collision list
                                         # 2: strings are produced at the last binary collision
