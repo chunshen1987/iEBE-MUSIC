@@ -9,7 +9,7 @@ import sys
 import shutil
 import h5py
 import numpy as np
-from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
+from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
 from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
 
 
@@ -270,7 +270,7 @@ def main(initial_condition, initial_type,
                     initial_condition.split("/")[-1].split(".h5")[0])
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             event_id = initial_database_name + "_" + event_id
-            shutil.move(ifile, "kompost/initial/Tmunu.dat")
+            shutil.move(ifile, "kompost/Tmunu.dat")
         elif initial_type == "3DMCGlauber":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
@@ -285,7 +285,7 @@ def main(initial_condition, initial_type,
                 final_results_folder, event_id)
             call("ln -s {0:s} {1:s}".format(
                 path.join(
-                    final_results_folder, kompost_folder_name,
+                    path.abspath(final_results_folder), kompost_folder_name,
                     ("ekt_tIn01_tOut08"
                      + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 "MUSIC/initial/epsilon-u-Hydro.dat"), shell=True)

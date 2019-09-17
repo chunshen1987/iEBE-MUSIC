@@ -188,6 +188,9 @@ results_folder={0:s}
 (
 cd kompost
 
+mkdir -p $results_folder
+rm -fr $results_folder/*
+
 """.format(hydro_results_folder))
 
     if nthreads > 0:
@@ -549,11 +552,15 @@ def main():
     initial_condition_database = ""
     initial_condition_database_name_pattern = ""
     IPGlasma_time_stamp = "0.4"
-    if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
+    if initial_condition_type == "IPGlasma":
         initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = str(
                 parameter_dict.music_dict['Initial_time_tau_0'])
+    elif initial_condition_type == "IPGlasma+KoMPoST":
+        initial_condition_database = (
+                parameter_dict.ipglasma['database_name_pattern'])
+        IPGlasma_time_stamp = "0.1"
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
