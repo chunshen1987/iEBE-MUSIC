@@ -74,6 +74,25 @@ def run_hydro_event(final_results_folder, event_id):
     return(hydro_success, hydro_folder_name)
 
 
+def run_kompost(final_results_folder, event_id):
+    """This functions run KoMPoST"""
+    print("\U0001F3B6  Run KoMPoST ... ")
+    call("bash ./run_kompost.sh", shell=True)
+
+    # check hydro finishes properly
+    #ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
+    #kompost_status = ftmp.readlines()[-1].split()[3]
+    kompost_success = True
+
+    kompost_folder_name = ""
+    if kompost_success:
+        # collect hydro results
+        kompost_folder_name = "kompost_results_{}".format(event_id)
+        shutil.move("kompost/kompost_results", path.join(final_results_folder,
+                                                         kompost_folder_name))
+    return(kompost_success, kompost_folder_name)
+
+
 def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
                                     n_urqmd):
     """This function prepares hydro surface for hadronic casade"""
@@ -260,6 +279,16 @@ def main(initial_condition, initial_type,
         if path.exists(final_results_folder):
             shutil.rmtree(final_results_folder)
         mkdir(final_results_folder)
+
+        if initial_type == "IPGlasma+KoMPoST":
+            kompost_success, kompost_folder_name = run_kompost(
+                final_results_folder, event_id)
+            call("ln -s {0:s} {1:s}".format(
+                path.join(
+                    final_results_folder, kompost_folder_name,
+                    ("ekt_tIn01_tOut08"
+                     + ".music_init_flowNonLinear_pimunuTransverse.txt")),
+                "MUSIC/initial/epsilon-u-Hydro.dat"), shell=True)
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
