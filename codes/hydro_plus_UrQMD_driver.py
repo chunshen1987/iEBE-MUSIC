@@ -232,16 +232,23 @@ def zip_results_into_hdf5(final_results_folder, event_id):
 
 
 def remove_unwanted_outputs(final_results_folder, event_id,
-                            save_hydro=True, save_urqmd=True):
+                            save_kompost=True, save_hydro=True,
+                            save_urqmd=True):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
 
     """
+    if not save_kompost:
+        kompostfolder = path.join(final_results_folder,
+                                  "kompost_results_{}".format(event_id))
+        shutil.rmtree(kompostfolder)
+
     if not save_hydro:
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder)
+
     if not save_urqmd:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
@@ -249,7 +256,7 @@ def remove_unwanted_outputs(final_results_folder, event_id,
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads,
-         save_hydro=True, save_urqmd=True,
+         save_kompost=True, save_hydro=True, save_urqmd=True,
          seed_add=0, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
@@ -306,24 +313,23 @@ def main(initial_condition, initial_type,
                         path.join(final_results_folder, hydro_folder_name,
                                   "strings_{}.dat".format(event_id)))
 
-        # if hydro finishes properly, we continue to do hadronic transport
-        prepare_surface_files_for_urqmd(final_results_folder,
-                                        hydro_folder_name, n_urqmd)
+            # if hydro finishes properly, we continue to do hadronic transport
+            prepare_surface_files_for_urqmd(final_results_folder,
+                                            hydro_folder_name, n_urqmd)
 
-        # then run UrQMD events in parallel
-        urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
-                                          event_id)
-
-        # finally collect results
-        run_spvn_analysis_shell(urqmd_file_path, num_threads,
-                                final_results_folder, event_id)
+            # then run UrQMD events in parallel
+            urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
+                                              event_id)
+            # finally collect results
+            run_spvn_analysis_shell(urqmd_file_path, num_threads,
+                                    final_results_folder, event_id)
 
         # zip results into a hdf5 database
         zip_results_into_hdf5(final_results_folder, event_id)
 
         # remove the unwanted outputs
         remove_unwanted_outputs(final_results_folder, event_id,
-                                save_hydro, save_urqmd)
+                                save_kompost, save_hydro, save_urqmd)
 
 
 
@@ -335,10 +341,11 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        SAVE_HYDRO = (sys.argv[7].lower() == "true")
-        SAVE_URQMD = (sys.argv[8].lower() == "true")
-        SEED_ADD = int(sys.argv[9])
-        TIME_STAMP = str(sys.argv[10])
+        SAVE_KOMPOST = (sys.argv[7].lower() == "true")
+        SAVE_HYDRO = (sys.argv[8].lower() == "true")
+        SAVE_URQMD = (sys.argv[9].lower() == "true")
+        SEED_ADD = int(sys.argv[10])
+        TIME_STAMP = str(sys.argv[11])
     except IndexError:
         print_usage()
         exit(0)
@@ -352,4 +359,4 @@ if __name__ == "__main__":
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
          N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
-         SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
+         SAVE_KOMPOST, SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
