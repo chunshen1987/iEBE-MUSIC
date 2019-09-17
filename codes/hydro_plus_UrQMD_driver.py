@@ -28,6 +28,11 @@ def get_initial_condition(database, initial_type, nev, idx0,
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
             yield file_name
+    elif initial_type == "IPGlasma+KoMPoST":
+        for iev in range(idx0, idx0 + nev):
+            file_name = fecth_an_IPGlasma_event_Tmunu(database,
+                                                      time_stamp_str, iev)
+            yield file_name
     elif initial_type == "3DMCGlauber":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
@@ -241,6 +246,12 @@ def main(initial_condition, initial_type,
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
             event_id = initial_database_name + "_" + event_id
+        elif initial_type == "IPGlasma+KoMPoST":
+            initial_database_name = (
+                    initial_condition.split("/")[-1].split(".h5")[0])
+            event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
+            event_id = initial_database_name + "_" + event_id
+            shutil.move(ifile, "kompost/initial/Tmunu.dat")
         elif initial_type == "3DMCGlauber":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
@@ -303,7 +314,8 @@ if __name__ == "__main__":
         print_usage()
         exit(0)
 
-    if INITIAL_CONDITION_TYPE not in ("IPGlasma", "3DMCGlauber"):
+    known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
+    if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   INITIAL_CONDITION_TYPE))

@@ -356,7 +356,7 @@ def update_parameters_dict(par_dict_path):
     parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
     initial_condition_type = (
                     parameters_dict.control_dict['initial_state_type'])
-    if initial_condition_type == "IPGlasma":
+    if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma.update(parameters_dict.ipglasma)
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 9
