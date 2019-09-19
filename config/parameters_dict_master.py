@@ -48,6 +48,9 @@ mcglauber_dict = {
                                         # 2: strings are produced at the last binary collision
     'rapidity_loss_method': 2,          # 1: LEXUS
                                         # 2: parameterization
+    'yloss_param_slope': 0.65,          # the slope parameter for yloss parameterization [0., 1.]
+    'yloss_param_alpha1': 1.50,         # the small y ~ y^alpha1 for yloss parameterization (>=1.)
+    'yloss_param_alpha2': 0.70,         # the large y ~ y^alpha2 for yloss parameterization [0., 1.]
     'evolve_QCD_string_mode': 2,        # string evolution mode
                                         # 1: deceleration with fixed rapidity loss (m/sigma = 1 fm, dtau = 0.5 fm)
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
