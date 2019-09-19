@@ -621,7 +621,9 @@ def main():
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         corr_flag = parameter_dict.hadronic_afterburner_toolkit_dict[
                                                     'compute_correlation']
-        kompost_flag = parameter_dict.control_dict['save_kompost_results']
+        kompost_flag = False
+        if initial_condition_type == "IPGlasma+KoMPoST":
+            kompost_flag = parameter_dict.control_dict['save_kompost_results']
         hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
         urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
         generate_event_folders(initial_condition_database.format(cent_label),
