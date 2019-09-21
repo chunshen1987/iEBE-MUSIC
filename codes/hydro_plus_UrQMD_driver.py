@@ -290,6 +290,7 @@ def main(initial_condition, initial_type,
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
                 final_results_folder, event_id)
+            remove("MUSIC/initial/epsilon-u-Hydro.dat")
             call("ln -s {0:s} {1:s}".format(
                 path.join(
                     path.abspath(final_results_folder), kompost_folder_name,
