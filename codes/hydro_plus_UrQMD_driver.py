@@ -313,16 +313,16 @@ def main(initial_condition, initial_type,
                         path.join(final_results_folder, hydro_folder_name,
                                   "strings_{}.dat".format(event_id)))
 
-            # if hydro finishes properly, we continue to do hadronic transport
-            prepare_surface_files_for_urqmd(final_results_folder,
-                                            hydro_folder_name, n_urqmd)
+        # if hydro finishes properly, we continue to do hadronic transport
+        prepare_surface_files_for_urqmd(final_results_folder,
+                                        hydro_folder_name, n_urqmd)
 
-            # then run UrQMD events in parallel
-            urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
-                                              event_id)
-            # finally collect results
-            run_spvn_analysis_shell(urqmd_file_path, num_threads,
-                                    final_results_folder, event_id)
+        # then run UrQMD events in parallel
+        urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
+                                          event_id)
+        # finally collect results
+        run_spvn_analysis_shell(urqmd_file_path, num_threads,
+                                final_results_folder, event_id)
 
         # zip results into a hdf5 database
         zip_results_into_hdf5(final_results_folder, event_id)
