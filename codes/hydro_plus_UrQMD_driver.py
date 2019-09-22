@@ -290,13 +290,15 @@ def main(initial_condition, initial_type,
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
                 final_results_folder, event_id)
-            remove("MUSIC/initial/epsilon-u-Hydro.dat")
+            hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
+            if path.isfile(hydro_initial_file):
+                remove(hydro_initial_file)
             call("ln -s {0:s} {1:s}".format(
                 path.join(
                     path.abspath(final_results_folder), kompost_folder_name,
                     ("ekt_tIn01_tOut08"
                      + ".music_init_flowNonLinear_pimunuTransverse.txt")),
-                "MUSIC/initial/epsilon-u-Hydro.dat"), shell=True)
+                hydro_initial_file), shell=True)
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
