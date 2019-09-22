@@ -291,7 +291,7 @@ def main(initial_condition, initial_type,
             kompost_success, kompost_folder_name = run_kompost(
                 final_results_folder, event_id)
             hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
-            if path.isfile(hydro_initial_file):
+            if path.islink(hydro_initial_file):
                 remove(hydro_initial_file)
             call("ln -s {0:s} {1:s}".format(
                 path.join(
