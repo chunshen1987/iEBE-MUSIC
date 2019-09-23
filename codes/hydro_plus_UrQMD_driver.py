@@ -27,11 +27,13 @@ def get_initial_condition(database, initial_type, nev, idx0,
     if initial_type == "IPGlasma":
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
+            if file_name == "Failed": continue
             yield file_name
     elif initial_type == "IPGlasma+KoMPoST":
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_IPGlasma_event_Tmunu(database,
                                                       time_stamp_str, iev)
+            if file_name == "Failed": continue
             yield file_name
     elif initial_type == "3DMCGlauber":
         if database == "self":
