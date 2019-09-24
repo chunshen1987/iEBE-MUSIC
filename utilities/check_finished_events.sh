@@ -26,11 +26,15 @@ do
     for iev in `ls --color=none $eventsPath | grep $event_folder_name`
     do 
         event_id=`echo $iev | rev | cut -f 1 -d "_" | rev`
-        hydrotime=`tail -n 3 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | head -n 1 | cut -f 8 -d " "`
-        hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | cut -f 4 -d " "`
+        hydrostatus="Finished."
+        hydrotime="-1"
+        if [ -f "$eventsPath/$iev/$hydro_folder_name*$event_id/run.log" ]; then
+            hydrotime=`tail -n 3 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | head -n 1 | cut -f 8 -d " "`
+            hydrostatus=`tail -n 1 $eventsPath/$iev/$hydro_folder_name*$event_id/run.log 2>/dev/null | cut -f 4 -d " "`
+        fi
         if [ "$hydrostatus" == "Finished." ]; then
-            echo $iev $hydrostatus $hydrotime
-            if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-0.5_0.5.dat ]; then
+            if [ -a $eventsPath/$iev/$spvn_folder_name*$event_id/particle_9999_vndata_eta_-2_2.dat ]; then
+                echo $iev $hydrostatus $hydrotime
                 ((collected_eventNum++))
             fi
         fi
