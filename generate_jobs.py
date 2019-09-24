@@ -76,12 +76,25 @@ def write_script_header(cluster, script, n_threads,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
+    elif cluster == "mwsugrid":
+        script.write(
+            """#!/usr/bin/env bash
+#PBS -N {0:s}
+#PBS -l select=1:ncpus={1:d}:mem={2:.0f}GB:cpu_type=Intel
+##PBS -l walltime={3:s}
+#PBS -S /bin/bash
+#PBS -e test.err
+#PBS -o test.log
+#PBS -q mwsuq
+
+cd {4:s}
+""".format(event_id, n_threads, mem, walltime, working_folder))
     elif cluster in "local":
         script.write("#!/usr/bin/env bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
-        print("Available options: nersc, nerscKNL, wsugrid, local, guillimin, "
-              + "McGill")
+        print("Available options: nersc, nerscKNL, wsugrid, mwsugrid, "
+              + "local, guillimin, McGill")
         exit(1)
 
 
@@ -432,8 +445,8 @@ def main():
                         type=str, default='playground',
                         help='working folder path')
     parser.add_argument('-c', '--cluster_name', metavar='', type=str,
-                        choices=['nersc', 'nerscKNL', 'wsugrid', 'local',
-                                 'guillimin', 'McGill'],
+                        choices=['nersc', 'nerscKNL', 'wsugrid', 'mwsugrid',
+                                 'local', 'guillimin', 'McGill'],
                         default='local', help='name of the cluster')
     parser.add_argument('-n', '--n_jobs', metavar='',
                         type=int, default=1, help='number of jobs')
@@ -606,7 +619,7 @@ def main():
                                          n_nodes, n_threads,
                                          int(n_jobs/n_nodes), walltime)
 
-    if cluster_name == "wsugrid":
+    if cluster_name in ("wsugrid", "mwsugrid"):
         shutil.copy(path.join(code_package_path,
                               'Cluster_supports/WSUgrid/submit_all_jobs.sh'),
                     pwd)
