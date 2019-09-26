@@ -16,6 +16,9 @@ then
     exit 1
 fi
 
+fromFolder=${fromFolder%"/"}
+toFolder=${toFolder%"/"}
+
 echo "collecting events from " $fromFolder " to " $toFolder
 
 folderName=`echo $fromFolder | rev | cut -d "/" -f 1 | rev`
@@ -44,8 +47,8 @@ do
     do
         echo $iev
         event_id=`echo $iev | rev | cut -f 1 -d "_" | rev`
-        hydro_folder=`$eventsPath/$iev/$hydro_folder_name*$event_id/`
-        urqmd_file=`$eventsPath/$iev/$UrQMD_file_name*$event_id.gz`
+        hydro_folder="$eventsPath/$iev/$hydro_folder_name*$event_id/"
+        urqmd_file="$eventsPath/$iev/$UrQMD_file_name*$event_id.gz"
         hydrostatus=false
         urqmdstatus=false
         if [ -d $hydro_folder ]; then
