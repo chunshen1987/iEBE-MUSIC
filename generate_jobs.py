@@ -314,7 +314,7 @@ def generate_event_folders(initial_condition_database,
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
     mkdir(event_folder)
-    shutil.copy(path.join(code_package_path,
+    shutil.copy(path.join(working_folder,
                           'codes/hydro_plus_UrQMD_driver.py'),
                 event_folder)
     shutil.copy(path.join(code_package_path, 'IPGlasma_database',
@@ -324,20 +324,19 @@ def generate_event_folders(initial_condition_database,
                           'fetch_3DMCGlauber_event_from_hdf5_database.py'),
                 event_folder)
     if initial_condition_database == "self":
-        shutil.copytree(path.join(code_package_path, 'codes/3dMCGlauber'),
+        shutil.copytree(path.join(working_folder, 'codes/3dMCGlauber'),
                         path.join(event_folder, '3dMCGlauber'), symlinks=True)
         shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
                         path.join(event_folder, '3dMCGlauber/input'))
         subprocess.call("ln -s {0:s} {1:s}".format(
                         path.abspath(path.join(
-                                        code_package_path,
+                                        working_folder,
                                         'codes/3dMCGlauber_code/3dMCGlb.e')),
                         path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
                         shell=True)
         subprocess.call("ln -s {0:s} {1:s}".format(
-                        path.abspath(path.join(
-                                        code_package_path,
-                                        'codes/3dMCGlauber_code/eps09')),
+                        path.abspath(path.join(working_folder,
+                                               'codes/3dMCGlauber_code/eps09')),
                         path.join(event_folder, "3dMCGlauber/eps09")),
                         shell=True)
 
@@ -349,16 +348,16 @@ def generate_event_folders(initial_condition_database,
 
     generate_script_hydro(event_folder, n_threads)
 
-    shutil.copytree(path.join(code_package_path, 'codes/MUSIC'),
+    shutil.copytree(path.join(working_folder, 'codes/MUSIC'),
                     path.join(event_folder, 'MUSIC'),
                     symlinks=True)
     shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
                     path.join(event_folder, 'MUSIC/music_input_mode_2'))
     subprocess.call("ln -s {0:s} {1:s}".format(
-        path.abspath(path.join(code_package_path, 'codes/MUSIC_code/EOS')),
+        path.abspath(path.join(working_folder, 'codes/MUSIC_code/EOS')),
         path.join(event_folder, "MUSIC/EOS")), shell=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-        path.abspath(path.join(code_package_path,
+        path.abspath(path.join(working_folder,
                                'codes/MUSIC_code/MUSIChydro')),
         path.join(event_folder, "MUSIC/MUSIChydro")), shell=True)
     generate_script_afterburner(event_folder, GMC_flag)
@@ -368,27 +367,27 @@ def generate_event_folders(initial_condition_database,
                                      'event_{0:d}'.format(event_id),
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
-        shutil.copytree(path.join(code_package_path, 'codes/iSS'),
+        shutil.copytree(path.join(working_folder, 'codes/iSS'),
                         path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_package_path,
+            path.abspath(path.join(working_folder,
                                    'codes/iSS_code/iSS_tables')),
             path.join(sub_event_folder, "iSS/iSS_tables")), shell=True)
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_package_path,
+            path.abspath(path.join(working_folder,
                                    'codes/iSS_code/iSS.e')),
             path.join(sub_event_folder, "iSS/iSS.e")), shell=True)
-        shutil.copytree(path.join(code_package_path, 'codes/osc2u'),
+        shutil.copytree(path.join(working_folder, 'codes/osc2u'),
                         path.join(sub_event_folder, 'osc2u'))
-        shutil.copytree(path.join(code_package_path, 'codes/urqmd'),
+        shutil.copytree(path.join(working_folder, 'codes/urqmd'),
                         path.join(sub_event_folder, 'urqmd'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_package_path,
+            path.abspath(path.join(working_folder,
                                    'codes/urqmd_code/urqmd/urqmd.e')),
             path.join(sub_event_folder, "urqmd/urqmd.e")), shell=True)
-    shutil.copytree(path.join(code_package_path,
+    shutil.copytree(path.join(working_folder,
                               'codes/hadronic_afterburner_toolkit'),
                     path.join(event_folder, 'hadronic_afterburner_toolkit'))
     shutil.copyfile(path.join(param_folder,
@@ -396,13 +395,13 @@ def generate_event_folders(initial_condition_database,
                     path.join(event_folder,
                               'hadronic_afterburner_toolkit/parameters.dat'))
     subprocess.call("ln -s {0:s} {1:s}".format(
-        path.abspath(path.join(code_package_path, 'codes',
+        path.abspath(path.join(working_folder, 'codes',
                                'hadronic_afterburner_toolkit_code',
                                'hadronic_afterburner_tools.e')),
         path.join(event_folder, "hadronic_afterburner_toolkit",
                   "hadronic_afterburner_tools.e")), shell=True)
     subprocess.call("ln -s {0:s} {1:s}".format(
-        path.abspath(path.join(code_package_path,
+        path.abspath(path.join(working_folder,
                                'codes/hadronic_afterburner_toolkit_code/EOS')),
         path.join(event_folder, "hadronic_afterburner_toolkit/EOS")),
                     shell=True)
@@ -510,6 +509,8 @@ def main():
     create_a_working_folder(working_folder_name)
 
     shutil.copy(args.par_dict, working_folder_name)
+    shutil.copytree("{}/codes".format(code_package_path),
+                    path.join(working_folder_name, "codes"))
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
         subprocess.call("(cd {}/config; ".format(code_package_path)
