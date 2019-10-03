@@ -9,7 +9,7 @@ import sys
 import shutil
 import h5py
 import numpy as np
-from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event
+from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
 from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
 
 
@@ -27,6 +27,13 @@ def get_initial_condition(database, initial_type, nev, idx0,
     if initial_type == "IPGlasma":
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
+            if file_name == "Failed": continue
+            yield file_name
+    elif initial_type == "IPGlasma+KoMPoST":
+        for iev in range(idx0, idx0 + nev):
+            file_name = fecth_an_IPGlasma_event_Tmunu(database,
+                                                      time_stamp_str, iev)
+            if file_name == "Failed": continue
             yield file_name
     elif initial_type == "3DMCGlauber":
         if database == "self":
@@ -67,6 +74,25 @@ def run_hydro_event(final_results_folder, event_id):
         shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
                                                      hydro_folder_name))
     return(hydro_success, hydro_folder_name)
+
+
+def run_kompost(final_results_folder, event_id):
+    """This functions run KoMPoST"""
+    print("\U0001F3B6  Run KoMPoST ... ")
+    call("bash ./run_kompost.sh", shell=True)
+
+    # check hydro finishes properly
+    #ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
+    #kompost_status = ftmp.readlines()[-1].split()[3]
+    kompost_success = True
+
+    kompost_folder_name = ""
+    if kompost_success:
+        # collect hydro results
+        kompost_folder_name = "kompost_results_{}".format(event_id)
+        shutil.move("kompost/kompost_results", path.join(final_results_folder,
+                                                         kompost_folder_name))
+    return(kompost_success, kompost_folder_name)
 
 
 def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
@@ -208,16 +234,23 @@ def zip_results_into_hdf5(final_results_folder, event_id):
 
 
 def remove_unwanted_outputs(final_results_folder, event_id,
-                            save_hydro=True, save_urqmd=True):
+                            save_kompost=True, save_hydro=True,
+                            save_urqmd=True):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
 
     """
+    if not save_kompost:
+        kompostfolder = path.join(final_results_folder,
+                                  "kompost_results_{}".format(event_id))
+        shutil.rmtree(kompostfolder)
+
     if not save_hydro:
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder)
+
     if not save_urqmd:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
@@ -225,7 +258,7 @@ def remove_unwanted_outputs(final_results_folder, event_id,
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads,
-         save_hydro=True, save_urqmd=True,
+         save_kompost=True, save_hydro=True, save_urqmd=True,
          seed_add=0, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
@@ -241,6 +274,12 @@ def main(initial_condition, initial_type,
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
             event_id = initial_database_name + "_" + event_id
+        elif initial_type == "IPGlasma+KoMPoST":
+            initial_database_name = (
+                    initial_condition.split("/")[-1].split(".h5")[0])
+            event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
+            event_id = initial_database_name + "_" + event_id
+            shutil.move(ifile, "kompost/Tmunu.dat")
         elif initial_type == "3DMCGlauber":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
@@ -249,6 +288,19 @@ def main(initial_condition, initial_type,
         if path.exists(final_results_folder):
             shutil.rmtree(final_results_folder)
         mkdir(final_results_folder)
+
+        if initial_type == "IPGlasma+KoMPoST":
+            kompost_success, kompost_folder_name = run_kompost(
+                final_results_folder, event_id)
+            hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
+            if path.islink(hydro_initial_file):
+                remove(hydro_initial_file)
+            call("ln -s {0:s} {1:s}".format(
+                path.join(
+                    path.abspath(final_results_folder), kompost_folder_name,
+                    ("ekt_tIn01_tOut08"
+                     + ".music_init_flowNonLinear_pimunuTransverse.txt")),
+                hydro_initial_file), shell=True)
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
@@ -273,7 +325,6 @@ def main(initial_condition, initial_type,
         # then run UrQMD events in parallel
         urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
                                           event_id)
-
         # finally collect results
         run_spvn_analysis_shell(urqmd_file_path, num_threads,
                                 final_results_folder, event_id)
@@ -283,7 +334,7 @@ def main(initial_condition, initial_type,
 
         # remove the unwanted outputs
         remove_unwanted_outputs(final_results_folder, event_id,
-                                save_hydro, save_urqmd)
+                                save_kompost, save_hydro, save_urqmd)
 
 
 
@@ -295,15 +346,17 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        SAVE_HYDRO = (sys.argv[7].lower() == "true")
-        SAVE_URQMD = (sys.argv[8].lower() == "true")
-        SEED_ADD = int(sys.argv[9])
-        TIME_STAMP = str(sys.argv[10])
+        SAVE_KOMPOST = (sys.argv[7].lower() == "true")
+        SAVE_HYDRO = (sys.argv[8].lower() == "true")
+        SAVE_URQMD = (sys.argv[9].lower() == "true")
+        SEED_ADD = int(sys.argv[10])
+        TIME_STAMP = str(sys.argv[11])
     except IndexError:
         print_usage()
         exit(0)
 
-    if INITIAL_CONDITION_TYPE not in ("IPGlasma", "3DMCGlauber"):
+    known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
+    if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   INITIAL_CONDITION_TYPE))
@@ -311,4 +364,4 @@ if __name__ == "__main__":
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
          N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
-         SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
+         SAVE_KOMPOST, SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)

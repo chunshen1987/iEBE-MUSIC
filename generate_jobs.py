@@ -15,6 +15,8 @@ centrality_list = [
     (0.8, 0.9, '80-90'), (0.9, 1.0, '90-100')
 ]
 
+known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
+
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
     """This function write the header of the job submission script"""
@@ -165,8 +167,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, hydro_flag,
-                             urqmd_flag, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, kompost_flag,
+                             hydro_flag, urqmd_flag, time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -178,9 +180,45 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write("\nseed_add=${1:-0}\n"
             +
         """
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} $seed_add {8:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} $seed_add {9:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           hydro_flag, urqmd_flag, time_stamp))
+           kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+    script.close()
+
+
+def generate_script_kompost(folder_name, nthreads):
+    """This function generates script for KoMPoST simulation"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "run_kompost.sh"), "w")
+
+    hydro_results_folder = 'kompost_results'
+    script.write(
+        """#!/usr/bin/env bash
+
+results_folder={0:s}
+
+(
+cd kompost
+
+mkdir -p $results_folder
+rm -fr $results_folder/*
+
+""".format(hydro_results_folder))
+
+    if nthreads > 0:
+        script.write(
+            """
+export OMP_NUM_THREADS={0:d}
+""".format(nthreads))
+
+    script.write(
+        """
+# KoMPoST EKT evolution
+./KoMPoST.exe setup.ini 1> run.log 2> run.err
+mv *.txt $results_folder
+)
+""")
     script.close()
 
 
@@ -321,7 +359,7 @@ def generate_event_folders(initial_condition_database,
                            code_package_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp,
+                           time_stamp, kompost_flag,
                            hydro_flag, urqmd_flag, GMC_flag, corr_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
@@ -357,7 +395,23 @@ def generate_event_folders(initial_condition_database,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id_offset, n_urqmd_per_hydro,
-                             n_threads, hydro_flag, urqmd_flag, time_stamp)
+                             n_threads, kompost_flag, hydro_flag, urqmd_flag,
+                             time_stamp)
+
+    if initial_condition_type == "IPGlasma+KoMPoST":
+        generate_script_kompost(event_folder, n_threads)
+        shutil.copytree(path.join(code_package_path, 'codes/kompost'),
+                        path.join(event_folder, 'kompost'),
+                        symlinks=True)
+        #shutil.copyfile(path.join(param_folder, 'kompost/setup.ini'),
+        #                path.join(event_folder, 'kompost/setup.ini'))
+        subprocess.call("ln -s {0:s} {1:s}".format(
+            path.abspath(path.join(code_package_path, 'codes/kompost_code/EKT')),
+            path.join(event_folder, "kompost/EKT")), shell=True)
+        subprocess.call("ln -s {0:s} {1:s}".format(
+            path.abspath(path.join(code_package_path,
+                                   'codes/kompost_code/KoMPoST.exe')),
+            path.join(event_folder, "kompost/KoMPoST.exe")), shell=True)
 
     generate_script_hydro(event_folder, n_threads)
 
@@ -373,8 +427,11 @@ def generate_event_folders(initial_condition_database,
         path.abspath(path.join(working_folder,
                                'codes/MUSIC_code/MUSIChydro')),
         path.join(event_folder, "MUSIC/MUSIChydro")), shell=True)
+
     generate_script_afterburner(event_folder, GMC_flag)
+
     generate_script_analyze_spvn(event_folder, corr_flag)
+
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
                                      'event_{0:d}'.format(event_id),
@@ -500,7 +557,7 @@ def main():
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
     initial_condition_type = (
                     parameter_dict.control_dict['initial_state_type'])
-    if initial_condition_type not in ("IPGlasma", "3DMCGlauber"):
+    if initial_condition_type not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   initial_condition_type))
@@ -514,6 +571,10 @@ def main():
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = str(
                 parameter_dict.music_dict['Initial_time_tau_0'])
+    elif initial_condition_type == "IPGlasma+KoMPoST":
+        initial_condition_database = (
+                parameter_dict.ipglasma['database_name_pattern'])
+        IPGlasma_time_stamp = "0.1"
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
@@ -562,7 +623,7 @@ def main():
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
-        if (initial_condition_type == 'IPGlasma'
+        if (initial_condition_type in ('IPGlasma', 'IPGlasma+KoMPoST')
                 and parameter_dict.ipglasma['type'] == 'minimumbias'):
             precent_local = float(iev)/float(n_jobs)
             for cen_min, cen_max, cen_label in centrality_list:
@@ -575,6 +636,9 @@ def main():
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         corr_flag = parameter_dict.hadronic_afterburner_toolkit_dict[
                                                     'compute_correlation']
+        kompost_flag = False
+        if initial_condition_type == "IPGlasma+KoMPoST":
+            kompost_flag = parameter_dict.control_dict['save_kompost_results']
         hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
         urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
         generate_event_folders(initial_condition_database.format(cent_label),
@@ -582,7 +646,7 @@ def main():
                                code_package_path, working_folder_name,
                                cluster_name, iev, event_id_offset,
                                n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp,
+                               IPGlasma_time_stamp, kompost_flag,
                                hydro_flag, urqmd_flag, GMC_flag, corr_flag)
         event_id_offset += n_hydro_per_job
     sys.stdout.write("\n")

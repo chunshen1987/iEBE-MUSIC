@@ -14,6 +14,15 @@ echo "compile 3dMCGlauber ... "
 mkdir -p 3dMCGlauber
 cp 3dMCGlauber_code/input 3dMCGlauber/
 
+# compile KoMPoST
+echo "compile KoMPoST ... "
+(
+    cd kompost_code
+    make
+)
+mkdir -p kompost
+cp kompost_code/setup.ini kompost/
+
 # compile MUSIC
 echo "compile MUSIC ... "
 (

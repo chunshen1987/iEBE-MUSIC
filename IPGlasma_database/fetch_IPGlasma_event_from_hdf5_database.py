@@ -20,9 +20,13 @@ def fecth_an_IPGlasma_event_Tmunu(database_path, time_stamp, event_idx):
     )
     hf          = h5py.File(database_path, "r")
     event_name  = "event-{0:d}".format(event_idx)
-    event_group = hf.get(event_name)
     file_name   = "Tmunu-t{0:s}-{1:d}.dat".format(time_stamp, event_idx)
-    temp_data   = event_group.get(file_name)
+    try:
+        event_group = hf.get(event_name)
+        temp_data   = event_group.get(file_name)
+    except AttributeError:
+        print("Can not load {}".format(event_name))
+        return("Failed")
     data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
     x_size      = temp_data.attrs["x_size"]
     y_size      = temp_data.attrs["y_size"]
@@ -52,10 +56,14 @@ def fecth_an_IPGlasma_event(database_path, time_stamp, event_idx):
     )
     hf          = h5py.File(database_path, "r")
     event_name  = "event-{0:d}".format(event_idx)
-    event_group = hf.get(event_name)
     file_name   = "epsilon-u-Hydro-t{0:s}-{1:d}.dat".format(time_stamp,
                                                             event_idx)
-    temp_data   = event_group.get(file_name)
+    try:
+        event_group = hf.get(event_name)
+        temp_data   = event_group.get(file_name)
+    except AttributeError:
+        print("Can not load {}".format(event_name))
+        return("Failed")
     data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
     x_size      = temp_data.attrs["x_size"]
     y_size      = temp_data.attrs["y_size"]
