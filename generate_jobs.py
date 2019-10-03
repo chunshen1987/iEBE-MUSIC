@@ -400,16 +400,16 @@ def generate_event_folders(initial_condition_database,
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads)
-        shutil.copytree(path.join(code_package_path, 'codes/kompost'),
+        shutil.copytree(path.join(working_folder, 'codes/kompost'),
                         path.join(event_folder, 'kompost'),
                         symlinks=True)
         #shutil.copyfile(path.join(param_folder, 'kompost/setup.ini'),
         #                path.join(event_folder, 'kompost/setup.ini'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_package_path, 'codes/kompost_code/EKT')),
+            path.abspath(path.join(working_folder, 'codes/kompost_code/EKT')),
             path.join(event_folder, "kompost/EKT")), shell=True)
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_package_path,
+            path.abspath(path.join(working_folder,
                                    'codes/kompost_code/KoMPoST.exe')),
             path.join(event_folder, "kompost/KoMPoST.exe")), shell=True)
 
