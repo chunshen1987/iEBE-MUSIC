@@ -244,7 +244,7 @@ def remove_unwanted_outputs(final_results_folder, event_id,
     if not save_kompost:
         kompostfolder = path.join(final_results_folder,
                                   "kompost_results_{}".format(event_id))
-        shutil.rmtree(kompostfolder)
+        shutil.rmtree(kompostfolder, ignore_errors=True)
 
     if not save_hydro:
         hydrofolder = path.join(final_results_folder,
