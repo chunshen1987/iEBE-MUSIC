@@ -9,10 +9,10 @@ import argparse
 
 
 centrality_list = [
-    (0, 0.05, '0-5'), (0.05, 0.1, '5-10'), (0.1, 0.2, '10-20'),
-    (0.2, 0.3, '20-30'), (0.3, 0.4, '30-40'), (0.4, 0.5, '40-50'),
-    (0.5, 0.6, '50-60'), (0.6, 0.7, '60-70'), (0.7, 0.8, '70-80'),
-    (0.8, 0.9, '80-90'), (0.9, 1.0, '90-100')
+    (0, 0.10, '0-5'), (0.10, 0.20, '5-10'), (0.20, 0.30, '10-20'),
+    (0.30, 0.40, '20-30'), (0.40, 0.50, '30-40'), (0.50, 0.60, '40-50'),
+    (0.60, 0.70, '50-60'), (0.70, 0.80, '60-70'), (0.80, 0.90, '70-80'),
+    (0.90, 0.95, '80-90'), (0.95, 1.00, '90-100')
 ]
 
 known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
@@ -618,6 +618,7 @@ def main():
     sys.stdout.flush()
     sys.stdout.write("\b" * (toolbar_width+1))
     event_id_offset = 0
+    n_hydro_rescaled = n_hydro_per_job
     for iev in range(n_jobs):
         progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
                       - int(float(iev)/n_jobs*toolbar_width))
@@ -630,6 +631,10 @@ def main():
             for cen_min, cen_max, cen_label in centrality_list:
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
+                    if cen_label in ('0-5', '5-10'):
+                        n_hydro_rescaled = max(1, int(n_hydro_per_job/2))
+                    if cen_label in ('80-90', '90-100'):
+                        n_hydro_rescaled = n_hydro_per_job*2
                     if cent_label != cent_label_pre:
                         cent_label_pre = cent_label
                         event_id_offset = 0
@@ -646,10 +651,10 @@ def main():
                                initial_condition_type,
                                code_package_path, working_folder_name,
                                cluster_name, iev, event_id_offset,
-                               n_hydro_per_job, n_urqmd_per_hydro, n_threads,
+                               n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
                                IPGlasma_time_stamp, kompost_flag,
                                hydro_flag, urqmd_flag, GMC_flag, corr_flag)
-        event_id_offset += n_hydro_per_job
+        event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
 
