@@ -8,12 +8,17 @@ import subprocess
 import argparse
 
 
-centrality_list = [
-    (0, 0.10, '0-5'), (0.10, 0.20, '5-10'), (0.20, 0.30, '10-20'),
-    (0.30, 0.40, '20-30'), (0.40, 0.50, '30-40'), (0.50, 0.60, '40-50'),
-    (0.60, 0.70, '50-60'), (0.70, 0.80, '60-70'), (0.80, 0.90, '70-80'),
-    (0.90, 0.95, '80-90'), (0.95, 1.00, '90-100')
-]
+centrality_list = [(0.00, 0.15,    '0-5', 0.05),
+                   (0.15, 0.28,   '5-10', 0.05),
+                   (0.28, 0.40,  '10-20', 0.10),
+                   (0.40, 0.50,  '20-30', 0.10),
+                   (0.50, 0.60,  '30-40', 0.10),
+                   (0.60, 0.69,  '40-50', 0.10),
+                   (0.69, 0.77,  '50-60', 0.10),
+                   (0.77, 0.85,  '60-70', 0.10),
+                   (0.85, 0.92,  '70-80', 0.10),
+                   (0.92, 0.97,  '80-90', 0.10),
+                   (0.97, 1.00, '90-100', 0.10)]
 
 known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
 
@@ -628,13 +633,12 @@ def main():
         if (initial_condition_type in ('IPGlasma', 'IPGlasma+KoMPoST')
                 and parameter_dict.ipglasma['type'] == 'minimumbias'):
             precent_local = float(iev)/float(n_jobs)
-            for cen_min, cen_max, cen_label in centrality_list:
+            for cen_min, cen_max, cen_label, cen_precent in centrality_list:
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
-                    if cen_label in ('0-5', '5-10'):
-                        n_hydro_rescaled = max(1, int(n_hydro_per_job/2))
-                    if cen_label in ('80-90', '90-100'):
-                        n_hydro_rescaled = n_hydro_per_job*2
+                    rescale_factor = cen_precent/(cen_max - cen_min)
+                    n_hydro_rescaled = (
+                            max(1, int(n_hydro_per_job*rescale_factor)))
                     if cent_label != cent_label_pre:
                         cent_label_pre = cent_label
                         event_id_offset = 0
