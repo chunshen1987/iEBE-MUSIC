@@ -14,6 +14,15 @@ echo "compile 3dMCGlauber ... "
 mkdir -p 3dMCGlauber
 cp 3dMCGlauber_code/input 3dMCGlauber/
 
+# compile IPGlasma
+echo "compile IPGlasma ... "
+(
+    cd ipglasma_code
+    ./compile_IPGlasma.sh
+)
+mkdir -p ipglasma
+cp ipglasma_code/input ipglasma/
+
 # compile KoMPoST
 echo "compile KoMPoST ... "
 (
