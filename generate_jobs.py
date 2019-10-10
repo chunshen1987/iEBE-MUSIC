@@ -172,7 +172,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, kompost_flag,
+                             n_hydro, ev0_id, n_urqmd, n_threads,
+                             ipglasma_flag, kompost_flag,
                              hydro_flag, urqmd_flag, time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
@@ -185,9 +186,45 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write("\nseed_add=${1:-0}\n"
             +
         """
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} $seed_add {9:s} > run.log
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} > run.log
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+    script.close()
+
+
+def generate_script_ipglasma(folder_name, nthreads):
+    """This function generates script for IPGlasma simulation"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "run_ipglasma.sh"), "w")
+
+    results_folder = 'ipglasma_results'
+    script.write(
+        """#!/usr/bin/env bash
+
+results_folder={0:s}
+
+(
+cd ipglasma
+
+mkdir -p $results_folder
+rm -fr $results_folder/*
+
+""".format(results_folder))
+
+    if nthreads > 0:
+        script.write(
+            """
+export OMP_NUM_THREADS={0:d}
+""".format(nthreads))
+
+    script.write(
+        """
+# IPGlasma evolution (run 1 event)
+./ipglasma input 1> run.log 2> run.err
+mv *.dat $results_folder
+)
+""")
     script.close()
 
 
@@ -364,7 +401,7 @@ def generate_event_folders(initial_condition_database,
                            code_package_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, kompost_flag,
+                           time_stamp, ipglasma_flag, kompost_flag,
                            hydro_flag, urqmd_flag, GMC_flag, corr_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
@@ -380,28 +417,49 @@ def generate_event_folders(initial_condition_database,
                           'fetch_3DMCGlauber_event_from_hdf5_database.py'),
                 event_folder)
     if initial_condition_database == "self":
-        shutil.copytree(path.join(working_folder, 'codes/3dMCGlauber'),
-                        path.join(event_folder, '3dMCGlauber'), symlinks=True)
-        shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
-                        path.join(event_folder, '3dMCGlauber/input'))
-        subprocess.call("ln -s {0:s} {1:s}".format(
-                        path.abspath(path.join(
+        if initial_condition_type == "3DMCGlauber":
+            shutil.copytree(path.join(working_folder, 'codes/3dMCGlauber'),
+                            path.join(event_folder, '3dMCGlauber'),
+                            symlinks=True)
+            shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
+                            path.join(event_folder, '3dMCGlauber/input'))
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                            path.abspath(path.join(
                                         working_folder,
                                         'codes/3dMCGlauber_code/3dMCGlb.e')),
-                        path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
-                        shell=True)
-        subprocess.call("ln -s {0:s} {1:s}".format(
-                        path.abspath(path.join(working_folder,
-                                               'codes/3dMCGlauber_code/eps09')),
-                        path.join(event_folder, "3dMCGlauber/eps09")),
-                        shell=True)
+                            path.join(event_folder, "3dMCGlauber/3dMCGlb.e")),
+                            shell=True)
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                            path.abspath(path.join(
+                                working_folder,
+                                'codes/3dMCGlauber_code/eps09')),
+                            path.join(event_folder, "3dMCGlauber/eps09")),
+                            shell=True)
+        elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
+            generate_script_ipglasma(event_folder, n_threads)
+            shutil.copytree(path.join(working_folder, 'codes/ipglasma'),
+                            path.join(event_folder, 'ipglasma'),
+                            symlinks=True)
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                path.abspath(path.join(working_folder,
+                             'codes/ipglasma_code/qs2Adj_vs_Tp_vs_Y_200.in')),
+                path.join(event_folder, "ipglasma/qs2Adj_vs_Tp_vs_Y_200.in")),
+                shell=True)
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                path.abspath(path.join(working_folder,
+                                       'codes/ipglasma_code/utilities')),
+                path.join(event_folder, "ipglasma/utilities")), shell=True)
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                path.abspath(path.join(working_folder,
+                                       'codes/ipglasma_code/ipglasma')),
+                path.join(event_folder, "ipglasma/ipglasma")), shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
                              initial_condition_type, n_hydro_per_job,
                              event_id_offset, n_urqmd_per_hydro,
-                             n_threads, kompost_flag, hydro_flag, urqmd_flag,
-                             time_stamp)
+                             n_threads, ipglasma_flag, kompost_flag,
+                             hydro_flag, urqmd_flag, time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads)
@@ -569,15 +627,20 @@ def main():
         exit(1)
 
     initial_condition_database = ""
-    initial_condition_database_name_pattern = ""
     IPGlasma_time_stamp = "0.4"
     if initial_condition_type == "IPGlasma":
-        initial_condition_database = (
+        if parameter_dict.ipglasma['type'] == "self":
+            initial_condition_database = "self"
+        else:
+            initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = str(
                 parameter_dict.music_dict['Initial_time_tau_0'])
     elif initial_condition_type == "IPGlasma+KoMPoST":
-        initial_condition_database = (
+        if parameter_dict.ipglasma['type'] == "self":
+            initial_condition_database = "self"
+        else:
+            initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = "0.1"
     else:
@@ -646,6 +709,10 @@ def main():
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         corr_flag = parameter_dict.hadronic_afterburner_toolkit_dict[
                                                     'compute_correlation']
+        ipglasma_flag = False
+        if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
+            and initial_condition_database == "self"):
+            ipglasma_flag = parameter_dict.control_dict['save_ipglasma_results']
         kompost_flag = False
         if initial_condition_type == "IPGlasma+KoMPoST":
             kompost_flag = parameter_dict.control_dict['save_kompost_results']
@@ -656,8 +723,9 @@ def main():
                                code_package_path, working_folder_name,
                                cluster_name, iev, event_id_offset,
                                n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, kompost_flag,
-                               hydro_flag, urqmd_flag, GMC_flag, corr_flag)
+                               IPGlasma_time_stamp, ipglasma_flag,
+                               kompost_flag, hydro_flag, urqmd_flag,
+                               GMC_flag, corr_flag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
