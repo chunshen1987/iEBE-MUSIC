@@ -25,16 +25,32 @@ def get_initial_condition(database, initial_type, nev, idx0,
                           seed_add, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     if initial_type == "IPGlasma":
-        for iev in range(idx0, idx0 + nev):
-            file_name = fecth_an_IPGlasma_event(database, time_stamp_str, iev)
-            if file_name == "Failed": continue
-            yield file_name
+        if database == "self":
+            for iev in range(idx0, idx0 + nev):
+                file_name = ("ipglasma/ipglasma_results/"
+                             + "epsilon-u-Hydro-t{0:s}.dat".format(
+                                                        time_stamp_str))
+                run_ipglasma()
+                yield (iev, file_name)
+        else:
+            for iev in range(idx0, idx0 + nev):
+                file_name = fecth_an_IPGlasma_event(database,
+                                                    time_stamp_str, iev)
+                if file_name == "Failed": continue
+                yield (iev, file_name)
     elif initial_type == "IPGlasma+KoMPoST":
-        for iev in range(idx0, idx0 + nev):
-            file_name = fecth_an_IPGlasma_event_Tmunu(database,
-                                                      time_stamp_str, iev)
-            if file_name == "Failed": continue
-            yield file_name
+        if database == "self":
+            for iev in range(idx0, idx0 + nev):
+                file_name = ("ipglasma/ipglasma_results/"
+                             + "Tmunu-t{0:s}.dat".format(time_stamp_str))
+                run_ipglasma()
+                yield (iev, file_name)
+        else:
+            for iev in range(idx0, idx0 + nev):
+                file_name = fecth_an_IPGlasma_event_Tmunu(database,
+                                                          time_stamp_str, iev)
+                if file_name == "Failed": continue
+                yield (iev, file_name)
     elif initial_type == "3DMCGlauber":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
@@ -43,16 +59,29 @@ def get_initial_condition(database, initial_type, nev, idx0,
                                                     seed_add), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-                yield file_name
+                yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
                 file_name = fecth_an_3DMCGlauber_event(database, iev)
-                yield file_name
+                yield (iev, file_name)
     else:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   initial_type))
         exit(1)
+
+
+def run_ipglasma():
+    """This functions run IPGlasma"""
+    print("\U0001F3B6  Run IPGlasma ... ")
+    call("bash ./run_ipglasma.sh", shell=True)
+
+
+def collect_ipglasma_event(final_results_folder, event_id):
+    """This function collects the ipglasma results"""
+    ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
+    shutil.move("ipglasma/ipglasma_results", path.join(
+                                final_results_folder, ipglasma_folder_name))
 
 
 def run_hydro_event(final_results_folder, event_id):
@@ -234,13 +263,18 @@ def zip_results_into_hdf5(final_results_folder, event_id):
 
 
 def remove_unwanted_outputs(final_results_folder, event_id,
-                            save_kompost=True, save_hydro=True,
-                            save_urqmd=True):
+                            save_ipglasma=True, save_kompost=True,
+                            save_hydro=True, save_urqmd=True):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
 
     """
+    if not save_ipglasma:
+        ipglasmafolder = path.join(final_results_folder,
+                                   "ipglasma_results_{}".format(event_id))
+        shutil.rmtree(ipglasmafolder, ignore_errors=True)
+
     if not save_kompost:
         kompostfolder = path.join(final_results_folder,
                                   "kompost_results_{}".format(event_id))
@@ -249,7 +283,7 @@ def remove_unwanted_outputs(final_results_folder, event_id,
     if not save_hydro:
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
-        shutil.rmtree(hydrofolder)
+        shutil.rmtree(hydrofolder, ignore_errors=True)
 
     if not save_urqmd:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
@@ -258,30 +292,29 @@ def remove_unwanted_outputs(final_results_folder, event_id,
 
 def main(initial_condition, initial_type,
          n_hydro, hydro_id0, n_urqmd, num_threads,
-         save_kompost=True, save_hydro=True, save_urqmd=True,
-         seed_add=0, time_stamp_str="0.4"):
+         save_ipglasma=True, save_kompost=True, save_hydro=True,
+         save_urqmd=True, seed_add=0, time_stamp_str="0.4"):
     """This is the main function"""
     print("\U0001F3CE  Number of threads: {}".format(num_threads))
 
-    for ifile in get_initial_condition(initial_condition,
-                                       initial_type,
-                                       n_hydro, hydro_id0,
-                                       seed_add, time_stamp_str):
+    for event_id, ifile in get_initial_condition(initial_condition,
+                                                 initial_type,
+                                                 n_hydro, hydro_id0,
+                                                 seed_add, time_stamp_str):
         print("\U0001F680 Run simulations with {} ... ".format(ifile))
         if initial_type == "IPGlasma":
-            initial_database_name = (
-                    initial_condition.split("/")[-1].split(".h5")[0])
-            event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
-            shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
-            event_id = initial_database_name + "_" + event_id
+            shutil.copy(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
+            if initial_database_name != "self":
+                initial_database_name = (
+                        initial_condition.split("/")[-1].split(".h5")[0])
+                event_id = initial_database_name + "_" + event_id
         elif initial_type == "IPGlasma+KoMPoST":
-            initial_database_name = (
-                    initial_condition.split("/")[-1].split(".h5")[0])
-            event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
-            event_id = initial_database_name + "_" + event_id
-            shutil.move(ifile, "kompost/Tmunu.dat")
+            shutil.copy(ifile, "kompost/Tmunu.dat")
+            if initial_database_name != "self":
+                initial_database_name = (
+                        initial_condition.split("/")[-1].split(".h5")[0])
+                event_id = initial_database_name + "_" + event_id
         elif initial_type == "3DMCGlauber":
-            event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
@@ -334,7 +367,8 @@ def main(initial_condition, initial_type,
 
         # remove the unwanted outputs
         remove_unwanted_outputs(final_results_folder, event_id,
-                                save_kompost, save_hydro, save_urqmd)
+                                save_ipglasma, save_kompost,
+                                save_hydro, save_urqmd)
 
 
 
@@ -346,11 +380,12 @@ if __name__ == "__main__":
         HYDRO_EVENT_ID0 = int(sys.argv[4])
         N_URQMD = int(sys.argv[5])
         N_THREADS = int(sys.argv[6])
-        SAVE_KOMPOST = (sys.argv[7].lower() == "true")
-        SAVE_HYDRO = (sys.argv[8].lower() == "true")
-        SAVE_URQMD = (sys.argv[9].lower() == "true")
-        SEED_ADD = int(sys.argv[10])
-        TIME_STAMP = str(sys.argv[11])
+        SAVE_IPGLASMA = (sys.argv[7].lower() == "true")
+        SAVE_KOMPOST = (sys.argv[8].lower() == "true")
+        SAVE_HYDRO = (sys.argv[9].lower() == "true")
+        SAVE_URQMD = (sys.argv[10].lower() == "true")
+        SEED_ADD = int(sys.argv[11])
+        TIME_STAMP = str(sys.argv[12])
     except IndexError:
         print_usage()
         exit(0)
@@ -364,4 +399,5 @@ if __name__ == "__main__":
 
     main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
          N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
-         SAVE_KOMPOST, SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
+         SAVE_IPGLASMA, SAVE_KOMPOST, SAVE_HYDRO, SAVE_URQMD,
+         SEED_ADD, TIME_STAMP)
