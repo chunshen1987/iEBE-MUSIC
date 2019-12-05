@@ -21,6 +21,15 @@ def print_usage():
           + "n_threads save_hydro_flag save_urqmd_flag seed_add tau0")
 
 
+def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
+    """This function returns the filename of an initial condition in the
+       database_path folder
+    """
+    filelist = glob(path.join(database_path,
+                              'nuclear_thickness_TA_fromSd_order_2_C*.dat'))
+    return(filelist[iev])
+
+
 def get_initial_condition(database, initial_type, nev, idx0,
                           seed_add, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
@@ -48,6 +57,10 @@ def get_initial_condition(database, initial_type, nev, idx0,
             for iev in range(idx0, idx0 + nev):
                 file_name = fecth_an_3DMCGlauber_event(database, iev)
                 yield file_name
+    elif initial_type == "3DMCGlauber_smooth":
+        for iev in range(idx0, idx0 + nev):
+            file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
+            yield file_name
     else:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
@@ -283,6 +296,21 @@ def main(initial_condition, initial_type,
         elif initial_type == "3DMCGlauber":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
+        elif initial_type == "3DMCGlauber_smooth":
+            event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
+            filepath = initial_condition
+            shutil.copy(path.join(filepath,
+                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
+                "MUSIC/initial/initial_TA.dat")
+            shutil.copy(path.join(filepath,
+                "nuclear_thickness_TB_fromSd_order_2_{}.dat".format(event_id)),
+                "MUSIC/initial/initial_TB.dat")
+            shutil.copy(path.join(filepath,
+                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
+                "MUSIC/initial/initial_rhob_TA.dat")
+            shutil.copy(path.join(filepath,
+                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
+                "MUSIC/initial/initial_rhob_TB.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
@@ -355,7 +383,8 @@ if __name__ == "__main__":
         print_usage()
         exit(0)
 
-    known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
+    known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST",
+                           "3DMCGlauber", "3DMCGlauber_smooth"]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
