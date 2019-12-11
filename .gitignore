@@ -102,3 +102,11 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+codes/*_code
+3dMCGlauber
+MUSIC
+hadronic_afterburner_toolkit
+iSS
+osc2u
+urqmd
