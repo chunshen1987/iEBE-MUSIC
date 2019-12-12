@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import argparse
 from math import ceil
+from glob import glob
 
 
 centrality_list = [(0.00, 0.15,    '0-5', 0.05),
@@ -585,8 +586,13 @@ def main():
     elif initial_condition_type == "3DMCGlauber_smooth":
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
-        n_jobs = min(len(centrality_list), n_jobs)
-        n_hydro_per_job = int(ceil(len(centrality_list)/n_jobs))
+        filelist = glob(path.join(initial_condition_database,
+                        'nuclear_thickness_TA_fromSd_order_2_C*.dat'))
+        nev = max(1, len(filelist))
+        print("there are {} events found under the folder {}".format(
+            nev, initial_condition_database))
+        n_jobs = min(nev, n_jobs)
+        n_hydro_per_job = int(ceil(nev/n_jobs))
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
