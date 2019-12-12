@@ -592,6 +592,7 @@ def main():
         print("there are {} events found under the folder {}".format(
             nev, initial_condition_database))
         n_jobs = min(nev, n_jobs)
+        print("n_jobs = {}".format(n_jobs))
         n_hydro_per_job = int(ceil(nev/n_jobs))
     else:
         initial_condition_database = (
