@@ -6,6 +6,8 @@ from os import path, mkdir
 import shutil
 import subprocess
 import argparse
+from math import ceil
+from glob import glob
 
 
 centrality_list = [(0.00, 0.15,    '0-5', 0.05),
@@ -20,7 +22,8 @@ centrality_list = [(0.00, 0.15,    '0-5', 0.05),
                    (0.92, 0.97,  '80-90', 0.10),
                    (0.97, 1.00, '90-100', 0.10)]
 
-known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber"]
+known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST",
+                       "3DMCGlauber", "3DMCGlauber_smooth"]
 
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
@@ -643,6 +646,17 @@ def main():
             initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = "0.1"
+    elif initial_condition_type == "3DMCGlauber_smooth":
+        initial_condition_database = (
+                parameter_dict.mcglauber_dict['database_name'])
+        filelist = glob(path.join(initial_condition_database,
+                        'nuclear_thickness_TA_fromSd_order_2_C*.dat'))
+        nev = max(1, len(filelist))
+        print("there are {} events found under the folder {}".format(
+            nev, initial_condition_database))
+        n_jobs = min(nev, n_jobs)
+        print("n_jobs = {}".format(n_jobs))
+        n_hydro_per_job = int(ceil(nev/n_jobs))
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
