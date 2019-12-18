@@ -29,13 +29,12 @@ music_dict = {
     'Initial_rhob_TA_Distribution_Filename': 'initial/initial_rhob_TA.dat',
     'Initial_rhob_TB_Distribution_Filename': 'initial/initial_rhob_TB.dat',
     # parameters for the eta profiles in entropy density and net baryon density
-    'initial_eta_profile': 1,       # 1: Gaussian + plateau for entropy density
+    'ecm': 19.6,                    # collision energy
     'Eta_plateau_size': 5.4,        # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
     'Eta_fall_off': 0.3,            # Gaussian width fall off for entropy density
     'eta_rhob_0': 1.5,              # peak position of the net baryon density
     'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
-    's_factor': 6.30,       # normalization factor read in initial data file
     'Initial_time_tau_0': 1.5,  # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.010,     # time step to use in the evolution [fm/c]
     'boost_invariant':  0,  # whether the simulation is boost-invariant
