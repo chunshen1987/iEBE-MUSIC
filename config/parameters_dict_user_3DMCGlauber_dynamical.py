@@ -7,8 +7,8 @@
 
 # control parameters
 control_dict = {
-    'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
-    'walltime': "10:00:00",  # walltime to run
+    'initial_state_type': "3DMCGlauber_dynamical",
+    'walltime': "10:00:00",         # walltime to run
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
 }
@@ -42,7 +42,7 @@ mcglauber_dict = {
 # MUSIC
 music_dict = {
     'Initial_profile': 13,  # type of initial condition 
-                            # 13: dynamical initialization (3dMCGlauber)
+                            # 13: dynamical initialization (3dMCGlauber_dynamical)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
     's_factor': 1.000,      # normalization factor read in initial data file
     'Delta_Tau': 0.010,     # time step to use in the evolution [fm/c]

@@ -23,7 +23,7 @@ centrality_list = [(0.00, 0.15,    '0-5', 0.05),
                    (0.97, 1.00, '90-100', 0.10)]
 
 known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST",
-                       "3DMCGlauber", "3DMCGlauber_smooth"]
+                       "3DMCGlauber_dynamical", "3DMCGlauber_consttau"]
 
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
@@ -583,7 +583,7 @@ def main():
         initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = "0.1"
-    elif initial_condition_type == "3DMCGlauber_smooth":
+    elif initial_condition_type == "3DMCGlauber_consttau":
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
         filelist = glob(path.join(initial_condition_database,
