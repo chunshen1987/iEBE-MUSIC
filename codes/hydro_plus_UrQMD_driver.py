@@ -305,12 +305,6 @@ def main(initial_condition, initial_type,
             shutil.copy(path.join(filepath,
                 "nuclear_thickness_TB_fromSd_order_2_{}.dat".format(event_id)),
                 "MUSIC/initial/initial_TB.dat")
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_rhob_TA.dat")
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_rhob_TB.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
