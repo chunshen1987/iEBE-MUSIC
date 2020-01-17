@@ -41,4 +41,4 @@ print("job path: ", job_path)
 if (check_date - start_date > timedelta(days=1)):
     print("restart job: ", jobid)
     cmd = subprocess.Popen(['qdel', jobid], stdout=subprocess.PIPE)
-    subprocess.call("(cd {}; qsub submit_job.pbs;".format(job_path), shell=True)
+    subprocess.call("(cd {}; qsub submit_job.pbs;)".format(job_path), shell=True)
