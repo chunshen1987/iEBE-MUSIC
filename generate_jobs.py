@@ -282,6 +282,8 @@ results_folder={0:s}
 (
 cd MUSIC
 
+rm -fr $results_folder
+
 """.format(hydro_results_folder))
 
     if nthreads > 0:

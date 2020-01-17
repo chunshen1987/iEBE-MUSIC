@@ -347,6 +347,15 @@ def main(initial_condition, initial_type,
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
+            print("{} exists ...".format(final_results_folder))
+            spvnfolder = path.join(final_results_folder,
+                                   "spvn_results_{}".format(event_id))
+            status = check_an_event_is_good(spvnfolder)
+            if status:
+                print("{} finished properly. No need to rerun.".format(
+                    event_id))
+                continue
+            print("Rerun {} ...".format(final_results_folder))
             shutil.rmtree(final_results_folder)
         mkdir(final_results_folder)
 
