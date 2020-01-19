@@ -680,7 +680,7 @@ def main():
     pwd = path.abspath(".")
     script_path = path.join(code_package_path, "utilities")
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
-    shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'), pwd)
     script_path = (
         path.join(code_package_path,
                   "codes/hadronic_afterburner_toolkit_code/ebe_scripts")
