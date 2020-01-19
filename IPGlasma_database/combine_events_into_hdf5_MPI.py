@@ -133,9 +133,11 @@ def collect_IPGlasma_events(results_folder):
     print("MPI rank {0}: collect {1} to {2} ... ".format(
         mpi_rank, results_folder, h5filename))
     hf = h5py.File(h5filename, "w")
+    nev_per_thread = int(nev/mpi_size) + 1
     mpi_comm.Barrier()
-    for ievent in range(nev):
-        if mpi_rank == ievent%mpi_size:
+    for iev in range(nev_per_thread):
+        ievent = mpi_rank + iev*mpi_size
+        if ievent < nev:
             event_path = event_list[ievent]
             print("MPI rank {0:d} processing {1:d}/{2:d} ... ".format(
                 mpi_rank, ievent, nev))
