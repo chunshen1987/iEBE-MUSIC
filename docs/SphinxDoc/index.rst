@@ -10,6 +10,24 @@ Welcome to iEBE-MUSIC's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+Quickstart
+----------
+First, install the dependencies:
+
+
+User guide
+----------
+.. toctree::
+   :maxdepth: 2
+
+    installation
+    usage
+    examples
+
+
+Attribution
+-----------
+If you make use of this software in your research, please cite
 
 
 Indices and tables
