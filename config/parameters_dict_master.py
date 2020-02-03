@@ -10,17 +10,18 @@ import argparse
 
 # control parameters
 control_dict = {
-    'initial_state_type': "3DMCGlauber",  # 3DMCGlauber, IPGlasma
-    'walltime': "10:00:00",  # walltime to run
-    'save_kompost_results': False,   # flag to save kompost results
-    'save_hydro_surfaces': False,   # flag to save hydro surfaces
-    'save_UrQMD_files': False,      # flag to save UrQMD files
+    'initial_state_type': "3DMCGlauber_dynamical",  # options: IPGlasma, IPGlasma+KoMPoST,
+                                                    #          3DMCGlauber_dynamical, 3DMCGlauber_consttau
+    'walltime': "10:00:00",                         # walltime to run
+    'save_kompost_results': False,                  # flag to save kompost results
+    'save_hydro_surfaces': False,                   # flag to save hydro surfaces
+    'save_UrQMD_files': False,                      # flag to save UrQMD files
 }
 
 
 # IPGlasma
 ipglasma = {
-    'type': "minimumbias",  # minimumbias or fixed
+    'type': "minimumbias",                                        # minimumbias or fixed
     'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
 }
 
@@ -62,31 +63,47 @@ mcglauber_dict = {
 
 # MUSIC
 music_dict = {
-    'echo_level':  1,   # control the mount of message output to screen
-    'mode': 2,          # MUSIC running mode 2: Evolution only.
+    'echo_level':  1,       # control the mount of message output to screen
+    'mode': 2,              # MUSIC running mode 2: Evolution only.
     'Initial_profile': 9,   # type of initial condition 
                             # 9: IPGlasma (full Tmunu),
                             #   -- 91: e and u^\mu,
                             #   -- 92: e only,
                             #   -- 93: e, u^\mu, and pi^\munu
-                            # 13: dynamical initialization (3dMCGlauber)
+                            # 11: 3dMCGlauber initial condition at a constant tau surface
+                            #     based on the nuclear thickness funciton TA and TB
+                            #   -- 111: second parameterization of eta profile
+                            # 13: dynamical initialization (3dMCGlauber_dynamical)
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
-    # read in initial conditions from external file
+
+    # parameters for the eta profiles in entropy density and net baryon density
+    # Initial_profile == 11 or 111
+    'ecm': 200.,                    # collision energy
+    'Eta_plateau_size': 5.4,        # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
+    'Eta_fall_off': 0.3,            # Gaussian width fall off for entropy density
+    'eta_rhob_0': 1.5,              # peak position of the net baryon density
+    'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
+    'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
+
+    # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
-    'Initial_time_tau_0': 0.4,  # starting time of the hydrodynamic evolution (fm/c)
-    'Total_evolution_time_tau': 30.,  # the maximum allowed running evolution time (fm/c)
-    'Delta_Tau': 0.005,             # time step to use in the evolution [fm/c]
-    'boost_invariant':  1,  # whether the simulation is boost-invariant 
-    'Eta_grid_size': 14.0,  # spatial rapidity range 
-                            # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
-    'Grid_size_in_eta': 1,  # number of the grid points in spatial rapidity direction
-    'X_grid_size_in_fm': 20.0,  # spatial range along x direction in the transverse plane 
+
+    'Initial_time_tau_0': 0.4,          # starting time of the hydrodynamic evolution (fm/c)
+    'Delta_Tau': 0.005,                 # time step to use in the evolution [fm/c]
+    'Total_evolution_time_tau': 30.,    # the maximum allowed running evolution time (fm/c)
+
+    'boost_invariant':  1,      # whether the simulation is boost-invariant 
+    'Eta_grid_size': 14.0,      # spatial rapidity range
+                                # [-Eta_grid_size/2, Eta_grid_size/2 - delta_eta]
+    'Grid_size_in_eta': 1,      # number of the grid points in spatial rapidity direction
+    'X_grid_size_in_fm': 20.0,  # spatial range along x direction in the transverse plane
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
-    'Y_grid_size_in_fm': 20.0,  # spatial range along x direction in the transverse plane 
+    'Y_grid_size_in_fm': 20.0,  # spatial range along x direction in the transverse plane
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
     'Grid_size_in_x': 200,      # number of the grid points in x direction
     'Grid_size_in_y': 200,      # number of the grid points in y direction
+
     'EOS_to_use': 9,            # type of the equation of state
                                 # 0: ideal gas
                                 # 1: EOS-Q from azhydro
@@ -290,9 +307,9 @@ hadronic_afterburner_toolkit_dict = {
 
     'rap_type': 1,      # 0: for pseudo-rapidity; 1: for rapidity
     'rapidity_distribution': 1,   # 1: output particle rapidity distribution 
-    'n_rap': 101,                 # numpber of points in rapidity distr.
-    'rapidity_dis_min': -5.0,     # minimum value of particle rapidity distribution
-    'rapidity_dis_max': 5.0,      # maximum value of particle rapidity distribution
+    'n_rap': 141,                 # numpber of points in rapidity distr.
+    'rapidity_dis_min': -7.0,     # minimum value of particle rapidity distribution
+    'rapidity_dis_max': 7.0,      # maximum value of particle rapidity distribution
     'vn_rapidity_dis_pT_min': 0.20,  # the minimum value of pT for vn rap. distr.
     'vn_rapidity_dis_pT_max': 3.0,   # the maximum value of pT for vn rap. distr.
 

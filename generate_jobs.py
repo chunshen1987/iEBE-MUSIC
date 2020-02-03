@@ -23,7 +23,7 @@ centrality_list = [(0.00, 0.15,    '0-5', 0.05),
                    (0.97, 1.00, '90-100', 0.10)]
 
 known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST",
-                       "3DMCGlauber", "3DMCGlauber_smooth"]
+                       "3DMCGlauber_dynamical", "3DMCGlauber_consttau"]
 
 def write_script_header(cluster, script, n_threads,
                         event_id, walltime, working_folder):
@@ -245,6 +245,8 @@ results_folder={0:s}
 (
 cd MUSIC
 
+rm -fr $results_folder
+
 """.format(hydro_results_folder))
 
     if nthreads > 0:
@@ -332,6 +334,7 @@ pid=$1
     cd hadronic_afterburner_toolkit
     if [ "$pid" == "9999" ]; then
         # charged hadrons
+        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 vn_rapidity_dis_pT_min=0.15 vn_rapidity_dis_pT_max=3.0 > run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 > run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=-0.1 compute_correlation=0 flag_charge_dependence=0 >> run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=0.1 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
@@ -583,7 +586,7 @@ def main():
         initial_condition_database = (
                 parameter_dict.ipglasma['database_name_pattern'])
         IPGlasma_time_stamp = "0.1"
-    elif initial_condition_type == "3DMCGlauber_smooth":
+    elif initial_condition_type == "3DMCGlauber_consttau":
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
         filelist = glob(path.join(initial_condition_database,
@@ -680,7 +683,7 @@ def main():
     pwd = path.abspath(".")
     script_path = path.join(code_package_path, "utilities")
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
-    shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'), pwd)
     script_path = (
         path.join(code_package_path,
                   "codes/hadronic_afterburner_toolkit_code/ebe_scripts")

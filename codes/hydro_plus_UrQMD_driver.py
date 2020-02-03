@@ -44,7 +44,7 @@ def get_initial_condition(database, initial_type, nev, idx0,
                                                       time_stamp_str, iev)
             if file_name == "Failed": continue
             yield file_name
-    elif initial_type == "3DMCGlauber":
+    elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
                 file_name = "strings_event_{}.dat".format(iev)
@@ -57,7 +57,7 @@ def get_initial_condition(database, initial_type, nev, idx0,
             for iev in range(idx0, idx0 + nev):
                 file_name = fecth_an_3DMCGlauber_event(database, iev)
                 yield file_name
-    elif initial_type == "3DMCGlauber_smooth":
+    elif initial_type == "3DMCGlauber_consttau":
         for iev in range(idx0, idx0 + nev):
             file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
             yield file_name
@@ -212,6 +212,8 @@ def zip_results_into_hdf5(final_results_folder, event_id):
                               "momentum_anisotropy_eta_*.dat",
                               "inverse_Reynolds_number_eta_*.dat",
                               "averaged_phase_diagram_trajectory_eta_*.dat",
+                              "global_conservation_laws.dat",
+                              "global_angular_momentum.dat",
                               "vorticity_*.dat",
                               "strings_*.dat"]
 
@@ -293,10 +295,10 @@ def main(initial_condition, initial_type,
             event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
             event_id = initial_database_name + "_" + event_id
             shutil.move(ifile, "kompost/Tmunu.dat")
-        elif initial_type == "3DMCGlauber":
+        elif initial_type == "3DMCGlauber_dynamical":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
-        elif initial_type == "3DMCGlauber_smooth":
+        elif initial_type == "3DMCGlauber_consttau":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             filepath = initial_condition
             shutil.copy(path.join(filepath,
@@ -305,15 +307,18 @@ def main(initial_condition, initial_type,
             shutil.copy(path.join(filepath,
                 "nuclear_thickness_TB_fromSd_order_2_{}.dat".format(event_id)),
                 "MUSIC/initial/initial_TB.dat")
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_rhob_TA.dat")
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_rhob_TB.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
+            print("{} exists ...".format(final_results_folder))
+            spvnfolder = path.join(final_results_folder,
+                                   "spvn_results_{}".format(event_id))
+            status = check_an_event_is_good(spvnfolder)
+            if status:
+                print("{} finished properly. No need to rerun.".format(
+                    event_id))
+                continue
+            print("Rerun {} ...".format(final_results_folder))
             shutil.rmtree(final_results_folder)
         mkdir(final_results_folder)
 
@@ -340,7 +345,8 @@ def main(initial_condition, initial_type,
                 hydro_folder_name))
             continue
 
-        if initial_type == "3DMCGlauber" and initial_condition == "self":
+        if (initial_type == "3DMCGlauber_dynamical"
+                and initial_condition == "self"):
             # save the initial condition
             shutil.move("MUSIC/initial/strings.dat",
                         path.join(final_results_folder, hydro_folder_name,
@@ -384,7 +390,7 @@ if __name__ == "__main__":
         exit(0)
 
     known_initial_types = ["IPGlasma", "IPGlasma+KoMPoST",
-                           "3DMCGlauber", "3DMCGlauber_smooth"]
+                           "3DMCGlauber_dynamical", "3DMCGlauber_consttau"]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
