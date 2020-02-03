@@ -50,7 +50,10 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+#html_theme = 'alabaster'
+import sphinx_theme_pd
+html_theme = 'sphinx_theme_pd'
+html_theme_path = [sphinx_theme_pd.get_html_theme_path()]
 html_context = dict(
     display_github=True,
     github_user='chunshen1987',
