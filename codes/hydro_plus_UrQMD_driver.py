@@ -7,6 +7,7 @@ from os import path, mkdir, remove
 from glob import glob
 import sys
 import shutil
+import re
 import h5py
 import numpy as np
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
@@ -26,7 +27,7 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
        database_path folder
     """
     filelist = glob(path.join(database_path,
-                              'nuclear_thickness_TA_fromSd_order_2_C*.dat'))
+                              'nuclear_thickness_TA_*.dat'))
     return(filelist[iev])
 
 
@@ -299,14 +300,13 @@ def main(initial_condition, initial_type,
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
         elif initial_type == "3DMCGlauber_consttau":
-            event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
+            filename = ifile.split("/")[-1]
+            event_id = filename.split("_")[-1].split(".dat")[0]
             filepath = initial_condition
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TA_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_TA.dat")
-            shutil.copy(path.join(filepath,
-                "nuclear_thickness_TB_fromSd_order_2_{}.dat".format(event_id)),
-                "MUSIC/initial/initial_TB.dat")
+            shutil.copy(path.join(filepath, filename),
+                        "MUSIC/initial/initial_TA.dat")
+            shutil.copy(path.join(filepath, re.sub("TA", "TB", filename)),
+                        "MUSIC/initial/initial_TB.dat")
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
