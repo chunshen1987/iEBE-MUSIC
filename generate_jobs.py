@@ -245,6 +245,7 @@ results_folder={0:s}
 (
 cd MUSIC
 
+rm -fr *.dat
 rm -fr $results_folder
 
 """.format(hydro_results_folder))
@@ -273,7 +274,7 @@ def generate_script_afterburner(folder_name, GMC_flag=0):
     script.write(
         """#!/usr/bin/env bash
 
-unalias ls
+unalias ls 2>/dev/null
 
 SubEventId=$1
 

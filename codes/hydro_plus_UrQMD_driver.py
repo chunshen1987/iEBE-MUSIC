@@ -73,20 +73,25 @@ def run_hydro_event(final_results_folder, event_id):
     """This functions run hydro"""
     logo = "\U0001F3B6"
     hydro_folder_name = "hydro_results_{}".format(event_id)
-    results_folder = path.join(final_results_folder, hydro_folder_name))
+    results_folder = path.join(final_results_folder, hydro_folder_name)
     hydro_success = False
 
     if path.exists(results_folder):
         print("{} Hydrodynaimc results {} exist ... ".format(
                                                     logo, hydro_folder_name))
         # check hydro finishes properly
-        ftmp = open(path.join(results_folder, "run.log"), 'r',
-                    encoding="utf-8")
-        hydro_status = ftmp.readlines()[-1].split()[3]
-        if hydro_status == "Finished.":
-            print("{} Hydrodynamic run finished properly ... ".format(logo))
-            hydro_success = True
-        else:
+        try:
+            ftmp = open(path.join(results_folder, "run.log"), 'r',
+                        encoding="utf-8")
+            hydro_status = ftmp.readlines()[-1].split()[3]
+            ftmp.close()
+            if hydro_status == "Finished.":
+                print("{} Hydrodynamic run finished properly ... ".format(logo))
+                hydro_success = True
+        except FileNotFoundError:
+            hydro_success = False
+
+        if not hydro_success:
             print("{} Hydrodynamic run failed, rerun ... ".format(logo))
             shutil.rmtree(results_folder)
 
@@ -111,7 +116,7 @@ def run_kompost(final_results_folder, event_id):
     """This functions run KoMPoST simulation"""
     logo = "\U0001F3B6"
     kompost_folder_name = "kompost_results_{}".format(event_id)
-    results_folder = path.join(final_results_folder, kompost_folder_name))
+    results_folder = path.join(final_results_folder, kompost_folder_name)
     kompost_success = False
 
     if path.exists(results_folder):
