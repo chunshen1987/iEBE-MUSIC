@@ -71,41 +71,69 @@ def get_initial_condition(database, initial_type, nev, idx0,
 
 def run_hydro_event(final_results_folder, event_id):
     """This functions run hydro"""
-    print("\U0001F3B6  Playing MUSIC ... ")
-    call("bash ./run_hydro.sh", shell=True)
-
-    # check hydro finishes properly
-    ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
-    hydro_status = ftmp.readlines()[-1].split()[3]
+    logo = "\U0001F3B6"
+    hydro_folder_name = "hydro_results_{}".format(event_id)
+    results_folder = path.join(final_results_folder, hydro_folder_name))
     hydro_success = False
-    if hydro_status == "Finished.":
-        hydro_success = True
 
-    hydro_folder_name = ""
-    if hydro_success:
-        # collect hydro results
-        hydro_folder_name = "hydro_results_{}".format(event_id)
-        shutil.move("MUSIC/hydro_results", path.join(final_results_folder,
-                                                     hydro_folder_name))
+    if path.exists(results_folder):
+        print("{} Hydrodynaimc results {} exist ... ".format(
+                                                    logo, hydro_folder_name))
+        # check hydro finishes properly
+        ftmp = open(path.join(results_folder, "run.log"), 'r',
+                    encoding="utf-8")
+        hydro_status = ftmp.readlines()[-1].split()[3]
+        if hydro_status == "Finished.":
+            print("{} Hydrodynamic run finished properly ... ".format(logo))
+            hydro_success = True
+        else:
+            print("{} Hydrodynamic run failed, rerun ... ".format(logo))
+            shutil.rmtree(results_folder)
+
+    if not hydro_success:
+        print("{}  Playing MUSIC ... ".format(logo))
+        call("bash ./run_hydro.sh", shell=True)
+
+        # check hydro finishes properly
+        ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
+        hydro_status = ftmp.readlines()[-1].split()[3]
+        if hydro_status == "Finished.":
+            hydro_success = True
+
+        if hydro_success:
+            # collect hydro results
+            shutil.move("MUSIC/hydro_results", results_folder)
+
     return(hydro_success, hydro_folder_name)
 
 
 def run_kompost(final_results_folder, event_id):
-    """This functions run KoMPoST"""
-    print("\U0001F3B6  Run KoMPoST ... ")
-    call("bash ./run_kompost.sh", shell=True)
+    """This functions run KoMPoST simulation"""
+    logo = "\U0001F3B6"
+    kompost_folder_name = "kompost_results_{}".format(event_id)
+    results_folder = path.join(final_results_folder, kompost_folder_name))
+    kompost_success = False
 
-    # check hydro finishes properly
-    #ftmp = open("MUSIC/hydro_results/run.log", 'r', encoding="utf-8")
-    #kompost_status = ftmp.readlines()[-1].split()[3]
-    kompost_success = True
+    if path.exists(results_folder):
+        # check whether KoMPoST has already run or not
+        print("{} KoMPoST results {} exist ...".format(logo,
+                                                        kompost_folder_name))
+        kompost_success = True
+        if kompost_success:
+            print("{} no need to rerun KoMPoST".format(logo))
+        else:
+            print("{} KoMPoST simulation failed, rerun ...".format(logo))
+            shutil.rmtree(results_folder)
 
-    kompost_folder_name = ""
-    if kompost_success:
-        # collect hydro results
-        kompost_folder_name = "kompost_results_{}".format(event_id)
-        shutil.move("kompost/kompost_results", path.join(final_results_folder,
-                                                         kompost_folder_name))
+    if not kompost_success:
+        print("\U0001F3B6  Run KoMPoST ... ")
+        call("bash ./run_kompost.sh", shell=True)
+
+        kompost_success = True
+        if kompost_success:
+            # collect results
+            shutil.move("kompost/kompost_results", results_folder)
+
     return(kompost_success, kompost_folder_name)
 
 
@@ -125,30 +153,44 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(path.join(final_results_folder, hydro_folder_name,
                               "music_input"), hydro_surface_folder)
 
+
 def run_urqmd_event(event_id):
     """This function runs hadornic afterburner"""
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
 
+
 def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
     """This function runs urqmd events in parallel"""
-    print("\U0001F5FF  Running UrQMD ... ")
-    with Pool(processes=n_urqmd) as pool1:
-        pool1.map(run_urqmd_event, range(n_urqmd))
-
-    for iev in range(1, n_urqmd):
-        call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
-             + "UrQMDev_0/UrQMD_results/particle_list.gz "
-             + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
-             shell=True)
+    logo = "\U0001F5FF"
     urqmd_results_name = "particle_list_{}.gz".format(event_id)
-    shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz",
-                path.join(final_results_folder, urqmd_results_name))
-    return path.join(final_results_folder, urqmd_results_name)
+    results_folder = path.join(final_results_folder, urqmd_results_name)
+    urqmd_success = False
+
+    if path.exists(results_folder):
+        print("{} UrQMD results {} exist ... ".format(logo,
+                                                      urqmd_results_name))
+        urqmd_success = True
+
+    if not urqmd_success:
+        print("{}  Running UrQMD ... ".format(logo))
+        with Pool(processes=n_urqmd) as pool1:
+            pool1.map(run_urqmd_event, range(n_urqmd))
+
+        for iev in range(1, n_urqmd):
+            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
+                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
+                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+                 shell=True)
+        urqmd_success = True
+        shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz", results_folder)
+
+    return (urqmd_success, results_folder)
 
 
 def run_spvn_analysis(pid):
     """This function runs analysis"""
     call("bash ./run_analysis_spvn.sh {0:s}".format(pid), shell=True)
+
 
 def run_spvn_analysis_shell(urqmd_file_path, n_threads,
                             final_results_folder, event_id):
@@ -247,6 +289,7 @@ def zip_results_into_hdf5(final_results_folder, event_id):
         shutil.move("{}.h5".format(results_name), final_results_folder)
     else:
         print("{} is broken, skipped".format(spvnfolder))
+    return(status)
 
 
 def remove_unwanted_outputs(final_results_folder, event_id,
@@ -319,8 +362,9 @@ def main(initial_condition, initial_type,
                     event_id))
                 continue
             print("Rerun {} ...".format(final_results_folder))
-            shutil.rmtree(final_results_folder)
-        mkdir(final_results_folder)
+            #shutil.rmtree(final_results_folder)
+        else:
+            mkdir(final_results_folder)
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
@@ -357,19 +401,24 @@ def main(initial_condition, initial_type,
                                         hydro_folder_name, n_urqmd)
 
         # then run UrQMD events in parallel
-        urqmd_file_path = run_urqmd_shell(n_urqmd, final_results_folder,
-                                          event_id)
+        urqmd_success, urqmd_file_path = run_urqmd_shell(
+                                    n_urqmd, final_results_folder, event_id)
+        if not urqmd_success:
+            print("\U000026D4  {} did not finsh properly, skipped.".format(
+                                                            urqmd_file_path))
+            continue
+
         # finally collect results
         run_spvn_analysis_shell(urqmd_file_path, num_threads,
                                 final_results_folder, event_id)
 
         # zip results into a hdf5 database
-        zip_results_into_hdf5(final_results_folder, event_id)
+        status = zip_results_into_hdf5(final_results_folder, event_id)
 
-        # remove the unwanted outputs
-        remove_unwanted_outputs(final_results_folder, event_id,
-                                save_kompost, save_hydro, save_urqmd)
-
+        # remove the unwanted outputs if event is finished properly
+        if status:
+            remove_unwanted_outputs(final_results_folder, event_id,
+                                    save_kompost, save_hydro, save_urqmd)
 
 
 if __name__ == "__main__":
