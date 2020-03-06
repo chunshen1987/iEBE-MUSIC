@@ -18,8 +18,8 @@ heavy-ion collisions. These collisions can create extreme conditions, under
 which quarks and gluons are deformed from individual hadrons and form
 a new state of matter called the Quark-Gluon Plasma.
 The dynamics during the relativistic heavy-ion collisions is extremly short.
-During only a few yatoseconds (~10^{-23}), the collision system goes through
-a complex multi-stage evolution.
+During only a few yatoseconds :math:`(\sim 10^{-23})`, 
+the collision system goes through a complex multi-stage evolution.
 First, it evolves from a pre-equilibrium phase to a strongly coupled 
 fluid-dynamic regime. As the system further expands and cools, the
 quarks and gluons will recombined into hadrons. These hadrons will scatter
