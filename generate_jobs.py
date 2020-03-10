@@ -245,6 +245,9 @@ results_folder={0:s}
 (
 cd MUSIC
 
+rm -fr *.dat
+rm -fr $results_folder
+
 """.format(hydro_results_folder))
 
     if nthreads > 0:
@@ -271,7 +274,7 @@ def generate_script_afterburner(folder_name, GMC_flag=0):
     script.write(
         """#!/usr/bin/env bash
 
-unalias ls
+unalias ls 2>/dev/null
 
 SubEventId=$1
 
@@ -334,6 +337,8 @@ pid=$1
         # charged hadrons
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 vn_rapidity_dis_pT_min=0.15 vn_rapidity_dis_pT_max=3.0 > run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 > run.log
+        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.8 rap_max=0.8 compute_correlation=0 flag_charge_dependence=0 > run.log
+        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.4 rap_max=2.4 compute_correlation=0 flag_charge_dependence=0 > run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=-0.1 compute_correlation=0 flag_charge_dependence=0 >> run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=0.1 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
         ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=0.5 rap_max=2.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
@@ -593,13 +598,14 @@ def main():
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
         filelist = glob(path.join(initial_condition_database,
-                        'nuclear_thickness_TA_fromSd_order_2_C*.dat'))
+                        'nuclear_thickness_TA_*.dat'))
         nev = max(1, len(filelist))
         print("there are {} events found under the folder {}".format(
             nev, initial_condition_database))
         n_jobs = min(nev, n_jobs)
-        print("n_jobs = {}".format(n_jobs))
         n_hydro_per_job = int(ceil(nev/n_jobs))
+        print("n_jobs = {}, n_hydro_per_job = {}".format(
+                                                    n_jobs, n_hydro_per_job))
     else:
         initial_condition_database = (
                 parameter_dict.mcglauber_dict['database_name'])
@@ -686,7 +692,7 @@ def main():
     pwd = path.abspath(".")
     script_path = path.join(code_package_path, "utilities")
     shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
-    shutil.copy(path.join(script_path, 'combine_results_into_hdf5.py'), pwd)
+    shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'), pwd)
     script_path = (
         path.join(code_package_path,
                   "codes/hadronic_afterburner_toolkit_code/ebe_scripts")

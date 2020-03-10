@@ -388,11 +388,6 @@ def update_parameters_dict(par_dict_path):
         if 'boost_invariant' not in parameters_dict.music_dict:
             parameters_dict.music_dict['boost_invariant'] = 1
 
-        if parameters_dict.music_dict['boost_invariant'] == 1:
-            parameters_dict.iss_dict['hydro_mode'] = 1
-        else:
-            parameters_dict.iss_dict['hydro_mode'] = 2
-
         if 'Include_Rhob_Yes_1_No_0' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Include_Rhob_Yes_1_No_0'] = 0
     else:
@@ -404,9 +399,15 @@ def update_parameters_dict(par_dict_path):
                 'Initial_Distribution_input_filename'] = 'initial/strings.dat'
         if 'boost_invariant' not in parameters_dict.music_dict:
             parameters_dict.music_dict['boost_invariant'] = 0
-        parameters_dict.iss_dict['hydro_mode'] = 2
+
         if 'Include_Rhob_Yes_1_No_0' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Include_Rhob_Yes_1_No_0'] = 1
+
+    if parameters_dict.music_dict['boost_invariant'] == 1:
+        parameters_dict.iss_dict['hydro_mode'] = 1
+    else:
+        parameters_dict.iss_dict['hydro_mode'] = 2
+
     music_dict.update(parameters_dict.music_dict)
     iss_dict.update(parameters_dict.iss_dict)
     hadronic_afterburner_toolkit_dict.update(
