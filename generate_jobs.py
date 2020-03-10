@@ -399,6 +399,11 @@ def generate_event_folders(initial_condition_database,
                                                'codes/3dMCGlauber_code/eps09')),
                         path.join(event_folder, "3dMCGlauber/eps09")),
                         shell=True)
+        subprocess.call("ln -s {0:s} {1:s}".format(
+                        path.abspath(path.join(
+                            working_folder, 'codes/3dMCGlauber_code/tables')),
+                        path.join(event_folder, "3dMCGlauber/tables")),
+                        shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
                              initial_condition_database,
