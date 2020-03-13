@@ -11,6 +11,7 @@ then
 fi
 
 echo "submit jobs in " $workFolder
+echo $workFolder >> current_sims_list.txt
 
 Numjobs=0
 cd $workFolder
@@ -18,7 +19,7 @@ for ijob in `ls --color=none | grep "event"`;
 do 
     echo "submit job in " $workFolder/$ijob
     cd $ijob
-    qsub submit_job.pbs
+    qsub submit_job.pbs > job_id
     cd ..
     ((Numjobs++))
 done
