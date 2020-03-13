@@ -192,14 +192,9 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
     return (urqmd_success, results_folder)
 
 
-def run_spvn_analysis(pid):
+def run_spvn_analysis(urqmd_file_path, n_threads,
+                      final_results_folder, event_id):
     """This function runs analysis"""
-    call("bash ./run_analysis_spvn.sh {0:s}".format(pid), shell=True)
-
-
-def run_spvn_analysis_shell(urqmd_file_path, n_threads,
-                            final_results_folder, event_id):
-    """This function runs analysis in parallel"""
     spvn_folder = "hadronic_afterburner_toolkit/results"
     if path.exists(spvn_folder):
         shutil.rmtree(spvn_folder)
@@ -208,12 +203,9 @@ def run_spvn_analysis_shell(urqmd_file_path, n_threads,
         path.abspath(urqmd_file_path),
         path.join(spvn_folder, "particle_list.dat")), shell=True)
     # finally collect results
-    particle_list = [
-        '9999', '211', '-211', '321', '-321', '2212', '-2212',
-        '3122', '-3122', '3312', '-3312', '3334', '-3334', '333']
     print("\U0001F3CD Running spvn analysis ... ")
-    with Pool(processes=min(10, n_threads)) as pool:
-        pool.map(run_spvn_analysis, particle_list)
+
+    call("bash ./run_analysis_spvn.sh", shell=True)
 
     print("\U0001F3CD Finished spvn analysis ... ")
 
@@ -414,8 +406,8 @@ def main(initial_condition, initial_type,
             continue
 
         # finally collect results
-        run_spvn_analysis_shell(urqmd_file_path, num_threads,
-                                final_results_folder, event_id)
+        run_spvn_analysis(urqmd_file_path, num_threads,
+                          final_results_folder, event_id)
 
         # zip results into a hdf5 database
         status = zip_results_into_hdf5(final_results_folder, event_id)
