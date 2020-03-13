@@ -334,6 +334,7 @@ pid=$1
 (
     cd hadronic_afterburner_toolkit
     ./hadronic_afterburner_tools.e >> run.log
+)
         """)
     script.close()
 
