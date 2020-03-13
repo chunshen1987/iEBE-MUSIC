@@ -195,6 +195,10 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
 def run_spvn_analysis(urqmd_file_path, n_threads,
                       final_results_folder, event_id):
     """This function runs analysis"""
+    final_results_folder = path.join(final_results_folder,
+                                     "spvn_results_{0:s}".format(event_id))
+    if path.exists(final_results_folder):
+        shutil.rmtree(final_results_folder)
     spvn_folder = "hadronic_afterburner_toolkit/results"
     if path.exists(spvn_folder):
         shutil.rmtree(spvn_folder)
@@ -210,9 +214,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads,
     print("\U0001F3CD Finished spvn analysis ... ")
 
     call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
-    shutil.move(spvn_folder,
-                path.join(final_results_folder,
-                          "spvn_results_{0:s}".format(event_id)))
+    shutil.move(spvn_folder, final_results_folder)
 
 
 def check_an_event_is_good(event_folder):

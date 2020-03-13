@@ -329,8 +329,6 @@ def generate_script_analyze_spvn(folder_name):
     script.write(
         """#!/usr/bin/env bash
 
-pid=$1
-
 (
     cd hadronic_afterburner_toolkit
     ./hadronic_afterburner_tools.e >> run.log
