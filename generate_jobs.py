@@ -321,7 +321,7 @@ rm -fr hydro_event
     script.close()
 
 
-def generate_script_analyze_spvn(folder_name, corr_flag=0):
+def generate_script_analyze_spvn(folder_name):
     """This function generates script for analysis"""
     working_folder = folder_name
 
@@ -333,38 +333,8 @@ pid=$1
 
 (
     cd hadronic_afterburner_toolkit
-    if [ "$pid" == "9999" ]; then
-        # charged hadrons
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 vn_rapidity_dis_pT_min=0.15 vn_rapidity_dis_pT_max=3.0 > run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.5 rap_max=0.5 compute_correlation=0 flag_charge_dependence=0 > run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-0.8 rap_max=0.8 compute_correlation=0 flag_charge_dependence=0 > run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.4 rap_max=2.4 compute_correlation=0 flag_charge_dependence=0 > run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=-0.1 compute_correlation=0 flag_charge_dependence=0 >> run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=0.1 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=0.5 rap_max=2.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=-0.5 compute_correlation=0 flag_charge_dependence=0 >> run.log
+    ./hadronic_afterburner_tools.e >> run.log
         """)
-    if corr_flag == 1:
-        script.write(
-        """
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0 compute_correlation=1 flag_charge_dependence=1 pT_min=0.2 pT_max=2.0 >> run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0 compute_correlation=1 flag_charge_dependence=1 pT_min=0.2 pT_max=2.0 >> run.log
-        """)
-    script.write(
-        """
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-1.0 rap_max=1.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
-        ./hadronic_afterburner_tools.e particle_monval=$pid distinguish_isospin=0 rap_type=0 rap_min=-2.0 rap_max=2.0 compute_correlation=0 flag_charge_dependence=0 >> run.log
-    else
-        if [ "$pid" == 3122 -o "$pid" == -3122 -o "$pid" == 3312 -o "$pid" == -3312 -o "$pid" == 3334 -o "$pid" == -3334 ]; then
-            #./hadronic_afterburner_tools.e particle_monval=$pid rap_type=0 resonance_weak_feed_down_flag=0 >> run.log
-            ./hadronic_afterburner_tools.e particle_monval=$pid resonance_weak_feed_down_flag=0 compute_correlation=0 flag_charge_dependence=0 >> run.log
-        else
-            #./hadronic_afterburner_tools.e particle_monval=$pid rap_type=0 >> run.log
-            ./hadronic_afterburner_tools.e particle_monval=$pid compute_correlation=0 flag_charge_dependence=0 >> run.log
-        fi
-    fi
-)
-""")
     script.close()
 
 
@@ -374,7 +344,7 @@ def generate_event_folders(initial_condition_database,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
                            time_stamp, kompost_flag,
-                           hydro_flag, urqmd_flag, GMC_flag, corr_flag):
+                           hydro_flag, urqmd_flag, GMC_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -444,7 +414,7 @@ def generate_event_folders(initial_condition_database,
 
     generate_script_afterburner(event_folder, GMC_flag)
 
-    generate_script_analyze_spvn(event_folder, corr_flag)
+    generate_script_analyze_spvn(event_folder)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
@@ -665,8 +635,6 @@ def main():
                         event_id_offset = 0
                     break
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
-        corr_flag = parameter_dict.hadronic_afterburner_toolkit_dict[
-                                                    'compute_correlation']
         kompost_flag = False
         if initial_condition_type == "IPGlasma+KoMPoST":
             kompost_flag = parameter_dict.control_dict['save_kompost_results']
@@ -678,7 +646,7 @@ def main():
                                cluster_name, iev, event_id_offset,
                                n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
                                IPGlasma_time_stamp, kompost_flag,
-                               hydro_flag, urqmd_flag, GMC_flag, corr_flag)
+                               hydro_flag, urqmd_flag, GMC_flag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
