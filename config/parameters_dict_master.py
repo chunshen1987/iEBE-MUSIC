@@ -157,7 +157,7 @@ music_dict = {
 # iSS
 iss_dict = {
     'hydro_mode': 2,    # mode for reading in freeze out information 
-    'afterburner_type': 1     # 0: PDG_Decay  1: UrQMD  2: SMASH
+    'afterburner_type': 1,     # 0: PDG_Decay  1: UrQMD  2: SMASH
     'turn_on_bulk': 0,  # read in bulk viscous pressure
     'turn_on_rhob': 0,  # read in net baryon chemical potential
     'turn_on_diff': 0,  # read in baryon diffusion current
