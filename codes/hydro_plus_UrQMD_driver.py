@@ -6,6 +6,7 @@ from subprocess import call
 from os import path, mkdir, remove
 from glob import glob
 import sys
+import time
 import shutil
 import re
 import h5py
@@ -77,7 +78,7 @@ def run_hydro_event(final_results_folder, event_id):
     hydro_success = False
 
     if path.exists(results_folder):
-        print("{} Hydrodynaimc results {} exist ... ".format(
+        print("{}  Hydrodynaimc results {} exist ... ".format(
                                                     logo, hydro_folder_name))
         # check hydro finishes properly
         try:
@@ -96,7 +97,8 @@ def run_hydro_event(final_results_folder, event_id):
             shutil.rmtree(results_folder)
 
     if not hydro_success:
-        print("{}  Playing MUSIC ... ".format(logo))
+        curr_time = time.asctime()
+        print("{}  [{}] Playing MUSIC ... ".format(logo, curr_time))
         call("bash ./run_hydro.sh", shell=True)
 
         # check hydro finishes properly
@@ -131,7 +133,8 @@ def run_kompost(final_results_folder, event_id):
             shutil.rmtree(results_folder)
 
     if not kompost_success:
-        print("\U0001F3B6  Run KoMPoST ... ")
+        curr_time = time.asctime()
+        print("\U0001F3B6  [{}] Run KoMPoST ... ".format(curr_time))
         call("bash ./run_kompost.sh", shell=True)
 
         kompost_success = True
@@ -177,7 +180,8 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
         urqmd_success = True
 
     if not urqmd_success:
-        print("{}  Running UrQMD ... ".format(logo))
+        curr_time = time.asctime()
+        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time))
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
 
@@ -207,11 +211,13 @@ def run_spvn_analysis(urqmd_file_path, n_threads,
         path.abspath(urqmd_file_path),
         path.join(spvn_folder, "particle_list.dat")), shell=True)
     # finally collect results
-    print("\U0001F3CD Running spvn analysis ... ")
+    curr_time = time.asctime()
+    print("\U0001F3CD  [{}] Running spvn analysis ... ".format(curr_time))
 
     call("bash ./run_analysis_spvn.sh", shell=True)
 
-    print("\U0001F3CD Finished spvn analysis ... ")
+    curr_time = time.asctime()
+    print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time))
 
     call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
     shutil.move(spvn_folder, final_results_folder)
@@ -265,7 +271,9 @@ def zip_results_into_hdf5(final_results_folder, event_id):
 
     status = check_an_event_is_good(spvnfolder)
     if status:
-        print("{} is good, converting results to hdf5".format(spvnfolder))
+        curr_time = time.asctime()
+        print("[{}] {} is good, converting results to hdf5".format(curr_time,
+                                                                   spvnfolder))
         for ipattern in hydro_info_filepattern:
             hydro_info_list = glob(path.join(hydrofolder, ipattern))
             for ihydrofile in hydro_info_list:
@@ -314,18 +322,23 @@ def remove_unwanted_outputs(final_results_folder, event_id,
         remove(path.join(final_results_folder, urqmd_results_name))
 
 
-def main(initial_condition, initial_type,
-         n_hydro, hydro_id0, n_urqmd, num_threads,
-         save_kompost=True, save_hydro=True, save_urqmd=True,
-         seed_add=0, time_stamp_str="0.4"):
+def main(para_dict_):
     """This is the main function"""
-    print("\U0001F3CE  Number of threads: {}".format(num_threads))
+    initial_condition = para_dict_['initial_condition']
+    initial_type = para_dict_['initial_type']
+    num_threads = para_dict_['num_threads']
+    curr_time = time.asctime()
+    print("\U0001F3CE  [{}] Number of threads: {}".format(curr_time,
+                                                          num_threads))
 
-    for ifile in get_initial_condition(initial_condition,
-                                       initial_type,
-                                       n_hydro, hydro_id0,
-                                       seed_add, time_stamp_str):
-        print("\U0001F680 Run simulations with {} ... ".format(ifile))
+    for ifile in get_initial_condition(initial_condition, initial_type,
+                                       para_dict_['n_hydro'],
+                                       para_dict_['hydro_id0'],
+                                       para_dict_['seed_add'],
+                                       para_dict_['time_stamp_str']):
+        curr_time = time.asctime()
+        print("\U0001F680  [{}] Run simulations with {} ... ".format(curr_time,
+                                                                     ifile))
         if initial_type == "IPGlasma":
             initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
@@ -361,7 +374,6 @@ def main(initial_condition, initial_type,
                     event_id))
                 continue
             print("Rerun {} ...".format(final_results_folder))
-            #shutil.rmtree(final_results_folder)
         else:
             mkdir(final_results_folder)
 
@@ -445,6 +457,18 @@ if __name__ == "__main__":
                   INITIAL_CONDITION_TYPE))
         exit(1)
 
-    main(INITIAL_CONDITION_DATABASE, INITIAL_CONDITION_TYPE,
-         N_HYDRO_EVENTS, HYDRO_EVENT_ID0, N_URQMD, N_THREADS,
-         SAVE_KOMPOST, SAVE_HYDRO, SAVE_URQMD, SEED_ADD, TIME_STAMP)
+    para_dict = {
+            'initial_condition': INITIAL_CONDITION_DATABASE,
+            'initial_type': INITIAL_CONDITION_TYPE,
+            'n_hydro': N_HYDRO_EVENTS,
+            'hydro_id0': HYDRO_EVENT_ID0,
+            'n_urqmd': N_URQMD,
+            'num_threads': N_THREADS,
+            'save_kompost': SAVE_KOMPOST,
+            'save_hydro': SAVE_HYDRO,
+            'save_urqmd': SAVE_URQMD,
+            'seed_add': SEED_ADD,
+            'time_stamp_str': TIME_STAMP,
+    }
+
+    main(para_dict)
