@@ -327,6 +327,7 @@ def main(para_dict_):
     initial_condition = para_dict_['initial_condition']
     initial_type = para_dict_['initial_type']
     num_threads = para_dict_['num_threads']
+    n_urqmd = para_dict_['n_urqmd']
     curr_time = time.asctime()
     print("\U0001F3CE  [{}] Number of threads: {}".format(curr_time,
                                                           num_threads))
@@ -429,7 +430,9 @@ def main(para_dict_):
         # remove the unwanted outputs if event is finished properly
         if status:
             remove_unwanted_outputs(final_results_folder, event_id,
-                                    save_kompost, save_hydro, save_urqmd)
+                                    para_dict_['save_kompost'],
+                                    para_dict_['save_hydro'],
+                                    para_dict_['save_urqmd'])
 
 
 if __name__ == "__main__":
