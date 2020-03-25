@@ -79,7 +79,8 @@ def run_hydro_event(final_results_folder, event_id):
 
     if path.exists(results_folder):
         print("{}  Hydrodynaimc results {} exist ... ".format(
-                                                    logo, hydro_folder_name))
+                                                    logo, hydro_folder_name),
+              flush=True)
         # check hydro finishes properly
         try:
             ftmp = open(path.join(results_folder, "run.log"), 'r',
@@ -87,18 +88,21 @@ def run_hydro_event(final_results_folder, event_id):
             hydro_status = ftmp.readlines()[-1].split()[3]
             ftmp.close()
             if hydro_status == "Finished.":
-                print("{} Hydrodynamic run finished properly ... ".format(logo))
+                print("{} Hydrodynamic run finished properly ... ".format(
+                        logo), flush=True)
                 hydro_success = True
         except FileNotFoundError:
             hydro_success = False
 
         if not hydro_success:
-            print("{} Hydrodynamic run failed, rerun ... ".format(logo))
+            print("{} Hydrodynamic run failed, rerun ... ".format(logo),
+                  flush=True)
             shutil.rmtree(results_folder)
 
     if not hydro_success:
         curr_time = time.asctime()
-        print("{}  [{}] Playing MUSIC ... ".format(logo, curr_time))
+        print("{}  [{}] Playing MUSIC ... ".format(logo, curr_time),
+              flush=True)
         call("bash ./run_hydro.sh", shell=True)
 
         # check hydro finishes properly
@@ -124,17 +128,20 @@ def run_kompost(final_results_folder, event_id):
     if path.exists(results_folder):
         # check whether KoMPoST has already run or not
         print("{} KoMPoST results {} exist ...".format(logo,
-                                                        kompost_folder_name))
+                                                        kompost_folder_name),
+              flush=True)
         kompost_success = True
         if kompost_success:
-            print("{} no need to rerun KoMPoST".format(logo))
+            print("{} no need to rerun KoMPoST".format(logo), flush=True)
         else:
-            print("{} KoMPoST simulation failed, rerun ...".format(logo))
+            print("{} KoMPoST simulation failed, rerun ...".format(logo),
+                  flush=True)
             shutil.rmtree(results_folder)
 
     if not kompost_success:
         curr_time = time.asctime()
-        print("\U0001F3B6  [{}] Run KoMPoST ... ".format(curr_time))
+        print("\U0001F3B6  [{}] Run KoMPoST ... ".format(curr_time),
+              flush=True)
         call("bash ./run_kompost.sh", shell=True)
 
         kompost_success = True
@@ -176,12 +183,14 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
 
     if path.exists(results_folder):
         print("{} UrQMD results {} exist ... ".format(logo,
-                                                      urqmd_results_name))
+                                                      urqmd_results_name),
+              flush=True)
         urqmd_success = True
 
     if not urqmd_success:
         curr_time = time.asctime()
-        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time))
+        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
+              flush=True)
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
 
@@ -212,12 +221,14 @@ def run_spvn_analysis(urqmd_file_path, n_threads,
         path.join(spvn_folder, "particle_list.dat")), shell=True)
     # finally collect results
     curr_time = time.asctime()
-    print("\U0001F3CD  [{}] Running spvn analysis ... ".format(curr_time))
+    print("\U0001F3CD  [{}] Running spvn analysis ... ".format(curr_time),
+          flush=True)
 
     call("bash ./run_analysis_spvn.sh", shell=True)
 
     curr_time = time.asctime()
-    print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time))
+    print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time),
+          flush=True)
 
     call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
     shutil.move(spvn_folder, final_results_folder)
@@ -248,7 +259,8 @@ def check_an_event_is_good(event_folder):
         filename = path.join(event_folder, ifile)
         if filename not in event_file_list:
             print("event {} is bad, missing {} ...".format(event_folder,
-                                                           filename))
+                                                           filename),
+                  flush=True)
             return False
     return True
 
@@ -273,7 +285,8 @@ def zip_results_into_hdf5(final_results_folder, event_id):
     if status:
         curr_time = time.asctime()
         print("[{}] {} is good, converting results to hdf5".format(curr_time,
-                                                                   spvnfolder))
+                                                                   spvnfolder),
+              flush=True)
         for ipattern in hydro_info_filepattern:
             hydro_info_list = glob(path.join(hydrofolder, ipattern))
             for ihydrofile in hydro_info_list:
@@ -295,7 +308,7 @@ def zip_results_into_hdf5(final_results_folder, event_id):
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
     else:
-        print("{} is broken, skipped".format(spvnfolder))
+        print("{} is broken, skipped".format(spvnfolder), flush=True)
     return(status)
 
 
@@ -330,7 +343,8 @@ def main(para_dict_):
     n_urqmd = para_dict_['n_urqmd']
     curr_time = time.asctime()
     print("\U0001F3CE  [{}] Number of threads: {}".format(curr_time,
-                                                          num_threads))
+                                                          num_threads),
+          flush=True)
 
     for ifile in get_initial_condition(initial_condition, initial_type,
                                        para_dict_['n_hydro'],
@@ -339,7 +353,8 @@ def main(para_dict_):
                                        para_dict_['time_stamp_str']):
         curr_time = time.asctime()
         print("\U0001F680  [{}] Run simulations with {} ... ".format(curr_time,
-                                                                     ifile))
+                                                                     ifile),
+              flush=True)
         if initial_type == "IPGlasma":
             initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
@@ -366,15 +381,15 @@ def main(para_dict_):
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
-            print("{} exists ...".format(final_results_folder))
+            print("{} exists ...".format(final_results_folder), flush=True)
             spvnfolder = path.join(final_results_folder,
                                    "spvn_results_{}".format(event_id))
             status = check_an_event_is_good(spvnfolder)
             if status:
                 print("{} finished properly. No need to rerun.".format(
-                    event_id))
+                    event_id), flush=True)
                 continue
-            print("Rerun {} ...".format(final_results_folder))
+            print("Rerun {} ...".format(final_results_folder), flush=True)
         else:
             mkdir(final_results_folder)
 
@@ -398,7 +413,7 @@ def main(para_dict_):
         if not hydro_success:
             # if hydro didn't finish properly, just skip this event
             print("\U000026D4  {} did not finsh properly, skipped.".format(
-                hydro_folder_name))
+                hydro_folder_name), flush=True)
             continue
 
         if (initial_type == "3DMCGlauber_dynamical"
@@ -417,7 +432,8 @@ def main(para_dict_):
                                     n_urqmd, final_results_folder, event_id)
         if not urqmd_success:
             print("\U000026D4  {} did not finsh properly, skipped.".format(
-                                                            urqmd_file_path))
+                                                            urqmd_file_path),
+                  flush=True)
             continue
 
         # finally collect results
@@ -457,7 +473,7 @@ if __name__ == "__main__":
     if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
-                  INITIAL_CONDITION_TYPE))
+                  INITIAL_CONDITION_TYPE), flush=True)
         exit(1)
 
     para_dict = {
