@@ -27,8 +27,11 @@ do
     fi
     if [[ ${job_status} == "F" ]]
     then
-        echo "Job finished"
-        ls ${eventsPath}/
+        echo "Job finished, restarting ..."
+        (
+            cd ${eventsPath}
+            qsub -q wsuq submit_job.pbs > job_id
+        )
     else
         echo ${output}
     fi
