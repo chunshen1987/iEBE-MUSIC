@@ -78,23 +78,11 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster == "mwsugrid":
-        script.write("""#!/usr/bin/env bash
-#PBS -N {0:s}
-#PBS -l select=1:ncpus={1:d}:mem={2:.0f}GB:cpu_type=Intel
-##PBS -l walltime={3:s}
-#PBS -S /bin/bash
-#PBS -e test.err
-#PBS -o test.log
-#PBS -q mwsuq
-
-cd {4:s}
-""".format(event_id, n_threads, mem, walltime, working_folder))
     elif cluster in "local":
         script.write("#!/usr/bin/env bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
-        print("Available options: nersc, nerscKNL, wsugrid, mwsugrid, " +
+        print("Available options: nersc, nerscKNL, wsugrid, " +
               "local, guillimin, McGill")
         exit(1)
 
@@ -477,7 +465,7 @@ def main():
                         metavar='',
                         type=str,
                         choices=[
-                            'nersc', 'nerscKNL', 'wsugrid', 'mwsugrid', 'local',
+                            'nersc', 'nerscKNL', 'wsugrid', 'local',
                             'guillimin', 'McGill'
                         ],
                         default='local',
@@ -695,7 +683,7 @@ def main():
                                          n_threads, int(n_jobs/n_nodes),
                                          walltime)
 
-    if cluster_name in ("wsugrid", "mwsugrid"):
+    if cluster_name == "wsugrid":
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/WSUgrid/submit_all_jobs.sh'), pwd)
