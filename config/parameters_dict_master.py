@@ -170,7 +170,7 @@ iss_dict = {
     'bulk_deltaf_kind': 1,     # 0: 14-momentum approximation, 1: relaxation time approximation
     'restrict_deltaf': 0,      # flag to apply restriction on the size of delta f
     'deltaf_max_ratio': 1.0,   # the maximum allowed size of delta f w.r.t f0
-    'f0_is_not_small': 1,      # include (1 \pm f_0) factor in delta f
+    'quantum_statistics': 1,   # include quantum statistics (1: yes, 0: no)
 
     'randomSeed': -1,   # If <0, use system clock.
     'calculate_vn': 0,  # 1/0: whether to calculate the 
