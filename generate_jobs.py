@@ -21,6 +21,10 @@ known_initial_types = [
     "3DMCGlauber_consttau"
 ]
 
+support_cluster_list = [
+    'nersc', 'nerscKNL', 'wsugrid', "OSG", "local", "guillimin", "McGill"
+]
+
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
                         working_folder):
@@ -78,12 +82,11 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in "local":
+    elif cluster in ("local", "OSG"):
         script.write("#!/usr/bin/env bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
-        print("Available options: nersc, nerscKNL, wsugrid, " +
-              "local, guillimin, McGill")
+        print("Available options: ", support_cluster_list)
         exit(1)
 
 
@@ -464,10 +467,7 @@ def main():
                         '--cluster_name',
                         metavar='',
                         type=str,
-                        choices=[
-                            'nersc', 'nerscKNL', 'wsugrid', 'local',
-                            'guillimin', 'McGill'
-                        ],
+                        choices=support_cluster_list,
                         default='local',
                         help='name of the cluster')
     parser.add_argument('-n',
@@ -507,6 +507,12 @@ def main():
                         type=str,
                         default='',
                         help='parameters from bayesian analysis')
+    parser.add_argument('-id',
+                        '--OSG_process_id',
+                        metavar='',
+                        type=int,
+                        default='0',
+                        help='OSG job process id number')
     args = parser.parse_args()
 
     # print out all the arguments
@@ -524,6 +530,7 @@ def main():
         n_hydro_per_job = args.n_hydro_per_job
         n_urqmd_per_hydro = args.n_urqmd_per_hydro
         n_threads = args.n_threads
+        osg_job_id = args.OSG_process_id
     except:
         parser.print_help()
         exit(0)
@@ -634,6 +641,8 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
+        if cluster_name == "OSG":
+            event_id_offset = osg_job_id
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         kompost_flag = False
         if initial_condition_type == "IPGlasma+KoMPoST":
