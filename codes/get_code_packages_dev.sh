@@ -9,7 +9,7 @@ git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b remnant 3dMCG
 git clone --depth=1 https://github.com/j-f-paquet/kompost kompost_code
 
 # download MUSIC
-git clone https://Chunshen1987@bitbucket.org/Chunshen1987/music_dev.git -b new_string_format MUSIC_code
+git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
 
 # download iSS particle sampler
 git clone --depth=1 https://github.com/chunshen1987/iSS iSS_code
@@ -22,9 +22,9 @@ git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit
 
 
 # download neos_bqs
-neos_bqs_name="neosBQS-v0.11"
-neos_bqs_destination="MUSIC_code/EOS/"
-wget https://s3.amazonaws.com/qcdneos/${neos_bqs_name}.tar.gz && \
-tar -zxf ${neos_bqs_name}.tar.gz -C ${neos_bqs_destination} && \
-mv ${neos_bqs_destination}/${neos_bqs_name} ${neos_bqs_destination}/neos_bqs && \
-rm ${neos_bqs_name}.tar.gz
+#neos_bqs_name="neosBQS-v0.11"
+#neos_bqs_destination="MUSIC_code/EOS/"
+#wget https://s3.amazonaws.com/qcdneos/${neos_bqs_name}.tar.gz && \
+#tar -zxf ${neos_bqs_name}.tar.gz -C ${neos_bqs_destination} && \
+#mv ${neos_bqs_destination}/${neos_bqs_name} ${neos_bqs_destination}/neos_bqs && \
+#rm ${neos_bqs_name}.tar.gz
