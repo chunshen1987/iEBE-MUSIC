@@ -80,6 +80,6 @@ echo "Collected events number: " $collected_eventNum " out of " $total_eventNum
 if [ -f ${target_folder}/${folderName}.h5 ]; then
     mv ${target_folder}/${folderName}.h5 ${target_spvn_folder}
 fi
-./combine_results_into_hdf5.py ${target_spvn_folder}
+./combine_multiple_hdf5.py ${target_spvn_folder}
 mv SPVN_RESULTS.h5 ${target_folder}/${folderName}.h5
 rm -fr $target_spvn_folder
