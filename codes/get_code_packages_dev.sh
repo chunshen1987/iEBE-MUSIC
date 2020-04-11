@@ -5,6 +5,9 @@
 # download 3DMCGlauber
 git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b remnant 3dMCGlauber_code
 
+# download IPGlasma
+git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
+
 # download KoMPoST
 git clone --depth=1 https://github.com/j-f-paquet/kompost kompost_code
 
