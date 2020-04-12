@@ -42,8 +42,8 @@ def get_initial_condition(database,
         if database == "self":
             for iev in range(idx0, idx0 + nev):
                 file_name = ("ipglasma/ipglasma_results/"
-                             + "epsilon-u-Hydro-t{0:s}.dat".format(
-                                                        time_stamp_str))
+                             + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
+                                                        time_stamp_str, iev))
                 run_ipglasma()
                 yield (iev, file_name)
         else:
@@ -385,25 +385,26 @@ def main(para_dict_):
         curr_time, num_threads),
           flush=True)
 
-    for ifile in get_initial_condition(initial_condition, initial_type,
-                                       para_dict_['n_hydro'],
-                                       para_dict_['hydro_id0'],
-                                       para_dict_['seed_add'],
-                                       para_dict_['time_stamp_str']):
+    for iev, ifile in get_initial_condition(initial_condition, initial_type,
+                                            para_dict_['n_hydro'],
+                                            para_dict_['hydro_id0'],
+                                            para_dict_['seed_add'],
+                                            para_dict_['time_stamp_str']):
         curr_time = time.asctime()
         print("\U0001F680  [{}] Run simulations with {} ... ".format(
             curr_time, ifile),
               flush=True)
         if initial_type == "IPGlasma":
             shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
-            if initial_database_name != "self":
+            event_id = iev
+            if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
                 event_id = initial_database_name + "_" + event_id
         elif initial_type == "IPGlasma+KoMPoST":
             shutil.move(ifile, "kompost/Tmunu.dat")
-            if initial_database_name != "self":
+            if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
