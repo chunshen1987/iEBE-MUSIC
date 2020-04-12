@@ -45,6 +45,11 @@ def get_initial_condition(database,
                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
                                                         time_stamp_str, iev))
                 run_ipglasma()
+                tempfile  = ("ipglasma/ipglasma_results/"
+                             + "epsilon-u-Hydro-t{0:s}-0.dat".format(
+                                                        time_stamp_str))
+                call("mv {0} {1}".format(tempfile, file_name),
+                     shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -59,6 +64,10 @@ def get_initial_condition(database,
                              + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
                                                              iev))
                 run_ipglasma()
+                tempfile = ("ipglasma/ipglasma_results/"
+                            + "Tmunu-t{0:s}-0.dat".format(time_stamp_str))
+                call("mv {0} {1}".format(tempfile, file_name),
+                     shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -407,7 +416,7 @@ def main(para_dict_):
             curr_time, ifile),
               flush=True)
         if initial_type == "IPGlasma":
-            event_id = iev
+            event_id = str(iev)
             if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
