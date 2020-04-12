@@ -56,7 +56,8 @@ def get_initial_condition(database,
         if database == "self":
             for iev in range(idx0, idx0 + nev):
                 file_name = ("ipglasma/ipglasma_results/"
-                             + "Tmunu-t{0:s}.dat".format(time_stamp_str))
+                             + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
+                                                             iev))
                 run_ipglasma()
                 yield (iev, file_name)
         else:
@@ -96,11 +97,21 @@ def run_ipglasma():
     call("bash ./run_ipglasma.sh", shell=True)
 
 
-def collect_ipglasma_event(final_results_folder, event_id):
+def collect_ipglasma_event(final_results_folder, event_id, initial_type,
+                           filename):
     """This function collects the ipglasma results"""
-    ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
-    shutil.move("ipglasma/ipglasma_results", path.join(
-                                final_results_folder, ipglasma_folder_name))
+    ipglasma_folder_name = "ipglasma_results"
+    res_path = path.join(path.abspath(final_results_folder),
+                         ipglasma_folder_name)
+    shutil.move("ipglasma/ipglasma_results", res_path)
+    if initial_type == "IPGlasma":
+        hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
+        call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
+                                        hydro_initial_file), shell=True)
+    elif initial_type == "IPGlasma+KoMPoST":
+        kompost_initial_file = "kompost/Tmunu.dat"
+        call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
+                                        kompost_initial_file), shell=True)
 
 
 def run_hydro_event(final_results_folder, event_id):
@@ -301,6 +312,7 @@ def check_an_event_is_good(event_folder):
 def zip_results_into_hdf5(final_results_folder, event_id):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
+    initial_state_file = ['epsilon-u-Hydro-t{}.dat']
     hydro_info_filepattern = [
         "eccentricities_evo_eta_*.dat", "momentum_anisotropy_eta_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
@@ -395,7 +407,6 @@ def main(para_dict_):
             curr_time, ifile),
               flush=True)
         if initial_type == "IPGlasma":
-            shutil.move(ifile, "MUSIC/initial/epsilon-u-Hydro.dat")
             event_id = iev
             if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
@@ -403,7 +414,6 @@ def main(para_dict_):
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
                 event_id = initial_database_name + "_" + event_id
         elif initial_type == "IPGlasma+KoMPoST":
-            shutil.move(ifile, "kompost/Tmunu.dat")
             if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
@@ -435,6 +445,11 @@ def main(para_dict_):
             print("Rerun {} ...".format(final_results_folder), flush=True)
         else:
             mkdir(final_results_folder)
+
+        if "IPGlasma" in initial_type:
+            filename = ifile.split("/")[-1]
+            collect_ipglasma_event(final_results_folder, event_id,
+                                   initial_type, filename)
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
