@@ -48,8 +48,9 @@ def get_initial_condition(database,
                 tempfile  = ("ipglasma/ipglasma_results/"
                              + "epsilon-u-Hydro-t{0:s}-0.dat".format(
                                                         time_stamp_str))
-                call("mv {0} {1}".format(tempfile, file_name),
-                     shell=True)
+                if iev != 0:
+                    call("mv {0} {1}".format(tempfile, file_name),
+                         shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -106,8 +107,7 @@ def run_ipglasma():
     call("bash ./run_ipglasma.sh", shell=True)
 
 
-def collect_ipglasma_event(final_results_folder, event_id, initial_type,
-                           filename):
+def collect_ipglasma_event(final_results_folder, initial_type, filename):
     """This function collects the ipglasma results"""
     ipglasma_folder_name = "ipglasma_results"
     res_path = path.join(path.abspath(final_results_folder),
@@ -458,8 +458,7 @@ def main(para_dict_):
 
         if "IPGlasma" in initial_type:
             filename = ifile.split("/")[-1]
-            collect_ipglasma_event(final_results_folder, event_id,
-                                   initial_type, filename)
+            collect_ipglasma_event(final_results_folder, initial_type, filename)
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
