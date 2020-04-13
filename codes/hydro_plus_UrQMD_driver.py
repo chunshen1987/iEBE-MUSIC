@@ -423,6 +423,7 @@ def main(para_dict_):
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
                 event_id = initial_database_name + "_" + event_id
         elif initial_type == "IPGlasma+KoMPoST":
+            event_id = str(iev)
             if para_dict_['initial_condition'] != "self":
                 initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
