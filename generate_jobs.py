@@ -388,6 +388,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             shutil.copytree(path.join(working_folder, 'codes/ipglasma'),
                             path.join(event_folder, 'ipglasma'),
                             symlinks=True)
+            shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
+                            path.join(event_folder, 'ipglasma/input'))
             subprocess.call("ln -s {0:s} {1:s}".format(
                 path.abspath(path.join(working_folder,
                              'codes/ipglasma_code/qs2Adj_vs_Tp_vs_Y_200.in')),
@@ -414,8 +416,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         shutil.copytree(path.join(working_folder, 'codes/kompost'),
                         path.join(event_folder, 'kompost'),
                         symlinks=True)
-        #shutil.copyfile(path.join(param_folder, 'kompost/setup.ini'),
-        #                path.join(event_folder, 'kompost/setup.ini'))
+        shutil.copyfile(path.join(param_folder, 'KoMPoST/setup.ini'),
+                        path.join(event_folder, 'kompost/setup.ini'))
         subprocess.call("ln -s {0:s} {1:s}".format(
             path.abspath(path.join(working_folder, 'codes/kompost_code/EKT')),
             path.join(event_folder, "kompost/EKT")),
