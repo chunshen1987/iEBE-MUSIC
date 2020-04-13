@@ -122,6 +122,33 @@ mcglauber_dict = {
                                         # 4: deceleration with LEXUS sampled rapidit loss (dtau = 0.5 fm, m/sigma fluctuates)
 }
 
+# KoMPoST
+kompost_dict = {
+    'KoMPoSTInputs': {
+        'tIn': 0.1,
+        'tOut': 0.8,
+        'InputFile': "Tmunu.dat",
+        'OutputFileTag': "ekt_tIn01_tOut08",
+    },
+    'KoMPoSTParameters': {
+        'EtaOverS': 0.12,                   # specific shear viscosity
+        'EtaOverSTemperatureScale': 0.1,
+        'EVOLUTION_MODE': 1,                # 0 for free-streaming, 1: for "KoMPoST" EKT evolution
+        'ENERGY_PERTURBATIONS': 1,
+        'MOMENTUM_PERTURBATIONS': 1,
+        'DECOMPOSITION_METHOD': 1,
+    },
+    'EventInput': {
+        'normFactor': 0.287,    # Tmunu is normalized by this factor after being read in
+        'afm': 0.0664062,       # lattice spacing in fm
+        'Ns': 512,              # number of grid points on a square lattice
+        'xSTART': 0,            # The first grid point to include in the x direction
+        'xEND': 511,            # The last grid point to include in the x direction
+        'ySTART': 0,            # The first grid point to include in the y direction
+        'yEND': 511,            # The last grid point to include in the y direction
+    },
+}
+
 
 # MUSIC
 music_dict = {
@@ -420,6 +447,7 @@ hadronic_afterburner_toolkit_dict = {
 
 Parameters_list = [
     (ipglasma_dict, "input", 3),
+    (kompost_dict, "setup.ini", 4),
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 2),
     (iss_dict, "iSS_parameters.dat", 1),
@@ -428,6 +456,7 @@ Parameters_list = [
 
 path_list = [
     'model_parameters/IPGlasma/',
+    'model_parameters/KoMPoST/',
     'model_parameters/3dMCGlauber/',
     'model_parameters/MUSIC/',
     'model_parameters/iSS/',
@@ -514,6 +543,13 @@ def output_parameters_to_files(workfolder="."):
                 f.write("{parameter_name}  {parameter_value}\n".format(
                     parameter_name=key_name,
                     parameter_value=parameters_dict[key_name]))
+            elif itype == 4:
+                f.write("[{}]\n".format(key_name))
+                for subkey_name in parameters_dict[key_name]:
+                    f.write("{parameter_name} = {parameter_value};\n".format(
+                        parameter_name=subkey_name,
+                        parameter_value=parameters_dict[key_name][subkey_name])
+                    )
         if itype == 2:
             f.write("EndOfData")
         elif itype == 3:
