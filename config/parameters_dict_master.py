@@ -21,9 +21,70 @@ control_dict = {
 
 
 # IPGlasma
-ipglasma = {
+ipglasma_dict = {
     'type': "minimumbias",  # minimumbias, fixed, or self
     'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
+    'mode': 1,              # run mode
+    'readMultFromFile': 0,
+    'size': 720,            # number of grid points of IP-Glasma computation
+    'L': 30.,               # grid size in the transverse plane
+    'Nc': 3,                # number of color
+    'm': 0.2,               # infrared cut-off mass (GeV)
+    'rmax': 100.,
+    'UVdamp': 0.,
+    'Jacobianm': 0.35,
+    'g': 1.,                # strong coupling constant
+    'BG': 4.,
+    'BGq': 0.3,
+    'useSmoothNucleus': 0,
+    'useConstituentQuarkProton': 0,
+    'shiftConstituentQuarkProtonOrigin': 1,
+    'runningCoupling': 0,
+    'muZero': 0.3,
+    'c': 0.2,
+    'g2mu': 0.1,
+    'useFatTails': 0,
+    'tDistNu': 3,
+    'smearQs': 1,
+    'smearingWidth': 0.6,
+    'protonAnisotropy': 0,
+    'roots': 200.,
+    'usePseudoRapidity': 0,
+    'Rapidity': 0.,
+    'useFluctuatingx': 1,
+    'xFromThisFactorTimesQs': 1,
+    'useNucleus': 1,
+    'nucleonPositionsFromFile': 0,
+    'NucleusQsTableFileName': "qs2Adj_vs_Tp_vs_Y_200.in",
+    'QsmuRatio': 0.8,
+    'samplebFromLinearDistribution': 1,
+    'runWith0Min1Avg2MaxQs': 2,
+    'runWithThisFactorTimesQs': 0.5,
+    'runWithLocalQs': 0,
+    'runWithkt': 0,
+    'Ny': 50,
+    'useSeedList': 0,
+    'seed': 3,
+    'useTimeForSeed': 0,
+    'Projectile': "Au",
+    'Target': "Au",
+    'bmin': 0.,
+    'bmax': 20.,
+    'useFixedNpart': 0,
+    'averageOverThisManyNuclei': 1,
+    'SigmaNN': 42.,
+    'gaussianWounding': 1,
+    'inverseQsForMaxTime': 0,
+    'maxtime': 0.6,
+    'dtau': 0.1,
+    'LOutput': 30,
+    'sizeOutput': 512,
+    'etaSizeOutput': 1,
+    'detaOutput': 0,
+    'writeOutputs': 5,
+    'writeEvolution': 0,
+    'writeInitialWilsonLines': 0,
+    'writeOutputsToHDF5': 0
 }
 
 
@@ -358,6 +419,7 @@ hadronic_afterburner_toolkit_dict = {
 
 
 Parameters_list = [
+    (ipglasma_dict, "input", 3),
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 2),
     (iss_dict, "iSS_parameters.dat", 1),
@@ -365,6 +427,7 @@ Parameters_list = [
 ]
 
 path_list = [
+    'model_parameters/IPGlasma/',
     'model_parameters/3dMCGlauber/',
     'model_parameters/MUSIC/',
     'model_parameters/iSS/',
@@ -381,7 +444,7 @@ def update_parameters_dict(par_dict_path):
     initial_condition_type = (
                     parameters_dict.control_dict['initial_state_type'])
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
-        ipglasma.update(parameters_dict.ipglasma)
+        ipglasma_dict.update(parameters_dict.ipglasma_dict)
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 9
         if 'Initial_Distribution_input_filename' not in parameters_dict.music_dict:
@@ -446,8 +509,15 @@ def output_parameters_to_files(workfolder="."):
                 f.write("{parameter_name} = {parameter_value}\n".format(
                     parameter_name=key_name,
                     parameter_value=parameters_dict[key_name]))
+            elif itype == 3:
+                if key_name in ("type", "database_name_pattern"): continue
+                f.write("{parameter_name}  {parameter_value}\n".format(
+                    parameter_name=key_name,
+                    parameter_value=parameters_dict[key_name]))
         if itype == 2:
             f.write("EndOfData")
+        elif itype == 3:
+            f.write("EndOfFile")
         f.close()
 
 

@@ -615,19 +615,19 @@ def main():
     initial_condition_database = ""
     IPGlasma_time_stamp = "0.4"
     if initial_condition_type == "IPGlasma":
-        if parameter_dict.ipglasma['type'] == "self":
+        if parameter_dict.ipglasma_dict['type'] == "self":
             initial_condition_database = "self"
         else:
             initial_condition_database = (
-                parameter_dict.ipglasma['database_name_pattern'])
+                parameter_dict.ipglasma_dict['database_name_pattern'])
         IPGlasma_time_stamp = str(
             parameter_dict.music_dict['Initial_time_tau_0'])
     elif initial_condition_type == "IPGlasma+KoMPoST":
-        if parameter_dict.ipglasma['type'] == "self":
+        if parameter_dict.ipglasma_dict['type'] == "self":
             initial_condition_database = "self"
         else:
             initial_condition_database = (
-                parameter_dict.ipglasma['database_name_pattern'])
+                parameter_dict.ipglasma_dict['database_name_pattern'])
         IPGlasma_time_stamp = "0.1"
     elif initial_condition_type == "3DMCGlauber_consttau":
         initial_condition_database = (
@@ -691,7 +691,7 @@ def main():
             sys.stdout.write("#")
             sys.stdout.flush()
         if (initial_condition_type in ('IPGlasma', 'IPGlasma+KoMPoST') and
-                parameter_dict.ipglasma['type'] == 'minimumbias'):
+                parameter_dict.ipglasma_dict['type'] == 'minimumbias'):
             precent_local = float(iev)/float(n_jobs)
             for cen_min, cen_max, cen_label, cen_precent in centrality_list:
                 if precent_local >= cen_min and precent_local < cen_max:

@@ -8,6 +8,7 @@
 control_dict = {
     'initial_state_type': "IPGlasma+KoMPoST",  # 3DMCGlauber, IPGlasma
     'walltime': "10:00:00",  # walltime to run
+    'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_kompost_results': False,   # flag to save kompost results
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
@@ -15,7 +16,7 @@ control_dict = {
 
 
 # IPGlasma
-ipglasma = {
+ipglasma_dict = {
     'type': "fixed",  # minimumbias or fixed
     'database_name_pattern': "IPGlasma_database/RESULTS.h5",  # path for the database file
 }

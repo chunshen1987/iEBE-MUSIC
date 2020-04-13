@@ -8,13 +8,14 @@
 control_dict = {
     'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
     'walltime': "10:00:00",  # walltime to run
+    'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
 }
 
 
 # IPGlasma
-ipglasma = {
+ipglasma_dict = {
     'type': "minimumbias",  # minimumbias or fixed
     'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
 }
