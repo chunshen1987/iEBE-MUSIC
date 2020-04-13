@@ -546,7 +546,7 @@ def output_parameters_to_files(workfolder="."):
             elif itype == 4:
                 f.write("[{}]\n".format(key_name))
                 for subkey_name in parameters_dict[key_name]:
-                    f.write("{parameter_name} = {parameter_value};\n".format(
+                    f.write("{parameter_name} = {parameter_value}\n".format(
                         parameter_name=subkey_name,
                         parameter_value=parameters_dict[key_name][subkey_name])
                     )
