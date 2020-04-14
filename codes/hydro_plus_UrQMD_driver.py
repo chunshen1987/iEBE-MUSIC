@@ -45,8 +45,8 @@ def get_initial_condition(database,
                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
                                                         time_stamp_str, iev))
                 run_ipglasma()
-                tempfile  = ("ipglasma/ipglasma_results/"
-                             + "epsilon-u-Hydro-t{0:s}-0.dat".format(
+                tempfile = ("ipglasma/ipglasma_results/"
+                            + "epsilon-u-Hydro-t{0:s}-0.dat".format(
                                                         time_stamp_str))
                 if iev != 0:
                     call("mv {0} {1}".format(tempfile, file_name),
@@ -61,14 +61,22 @@ def get_initial_condition(database,
     elif initial_type == "IPGlasma+KoMPoST":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
-                file_name = ("ipglasma/ipglasma_results/"
-                             + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
-                                                             iev))
+                file_name1 = ("ipglasma/ipglasma_results/"
+                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
+                                                         time_stamp_str, iev))
+                file_name2 = ("ipglasma/ipglasma_results/"
+                              + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
+                                                              iev))
                 run_ipglasma()
-                tempfile = ("ipglasma/ipglasma_results/"
-                            + "Tmunu-t{0:s}-0.dat".format(time_stamp_str))
+                tempfile1 = ("ipglasma/ipglasma_results/"
+                             + "epsilon-u-Hydro-t{0:s}-0.dat".format(
+                                                        time_stamp_str))
+                tempfile2 = ("ipglasma/ipglasma_results/"
+                             + "Tmunu-t{0:s}-0.dat".format(time_stamp_str))
                 if iev != 0:
-                    call("mv {0} {1}".format(tempfile, file_name),
+                    call("mv {0} {1}".format(tempfile1, file_name1),
+                         shell=True)
+                    call("mv {0} {1}".format(tempfile2, file_name2),
                          shell=True)
                 yield (iev, file_name)
         else:
