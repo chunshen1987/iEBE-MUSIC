@@ -108,9 +108,10 @@ def run_ipglasma():
     call("bash ./run_ipglasma.sh", shell=True)
 
 
-def collect_ipglasma_event(final_results_folder, initial_type, filename):
+def collect_ipglasma_event(final_results_folder, initial_type,
+                           event_id, filename):
     """This function collects the ipglasma results"""
-    ipglasma_folder_name = "ipglasma_results"
+    ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
     res_path = path.join(path.abspath(final_results_folder),
                          ipglasma_folder_name)
     shutil.move("ipglasma/ipglasma_results", res_path)
@@ -323,10 +324,14 @@ def check_an_event_is_good(event_folder):
     return True
 
 
-def zip_results_into_hdf5(final_results_folder, event_id):
+def zip_results_into_hdf5(final_results_folder, event_id,
+                          initial_type, initial_condition, time_stamp):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
-    initial_state_file = ['epsilon-u-Hydro-t{}.dat']
+    initial_state_filelist = [
+        'epsilon-u-Hydro-t{}-{}.dat'.format(time_stamp, event_id)]
+    pre_equilibrium_filelist = [
+        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt']
     hydro_info_filepattern = [
         "eccentricities_evo_eta_*.dat", "momentum_anisotropy_eta_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
@@ -345,6 +350,29 @@ def zip_results_into_hdf5(final_results_folder, event_id):
         print("[{}] {} is good, converting results to hdf5".format(
             curr_time, spvnfolder),
               flush=True)
+
+        if initial_condition == "self":
+            # save initial conditions
+            if "IPGlasma" in initial_type:
+                initial_folder = path.join(
+                    final_results_folder,
+                    "ipglasma_results_{}".format(event_id))
+                for inifilename in initial_state_filelist:
+                    inifile = path.join(initial_folder, inifilename)
+                    if path.isfile(inifile):
+                        shutil.move(inifile, spvnfolder)
+
+            # save pre-equilibrium results
+            if initial_type == "IPGlasma+KoMPoST":
+                preeq_folder = path.join(
+                    final_results_folder,
+                    "kompost_results_{}".format(event_id))
+                for prefilename in pre_equilibrium_filelist:
+                    prefile = path.join(preeq_folder, prefilename)
+                    if path.isfile(prefile):
+                        shutil.move(prefile, spvnfolder)
+
+        # save hydro evolution information
         for ipattern in hydro_info_filepattern:
             hydro_info_list = glob(path.join(hydrofolder, ipattern))
             for ihydrofile in hydro_info_list:
@@ -361,6 +389,7 @@ def zip_results_into_hdf5(final_results_folder, event_id):
                                           data=dtemp,
                                           compression="gzip",
                                           compression_opts=9)
+            # save header
             ftemp = open(file_path, "r")
             header_text = str(ftemp.readline())
             ftemp.close()
@@ -463,7 +492,8 @@ def main(para_dict_):
 
         if "IPGlasma" in initial_type:
             filename = ifile.split("/")[-1]
-            collect_ipglasma_event(final_results_folder, initial_type, filename)
+            collect_ipglasma_event(final_results_folder, initial_type,
+                                   event_id, filename)
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
@@ -516,7 +546,9 @@ def main(para_dict_):
                           event_id)
 
         # zip results into a hdf5 database
-        status = zip_results_into_hdf5(final_results_folder, event_id)
+        status = zip_results_into_hdf5(final_results_folder, event_id,
+                                       initial_type, initial_condition,
+                                       para_dict_['time_stamp_str'])
 
         # remove the unwanted outputs if event is finished properly
         if status:
