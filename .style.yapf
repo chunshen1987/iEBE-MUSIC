@@ -1,0 +1,4 @@
+[style]
+based_on_style = google
+NO_SPACES_AROUND_SELECTED_BINARY_OPERATORS = "*,/"
+SPACES_BEFORE_COMMENT = 2

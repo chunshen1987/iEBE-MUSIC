@@ -33,7 +33,9 @@ ENV HOME /home/
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} \
 && git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC \
-&& cd iEBE-MUSIC/codes && ./get_code_packages.sh \
+&& cd iEBE-MUSIC/codes \
+#&& ./get_code_packages.sh \
+&& ./get_code_packages_dev.sh \
 && ./compile_code_packages.sh
 
 ENV PYTHONIOENCODING utf-8
