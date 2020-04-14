@@ -67,8 +67,9 @@ def get_initial_condition(database,
                 run_ipglasma()
                 tempfile = ("ipglasma/ipglasma_results/"
                             + "Tmunu-t{0:s}-0.dat".format(time_stamp_str))
-                call("mv {0} {1}".format(tempfile, file_name),
-                     shell=True)
+                if iev != 0:
+                    call("mv {0} {1}".format(tempfile, file_name),
+                         shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -121,6 +122,8 @@ def collect_ipglasma_event(final_results_folder, initial_type, filename):
                                         hydro_initial_file), shell=True)
     elif initial_type == "IPGlasma+KoMPoST":
         kompost_initial_file = "kompost/Tmunu.dat"
+        if path.islink(kompost_initial_file):
+            remove(kompost_initial_file)
         call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
                                         kompost_initial_file), shell=True)
 
