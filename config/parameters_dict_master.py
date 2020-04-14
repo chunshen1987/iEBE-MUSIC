@@ -485,6 +485,14 @@ def update_parameters_dict(par_dict_path):
 
         if 'Include_Rhob_Yes_1_No_0' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Include_Rhob_Yes_1_No_0'] = 0
+        if initial_condition_type == "IPGlasma+KoMPoST":
+            # update KoMPoST parameters
+            for subdict in parameters_dict.kompost_dict:
+                kompost_dict[subdict].update(
+                            parameters_dict.kompost_dict[subdict])
+            parameters_dict.music_dict['s_factor'] = 1.0
+            parameters_dict.music_dict['Initial_time_tau_0'] = (
+                    kompost_dict['KoMPoSTInputs']['tOut'])
     else:
         mcglauber_dict.update(parameters_dict.mcglauber_dict)
         if 'Initial_profile' not in parameters_dict.music_dict:
@@ -502,6 +510,7 @@ def update_parameters_dict(par_dict_path):
         parameters_dict.iss_dict['hydro_mode'] = 1
     else:
         parameters_dict.iss_dict['hydro_mode'] = 2
+
 
     music_dict.update(parameters_dict.music_dict)
     iss_dict.update(parameters_dict.iss_dict)

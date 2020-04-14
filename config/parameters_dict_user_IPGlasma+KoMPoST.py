@@ -6,19 +6,41 @@
 
 # control parameters
 control_dict = {
-    'initial_state_type': "IPGlasma+KoMPoST",  # 3DMCGlauber, IPGlasma
+    'initial_state_type': "IPGlasma+KoMPoST",
     'walltime': "10:00:00",  # walltime to run
-    'save_ipglasma_results': False,   # flag to save IPGlasma results
-    'save_kompost_results': False,   # flag to save kompost results
-    'save_hydro_surfaces': False,   # flag to save hydro surfaces
-    'save_UrQMD_files': False,      # flag to save UrQMD files
+    'save_ipglasma_results': True,   # flag to save ipglasma results
+    'save_kompost_results': True,   # flag to save kompost results
+    'save_hydro_surfaces': True,   # flag to save hydro surfaces
+    'save_UrQMD_files': True,      # flag to save UrQMD files
 }
 
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "fixed",  # minimumbias or fixed
+    'type': "self",     # minimumbias or fixed or self
     'database_name_pattern': "IPGlasma_database/RESULTS.h5",  # path for the database file
+    # all parameters below are for "type == self"
+    'bmin': 0.,
+    'bmax': 16.,
+    'Projectile': "Au",
+    'Target': "Au",
+    'roots': 200.,
+    'SigmaNN': 42.,
+}
+
+
+# KoMPoST
+kompost_dict = {
+    'KoMPoSTInputs': {
+        'tIn': 0.1,
+        'tOut': 0.8,
+    },
+    'KoMPoSTParameters': {
+        'EtaOverS': 0.12,                   # specific shear viscosity
+    },
+    'EventInput': {
+        'normFactor': 0.287,    # Tmunu is normalized by this factor after being read in
+    },
 }
 
 

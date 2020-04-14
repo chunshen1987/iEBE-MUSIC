@@ -8,7 +8,7 @@
 control_dict = {
     'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
     'walltime': "10:00:00",  # walltime to run
-    'save_ipglasma_results': True,
+    'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
 }
@@ -16,15 +16,8 @@ control_dict = {
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "self",  # minimumbias or fixed or self
+    'type': "minimumbias",  # minimumbias or fixed or self
     'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
-    # all parameters below are for "type == self"
-    'bmin': 0.,
-    'bmax': 16.,
-    'Projectile': "Au",
-    'Target': "Au",
-    'roots': 200.,
-    'SigmaNN': 42.,
 }
 
 

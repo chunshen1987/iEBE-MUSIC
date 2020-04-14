@@ -6,25 +6,34 @@
 
 # control parameters
 control_dict = {
-    'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
+    'initial_state_type': "IPGlasma+KoMPoST",
     'walltime': "10:00:00",  # walltime to run
-    'save_ipglasma_results': True,
-    'save_hydro_surfaces': False,   # flag to save hydro surfaces
-    'save_UrQMD_files': False,      # flag to save UrQMD files
+    'save_ipglasma_results': True,   # flag to save ipglasma results
+    'save_kompost_results': True,   # flag to save kompost results
+    'save_hydro_surfaces': True,   # flag to save hydro surfaces
+    'save_UrQMD_files': True,      # flag to save UrQMD files
 }
 
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "self",  # minimumbias or fixed or self
-    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
-    # all parameters below are for "type == self"
-    'bmin': 0.,
-    'bmax': 16.,
-    'Projectile': "Au",
-    'Target': "Au",
-    'roots': 200.,
-    'SigmaNN': 42.,
+    'type': "minimumbias",  # minimumbias or fixed or self
+    'database_name_pattern': "IPGlasma_database/RESULTS.h5",  # path for the database file
+}
+
+
+# KoMPoST
+kompost_dict = {
+    'KoMPoSTInputs': {
+        'tIn': 0.1,
+        'tOut': 0.8,
+    },
+    'KoMPoSTParameters': {
+        'EtaOverS': 0.12,                   # specific shear viscosity
+    },
+    'EventInput': {
+        'normFactor': 0.287,    # Tmunu is normalized by this factor after being read in
+    },
 }
 
 
@@ -35,8 +44,8 @@ music_dict = {
                             #   -- 91: e and u^\mu,
                             #   -- 92: e only,
                             #   -- 93: e, u^\mu, and pi^\munu
-    's_factor': 0.224,      # normalization factor read in initial data file
-    'Initial_time_tau_0': 0.4,  # starting time of the hydrodynamic evolution (fm/c)
+    's_factor': 1.0,        # normalization factor read in initial data file
+    'Initial_time_tau_0': 0.8,  # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.005,         # time step to use in the evolution [fm/c]
     'boost_invariant':  1,      # whether the simulation is boost-invariant
     'EOS_to_use': 9,            # type of the equation of state

@@ -630,7 +630,8 @@ def main():
         else:
             initial_condition_database = (
                 parameter_dict.ipglasma_dict['database_name_pattern'])
-        IPGlasma_time_stamp = "0.1"
+        IPGlasma_time_stamp = str(
+            parameter_dict.kompost_dict['KoMPoSTInputs']['tIn'])
     elif initial_condition_type == "3DMCGlauber_consttau":
         initial_condition_database = (
             parameter_dict.mcglauber_dict['database_name'])
