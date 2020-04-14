@@ -115,6 +115,8 @@ def collect_ipglasma_event(final_results_folder, initial_type, filename):
     shutil.move("ipglasma/ipglasma_results", res_path)
     if initial_type == "IPGlasma":
         hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
+        if path.islink(hydro_initial_file):
+            remove(hydro_initial_file)
         call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
                                         hydro_initial_file), shell=True)
     elif initial_type == "IPGlasma+KoMPoST":
