@@ -186,6 +186,7 @@ def generate_script_ipglasma(folder_name, nthreads):
         """#!/usr/bin/env bash
 
 results_folder={0:s}
+evid=$1
 
 (
 cd ipglasma
@@ -205,7 +206,11 @@ export OMP_NUM_THREADS={0:d}
         """
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 1> run.log 2> run.err
-mv *.dat $results_folder
+for ifile in `ls *.dat`
+do
+    filename=`echo $ii | sed 's/0.dat/${evid}.dat/'`
+    cat ifile | sed 's$N/A$0.0$' > $results_folder/${filename}
+done
 )
 """)
     script.close()

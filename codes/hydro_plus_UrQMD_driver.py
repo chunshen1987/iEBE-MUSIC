@@ -40,17 +40,12 @@ def get_initial_condition(database,
     """This funciton get initial conditions"""
     if initial_type == "IPGlasma":
         if database == "self":
+            IPG_respath = "ipglasma/ipglasma_results/"
             for iev in range(idx0, idx0 + nev):
+                run_ipglasma(iev)
                 file_name = ("ipglasma/ipglasma_results/"
                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
                                                         time_stamp_str, iev))
-                run_ipglasma()
-                tempfile = ("ipglasma/ipglasma_results/"
-                            + "epsilon-u-Hydro-t{0:s}-0.dat".format(
-                                                        time_stamp_str))
-                if iev != 0:
-                    call("mv {0} {1}".format(tempfile, file_name),
-                         shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -61,23 +56,10 @@ def get_initial_condition(database,
     elif initial_type == "IPGlasma+KoMPoST":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
-                file_name1 = ("ipglasma/ipglasma_results/"
-                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
-                                                         time_stamp_str, iev))
-                file_name2 = ("ipglasma/ipglasma_results/"
-                              + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
+                run_ipglasma(iev)
+                file_name = ("ipglasma/ipglasma_results/"
+                             + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
                                                               iev))
-                run_ipglasma()
-                tempfile1 = ("ipglasma/ipglasma_results/"
-                             + "epsilon-u-Hydro-t{0:s}-0.dat".format(
-                                                        time_stamp_str))
-                tempfile2 = ("ipglasma/ipglasma_results/"
-                             + "Tmunu-t{0:s}-0.dat".format(time_stamp_str))
-                if iev != 0:
-                    call("mv {0} {1}".format(tempfile1, file_name1),
-                         shell=True)
-                    call("mv {0} {1}".format(tempfile2, file_name2),
-                         shell=True)
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
@@ -110,10 +92,10 @@ def get_initial_condition(database,
         exit(1)
 
 
-def run_ipglasma():
+def run_ipglasma(iev):
     """This functions run IPGlasma"""
     print("\U0001F3B6  Run IPGlasma ... ")
-    call("bash ./run_ipglasma.sh", shell=True)
+    call("bash ./run_ipglasma.sh {}".format(iev), shell=True)
 
 
 def collect_ipglasma_event(final_results_folder, initial_type,
@@ -337,7 +319,10 @@ def zip_results_into_hdf5(final_results_folder, event_id,
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
     initial_state_filelist = [
-        'epsilon-u-Hydro-t{}-{}.dat'.format(time_stamp, event_id)]
+        'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
+        'NcollList{}.dat'.format(event_id),
+        'NpartList{}.dat'.format(event_id),
+        'NpartdNdy-t0.6-{}.dat'.format(event_id)]
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt']
     hydro_info_filepattern = [
@@ -401,7 +386,8 @@ def zip_results_into_hdf5(final_results_folder, event_id,
             ftemp = open(file_path, "r")
             header_text = str(ftemp.readline())
             ftemp.close()
-            h5data.attrs.create("header", np.string_(header_text))
+            if header_text.startswith("#")
+                h5data.attrs.create("header", np.string_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
     else:
