@@ -386,7 +386,7 @@ def zip_results_into_hdf5(final_results_folder, event_id,
             ftemp = open(file_path, "r")
             header_text = str(ftemp.readline())
             ftemp.close()
-            if header_text.startswith("#")
+            if header_text.startswith("#"):
                 h5data.attrs.create("header", np.string_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
