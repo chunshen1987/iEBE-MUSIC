@@ -208,8 +208,9 @@ export OMP_NUM_THREADS={0:d}
 ./ipglasma input 1> run.log 2> run.err
 for ifile in `ls *.dat`
 do
-    filename=`echo $ii | sed 's/0.dat/${evid}.dat/'`
-    cat ifile | sed 's$N/A$0.0$' > $results_folder/${filename}
+    filename=`echo ${ifile} | sed "s/0.dat/${evid}.dat/"`
+    cat ${ifile} | sed 's$N/A$0.0$g' > $results_folder/${filename}
+    rm -fr ${ifile}
 done
 )
 """)
