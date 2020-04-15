@@ -314,10 +314,10 @@ def check_an_event_is_good(event_folder):
     return True
 
 
-def zip_results_into_hdf5(final_results_folder, event_id,
-                          initial_type, initial_condition, time_stamp):
+def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
+    time_stamp = para_dict['time_stamp_str']
     initial_state_filelist = [
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
         'NcollList{}.dat'.format(event_id),
@@ -344,9 +344,10 @@ def zip_results_into_hdf5(final_results_folder, event_id,
             curr_time, spvnfolder),
               flush=True)
 
-        if initial_condition == "self":
+        if para_dict['initial_condition'] == "self":
             # save initial conditions
-            if "IPGlasma" in initial_type:
+            if ("IPGlasma" in para_dict['initial_type']
+                and para_dict['save_ipglasma']):
                 initial_folder = path.join(
                     final_results_folder,
                     "ipglasma_results_{}".format(event_id))
@@ -356,7 +357,8 @@ def zip_results_into_hdf5(final_results_folder, event_id,
                         shutil.move(inifile, spvnfolder)
 
             # save pre-equilibrium results
-            if initial_type == "IPGlasma+KoMPoST":
+            if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
+                    and para_dict['save_kompost']):
                 preeq_folder = path.join(
                     final_results_folder,
                     "kompost_results_{}".format(event_id))
@@ -541,8 +543,7 @@ def main(para_dict_):
 
         # zip results into a hdf5 database
         status = zip_results_into_hdf5(final_results_folder, event_id,
-                                       initial_type, initial_condition,
-                                       para_dict_['time_stamp_str'])
+                                       para_dict_)
 
         # remove the unwanted outputs if event is finished properly
         if status:
