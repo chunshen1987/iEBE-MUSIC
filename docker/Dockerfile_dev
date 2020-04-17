@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM opensciencegrid/osgvo-ubuntu-18.04
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
