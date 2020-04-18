@@ -1,12 +1,21 @@
-FROM opensciencegrid/osgvo-ubuntu-18.04
+FROM opensciencegrid/osgvo-ubuntu-xenial
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
-    apt-get update && apt-get install -y --no-install-recommends \
+    apt-get update
+
+RUN apt-get install -y software-properties-common && \
+    add-apt-repository ppa:ubuntu-toolchain-r/test && \
+    apt-get update && \
+    apt install g++-7 -y
+
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60 \
+                         --slave /usr/bin/g++ g++ /usr/bin/g++-7 && \
+    update-alternatives --config gcc
+
+RUN apt-get install -y --no-install-recommends \
         cmake \
-        g++ \
-        gcc \
         gfortran \
         git \
         hdf5-tools \
@@ -17,7 +26,6 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
         libz-dev \
         make \
         libopenmpi-dev \
-        libopenmpi2 \
         openmpi-bin \
         openmpi-common \
         openmpi-doc \
