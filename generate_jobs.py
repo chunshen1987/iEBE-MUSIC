@@ -659,8 +659,7 @@ def main():
 
     shutil.copy(args.par_dict, working_folder_name)
     shutil.copytree("{}/codes".format(code_package_path),
-                    path.join(working_folder_name, "codes"),
-                    ignore=shutil.ignore_patterns("*.git*"))
+                    path.join(working_folder_name, "codes"))
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
         subprocess.call("(cd {}/config; ".format(code_package_path) +
