@@ -78,6 +78,7 @@ RUN pip3 install --upgrade && \
 
 ENV HOME /home/
 ENV PATH="${PATH}:/usr/lib64/openmpi/bin"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} && \
