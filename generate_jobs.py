@@ -83,7 +83,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
     elif cluster in ("local", "OSG"):
-        script.write("#!/usr/bin/env bash")
+        script.write("#!/bin/bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
         print("Available options: ", support_cluster_list)
@@ -183,7 +183,7 @@ def generate_script_ipglasma(folder_name, nthreads):
 
     results_folder = 'ipglasma_results'
     script.write(
-        """#!/usr/bin/env bash
+        """#!/bin/bash
 
 results_folder={0:s}
 evid=$1
@@ -206,12 +206,14 @@ export OMP_NUM_THREADS={0:d}
         """
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 1> run.log 2> run.err
-for ifile in `ls *.dat`
+for ifile in *.dat
 do
-    filename=`echo ${ifile} | sed "s/0.dat/${evid}.dat/"`
+    filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
     cat ${ifile} | sed 's$N/A$0.0$g' > $results_folder/${filename}
     rm -fr ${ifile}
 done
+mv run.log $results_folder/
+mv run.err $results_folder/
 )
 """)
     script.close()
@@ -224,7 +226,7 @@ def generate_script_kompost(folder_name, nthreads):
     script = open(path.join(working_folder, "run_kompost.sh"), "w")
 
     hydro_results_folder = 'kompost_results'
-    script.write("""#!/usr/bin/env bash
+    script.write("""#!/bin/bash
 
 results_folder={0:s}
 
@@ -257,7 +259,7 @@ def generate_script_hydro(folder_name, nthreads):
     script = open(path.join(working_folder, "run_hydro.sh"), "w")
 
     hydro_results_folder = 'hydro_results'
-    script.write("""#!/usr/bin/env bash
+    script.write("""#!/bin/bash
 
 results_folder={0:s}
 
@@ -288,7 +290,7 @@ def generate_script_afterburner(folder_name, GMC_flag=0):
     working_folder = folder_name
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
-    script.write("""#!/usr/bin/env bash
+    script.write("""#!/bin/bash
 
 unalias ls 2>/dev/null
 
@@ -340,7 +342,7 @@ def generate_script_analyze_spvn(folder_name):
     working_folder = folder_name
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
-    script.write("""#!/usr/bin/env bash
+    script.write("""#!/bin/bash
 
 (
     cd hadronic_afterburner_toolkit
