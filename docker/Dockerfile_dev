@@ -59,14 +59,9 @@ RUN  alternatives --install /usr/local/bin/cmake cmake /usr/bin/cmake3 20 \
 
 SHELL ["/usr/bin/scl", "enable", "devtoolset-7"]
 
-# gsl 2.4
-RUN wget https://ftp.gnu.org/gnu/gsl/gsl-2.4.tar.gz && \
-    tar -xf gsl-2.4.tar.gz && \
-    cd gsl-2.4 && \
-    ./configure && \
-    make && \
-    make install && \
-    cd .. && rm -fr gsl-2.4 && rm -fr gsl-2.4.tar.gz
+RUN yum -y install http://springdale.princeton.edu/data/springdale/7/x86_64/os/Computational/gsl25-2.5-3.sdl7.2.x86_64.rpm
+
+RUN yum -y install http://springdale.princeton.edu/data/springdale/7/x86_64/os/Computational/gsl25-devel-2.5-3.sdl7.2.x86_64.rpm
 
 # osg
 RUN yum -y install osg-ca-certs osg-wn-client && \
@@ -77,8 +72,13 @@ RUN pip3 install --upgrade && \
     pip3 install numpy h5py scipy
 
 ENV HOME /home/
-ENV PATH="${PATH}:/usr/lib64/openmpi/bin"
-ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
+ENV PATH="${PATH}:/usr/lib64/openmpi/bin:/usr/local/gsl/2.5/x86_64/bin"
+ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/gsl/2.5/x86_64/lib64"
+ENV GSL_ROOT_DIR="/usr/local/gsl/2.5/x86_64"
+
+RUN echo 'export PATH="${PATH}:/usr/lib64/openmpi/bin:/usr/local/gsl/2.5/x86_64/bin"' >> /root/.bashrc
+RUN echo 'LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/gsl/2.5/x86_64/lib64"' >> /root/.bashrc
+RUN echo 'GSL_ROOT_DIR="/usr/local/gsl/2.5/x86_64"' >> /root/.bashrc
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} && \
