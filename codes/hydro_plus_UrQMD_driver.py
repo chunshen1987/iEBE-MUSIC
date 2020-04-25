@@ -505,6 +505,13 @@ def main(para_dict_):
                 hydro_initial_file),
                  shell=True)
 
+        if (initial_type == "3DMCGlauber_dynamical" and
+                initial_condition == "self"):
+            # save the initial condition
+            shutil.copy("MUSIC/initial/strings.dat",
+                        path.join(final_results_folder,
+                                  "strings_{}.dat".format(event_id)))
+
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
             final_results_folder, event_id)
