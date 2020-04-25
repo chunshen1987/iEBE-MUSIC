@@ -3,7 +3,7 @@
 
 from multiprocessing import Pool
 from subprocess import call
-from os import path, mkdir, remove
+from os import path, mkdir, remove, makedirs
 from glob import glob
 import sys
 import time
@@ -452,6 +452,9 @@ def main(para_dict_):
                     initial_condition.split("/")[-1].split(".h5")[0])
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
                 event_id = initial_database_name + "_" + event_id
+                ipglasma_folder = "ipglasma/ipglasma_results"
+                makedirs(ipglasma_folder, exist_ok=True)
+                shutil.move(ifile, ipglasma_folder)
         elif initial_type == "IPGlasma+KoMPoST":
             event_id = str(iev)
             if para_dict_['initial_condition'] != "self":
@@ -459,6 +462,9 @@ def main(para_dict_):
                     initial_condition.split("/")[-1].split(".h5")[0])
                 event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
                 event_id = initial_database_name + "_" + event_id
+                ipglasma_folder = "ipglasma/ipglasma_results"
+                makedirs(ipglasma_folder, exist_ok=True)
+                shutil.move(ifile, ipglasma_folder)
         elif initial_type == "3DMCGlauber_dynamical":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
