@@ -390,6 +390,7 @@ hadronic_afterburner_toolkit_dict = {
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
+    'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
     'npT': 41,          # number of pT points for pT-differential spectra and vn
     'pT_min': 0.05,     # the minimum value of transverse momentum (GeV)
     'pT_max': 4.05,     # the maximum value of transverse momentum (GeV)

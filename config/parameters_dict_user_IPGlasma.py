@@ -35,20 +35,20 @@ music_dict = {
                             #   -- 91: e and u^\mu,
                             #   -- 92: e only,
                             #   -- 93: e, u^\mu, and pi^\munu
-    's_factor': 0.224,      # normalization factor read in initial data file
+    's_factor': 0.235,      # normalization factor read in initial data file
     'Initial_time_tau_0': 0.4,  # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.005,         # time step to use in the evolution [fm/c]
     'boost_invariant':  1,      # whether the simulation is boost-invariant
     'EOS_to_use': 9,            # type of the equation of state
                                 # 9: hotQCD EOS with UrQMD
     # transport coefficients
-    'quest_revert_strength': 5.0,          # the strength of the viscous regulation
+    'quest_revert_strength': 1.0,          # the strength of the viscous regulation
     'Viscosity_Flag_Yes_1_No_0': 1,        # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,    # include shear viscous effect
     'Shear_to_S_ratio': 0.12,              # value of \eta/s
     'T_dependent_Shear_to_S_ratio': 0,     # flag to use temperature dep. \eta/s(T)
     'Include_Bulk_Visc_Yes_1_No_0': 1,     # include bulk viscous effect
-    'T_dependent_zeta_over_s': 7,          # parameterization of \zeta/s(T)
+    'T_dependent_zeta_over_s': 8,          # parameterization of \zeta/s(T)
     'Include_second_order_terms': 1,       # include second order non-linear coupling terms
     'Include_vorticity_terms': 0,          # include vorticity coupling terms
 
@@ -77,5 +77,6 @@ hadronic_afterburner_toolkit_dict = {
     'event_buffer_size': 100000,       # the number of events read in at once
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
+    'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
 }
