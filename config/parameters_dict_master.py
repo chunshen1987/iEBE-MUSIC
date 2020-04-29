@@ -13,6 +13,7 @@ control_dict = {
     'initial_state_type': "3DMCGlauber_dynamical",  # options: IPGlasma, IPGlasma+KoMPoST,
                                                     #          3DMCGlauber_dynamical, 3DMCGlauber_consttau
     'walltime': "10:00:00",  # walltime to run
+    'random_seed': -1,                # random seed option
     'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
