@@ -595,10 +595,10 @@ def main():
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
 
-    if seed != -1:
-        parameter_dict.control_dict['random_seed'] = seed
     if cluster_name == "OSG":
-        parameter_dict.control_dict['random_seed'] += osg_job_id
+        if seed == -1: seed = 0
+        seed += osg_job_id
+        print("seed = ", seed)
 
     initial_condition_type = (parameter_dict.control_dict['initial_state_type'])
     if initial_condition_type not in known_initial_types:
@@ -651,15 +651,16 @@ def main():
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
         subprocess.call("(cd {}/config; ".format(code_package_path) +
                         "python3 parameters_dict_master.py " +
-                        "-path {} -par {} -b {};)".format(
+                        "-path {} -par {} -b {} -seed {};)".format(
                             working_folder_name, path.abspath(args.par_dict),
-                            args.bayes_file),
+                            args.bayes_file, seed),
                         shell=True)
     else:
         subprocess.call(
             "(cd {}/config; ".format(code_package_path) +
-            "python3 parameters_dict_master.py " + "-path {} -par {};)".format(
-                working_folder_name, path.abspath(args.par_dict)),
+            "python3 parameters_dict_master.py " +
+            "-path {} -par {} -seed {};)".format(
+                working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
 
     cent_label = "XXX"

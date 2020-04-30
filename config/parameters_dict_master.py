@@ -466,7 +466,7 @@ path_list = [
 ]
 
 
-def update_parameters_dict(par_dict_path):
+def update_parameters_dict(par_dict_path, ran_seed):
     """This function update the parameters dictionaries with user's settings"""
     par_diretory = path.dirname(par_dict_path)
     sys.path.insert(0, par_diretory)
@@ -476,6 +476,14 @@ def update_parameters_dict(par_dict_path):
                     parameters_dict.control_dict['initial_state_type'])
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
+
+        # set random seed
+        if ran_seed == -1:
+            ipglasma_dict['useTimeForSeed'] = 1
+        else:
+            ipglasma_dict['seed'] = ran_seed
+            ipglasma_dict['useTimeForSeed'] = 0
+
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 9
         if 'Initial_Distribution_input_filename' not in parameters_dict.music_dict:
@@ -497,6 +505,9 @@ def update_parameters_dict(par_dict_path):
                     kompost_dict['KoMPoSTInputs']['tOut'])
     else:
         mcglauber_dict.update(parameters_dict.mcglauber_dict)
+
+        mcglauber_dict['seed'] = ran_seed       # set random seed
+
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 13
         if 'Initial_Distribution_input_filename' not in parameters_dict.music_dict:
@@ -516,8 +527,10 @@ def update_parameters_dict(par_dict_path):
 
     music_dict.update(parameters_dict.music_dict)
     iss_dict.update(parameters_dict.iss_dict)
+    iss_dict['randomSeed'] = ran_seed
     hadronic_afterburner_toolkit_dict.update(
         parameters_dict.hadronic_afterburner_toolkit_dict)
+    hadronic_afterburner_toolkit_dict['randomSeed'] = ran_seed
 
 
 def update_parameters_bayesian(bayes_file):
@@ -581,8 +594,11 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--bayes_file', metavar='',
                         type=str, default='',
                         help='parameters from bayesian analysis')
+    parser.add_argument('-seed', '--random_seed', metavar='',
+                        type=int, default=-1,
+                        help='input random seed')
     args = parser.parse_args()
-    update_parameters_dict(path.abspath(args.par_dict))
+    update_parameters_dict(path.abspath(args.par_dict), args.random_seed)
     if args.bayes_file != "":
         update_parameters_bayesian(args.bayes_file)
     output_parameters_to_files(args.path)
