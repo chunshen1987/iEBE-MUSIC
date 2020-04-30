@@ -1,0 +1,31 @@
+universe = vanilla
+executable = run_singularity.sh
+arguments = parameters_dict_user_IPGlasma.py $(Process) 1 12311
+
+should_transfer_files = YES
+WhenToTransferOutput = ON_EXIT
+
+transfer_input_files = parameters_dict_user_IPGlasma.py
+transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
+
+Requirements = HAS_SINGULARITY == TRUE
++SingularityImage = "/cvmfs/singularity.opensciencegrid.org/chunshen1987/iebe-music:dev"
+
+error = log/job.$(Cluster).$(Process).error
+output = log/job.$(Cluster).$(Process).output
+log = log/job.$(Cluster).$(Process).log
+
+# The below are good base requirements for first testing jobs on OSG, 
+# if you don't have a good idea of memory and disk usage.
+request_cpus = 1
+request_memory = 2 GB
+request_disk = 1 GB
+
+# Send the job to Held state on failure. 
+on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+
+# Periodically retry the jobs every 10 minutes, up to a maximum of 10 retries.
+periodic_release =  (NumJobStarts < 10) && ((CurrentTime - EnteredCurrentStatus) > 600)
+
+# Queue one job with the above specifications.
+queue 1000
