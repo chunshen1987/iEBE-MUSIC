@@ -100,6 +100,8 @@ mcglauber_dict = {
     'b_max'     :   20.,         # maximum impact parameter (fm)
     'seed'      :   -1,          # random seed (-1: system)
     'only_event_statistics': 0,  # flag to only output the event_summary file
+    'cache_tables': 1,           # 1: use pre-generated tables for valence quark x
+                                 # 0: re-generate tables for valence quark x
     'baryon_junctions': 0,       # 0: baryon number assumed to be at string end
                                  # 1: baryon number transported assuming baryon
                                  # junctions (at smaller x)
