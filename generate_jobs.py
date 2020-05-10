@@ -337,7 +337,7 @@ rm -fr hydro_event
     script.close()
 
 
-def generate_script_analyze_spvn(folder_name):
+def generate_script_analyze_spvn(folder_name, HBT_flag):
     """This function generates script for analysis"""
     working_folder = folder_name
 
@@ -346,9 +346,15 @@ def generate_script_analyze_spvn(folder_name):
 
 (
     cd hadronic_afterburner_toolkit
-    ./hadronic_afterburner_tools.e >> run.log
-)
-        """)
+""")
+    if HBT_flag:
+        script.write("""
+    ./hadronic_afterburner_toolkit.e analyze_flow=1 analyze_HBT=0 >> run.log
+    ./hadronic_afterburner_toolkit.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=2000000 >> run.log
+""")
+    else:
+        script.write("    ./hadronic_afterburner_tools.e >> run.log\n")
+    script.write(")\n")
     script.close()
 
 
@@ -357,7 +363,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            event_id, event_id_offset, n_hydro_per_job,
                            n_urqmd_per_hydro, n_threads, time_stamp,
                            ipglasma_flag, kompost_flag, hydro_flag,
-                           urqmd_flag, GMC_flag):
+                           urqmd_flag, GMC_flag, HBT_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -436,7 +442,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     generate_script_afterburner(event_folder, GMC_flag)
 
-    generate_script_analyze_spvn(event_folder)
+    generate_script_analyze_spvn(event_folder, HBT_flag)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
@@ -712,13 +718,18 @@ def main():
             kompost_flag = parameter_dict.control_dict['save_kompost_results']
         hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
         urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
+        HBT_flag = False
+        if "analyze_HBT" in parameter_dict.hadronic_afterburner_toolkit_dict:
+            if parameter_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
+                HBT_flag = True
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type,
                                code_package_path, working_folder_name,
                                cluster_name, iev, event_id_offset,
                                n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
                                IPGlasma_time_stamp, ipglasma_flag,
-                               kompost_flag, hydro_flag, urqmd_flag, GMC_flag)
+                               kompost_flag, hydro_flag, urqmd_flag, GMC_flag,
+                               HBT_flag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()

@@ -365,14 +365,10 @@ hadronic_afterburner_toolkit_dict = {
                         #    (without header lines)
                         # 4: reads outputs from UrQMD 3.3p2 outputs
                         # 10: reads outputf from gzip outputs
-    'run_mode': 0,      # running mode for the program
-                        # 0: collect single particle spectra and vn
-                        # 1: compute HBT correlation function
-                        # 2: collect event-by-event particle yield
-                        #    distribution (pT and rapdity cuts are
-                        #    specified by pT_min, pT_max, rap_min,
-                        #    and rap_max)
-                        # 3: compute balance function
+    'analyze_flow': 1,                  # 0/1: flag to perform flow analysis
+    'analyze_HBT': 0,                   # 0/1: flag to perform HBT analysis
+    'analyze_balance_function': 0,      # 0/1: flag to analyze Balance function
+    'analyze_ebe_yield': 0,             # 0/1: flag to analyze ebe dis. of particle yield
     'randomSeed': -1,
     'particle_monval': 211,     # particle Monte-Carlo number
     'distinguish_isospin': 1,   # flag whether to distinguish the isospin of particles
