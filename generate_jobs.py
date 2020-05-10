@@ -313,7 +313,7 @@ export OMP_NUM_THREADS={0:d}
     else:
         script.write("""
 # hydro evolution
-./MUSIChydro music_input_mode_2
+./MUSIChydro music_input_mode_2 | tee run.log
 ./sweeper.sh $results_folder
 )
 """)
@@ -367,7 +367,7 @@ do
     cd ../osc2u
     if [ $SubEventId = "0" ]; then
     """)
-    script.write("    ./osc2u.e {0}".format(logfile))
+    script.write("    ./osc2u.e < ../iSS/OSCAR.DAT {0}".format(logfile))
     script.write("""
     else
         ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
