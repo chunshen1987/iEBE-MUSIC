@@ -166,16 +166,21 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
-    script.write("\nseed_add=${1:-0}\n"
-            +
-        """
+    script.write("\nseed_add=${1:-0}\n")
+    if cluster_name != "OSG":
+        script.write("""
 python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} > run.log
+""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
+           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+    else:
+        script.write("""
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
     script.close()
 
 
-def generate_script_ipglasma(folder_name, nthreads):
+def generate_script_ipglasma(folder_name, nthreads, cluster_name):
     """This function generates script for IPGlasma simulation"""
     working_folder = folder_name
 
@@ -202,10 +207,24 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    script.write(
-        """
+    if cluster_name != "OSG":
+        script.write("""
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 1> run.log 2> run.err
+for ifile in *.dat
+do
+    filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
+    cat ${ifile} | sed 's$N/A$0.0$g' > $results_folder/${filename}
+    rm -fr ${ifile}
+done
+mv run.log $results_folder/
+mv run.err $results_folder/
+)
+""")
+    else:
+        script.write("""
+# IPGlasma evolution (run 1 event)
+./ipglasma input
 for ifile in *.dat
 do
     filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
@@ -219,7 +238,7 @@ mv run.err $results_folder/
     script.close()
 
 
-def generate_script_kompost(folder_name, nthreads):
+def generate_script_kompost(folder_name, nthreads, cluster_name):
     """This function generates script for KoMPoST simulation"""
     working_folder = folder_name
 
@@ -243,16 +262,24 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    script.write("""
+    if cluster_name != "OSG":
+        script.write("""
 # KoMPoST EKT evolution
 ./KoMPoST.exe setup.ini 1> run.log 2> run.err
+mv *.txt $results_folder
+)
+""")
+    else:
+        script.write("""
+# KoMPoST EKT evolution
+./KoMPoST.exe setup.ini
 mv *.txt $results_folder
 )
 """)
     script.close()
 
 
-def generate_script_hydro(folder_name, nthreads):
+def generate_script_hydro(folder_name, nthreads, cluster_name):
     """This function generates script for hydro simulation"""
     working_folder = folder_name
 
@@ -276,18 +303,30 @@ rm -fr $results_folder
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    script.write("""
+    if cluster_name != "OSG":
+        script.write("""
 # hydro evolution
 ./MUSIChydro music_input_mode_2 1> run.log 2> run.err
+./sweeper.sh $results_folder
+)
+""")
+    else:
+        script.write("""
+# hydro evolution
+./MUSIChydro music_input_mode_2
 ./sweeper.sh $results_folder
 )
 """)
     script.close()
 
 
-def generate_script_afterburner(folder_name, GMC_flag=0):
+def generate_script_afterburner(folder_name, cluster_name, GMC_flag=0):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
+
+    logfile = ""
+    if cluster_name != "OSG":
+        logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
     script.write("""#!/bin/bash
@@ -309,8 +348,15 @@ do
     rm -fr results/*
     mv ../hydro_event/$iev results/surface.dat
     mv ../hydro_event/music_input results/music_input
-    ./iSS.e > run.log
+    if [ $SubEventId = "0" ]; then
     """)
+    script.write("    ./iSS.e {0}".format(logfile))
+    script.write("""
+    else
+        ./iSS.e > run.log
+    fi
+    """)
+
     if GMC_flag == 1:
         script.write("""
     # turn on global momentum conservation
@@ -319,10 +365,22 @@ do
     """)
     script.write("""
     cd ../osc2u
-    ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
+    if [ $SubEventId = "0" ]; then
+    """)
+    script.write("    ./osc2u.e {0}".format(logfile))
+    script.write("""
+    else
+        ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
+    fi
     mv fort.14 ../urqmd/OSCAR.input
     cd ../urqmd
-    ./runqmd.sh >> run.log
+    if [ $SubEventId = "0" ]; then
+    """)
+    script.write("    ./runqmd.sh {0}".format(logfile))
+    script.write("""
+    else
+        ./runqmd.sh >> run.log
+    fi
     mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr ../iSS/OSCAR.DAT
     rm -fr OSCAR.input
@@ -337,9 +395,13 @@ rm -fr hydro_event
     script.close()
 
 
-def generate_script_analyze_spvn(folder_name, HBT_flag):
+def generate_script_analyze_spvn(folder_name, HBT_flag, cluster_name):
     """This function generates script for analysis"""
     working_folder = folder_name
+
+    logfile = ""
+    if cluster_name != "OSG":
+        logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
     script.write("""#!/bin/bash
@@ -348,12 +410,13 @@ def generate_script_analyze_spvn(folder_name, HBT_flag):
     cd hadronic_afterburner_toolkit
 """)
     if HBT_flag:
-        script.write("""
-    ./hadronic_afterburner_toolkit.e analyze_flow=1 analyze_HBT=0 >> run.log
-    ./hadronic_afterburner_toolkit.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=2000000 >> run.log
-""")
+        script.write(
+            "   ./hadronic_afterburner_toolkit.e analyze_flow=1 analyze_HBT=0 {0}\n".format(logfile))
+        script.write(
+            "   ./hadronic_afterburner_toolkit.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=2000000 {0}\n".format(logfile))
     else:
-        script.write("    ./hadronic_afterburner_tools.e >> run.log\n")
+        script.write(
+            "    ./hadronic_afterburner_tools.e {0}\n".format(logfile))
     script.write(")\n")
     script.close()
 
@@ -392,7 +455,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                     path.join(event_folder, "3dMCGlauber/{}".format(link_i))),
                     shell=True)
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
-            generate_script_ipglasma(event_folder, n_threads)
+            generate_script_ipglasma(event_folder, n_threads, cluster_name)
             shutil.copytree(path.join(working_folder, 'codes/ipglasma'),
                             path.join(event_folder, 'ipglasma'),
                             symlinks=True)
@@ -413,7 +476,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                              hydro_flag, urqmd_flag, time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
-        generate_script_kompost(event_folder, n_threads)
+        generate_script_kompost(event_folder, n_threads, cluster_name)
         shutil.copytree(path.join(working_folder, 'codes/kompost'),
                         path.join(event_folder, 'kompost'),
                         symlinks=True)
@@ -426,7 +489,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(event_folder, "kompost/{}".format(link_i))),
                 shell=True)
 
-    generate_script_hydro(event_folder, n_threads)
+    generate_script_hydro(event_folder, n_threads, cluster_name)
 
     shutil.copytree(path.join(working_folder, 'codes/MUSIC'),
                     path.join(event_folder, 'MUSIC'),
@@ -440,9 +503,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
             shell=True)
 
-    generate_script_afterburner(event_folder, GMC_flag)
+    generate_script_afterburner(event_folder, cluster_name, GMC_flag)
 
-    generate_script_analyze_spvn(event_folder, HBT_flag)
+    generate_script_analyze_spvn(event_folder, HBT_flag, cluster_name)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
