@@ -320,7 +320,7 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
-def generate_script_afterburner(folder_name, cluster_name, GMC_flag=0):
+def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
 
@@ -373,6 +373,7 @@ do
         ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
     fi
     mv fort.14 ../urqmd/OSCAR.input
+    rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
     if [ $SubEventId = "0" ]; then
     """)
@@ -382,20 +383,35 @@ do
         ./runqmd.sh >> run.log
     fi
     mv particle_list.dat ../UrQMD_results/particle_list.dat
-    rm -fr ../iSS/OSCAR.DAT
     rm -fr OSCAR.input
     cd ..
     ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat
     rm -fr UrQMD_results/particle_list.dat
-done
+""")
+    if HBT_flag:
+        script.write("""
+    cd hadronic_afterburner_toolkit
+    mkdir -p results
+    cd results; rm -fr *
+    ln -s ../../UrQMD_results/particle_list.gz particle_list.dat
+    cd ..
+""")
+        script.write('    if [ $SubEventId = "0" ]; then\n')
+        script.write("        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 {0}\n".format(logfile))
+        script.write("    else\n")
+        script.write("        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 >> run.log\n")
+        script.write("    fi\n")
+        script.write("    mv results/HBT* ../UrQMD_results/ \n")
+    script.write("""
+    done
 
-rm -fr hydro_event
+    rm -fr hydro_event
 )
 """)
     script.close()
 
 
-def generate_script_analyze_spvn(folder_name, HBT_flag, cluster_name):
+def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
     """This function generates script for analysis"""
     working_folder = folder_name
 
@@ -409,14 +425,11 @@ def generate_script_analyze_spvn(folder_name, HBT_flag, cluster_name):
 (
     cd hadronic_afterburner_toolkit
 """)
+    script.write(
+        "   ./hadronic_afterburner_tools.e analyze_HBT=0 {0}\n".format(logfile))
     if HBT_flag:
         script.write(
-            "   ./hadronic_afterburner_toolkit.e analyze_flow=1 analyze_HBT=0 {0}\n".format(logfile))
-        script.write(
-            "   ./hadronic_afterburner_toolkit.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=2000000 {0}\n".format(logfile))
-    else:
-        script.write(
-            "    ./hadronic_afterburner_tools.e {0}\n".format(logfile))
+            "    python ./average_event_HBT_correlation_function.py .. results\n")
     script.write(")\n")
     script.close()
 
@@ -503,9 +516,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
             shell=True)
 
-    generate_script_afterburner(event_folder, cluster_name, GMC_flag)
+    generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
-    generate_script_analyze_spvn(event_folder, HBT_flag, cluster_name)
+    generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
@@ -531,6 +544,24 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(working_folder, 'codes/urqmd_code/urqmd/urqmd.e')),
             path.join(sub_event_folder, "urqmd/urqmd.e")),
                         shell=True)
+        if HBT_flag:
+            shutil.copytree(
+                path.join(working_folder,
+                          'codes/hadronic_afterburner_toolkit'),
+                path.join(sub_event_folder, 'hadronic_afterburner_toolkit'))
+            shutil.copyfile(
+                path.join(param_folder,
+                          'hadronic_afterburner_toolkit/parameters.dat'),
+                path.join(sub_event_folder,
+                          'hadronic_afterburner_toolkit/parameters.dat'))
+            for link_i in ['hadronic_afterburner_tools.e', 'EOS']:
+                subprocess.call("ln -s {0:s} {1:s}".format(
+                    path.abspath(path.join(working_folder,
+                        'codes/hadronic_afterburner_toolkit_code/{}'.format(
+                                                                    link_i))),
+                    path.join(sub_event_folder,
+                        "hadronic_afterburner_toolkit/{}".format(link_i))),
+                    shell=True)
     shutil.copytree(
         path.join(working_folder, 'codes/hadronic_afterburner_toolkit'),
         path.join(event_folder, 'hadronic_afterburner_toolkit'))

@@ -371,6 +371,7 @@ hadronic_afterburner_toolkit_dict = {
     'analyze_HBT': 0,                   # 0/1: flag to perform HBT analysis
     'analyze_balance_function': 0,      # 0/1: flag to analyze Balance function
     'analyze_ebe_yield': 0,             # 0/1: flag to analyze ebe dis. of particle yield
+    'read_in_real_mixed_events': 0,     # 0/1: read in real mixed events
     'randomSeed': -1,
     'particle_monval': 211,     # particle Monte-Carlo number
     'distinguish_isospin': 1,   # flag whether to distinguish the isospin of particles
