@@ -392,6 +392,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 h5data.attrs.create("header", np.string_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
+        shutil.rmtree(spvnfolder, ignore_errors=True)
     else:
         print("{} is broken, skipped".format(spvnfolder), flush=True)
     return (status)
