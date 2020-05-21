@@ -54,6 +54,7 @@ ipglasma_dict = {
     'useFluctuatingx': 1,
     'xFromThisFactorTimesQs': 1,
     'useNucleus': 1,
+    'useGaussian': 0,
     'nucleonPositionsFromFile': 0,
     'NucleusQsTableFileName': "qs2Adj_vs_Tp_vs_Y_200.in",
     'QsmuRatio': 0.8,
