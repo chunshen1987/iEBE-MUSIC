@@ -475,7 +475,10 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             symlinks=True)
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
-            for link_i in ['qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma']:
+            link_list = ['qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
+                         'carbon_alpha_3.in', 'carbon_plaintext.in',
+                         'oxygen_alpha_3.in', 'oxygen_plaintext.in']
+            for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
                     path.abspath(path.join(code_path,
                                  'ipglasma_code/{}'.format(link_i))),
