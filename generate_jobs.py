@@ -435,7 +435,8 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
 
 
 def generate_event_folders(initial_condition_database, initial_condition_type,
-                           code_package_path, working_folder, cluster_name,
+                           package_root_path, code_path, working_folder,
+                           cluster_name,
                            event_id, event_id_offset, n_hydro_per_job,
                            n_urqmd_per_hydro, n_threads, time_stamp,
                            ipglasma_flag, kompost_flag, hydro_flag,
@@ -444,40 +445,43 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
     mkdir(event_folder)
-    shutil.copy(path.join(working_folder, 'codes/hydro_plus_UrQMD_driver.py'),
+    shutil.copy(path.join(code_path, 'hydro_plus_UrQMD_driver.py'),
                 event_folder)
     shutil.copy(
-        path.join(code_package_path, 'IPGlasma_database',
+        path.join(package_root_path, 'IPGlasma_database',
                   'fetch_IPGlasma_event_from_hdf5_database.py'), event_folder)
     shutil.copy(
-        path.join(code_package_path, '3DMCGlauber_database',
+        path.join(package_root_path, '3DMCGlauber_database',
                   'fetch_3DMCGlauber_event_from_hdf5_database.py'),
         event_folder)
     if initial_condition_database == "self":
         if initial_condition_type in ("3DMCGlauber_dynamical",
                                       "3DMCGlauber_consttau"):
-            shutil.copytree(path.join(working_folder, 'codes/3dMCGlauber'),
+            shutil.copytree(path.join(code_path, '3dMCGlauber'),
                             path.join(event_folder, '3dMCGlauber'),
                             symlinks=True)
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
                             path.join(event_folder, '3dMCGlauber/input'))
             for link_i in ['3dMCGlb.e', 'eps09', 'tables']:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(working_folder,
-                        'codes/3dMCGlauber_code/{}'.format(link_i))),
+                    path.abspath(path.join(code_path,
+                        '3dMCGlauber_code/{}'.format(link_i))),
                     path.join(event_folder, "3dMCGlauber/{}".format(link_i))),
                     shell=True)
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
             generate_script_ipglasma(event_folder, n_threads, cluster_name)
-            shutil.copytree(path.join(working_folder, 'codes/ipglasma'),
+            shutil.copytree(path.join(code_path, 'ipglasma'),
                             path.join(event_folder, 'ipglasma'),
                             symlinks=True)
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
-            for link_i in ['qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma']:
+            link_list = ['qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
+                         'carbon_alpha_3.in', 'carbon_plaintext.in',
+                         'oxygen_alpha_3.in', 'oxygen_plaintext.in']
+            for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(working_folder,
-                                 'codes/ipglasma_code/{}'.format(link_i))),
+                    path.abspath(path.join(code_path,
+                                 'ipglasma_code/{}'.format(link_i))),
                     path.join(event_folder, "ipglasma/{}".format(link_i))),
                     shell=True)
 
@@ -490,7 +494,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
-        shutil.copytree(path.join(working_folder, 'codes/kompost'),
+        shutil.copytree(path.join(code_path, 'kompost'),
                         path.join(event_folder, 'kompost'),
                         symlinks=True)
         shutil.copyfile(path.join(param_folder, 'KoMPoST/setup.ini'),
@@ -498,13 +502,13 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         for link_i in ['EKT', 'KoMPoST.exe']:
             subprocess.call("ln -s {0:s} {1:s}".format(
                 path.abspath(path.join(
-                    working_folder, 'codes/kompost_code/{}'.format(link_i))),
+                    code_path, 'kompost_code/{}'.format(link_i))),
                 path.join(event_folder, "kompost/{}".format(link_i))),
                 shell=True)
 
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
-    shutil.copytree(path.join(working_folder, 'codes/MUSIC'),
+    shutil.copytree(path.join(code_path, 'MUSIC'),
                     path.join(event_folder, 'MUSIC'),
                     symlinks=True)
     shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
@@ -512,7 +516,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     for link_i in ['EOS', 'MUSIChydro']:
         subprocess.call("ln -s {0:s} {1:s}".format(
             path.abspath(path.join(
-                working_folder, 'codes/MUSIC_code/{}'.format(link_i))),
+                code_path, 'MUSIC_code/{}'.format(link_i))),
             path.join(event_folder, "MUSIC/{}".format(link_i))),
             shell=True)
 
@@ -525,29 +529,28 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                      'event_{0:d}'.format(event_id),
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
-        shutil.copytree(path.join(working_folder, 'codes/iSS'),
+        shutil.copytree(path.join(code_path, 'iSS'),
                         path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(
                 path.abspath(path.join(
-                    working_folder, 'codes/iSS_code/{}'.format(link_i))),
+                    code_path, 'iSS_code/{}'.format(link_i))),
                 path.join(sub_event_folder, "iSS/{}".format(link_i))),
                 shell=True)
-        shutil.copytree(path.join(working_folder, 'codes/osc2u'),
+        shutil.copytree(path.join(code_path, 'osc2u'),
                         path.join(sub_event_folder, 'osc2u'))
-        shutil.copytree(path.join(working_folder, 'codes/urqmd'),
+        shutil.copytree(path.join(code_path, 'urqmd'),
                         path.join(sub_event_folder, 'urqmd'))
         subprocess.call("ln -s {0:s} {1:s}".format(
             path.abspath(
-                path.join(working_folder, 'codes/urqmd_code/urqmd/urqmd.e')),
+                path.join(code_path, 'urqmd_code/urqmd/urqmd.e')),
             path.join(sub_event_folder, "urqmd/urqmd.e")),
                         shell=True)
         if HBT_flag:
             shutil.copytree(
-                path.join(working_folder,
-                          'codes/hadronic_afterburner_toolkit'),
+                path.join(code_path, 'hadronic_afterburner_toolkit'),
                 path.join(sub_event_folder, 'hadronic_afterburner_toolkit'))
             shutil.copyfile(
                 path.join(param_folder,
@@ -556,22 +559,22 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                           'hadronic_afterburner_toolkit/parameters.dat'))
             for link_i in ['hadronic_afterburner_tools.e', 'EOS']:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(working_folder,
-                        'codes/hadronic_afterburner_toolkit_code/{}'.format(
+                    path.abspath(path.join(code_path,
+                        'hadronic_afterburner_toolkit_code/{}'.format(
                                                                     link_i))),
                     path.join(sub_event_folder,
                         "hadronic_afterburner_toolkit/{}".format(link_i))),
                     shell=True)
     shutil.copytree(
-        path.join(working_folder, 'codes/hadronic_afterburner_toolkit'),
+        path.join(code_path, 'hadronic_afterburner_toolkit'),
         path.join(event_folder, 'hadronic_afterburner_toolkit'))
     shutil.copyfile(
         path.join(param_folder, 'hadronic_afterburner_toolkit/parameters.dat'),
         path.join(event_folder, 'hadronic_afterburner_toolkit/parameters.dat'))
     for link_i in ['hadronic_afterburner_tools.e', 'EOS']:
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(working_folder,
-                'codes/hadronic_afterburner_toolkit_code/{}'.format(link_i))),
+            path.abspath(path.join(code_path,
+                'hadronic_afterburner_toolkit_code/{}'.format(link_i))),
             path.join(event_folder,
                 "hadronic_afterburner_toolkit/{}".format(link_i))),
             shell=True)
@@ -659,6 +662,7 @@ def main():
                         type=int,
                         default='-1',
                         help='Random Seed (-1: according to system time)')
+    parser.add_argument('--nocopy', action='store_true')
     args = parser.parse_args()
 
     # print out all the arguments
@@ -699,6 +703,7 @@ def main():
         if seed == -1: seed = 0
         seed += osg_job_id
         print("seed = ", seed)
+        args.nocopy = True
 
     initial_condition_type = (parameter_dict.control_dict['initial_state_type'])
     if initial_condition_type not in known_initial_types:
@@ -745,8 +750,11 @@ def main():
     create_a_working_folder(working_folder_name)
 
     shutil.copy(args.par_dict, working_folder_name)
-    shutil.copytree("{}/codes".format(code_package_path),
-                    path.join(working_folder_name, "codes"))
+    code_path = path.join(code_package_path, "codes")
+    if not args.nocopy:
+        code_path = path.join(working_folder_name, "codes")
+        shutil.copytree("{}/codes".format(code_package_path), code_path)
+
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
         subprocess.call("(cd {}/config; ".format(code_package_path) +
@@ -818,7 +826,8 @@ def main():
                 HBT_flag = True
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type,
-                               code_package_path, working_folder_name,
+                               code_package_path, code_path,
+                               working_folder_name,
                                cluster_name, iev, event_id_offset,
                                n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
                                IPGlasma_time_stamp, ipglasma_flag,

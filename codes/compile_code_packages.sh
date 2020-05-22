@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+machine="$(uname -s)"
+case "${machine}" in
+    Linux*)     number_of_cores=`nproc --all`;;
+    Darwin*)    number_of_cores=`sysctl -n hw.ncpu`;;
+    *)          number_of_cores=1;;
+esac
+number_of_cores_to_compile=$(( ${number_of_cores} > 10 ? 10 : ${number_of_cores} ))
+
 # compile 3dMCGlauber
 echo "compile 3dMCGlauber ... "
 (
@@ -7,8 +15,8 @@ echo "compile 3dMCGlauber ... "
     ./get_LHAPDF.sh
     mkdir -p build
     cd build
-    cmake ..
-    make -j 4
+    cmake .. -Dlink_with_lib=OFF
+    make -j${number_of_cores_to_compile}
     make install
 )
 mkdir -p 3dMCGlauber
@@ -38,8 +46,8 @@ echo "compile MUSIC ... "
     cd MUSIC_code
     mkdir -p build
     cd build
-    cmake ..
-    make -j 4
+    cmake .. -Dlink_with_lib=OFF
+    make -j${number_of_cores_to_compile}
     make install
 )
 mkdir -p MUSIC
@@ -54,8 +62,8 @@ echo "compile iSS ... "
     cd iSS_code
     mkdir -p build
     cd build
-    cmake ..
-    make -j 4
+    cmake .. -Dlink_with_lib=OFF
+    make -j${number_of_cores_to_compile}
     make install
 )
 mkdir -p iSS
@@ -66,7 +74,7 @@ cp -r iSS_code/iSS_parameters.dat iSS/
 echo "compile UrQMD ... "
 (
     cd urqmd_code
-    make
+    make -j${number_of_cores_to_compile}
 )
 mkdir -p osc2u
 cp urqmd_code/osc2u/osc2u.e osc2u/
@@ -82,8 +90,8 @@ echo "compile hadronic afterburner toolkit ... "
     cd hadronic_afterburner_toolkit_code
     mkdir -p build
     cd build
-    cmake ..
-    make -j 4
+    cmake .. -Dlink_with_lib=OFF
+    make -j${number_of_cores_to_compile}
     make install
     cd ../ebe_scripts
     g++ convert_to_binary.cpp -lz -o convert_to_binary.e
