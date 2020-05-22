@@ -481,9 +481,15 @@ def main(para_dict_):
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
             print("{} exists ...".format(final_results_folder), flush=True)
-            spvnfolder = path.join(final_results_folder,
-                                   "spvn_results_{}".format(event_id))
-            status = check_an_event_is_good(spvnfolder)
+            results_file = path.join(final_results_folder,
+                                     "spvn_results_{}.h5".format(event_id))
+            status = False
+            if path.exists(results_file):
+                status = True
+            else:
+                spvnfolder = path.join(final_results_folder,
+                                       "spvn_results_{}".format(event_id))
+                status = check_an_event_is_good(spvnfolder)
             if status:
                 print(
                     "{} finished properly. No need to rerun.".format(event_id),
