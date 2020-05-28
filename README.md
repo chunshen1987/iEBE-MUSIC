@@ -67,4 +67,10 @@ export LC_CTYPE=en_US.UTF8
 
 The iEBE-MUSIC has its official docker image on docker hub [iebe-music](https://hub.docker.com/r/chunshen1987/iebe-music).
 
+## Coding Style
 
+We use YAPF to impose coding format for the python scripts. Before every commit, please use
+
+    yapf -i filename.py
+
+to apply the uniformed format to the source code files
