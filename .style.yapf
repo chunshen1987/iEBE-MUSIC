@@ -2,3 +2,5 @@
 based_on_style = google
 NO_SPACES_AROUND_SELECTED_BINARY_OPERATORS = "*,/"
 SPACES_BEFORE_COMMENT = 2
+split_before_logical_operator = true
+SPLIT_BEFORE_ARITHMETIC_OPERATOR = true

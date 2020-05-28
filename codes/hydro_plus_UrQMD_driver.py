@@ -17,10 +17,10 @@ from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_even
 
 def print_usage():
     """This function prints out help messages"""
-    print("\U0001F3B6  " + "Usage: {} ".format(sys.argv[0]) +
-          "initial_condition_database " +
-          "initial_condition_type n_hydro_events hydro_event_id n_UrQMD " +
-          "n_threads save_hydro_flag save_urqmd_flag seed_add tau0")
+    print("\U0001F3B6  " + "Usage: {} ".format(sys.argv[0])
+          + "initial_condition_database "
+          + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
+          + "n_threads save_hydro_flag save_urqmd_flag seed_add tau0")
 
 
 def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
@@ -45,27 +45,29 @@ def get_initial_condition(database,
                 run_ipglasma(iev)
                 file_name = ("ipglasma/ipglasma_results/"
                              + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
-                                                        time_stamp_str, iev))
+                                 time_stamp_str, iev))
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
-                file_name = fecth_an_IPGlasma_event(database,
-                                                    time_stamp_str, iev)
-                if file_name == "Failed": continue
+                file_name = fecth_an_IPGlasma_event(database, time_stamp_str,
+                                                    iev)
+                if file_name == "Failed":
+                    continue
                 yield (iev, file_name)
     elif initial_type == "IPGlasma+KoMPoST":
         if database == "self":
             for iev in range(idx0, idx0 + nev):
                 run_ipglasma(iev)
-                file_name = ("ipglasma/ipglasma_results/"
-                             + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
-                                                              iev))
+                file_name = (
+                    "ipglasma/ipglasma_results/"
+                    + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str, iev))
                 yield (iev, file_name)
         else:
             for iev in range(idx0, idx0 + nev):
-                file_name = fecth_an_IPGlasma_event_Tmunu(database,
-                                                          time_stamp_str, iev)
-                if file_name == "Failed": continue
+                file_name = fecth_an_IPGlasma_event_Tmunu(
+                    database, time_stamp_str, iev)
+                if file_name == "Failed":
+                    continue
                 yield (iev, file_name)
     elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
@@ -86,8 +88,8 @@ def get_initial_condition(database,
             file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
             yield (iev, file_name)
     else:
-        print("\U0001F6AB  " +
-              "Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                   initial_type))
         exit(1)
 
@@ -98,8 +100,8 @@ def run_ipglasma(iev):
     call("bash ./run_ipglasma.sh {}".format(iev), shell=True)
 
 
-def collect_ipglasma_event(final_results_folder, initial_type,
-                           event_id, filename):
+def collect_ipglasma_event(final_results_folder, initial_type, event_id,
+                           filename):
     """This function collects the ipglasma results"""
     ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
     res_path = path.join(path.abspath(final_results_folder),
@@ -110,13 +112,15 @@ def collect_ipglasma_event(final_results_folder, initial_type,
         if path.islink(hydro_initial_file):
             remove(hydro_initial_file)
         call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
-                                        hydro_initial_file), shell=True)
+                                        hydro_initial_file),
+             shell=True)
     elif initial_type == "IPGlasma+KoMPoST":
         kompost_initial_file = "kompost/Tmunu.dat"
         if path.islink(kompost_initial_file):
             remove(kompost_initial_file)
         call("ln -s {0:s} {1:s}".format(path.join(res_path, filename),
-                                        kompost_initial_file), shell=True)
+                                        kompost_initial_file),
+             shell=True)
 
 
 def run_hydro_event(final_results_folder, event_id):
@@ -243,9 +247,9 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
             pool1.map(run_urqmd_event, range(n_urqmd))
 
         for iev in range(1, n_urqmd):
-            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e " +
-                 "UrQMDev_0/UrQMD_results/particle_list.gz " +
-                 "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
+                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
+                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
                  shell=True)
         urqmd_success = True
         shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz", results_folder)
@@ -320,11 +324,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     time_stamp = para_dict['time_stamp_str']
     initial_state_filelist = [
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
-        'NcollList{}.dat'.format(event_id),
-        'NpartList{}.dat'.format(event_id),
-        'NpartdNdy-t0.6-{}.dat'.format(event_id)]
+        'NcollList{}.dat'.format(event_id), 'NpartList{}.dat'.format(event_id),
+        'NpartdNdy-t0.6-{}.dat'.format(event_id)
+    ]
     pre_equilibrium_filelist = [
-        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt']
+        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
+    ]
     hydro_info_filepattern = [
         "eccentricities_evo_eta_*.dat", "momentum_anisotropy_eta_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
@@ -347,7 +352,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         if para_dict['initial_condition'] == "self":
             # save initial conditions
             if ("IPGlasma" in para_dict['initial_type']
-                and para_dict['save_ipglasma']):
+                    and para_dict['save_ipglasma']):
                 initial_folder = path.join(
                     final_results_folder,
                     "ipglasma_results_{}".format(event_id))
@@ -359,9 +364,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
                     and para_dict['save_kompost']):
-                preeq_folder = path.join(
-                    final_results_folder,
-                    "kompost_results_{}".format(event_id))
+                preeq_folder = path.join(final_results_folder,
+                                         "kompost_results_{}".format(event_id))
                 for prefilename in pre_equilibrium_filelist:
                     prefile = path.join(preeq_folder, prefilename)
                     if path.isfile(prefile):
@@ -398,9 +402,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     return (status)
 
 
-def remove_unwanted_outputs(final_results_folder, event_id,
-                            save_ipglasma=True, save_kompost=True,
-                            save_hydro=True, save_urqmd=True):
+def remove_unwanted_outputs(final_results_folder,
+                            event_id,
+                            save_ipglasma=True,
+                            save_kompost=True,
+                            save_hydro=True,
+                            save_urqmd=True):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
@@ -455,7 +462,9 @@ def main(para_dict_):
                 event_id = initial_database_name + "_" + event_id
                 ipglasma_folder = "ipglasma/ipglasma_results"
                 makedirs(ipglasma_folder, exist_ok=True)
-                shutil.move(ifile, ipglasma_folder)
+                shutil.move(ifile,
+                            path.join(ipglasma_folder,
+                                      ifile.split("/")[-1]))
         elif initial_type == "IPGlasma+KoMPoST":
             event_id = str(iev)
             if para_dict_['initial_condition'] != "self":
@@ -465,7 +474,9 @@ def main(para_dict_):
                 event_id = initial_database_name + "_" + event_id
                 ipglasma_folder = "ipglasma/ipglasma_results"
                 makedirs(ipglasma_folder, exist_ok=True)
-                shutil.move(ifile, ipglasma_folder)
+                shutil.move(ifile,
+                            path.join(ipglasma_folder,
+                                      ifile.split("/")[-1]))
         elif initial_type == "3DMCGlauber_dynamical":
             event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
             shutil.move(ifile, "MUSIC/initial/strings.dat")
@@ -486,10 +497,10 @@ def main(para_dict_):
             status = False
             if path.exists(results_file):
                 status = True
-            else:
                 spvnfolder = path.join(final_results_folder,
                                        "spvn_results_{}".format(event_id))
-                status = check_an_event_is_good(spvnfolder)
+                if path.exists(spvnfolder):
+                    status = check_an_event_is_good(spvnfolder)
             if status:
                 print(
                     "{} finished properly. No need to rerun.".format(event_id),
@@ -501,8 +512,8 @@ def main(para_dict_):
 
         if "IPGlasma" in initial_type:
             filename = ifile.split("/")[-1]
-            collect_ipglasma_event(final_results_folder, initial_type,
-                                   event_id, filename)
+            collect_ipglasma_event(final_results_folder, initial_type, event_id,
+                                   filename)
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
@@ -513,17 +524,18 @@ def main(para_dict_):
             call("ln -s {0:s} {1:s}".format(
                 path.join(path.abspath(final_results_folder),
                           kompost_folder_name,
-                          ("ekt_tIn01_tOut08" +
-                           ".music_init_flowNonLinear_pimunuTransverse.txt")),
+                          ("ekt_tIn01_tOut08"
+                           + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
 
-        if (initial_type == "3DMCGlauber_dynamical" and
-                initial_condition == "self"):
+        if (initial_type == "3DMCGlauber_dynamical"
+                and initial_condition == "self"):
             # save the initial condition
-            shutil.copy("MUSIC/initial/strings.dat",
-                        path.join(final_results_folder,
-                                  "strings_{}.dat".format(event_id)))
+            shutil.copy(
+                "MUSIC/initial/strings.dat",
+                path.join(final_results_folder,
+                          "strings_{}.dat".format(event_id)))
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
@@ -536,8 +548,8 @@ def main(para_dict_):
                   flush=True)
             continue
 
-        if (initial_type == "3DMCGlauber_dynamical" and
-                initial_condition == "self"):
+        if (initial_type == "3DMCGlauber_dynamical"
+                and initial_condition == "self"):
             # save the initial condition
             shutil.move(
                 "MUSIC/initial/strings.dat",
@@ -597,8 +609,8 @@ if __name__ == "__main__":
         "3DMCGlauber_consttau"
     ]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
-        print("\U0001F6AB  " +
-              "Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                   INITIAL_CONDITION_TYPE),
               flush=True)
         exit(1)

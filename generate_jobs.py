@@ -155,9 +155,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads,
-                             ipglasma_flag, kompost_flag,
-                             hydro_flag, urqmd_flag, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, ipglasma_flag,
+                             kompost_flag, hydro_flag, urqmd_flag, time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -187,8 +186,7 @@ def generate_script_ipglasma(folder_name, nthreads, cluster_name):
     script = open(path.join(working_folder, "run_ipglasma.sh"), "w")
 
     results_folder = 'ipglasma_results'
-    script.write(
-        """#!/bin/bash
+    script.write("""#!/bin/bash
 
 results_folder={0:s}
 evid=$1
@@ -202,8 +200,7 @@ rm -fr $results_folder/*
 """.format(results_folder))
 
     if nthreads > 0:
-        script.write(
-            """
+        script.write("""
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
@@ -397,9 +394,13 @@ do
     cd ..
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
-        script.write("        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 {0}\n".format(logfile))
+        script.write(
+            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 {0}\n"
+            .format(logfile))
         script.write("    else\n")
-        script.write("        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 >> run.log\n")
+        script.write(
+            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 >> run.log\n"
+        )
         script.write("    fi\n")
         script.write("    mv results/HBT* ../UrQMD_results/ \n")
     script.write("""
@@ -429,17 +430,17 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
         "   ./hadronic_afterburner_tools.e analyze_HBT=0 {0}\n".format(logfile))
     if HBT_flag:
         script.write(
-            "    python ./average_event_HBT_correlation_function.py .. results\n")
+            "    python ./average_event_HBT_correlation_function.py .. results\n"
+        )
     script.write(")\n")
     script.close()
 
 
 def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
-                           cluster_name,
-                           event_id, event_id_offset, n_hydro_per_job,
-                           n_urqmd_per_hydro, n_threads, time_stamp,
-                           ipglasma_flag, kompost_flag, hydro_flag,
+                           cluster_name, event_id, event_id_offset,
+                           n_hydro_per_job, n_urqmd_per_hydro, n_threads,
+                           time_stamp, ipglasma_flag, kompost_flag, hydro_flag,
                            urqmd_flag, GMC_flag, HBT_flag):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
@@ -464,10 +465,11 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             path.join(event_folder, '3dMCGlauber/input'))
             for link_i in ['3dMCGlb.e', 'eps09', 'tables']:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(code_path,
-                        '3dMCGlauber_code/{}'.format(link_i))),
+                    path.abspath(
+                        path.join(code_path,
+                                  '3dMCGlauber_code/{}'.format(link_i))),
                     path.join(event_folder, "3dMCGlauber/{}".format(link_i))),
-                    shell=True)
+                                shell=True)
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
             generate_script_ipglasma(event_folder, n_threads, cluster_name)
             shutil.copytree(path.join(code_path, 'ipglasma'),
@@ -475,22 +477,24 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             symlinks=True)
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
-            link_list = ['qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
-                         'carbon_alpha_3.in', 'carbon_plaintext.in',
-                         'oxygen_alpha_3.in', 'oxygen_plaintext.in']
+            link_list = [
+                'qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
+                'carbon_alpha_3.in', 'carbon_plaintext.in', 'oxygen_alpha_3.in',
+                'oxygen_plaintext.in'
+            ]
             for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(code_path,
-                                 'ipglasma_code/{}'.format(link_i))),
+                    path.abspath(
+                        path.join(code_path,
+                                  'ipglasma_code/{}'.format(link_i))),
                     path.join(event_folder, "ipglasma/{}".format(link_i))),
-                    shell=True)
+                                shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database,
-                             initial_condition_type, n_hydro_per_job,
-                             event_id_offset, n_urqmd_per_hydro,
-                             n_threads, ipglasma_flag, kompost_flag,
-                             hydro_flag, urqmd_flag, time_stamp)
+                             initial_condition_database, initial_condition_type,
+                             n_hydro_per_job, event_id_offset,
+                             n_urqmd_per_hydro, n_threads, ipglasma_flag,
+                             kompost_flag, hydro_flag, urqmd_flag, time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
@@ -501,10 +505,10 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                         path.join(event_folder, 'kompost/setup.ini'))
         for link_i in ['EKT', 'KoMPoST.exe']:
             subprocess.call("ln -s {0:s} {1:s}".format(
-                path.abspath(path.join(
-                    code_path, 'kompost_code/{}'.format(link_i))),
+                path.abspath(
+                    path.join(code_path, 'kompost_code/{}'.format(link_i))),
                 path.join(event_folder, "kompost/{}".format(link_i))),
-                shell=True)
+                            shell=True)
 
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
@@ -515,10 +519,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                     path.join(event_folder, 'MUSIC/music_input_mode_2'))
     for link_i in ['EOS', 'MUSIChydro']:
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(
-                code_path, 'MUSIC_code/{}'.format(link_i))),
+            path.abspath(path.join(code_path, 'MUSIC_code/{}'.format(link_i))),
             path.join(event_folder, "MUSIC/{}".format(link_i))),
-            shell=True)
+                        shell=True)
 
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
@@ -535,17 +538,16 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(
-                path.abspath(path.join(
-                    code_path, 'iSS_code/{}'.format(link_i))),
+                path.abspath(path.join(code_path,
+                                       'iSS_code/{}'.format(link_i))),
                 path.join(sub_event_folder, "iSS/{}".format(link_i))),
-                shell=True)
+                            shell=True)
         shutil.copytree(path.join(code_path, 'osc2u'),
                         path.join(sub_event_folder, 'osc2u'))
         shutil.copytree(path.join(code_path, 'urqmd'),
                         path.join(sub_event_folder, 'urqmd'))
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(
-                path.join(code_path, 'urqmd_code/urqmd/urqmd.e')),
+            path.abspath(path.join(code_path, 'urqmd_code/urqmd/urqmd.e')),
             path.join(sub_event_folder, "urqmd/urqmd.e")),
                         shell=True)
         if HBT_flag:
@@ -559,25 +561,29 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                           'hadronic_afterburner_toolkit/parameters.dat'))
             for link_i in ['hadronic_afterburner_tools.e', 'EOS']:
                 subprocess.call("ln -s {0:s} {1:s}".format(
-                    path.abspath(path.join(code_path,
-                        'hadronic_afterburner_toolkit_code/{}'.format(
-                                                                    link_i))),
-                    path.join(sub_event_folder,
+                    path.abspath(
+                        path.join(
+                            code_path,
+                            'hadronic_afterburner_toolkit_code/{}'.format(
+                                link_i))),
+                    path.join(
+                        sub_event_folder,
                         "hadronic_afterburner_toolkit/{}".format(link_i))),
-                    shell=True)
-    shutil.copytree(
-        path.join(code_path, 'hadronic_afterburner_toolkit'),
-        path.join(event_folder, 'hadronic_afterburner_toolkit'))
+                                shell=True)
+    shutil.copytree(path.join(code_path, 'hadronic_afterburner_toolkit'),
+                    path.join(event_folder, 'hadronic_afterburner_toolkit'))
     shutil.copyfile(
         path.join(param_folder, 'hadronic_afterburner_toolkit/parameters.dat'),
         path.join(event_folder, 'hadronic_afterburner_toolkit/parameters.dat'))
     for link_i in ['hadronic_afterburner_tools.e', 'EOS']:
         subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_path,
-                'hadronic_afterburner_toolkit_code/{}'.format(link_i))),
+            path.abspath(
+                path.join(
+                    code_path,
+                    'hadronic_afterburner_toolkit_code/{}'.format(link_i))),
             path.join(event_folder,
-                "hadronic_afterburner_toolkit/{}".format(link_i))),
-            shell=True)
+                      "hadronic_afterburner_toolkit/{}".format(link_i))),
+                        shell=True)
 
 
 def create_a_working_folder(workfolder_path):
@@ -630,8 +636,8 @@ def main():
                         metavar='',
                         type=int,
                         default=1,
-                        help=('number of oversampled UrQMD events ' +
-                              'per hydro to run'))
+                        help=('number of oversampled UrQMD events '
+                              + 'per hydro to run'))
     parser.add_argument('-n_th',
                         '--n_threads',
                         metavar='',
@@ -689,8 +695,8 @@ def main():
     code_package_path = path.abspath(path.dirname(__file__))
 
     if n_threads < n_urqmd_per_hydro:
-        print("\U000026A0  " +
-              "Warning: n_threads = {} < n_urqmd_per_hydro = {}!".format(
+        print("\U000026A0  "
+              + "Warning: n_threads = {} < n_urqmd_per_hydro = {}!".format(
                   n_threads, n_urqmd_per_hydro))
         print("reset n_threads to {}".format(n_urqmd_per_hydro))
         n_threads = n_urqmd_per_hydro
@@ -700,15 +706,16 @@ def main():
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
 
     if cluster_name == "OSG":
-        if seed == -1: seed = 0
+        if seed == -1:
+            seed = 0
         seed += osg_job_id
         print("seed = ", seed)
         args.nocopy = True
 
     initial_condition_type = (parameter_dict.control_dict['initial_state_type'])
     if initial_condition_type not in known_initial_types:
-        print("\U0001F6AB  " +
-              "Do not recognize the initial condition type: {}".format(
+        print("\U0001F6AB  "
+              + "Do not recognize the initial condition type: {}".format(
                   initial_condition_type))
         exit(1)
 
@@ -757,17 +764,17 @@ def main():
 
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
-        subprocess.call("(cd {}/config; ".format(code_package_path) +
-                        "python3 parameters_dict_master.py " +
-                        "-path {} -par {} -b {} -seed {};)".format(
+        subprocess.call("(cd {}/config; ".format(code_package_path)
+                        + "python3 parameters_dict_master.py "
+                        + "-path {} -par {} -b {} -seed {};)".format(
                             working_folder_name, path.abspath(args.par_dict),
                             args.bayes_file, seed),
                         shell=True)
     else:
         subprocess.call(
-            "(cd {}/config; ".format(code_package_path) +
-            "python3 parameters_dict_master.py " +
-            "-path {} -par {} -seed {};)".format(
+            "(cd {}/config; ".format(code_package_path)
+            + "python3 parameters_dict_master.py "
+            + "-path {} -par {} -seed {};)".format(
                 working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
 
@@ -777,8 +784,8 @@ def main():
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
-        print("\U0001F375  " +
-              "Pre-generated initial conditions from {} ...".format(
+        print("\U0001F375  "
+              + "Pre-generated initial conditions from {} ...".format(
                   initial_condition_database.format(cent_label)))
 
     toolbar_width = 40
@@ -789,21 +796,21 @@ def main():
     event_id_offset = 0
     n_hydro_rescaled = n_hydro_per_job
     for iev in range(n_jobs):
-        progress_i = (int(float(iev + 1)/n_jobs*toolbar_width) -
-                      int(float(iev)/n_jobs*toolbar_width))
+        progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
+                      - int(float(iev)/n_jobs*toolbar_width))
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
-        if (initial_condition_type in ('IPGlasma', 'IPGlasma+KoMPoST') and
-                parameter_dict.ipglasma_dict['type'] == 'minimumbias'):
+        if (initial_condition_type in ('IPGlasma', 'IPGlasma+KoMPoST')
+                and parameter_dict.ipglasma_dict['type'] == 'minimumbias'):
             precent_local = float(iev)/float(n_jobs)
             for cen_min, cen_max, cen_label, cen_precent in centrality_list:
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
                     rescale_factor = cen_precent/(cen_max - cen_min)
                     n_hydro_rescaled = (max(1,
-                                            int(n_hydro_per_job*
-                                                rescale_factor)))
+                                            int(n_hydro_per_job
+                                                *rescale_factor)))
                     if cent_label != cent_label_pre:
                         cent_label_pre = cent_label
                         event_id_offset = 0
@@ -813,7 +820,7 @@ def main():
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         ipglasma_flag = False
         if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
-            and initial_condition_database == "self"):
+                and initial_condition_database == "self"):
             ipglasma_flag = parameter_dict.control_dict['save_ipglasma_results']
         kompost_flag = False
         if initial_condition_type == "IPGlasma+KoMPoST":
@@ -822,17 +829,16 @@ def main():
         urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
         HBT_flag = False
         if "analyze_HBT" in parameter_dict.hadronic_afterburner_toolkit_dict:
-            if parameter_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
+            if parameter_dict.hadronic_afterburner_toolkit_dict[
+                    'analyze_HBT'] == 1:
                 HBT_flag = True
         generate_event_folders(initial_condition_database.format(cent_label),
-                               initial_condition_type,
-                               code_package_path, code_path,
-                               working_folder_name,
-                               cluster_name, iev, event_id_offset,
-                               n_hydro_rescaled, n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, ipglasma_flag,
-                               kompost_flag, hydro_flag, urqmd_flag, GMC_flag,
-                               HBT_flag)
+                               initial_condition_type, code_package_path,
+                               code_path, working_folder_name, cluster_name,
+                               iev, event_id_offset, n_hydro_rescaled,
+                               n_urqmd_per_hydro, n_threads,
+                               IPGlasma_time_stamp, ipglasma_flag, kompost_flag,
+                               hydro_flag, urqmd_flag, GMC_flag, HBT_flag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
