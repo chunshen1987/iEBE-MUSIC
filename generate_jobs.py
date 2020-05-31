@@ -179,7 +179,7 @@ python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {
     script.close()
 
 
-def generate_script_ipglasma(folder_name, nthreads, cluster_name):
+def generate_script_ipglasma(folder_name, nthreads, cluster_name, event_id):
     """This function generates script for IPGlasma simulation"""
     working_folder = folder_name
 
@@ -205,6 +205,7 @@ export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
     if cluster_name != "OSG":
+        script.write("sleep {}".format(event_id))
         script.write("""
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 1> run.log 2> run.err
@@ -471,7 +472,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                     path.join(event_folder, "3dMCGlauber/{}".format(link_i))),
                                 shell=True)
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
-            generate_script_ipglasma(event_folder, n_threads, cluster_name)
+            generate_script_ipglasma(event_folder, n_threads, cluster_name,
+                                     event_id)
             shutil.copytree(path.join(code_path, 'ipglasma'),
                             path.join(event_folder, 'ipglasma'),
                             symlinks=True)
