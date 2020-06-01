@@ -61,7 +61,7 @@ do
         if [ -e $urqmd_file ]; then
             urqmdstatus=true
         fi
-        if [ -a ${eventsPath}/${iev}/${spvn_folder_name}*${event_id}/particle_9999_vndata_eta_-2_2.dat ]; then
+        if [ -a ${eventsPath}/${iev}/${spvn_folder_name}*${event_id}.h5 ]; then
             if [ "$hydrostatus" = true ]; then
                 mv ${eventsPath}/${iev}/${hydro_folder_name}*${event_id} $target_hydro_folder
             fi
