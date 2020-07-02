@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 .DS_Store
 
+.DS_Store
+
 # C extensions
 *.so
 
@@ -114,3 +116,6 @@ iSS
 osc2u
 urqmd
 playground
+
+# Sphinx
+docs/SphinxDoc/_build/
