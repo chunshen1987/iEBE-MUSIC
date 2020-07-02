@@ -323,6 +323,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     results_name = "spvn_results_{}".format(event_id)
     time_stamp = para_dict['time_stamp_str']
     initial_state_filelist = [
+        'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
         'NcollList{}.dat'.format(event_id), 'NpartList{}.dat'.format(event_id),
         'NpartdNdy-t0.6-{}.dat'.format(event_id)
