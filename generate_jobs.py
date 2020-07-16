@@ -212,7 +212,7 @@ export OMP_NUM_THREADS={0:d}
 for ifile in *.dat
 do
     filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
-    cat ${ifile} | sed 's$N/A$0.0$g' > $results_folder/${filename}
+    cat ${ifile} | sed 's$N/A$0.0$g' | sed 's/Q_s/#Q_s/' > $results_folder/${filename}
     rm -fr ${ifile}
 done
 mv run.log $results_folder/

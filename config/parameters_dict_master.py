@@ -41,6 +41,7 @@ ipglasma_dict = {
     'shiftConstituentQuarkProtonOrigin': 1,
     'runningCoupling': 0,
     'muZero': 0.3,
+    'minimumQs2ST': 200,
     'c': 0.2,
     'g2mu': 0.1,
     'useFatTails': 0,
