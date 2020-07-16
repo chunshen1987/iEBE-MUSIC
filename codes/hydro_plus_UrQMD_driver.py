@@ -326,7 +326,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
         'NcollList{}.dat'.format(event_id), 'NpartList{}.dat'.format(event_id),
-        'NpartdNdy-t0.6-{}.dat'.format(event_id)
+        'NpartdNdy-t0.6-{}.dat'.format(event_id),
+        'NgluonEstimators{}.dat'.format(event_id)
     ]
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
