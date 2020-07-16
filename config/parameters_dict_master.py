@@ -42,6 +42,7 @@ ipglasma_dict = {
     'runningCoupling': 0,
     'muZero': 0.3,
     'minimumQs2ST': 200,
+    'beta2': 0.28,
     'c': 0.2,
     'g2mu': 0.1,
     'useFatTails': 0,
