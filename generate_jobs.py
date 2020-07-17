@@ -9,12 +9,12 @@ import argparse
 from math import ceil
 from glob import glob
 
-centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.28, '5-10', 0.05),
-                   (0.28, 0.40, '10-20', 0.10), (0.40, 0.50, '20-30', 0.10),
-                   (0.50, 0.60, '30-40', 0.10), (0.60, 0.69, '40-50', 0.10),
-                   (0.69, 0.77, '50-60', 0.10), (0.77, 0.85, '60-70', 0.10),
-                   (0.85, 0.92, '70-80', 0.10), (0.92, 0.97, '80-90', 0.10),
-                   (0.97, 1.00, '90-100', 0.10)]
+centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
+                   (0.30, 0.45, '10-20', 0.10), (0.45, 0.55, '20-30', 0.10),
+                   (0.55, 0.65, '30-40', 0.10), (0.65, 0.75, '40-50', 0.10),
+                   (0.75, 0.80, '50-60', 0.10), (0.80, 0.85, '60-70', 0.10),
+                   (0.85, 0.90, '70-80', 0.10), (0.90, 0.95, '80-90', 0.10),
+                   (0.95, 1.00, '90-100', 0.10)]
 
 known_initial_types = [
     "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
@@ -209,24 +209,17 @@ export OMP_NUM_THREADS={0:d}
         script.write("""
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 1> run.log 2> run.err
-for ifile in *.dat
-do
-    filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
-    cat ${ifile} | sed 's$N/A$0.0$g' | sed 's/Q_s/#Q_s/' > $results_folder/${filename}
-    rm -fr ${ifile}
-done
-mv run.log $results_folder/
-mv run.err $results_folder/
-)
 """)
     else:
         script.write("""
 # IPGlasma evolution (run 1 event)
 ./ipglasma input
+""")
+    script.write("""
 for ifile in *.dat
 do
     filename=$(echo ${ifile} | sed "s/0.dat/${evid}.dat/")
-    cat ${ifile} | sed 's$N/A$0.0$g' > $results_folder/${filename}
+    cat ${ifile} | sed 's$N/A$0.0$g' | sed 's/Q_s/#Q_s/' > $results_folder/${filename}
     rm -fr ${ifile}
 done
 mv run.log $results_folder/
@@ -810,9 +803,8 @@ def main():
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
                     rescale_factor = cen_precent/(cen_max - cen_min)
-                    n_hydro_rescaled = (max(1,
-                                            int(n_hydro_per_job
-                                                *rescale_factor)))
+                    n_hydro_rescaled = (max(1, int(n_hydro_per_job
+                                                   *rescale_factor + 0.1)))
                     if cent_label != cent_label_pre:
                         cent_label_pre = cent_label
                         event_id_offset = 0
