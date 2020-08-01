@@ -23,7 +23,7 @@ Particlization & hadronic transport:
 
 ## Usage:
 
-type ./generate_jobs.py -h for help information
+type `./generate_jobs.py -h` for help information
 
 ## Parameters:
 Users can pass model parameters through a python script `parameters_dict_user.py`. It contains multiple dictionaries, which are related to each code module inside the iEBE-MUSIC framework. This script will update the master parameters dictionaries in `config/parameters_dict_master.py`. One can read `config/parameters_dict_master.py` for all the available parameters options for each module. If a user want to modify any parameters, he can add it in the `parameters_dict_user.py`.
@@ -45,14 +45,14 @@ For the 3DMCGlauber initial condition,
 #### music_dict
 The `music_dict` has all the parameters to run MUSIC for (3+1)D hydrodynamic simulations. 
 
-	'Initial_profile': 9,  for IPGlasma initial condition
-		- 9: IPGlasma (full Tmunu),                         
-		- 91: e and u^\mu,                             
-		- 92: e only,                                  
-		- 93: e, u^\mu, and pi^\munu    
-	'Initial_profile': 13,  for 3D MCGlauber initial condition
-		- 13: 3D MCGlauber initial condition with dynamical initialization,                         
-		- 131: 3D MCGlauber initial condition with instantaneous initialization
+    'Initial_profile': 9,  for IPGlasma initial condition
+        - 9: IPGlasma (full Tmunu),
+        - 91: e and u^\mu,
+        - 92: e only,
+        - 93: e, u^\mu, and pi^\munu
+    'Initial_profile': 13,  for 3D MCGlauber initial condition
+        - 13: 3D MCGlauber initial condition with dynamical initialization,
+        - 131: 3D MCGlauber initial condition with instantaneous initialization
 
 ## Settings on NERSC:
 
