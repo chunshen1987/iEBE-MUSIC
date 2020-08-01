@@ -301,6 +301,7 @@ iss_dict = {
     'use_OSCAR_format': 1,           # output results in OSCAR format
     'use_gzip_format': 0,  # output results in gzip format (only works with
                            # store_samples_in_memory = 1)
+    'use_binary_format': 0,
     'calculate_vn_to_order': 9,     # v_n's are calculated up to this order
     'use_pos_dN_only': 0,           # 1: all negative emission functions will be skipped. 
     'grouping_particles': 1,  # 0/1: Particles will be re-order according to 
