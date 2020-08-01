@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+Green='\033[0;32m'
+NC='\033[0m'
+
 machine="$(uname -s)"
 case "${machine}" in
     Linux*)     number_of_cores=`nproc --all`;;
@@ -9,7 +12,7 @@ esac
 number_of_cores_to_compile=$(( ${number_of_cores} > 10 ? 10 : ${number_of_cores} ))
 
 # compile 3dMCGlauber
-echo "compile 3dMCGlauber ... "
+echo -e "${Green}compile 3dMCGlauber ... ${NC}"
 (
     cd 3dMCGlauber_code
     ./get_LHAPDF.sh
@@ -23,7 +26,7 @@ mkdir -p 3dMCGlauber
 cp 3dMCGlauber_code/input 3dMCGlauber/
 
 # compile IPGlasma
-echo "compile IPGlasma ... "
+echo -e "${Green}compile IPGlasma ... ${NC}"
 (
     cd ipglasma_code
     ./compile_IPGlasma.sh
@@ -32,7 +35,7 @@ mkdir -p ipglasma
 cp ipglasma_code/input ipglasma/
 
 # compile KoMPoST
-echo "compile KoMPoST ... "
+echo -e "${Green}compile KoMPoST ... ${NC}"
 (
     cd kompost_code
     make
@@ -41,7 +44,7 @@ mkdir -p kompost
 cp kompost_code/setup.ini kompost/
 
 # compile MUSIC
-echo "compile MUSIC ... "
+echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
     mkdir -p build
@@ -57,7 +60,7 @@ cp MUSIC_code/utilities/sweeper.sh MUSIC/
 (cd MUSIC; mkdir initial)
 
 # download iSS particle sampler
-echo "compile iSS ... "
+echo -e "${Green}compile iSS ... ${NC}"
 (
     cd iSS_code
     mkdir -p build
@@ -71,7 +74,7 @@ mkdir -p iSS
 cp -r iSS_code/iSS_parameters.dat iSS/
 
 # download UrQMD afterburner
-echo "compile UrQMD ... "
+echo -e "${Green}compile UrQMD ... ${NC}"
 (
     cd urqmd_code
     make -j${number_of_cores_to_compile}
@@ -85,7 +88,7 @@ cp urqmd_code/urqmd/uqmd.burner urqmd/
 
 
 # download hadronic afterner
-echo "compile hadronic afterburner toolkit ... "
+echo -e "${Green}compile hadronic afterburner toolkit ... ${NC}"
 (
     cd hadronic_afterburner_toolkit_code
     mkdir -p build
