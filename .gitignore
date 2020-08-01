@@ -119,3 +119,8 @@ playground
 
 # Sphinx
 docs/SphinxDoc/_build/
+
+# local scripts
+average_event_spvn_h5.py
+collect_events.sh
+combine_multiple_hdf5.py
