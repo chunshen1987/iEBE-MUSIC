@@ -803,8 +803,8 @@ def main():
                 if precent_local >= cen_min and precent_local < cen_max:
                     cent_label = cen_label
                     rescale_factor = cen_precent/(cen_max - cen_min)
-                    n_hydro_rescaled = (max(1, int(n_hydro_per_job
-                                                   *rescale_factor + 0.1)))
+                    n_hydro_rescaled = (max(
+                        1, int(n_hydro_per_job*rescale_factor + 0.1)))
                     if cent_label != cent_label_pre:
                         cent_label_pre = cent_label
                         event_id_offset = 0
