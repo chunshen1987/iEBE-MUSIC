@@ -126,6 +126,8 @@ mcglauber_dict = {
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
                                         # 3: deceleration with LEXUS sampled rapidit loss (m/sigma = 1 fm, dtau fluctuates)
                                         # 4: deceleration with LEXUS sampled rapidit loss (dtau = 0.5 fm, m/sigma fluctuates)
+    'tau_form_min': 0.3,
+    'tau_form_max': 0.7,
 }
 
 # KoMPoST
