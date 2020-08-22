@@ -72,13 +72,15 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 """.format(event_id, n_threads, walltime, working_folder))
     elif cluster == "wsugrid":
         script.write("""#!/usr/bin/env bash
-#PBS -N {0:s}
-#PBS -l select=1:ncpus={1:d}:mem={2:.0f}GB:cpu_type=Intel
-##PBS -l walltime={3:s}
-#PBS -S /bin/bash
-#PBS -e test.err
-#PBS -o test.log
-#PBS -q wsuq
+#SBATCH --job-name {0:s}
+#SBATCH -q primary
+#SBATCH -N 1
+#SBATCH -n {1:d}
+#SBATCH --mem={2:.0f}G
+#SBATCH --constraint=intel
+#SBATCH -t {3:s}
+#SBATCH -e job.err
+#SBATCH -o job.log
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))

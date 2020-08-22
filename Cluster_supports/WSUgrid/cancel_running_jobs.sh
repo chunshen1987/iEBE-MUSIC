@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage="./cancel_running_jobs.sh fromFolder toFolder"
+usage="./cancel_running_jobs.sh fromFolder"
 
 jobFolder=$1
 
@@ -17,6 +17,6 @@ echo "cancelling jobs in " ${jobFolder}
 for ijob in `ls --color=none ${jobFolder} | grep "event" `;
 do
     eventsPath=${jobFolder}/${ijob}
-    qdel `cat ${eventsPath}/job_id`
+    scancel `cat ${eventsPath}/job_id`
 done
 
