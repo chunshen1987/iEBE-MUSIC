@@ -363,18 +363,12 @@ do
     script.write("    ./osc2u.e < ../iSS/OSCAR.DAT {0}".format(logfile))
     script.write("""
     else
-        ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
+        ./osc2u.e < ../iSS/OSCAR.DAT > run.log
     fi
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    if [ $SubEventId = "0" ]; then
-    """)
-    script.write("    ./runqmd.sh {0}".format(logfile))
-    script.write("""
-    else
-        ./runqmd.sh >> run.log
-    fi
+    ./runqmd.sh > /dev/null 2>&1
     mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr OSCAR.input
     cd ..
