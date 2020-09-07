@@ -1,6 +1,8 @@
 # iEBE-MUSIC
 This is a repository is an overarching numerical framework for event-by-event simulations of relativistic heavy-ion collisions.
 
+If you have any questions, please email to the iEBE google groups, iebe@googlegroups.com
+
 ## Setup & Ingradients:
 All the code packages can be downloaded from online git repositories. Please use `codes/get_code_packages.sh` to download the code packages and `codes/compile_code_packages.sh` to compile all the packages before event-by-event simulations.
 
