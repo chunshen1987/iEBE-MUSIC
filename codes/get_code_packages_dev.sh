@@ -4,7 +4,7 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b remnant 3dMCGlauber_code
+git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -37,11 +37,3 @@ rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit hadronic_afterburner_toolkit_code
 rm -fr hadronic_afterburner_toolkit_code/.git
 
-
-# download neos_bqs
-#neos_bqs_name="neosBQS-v0.11"
-#neos_bqs_destination="MUSIC_code/EOS/"
-#wget https://s3.amazonaws.com/qcdneos/${neos_bqs_name}.tar.gz && \
-#tar -zxf ${neos_bqs_name}.tar.gz -C ${neos_bqs_destination} && \
-#mv ${neos_bqs_destination}/${neos_bqs_name} ${neos_bqs_destination}/neos_bqs && \
-#rm ${neos_bqs_name}.tar.gz
