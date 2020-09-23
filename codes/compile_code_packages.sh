@@ -54,10 +54,9 @@ echo -e "${Green}compile MUSIC ... ${NC}"
     make install
 )
 mkdir -p MUSIC
-#cp MUSIC_code/mpihydro MUSIC/
 cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
 cp MUSIC_code/utilities/sweeper.sh MUSIC/
-(cd MUSIC; mkdir initial)
+(cd MUSIC; mkdir -p initial)
 
 # download iSS particle sampler
 echo -e "${Green}compile iSS ... ${NC}"
@@ -70,7 +69,6 @@ echo -e "${Green}compile iSS ... ${NC}"
     make install
 )
 mkdir -p iSS
-#cp iSS_code/iSS.e iSS/
 cp -r iSS_code/iSS_parameters.dat iSS/
 
 # download UrQMD afterburner
@@ -83,7 +81,6 @@ mkdir -p osc2u
 cp urqmd_code/osc2u/osc2u.e osc2u/
 mkdir -p urqmd
 cp urqmd_code/urqmd/runqmd.sh urqmd/
-#cp urqmd_code/urqmd/urqmd.e urqmd/
 cp urqmd_code/urqmd/uqmd.burner urqmd/
 
 
@@ -103,8 +100,6 @@ echo -e "${Green}compile hadronic afterburner toolkit ... ${NC}"
     mv concatenate_binary_files.e ../
 )
 mkdir -p hadronic_afterburner_toolkit
-#cp hadronic_afterburner_toolkit_code/hadronic_afterburner_tools.e hadronic_afterburner_toolkit/
-#cp -r hadronic_afterburner_toolkit_code/EOS hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/convert_to_binary.e hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/concatenate_binary_files.e hadronic_afterburner_toolkit/
 cp hadronic_afterburner_toolkit_code/parameters.dat hadronic_afterburner_toolkit/
