@@ -363,12 +363,12 @@ do
     script.write("    ./osc2u.e < ../iSS/OSCAR.DAT {0}".format(logfile))
     script.write("""
     else
-        ./osc2u.e < ../iSS/OSCAR.DAT > run.log
+        ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
     fi
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    ./runqmd.sh > /dev/null 2>&1
+    ./runqmd.sh >> run.log
     mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr OSCAR.input
     cd ..
