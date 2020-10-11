@@ -110,7 +110,7 @@ mcglauber_dict = {
                                  # 1: baryon number transported assuming baryon
                                  # junctions (at smaller x)
                                  # see arXiv:nucl-th/9602027
-    'lambdaB': 0.4,              # parameter the controls the strength of
+    'lambdaB': 0.2,              # parameter the controls the strength of
                                  # the baryon junction stopping
     'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'QCD_string_production_mode': 1,    # string production mode
@@ -128,8 +128,8 @@ mcglauber_dict = {
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
                                         # 3: deceleration with LEXUS sampled rapidit loss (m/sigma = 1 fm, dtau fluctuates)
                                         # 4: deceleration with LEXUS sampled rapidit loss (dtau = 0.5 fm, m/sigma fluctuates)
-    'tau_form_min': 0.3,
-    'tau_form_max': 0.7,
+    'tau_form_mean': 0.5,
+    'tau_form_fluct_gamma_beta': 1.0,
 }
 
 # KoMPoST
