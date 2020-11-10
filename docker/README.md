@@ -5,13 +5,22 @@ Docker is a software tool that allows one to deploy an application in a portable
 ### 1. Build a new Docker image
 We can build a docker image for the iEBE-MUSIC package using the following command,
 
-    `docker build -t iebe-music .`
+    docker build -t iebe-music .
 
 ### 2. Run iEBE-MUSIC
 The docker container has ready compiled all the software packages for iEBE-MUSIC.
 
-`docker run -it --name myiEBE chunshen1987/iebe-music:latest`
+	docker run -it --name myiEBE chunshen1987/iebe-music:latest
 
 ### 3. To delete all the Docker images in your laptop
 
-`docker system prune -a`
+	docker system prune -a
+
+## Using iEBE-MUSIC via Singularity
+
+Use the following command to create a singularity image (sif) from the
+docker image,
+
+    singularity pull  docker://chunshen1987/iebe-music:dev
+
+To run the singularity image, `singularity run ieee-music_dev.sif`
