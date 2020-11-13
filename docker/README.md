@@ -23,4 +23,4 @@ docker image,
 
     singularity pull  docker://chunshen1987/iebe-music:dev
 
-To run the singularity image, `singularity run ieee-music_dev.sif`
+To run the singularity image, `singularity run iebe-music_dev.sif`
