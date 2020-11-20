@@ -17,15 +17,15 @@ control_dict = {
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "self",     # minimumbias or fixed or self
-    'database_name_pattern': "IPGlasma_database/RESULTS.h5",  # path for the database file
-    # all parameters below are for "type == self"
+    'type': "self",
+    # all parameters below are for (type == self)
     'bmin': 0.,
-    'bmax': 16.,
+    'bmax': 20.,
     'Projectile': "Au",
     'Target': "Au",
     'roots': 200.,
     'SigmaNN': 42.,
+    'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
 }
 
 

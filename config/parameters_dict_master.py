@@ -22,15 +22,20 @@ control_dict = {
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "minimumbias",  # minimumbias, fixed, or self
-    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
+    'type': "self",  # minimumbias or fixed (pre-generated)
+                     # self (generate on the fly)
+
+    # path for the database file (for type == minimumbias or fixed)
+    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",
+
+    # all parameters below are for (type == self)
     'mode': 1,              # run mode
     'readMultFromFile': 0,
     'size': 720,            # number of grid points of IP-Glasma computation
     'L': 30.,               # grid size in the transverse plane
     'Nc': 3,                # number of color
     'm': 0.2,               # infrared cut-off mass (GeV)
-    'rmax': 100.,
+    'rmax': 10.,
     'UVdamp': 0.,
     'Jacobianm': 0.35,
     'g': 1.,                # strong coupling constant
@@ -41,7 +46,7 @@ ipglasma_dict = {
     'shiftConstituentQuarkProtonOrigin': 1,
     'runningCoupling': 0,
     'muZero': 0.3,
-    'minimumQs2ST': 200,
+    'minimumQs2ST': 0.,
     'beta2': 0.28,
     'c': 0.2,
     'g2mu': 0.1,
@@ -263,7 +268,7 @@ iss_dict = {
     'turn_on_diff': 0,  # read in baryon diffusion current
 
     'include_deltaf_shear': 1,      # include delta f contribution from shear
-    'include_deltaf_bulk': 0,       # include delta f contribution from bulk
+    'include_deltaf_bulk': 1,       # include delta f contribution from bulk
     'include_deltaf_diffusion': 0,  # include delta f contribution from diffusion
 
     'bulk_deltaf_kind': 1,     # 0: 14-momentum approximation, 1: relaxation time approximation
@@ -273,7 +278,7 @@ iss_dict = {
 
     'randomSeed': -1,   # If <0, use system clock.
     'calculate_vn': 0,  # 1/0: whether to calculate the 
-    'MC_sampling': 2,   # 0/1/2/3: whether to perform Monte-Carlo sampling
+    'MC_sampling': 4,   # 0/1/2/3: whether to perform Monte-Carlo sampling
                         # (not required for spectra calculation). 
                         # 0: No sampling. 
                         # 1: use dN_dxtdetady to sample. 

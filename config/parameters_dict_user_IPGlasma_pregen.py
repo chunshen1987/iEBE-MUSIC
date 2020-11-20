@@ -16,8 +16,10 @@ control_dict = {
 
 # IPGlasma
 ipglasma_dict = {
-    'type': "minimumbias",  # minimumbias or fixed or self
-    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",  # path for the database file
+    'type': "minimumbias",      # minimumbias or fixed (pre-generated)
+
+    # path for the database file (for type == minimumbias or fixed)
+    'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",
 }
 
 
