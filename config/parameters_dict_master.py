@@ -124,10 +124,11 @@ mcglauber_dict = {
     'rapidity_loss_method': 2,          # 1: LEXUS
                                         # 2: parameterization
                                         # 3: parameterization with logit-normal fluctuation
-    'yloss_param_slope': 0.65,          # the slope parameter for yloss parameterization [0., 1.]
-    'yloss_param_alpha1': 1.50,         # the small y ~ y^alpha1 for yloss parameterization (>=1.)
-    'yloss_param_alpha2': 0.70,         # the large y ~ y^alpha2 for yloss parameterization [0., 1.]
-    'yloss_param_fluct_var': 0.50,      # the variance ofthe logit-normal parameterized y_loss fluctuation
+    'yloss_param_slope': 1.50,          # the slope parameter for yloss parameterization [0., 1.]
+    'yloss_param_alpha1': 2.50,         # the small y ~ y^alpha1 for yloss parameterization (>=1.)
+    'yloss_param_alpha2': 0.25,         # the large y ~ y^alpha2 for yloss parameterization [0., 1.]
+    'yloss_param_fluct_var_RHIC': 0.60, # the variance ofthe logit-normal parameterized y_loss fluctuation
+    'yloss_param_fluct_var_LHC': 0.80,  # the variance ofthe logit-normal parameterized y_loss fluctuation
     'evolve_QCD_string_mode': 2,        # string evolution mode
                                         # 1: deceleration with fixed rapidity loss (m/sigma = 1 fm, dtau = 0.5 fm)
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
