@@ -106,6 +106,8 @@ def collect_ipglasma_event(final_results_folder, initial_type, event_id,
     ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
     res_path = path.join(path.abspath(final_results_folder),
                          ipglasma_folder_name)
+    if path.exists(res_path):
+        shutil.rmtree(res_path)
     shutil.move("ipglasma/ipglasma_results", res_path)
     if initial_type == "IPGlasma":
         hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
