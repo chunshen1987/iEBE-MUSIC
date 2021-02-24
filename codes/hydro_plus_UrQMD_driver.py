@@ -150,10 +150,9 @@ def run_hydro_event(final_results_folder, event_id):
         except FileNotFoundError:
             hydro_success = False
 
-        if not hydro_success:
-            print("{} Hydrodynamic run failed, rerun ... ".format(logo),
-                  flush=True)
-            shutil.rmtree(results_folder)
+        print("{} Hydrodynamic run failed, rerun ... ".format(logo),
+              flush=True)
+        shutil.rmtree(results_folder)
 
     if not hydro_success:
         curr_time = time.asctime()
