@@ -31,62 +31,62 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
     return (filelist[iev])
 
 
-def get_initial_condition(database,
-                          initial_type,
-                          nev,
-                          idx0,
-                          seed_add,
-                          time_stamp_str="0.4"):
+def get_initial_condition(database, initial_type, iev, seed_add,
+                          final_results_folder, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
-    if initial_type == "IPGlasma":
+    if "IPGlasma" in initial_type:
+        ipglasma_local_folder = "ipglasma/ipglasma_results"
+        file_name = ("epsilon-u-Hydro-t{0:s}-{1}.dat".format(
+                                                time_stamp_str, iev))
+        if "KoMPoST" in initial_type:
+            file_name = ("Tmunu-t{0:s}-{1}.dat".format(time_stamp_str, iev))
         if database == "self":
-            IPG_respath = "ipglasma/ipglasma_results/"
-            for iev in range(idx0, idx0 + nev):
+            # check existing events ...
+            ipglasma_folder_name = "ipglasma_results_{}".format(iev)
+            res_path = path.join(path.abspath(final_results_folder),
+                                 ipglasma_folder_name)
+
+            if not path.exists(path.join(res_path, file_name)):
                 run_ipglasma(iev)
-                file_name = ("ipglasma/ipglasma_results/"
-                             + "epsilon-u-Hydro-t{0:s}-{1}.dat".format(
-                                 time_stamp_str, iev))
-                yield (iev, file_name)
+                collect_ipglasma_event(final_results_folder, iev)
+            else:
+                print("IPGlasma event exists ...")
+                print("No need to rerun ...")
         else:
-            for iev in range(idx0, idx0 + nev):
-                file_name = fecth_an_IPGlasma_event(database, time_stamp_str,
+            if "KoMPoST" in initial_type:
+                file_temp = fecth_an_IPGlasma_event_Tmunu(
+                                            database, time_stamp_str, iev)
+            else:
+                file_temp = fecth_an_IPGlasma_event(database, time_stamp_str,
                                                     iev)
-                if file_name == "Failed":
-                    continue
-                yield (iev, file_name)
-    elif initial_type == "IPGlasma+KoMPoST":
-        if database == "self":
-            for iev in range(idx0, idx0 + nev):
-                run_ipglasma(iev)
-                file_name = (
-                    "ipglasma/ipglasma_results/"
-                    + "Tmunu-t{0:s}-{1}.dat".format(time_stamp_str, iev))
-                yield (iev, file_name)
-        else:
-            for iev in range(idx0, idx0 + nev):
-                file_name = fecth_an_IPGlasma_event_Tmunu(
-                    database, time_stamp_str, iev)
-                if file_name == "Failed":
-                    continue
-                yield (iev, file_name)
+            makedirs(ipglasma_local_folder, exist_ok=True)
+            shutil.move(file_temp,
+                        path.join(ipglasma_local_folder, file_name))
+            collect_ipglasma_event(final_results_folder, iev)
+        connect_ipglasma_event(final_results_folder, initial_type,
+                               iev, file_name)
+        return file_name
     elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
-            for iev in range(idx0, idx0 + nev):
-                file_name = "strings_event_{}.dat".format(iev)
+            file_name = "strings_event_{}.dat".format(iev)
+            if not path.exists(file_name):
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
-                    seed_add),
-                     shell=True)
+                        seed_add), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-                yield (iev, file_name)
+            else:
+                print("3D MC-Glauber event exists ...")
+                print("No need to rerun ...")
+            shutil.copy(file_name, "MUSIC/initial/strings.dat")
+            shutil.copy(file_name, path.join(final_results_folder,
+                                             "strings_{}.dat".format(iev)))
+            return file_name
         else:
-            for iev in range(idx0, idx0 + nev):
-                file_name = fecth_an_3DMCGlauber_event(database, iev)
-                yield (iev, file_name)
+            file_name = fecth_an_3DMCGlauber_event(database, iev)
+            return file_name
     elif initial_type == "3DMCGlauber_consttau":
-        for iev in range(idx0, idx0 + nev):
-            file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
-            yield (iev, file_name)
+        file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
+        return file_name
     else:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
@@ -100,8 +100,7 @@ def run_ipglasma(iev):
     call("bash ./run_ipglasma.sh {}".format(iev), shell=True)
 
 
-def collect_ipglasma_event(final_results_folder, initial_type, event_id,
-                           filename):
+def collect_ipglasma_event(final_results_folder, event_id):
     """This function collects the ipglasma results"""
     ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
     res_path = path.join(path.abspath(final_results_folder),
@@ -109,6 +108,13 @@ def collect_ipglasma_event(final_results_folder, initial_type, event_id,
     if path.exists(res_path):
         shutil.rmtree(res_path)
     shutil.move("ipglasma/ipglasma_results", res_path)
+
+
+def connect_ipglasma_event(final_results_folder, initial_type, event_id,
+                           filename):
+    ipglasma_folder_name = "ipglasma_results_{}".format(event_id)
+    res_path = path.join(path.abspath(final_results_folder),
+                         ipglasma_folder_name)
     if initial_type == "IPGlasma":
         hydro_initial_file = "MUSIC/initial/epsilon-u-Hydro.dat"
         if path.islink(hydro_initial_file):
@@ -447,50 +453,16 @@ def main(para_dict_):
         curr_time, num_threads),
           flush=True)
 
-    for iev, ifile in get_initial_condition(initial_condition, initial_type,
-                                            para_dict_['n_hydro'],
-                                            para_dict_['hydro_id0'],
-                                            para_dict_['seed_add'],
-                                            para_dict_['time_stamp_str']):
+    idx0 = para_dict_['hydro_id0']
+    nev = para_dict_['n_hydro']
+    for iev in range(idx0, idx0 + nev):
         curr_time = time.asctime()
-        print("\U0001F680  [{}] Run simulations with {} ... ".format(
-            curr_time, ifile),
-              flush=True)
-        if initial_type == "IPGlasma":
-            event_id = str(iev)
-            if para_dict_['initial_condition'] != "self":
-                initial_database_name = (
+
+        event_id = str(iev)
+        if para_dict_['initial_condition'] != "self":
+            initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
-                event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
-                event_id = initial_database_name + "_" + event_id
-                ipglasma_folder = "ipglasma/ipglasma_results"
-                makedirs(ipglasma_folder, exist_ok=True)
-                shutil.move(ifile,
-                            path.join(ipglasma_folder,
-                                      ifile.split("/")[-1]))
-        elif initial_type == "IPGlasma+KoMPoST":
-            event_id = str(iev)
-            if para_dict_['initial_condition'] != "self":
-                initial_database_name = (
-                    initial_condition.split("/")[-1].split(".h5")[0])
-                event_id = ifile.split("/")[-1].split("-")[-1].split(".dat")[0]
-                event_id = initial_database_name + "_" + event_id
-                ipglasma_folder = "ipglasma/ipglasma_results"
-                makedirs(ipglasma_folder, exist_ok=True)
-                shutil.move(ifile,
-                            path.join(ipglasma_folder,
-                                      ifile.split("/")[-1]))
-        elif initial_type == "3DMCGlauber_dynamical":
-            event_id = ifile.split("/")[-1].split("_")[-1].split(".dat")[0]
-            shutil.move(ifile, "MUSIC/initial/strings.dat")
-        elif initial_type == "3DMCGlauber_consttau":
-            filename = ifile.split("/")[-1]
-            event_id = filename.split("_")[-1].split(".dat")[0]
-            filepath = initial_condition
-            shutil.copy(path.join(filepath, filename),
-                        "MUSIC/initial/initial_TA.dat")
-            shutil.copy(path.join(filepath, re.sub("TA", "TB", filename)),
-                        "MUSIC/initial/initial_TB.dat")
+            event_id = initial_database_name + "_" + event_id
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
         if path.exists(final_results_folder):
@@ -512,11 +484,22 @@ def main(para_dict_):
             print("Rerun {} ...".format(final_results_folder), flush=True)
         else:
             mkdir(final_results_folder)
+        print("[{}] Generate initial condition ... ".format(curr_time),
+              flush=True)
 
-        if "IPGlasma" in initial_type:
+        ifile = get_initial_condition(initial_condition, initial_type,
+                                      iev,
+                                      para_dict_['seed_add'],
+                                      final_results_folder,
+                                      para_dict_['time_stamp_str'])
+
+        if initial_type == "3DMCGlauber_consttau":
             filename = ifile.split("/")[-1]
-            collect_ipglasma_event(final_results_folder, initial_type, event_id,
-                                   filename)
+            filepath = initial_condition
+            shutil.copy(path.join(filepath, filename),
+                        "MUSIC/initial/initial_TA.dat")
+            shutil.copy(path.join(filepath, re.sub("TA", "TB", filename)),
+                        "MUSIC/initial/initial_TB.dat")
 
         if initial_type == "IPGlasma+KoMPoST":
             kompost_success, kompost_folder_name = run_kompost(
@@ -531,14 +514,6 @@ def main(para_dict_):
                            + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
-
-        if (initial_type == "3DMCGlauber_dynamical"
-                and initial_condition == "self"):
-            # save the initial condition
-            shutil.copy(
-                "MUSIC/initial/strings.dat",
-                path.join(final_results_folder,
-                          "strings_{}.dat".format(event_id)))
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
