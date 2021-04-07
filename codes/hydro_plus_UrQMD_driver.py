@@ -156,9 +156,10 @@ def run_hydro_event(final_results_folder, event_id):
         except FileNotFoundError:
             hydro_success = False
 
-        print("{} Hydrodynamic run failed, rerun ... ".format(logo),
-              flush=True)
-        shutil.rmtree(results_folder)
+        if not hydro_success:
+            print("{} Hydrodynamic run failed, rerun ... ".format(logo),
+                 flush=True)
+            shutil.rmtree(results_folder)
 
     if not hydro_success:
         curr_time = time.asctime()
@@ -171,9 +172,8 @@ def run_hydro_event(final_results_folder, event_id):
         if hydro_status == "Finished.":
             hydro_success = True
 
-        if hydro_success:
-            # collect hydro results
-            shutil.move("MUSIC/hydro_results", results_folder)
+        # collect hydro results
+        shutil.move("MUSIC/hydro_results", results_folder)
 
     return (hydro_success, hydro_folder_name)
 
