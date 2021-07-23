@@ -118,12 +118,14 @@ mcglauber_dict = {
     'lambdaB': 0.2,              # parameter the controls the strength of
                                  # the baryon junction stopping
     'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
+    'fluct_Nstrings_per_NN_collision': 1,        # fluctuate number of strings produced per NN collision
     'QCD_string_production_mode': 1,    # string production mode
                                         # 1: strings are produced randomly in the binary collision list
                                         # 2: strings are produced at the last binary collision
     'rapidity_loss_method': 2,          # 1: LEXUS
                                         # 2: parameterization
                                         # 3: parameterization with logit-normal fluctuation
+    'remnant_energy_loss_fraction': 0.5,         # nucleon remnants energy loss fraction (fraction of string's y_loss) [0, 1]
     'yloss_param_slope': 1.50,          # the slope parameter for yloss parameterization [0., 1.]
     'yloss_param_alpha1': 2.50,         # the small y ~ y^alpha1 for yloss parameterization (>=1.)
     'yloss_param_alpha2': 0.25,         # the large y ~ y^alpha2 for yloss parameterization [0., 1.]
