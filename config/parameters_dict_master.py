@@ -102,6 +102,7 @@ mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
     'Projectile':  "Pb",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
+    'nucleon_configuration_from_file': 0,
     'roots'     :   17.3,        # collision energy (GeV)
     'useQuarks' :   1,           # switch to use valence quarks
     'Q2'        :   1.,          # the scale when evaluating the pdf
