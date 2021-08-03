@@ -59,8 +59,12 @@ def generate_event_folders(workingFolder, clusterName, eventId,
                         eventFolder)
     script.write("""
 singularity exec {0} ./{1} {2} {3} {4} {5} {6}
+
+mkdir -p temp
+./collect_events.sh playground temp
+mv temp/playground/playground.h5 RESULTS_{7}.h5
 """.format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nThreads, randomSeed))
+           eventId0, nHydroEvents, nThreads, randomSeed, eventId))
     script.close()
 
     # copy files
