@@ -303,6 +303,7 @@ iss_dict = {
                                    # -- For dN_dy_sampling_model==10 or 20, 
 
     'perform_decays': 0,             # flag to perform resonance decay
+    'perform_checks': 0,             # flag to perform tests for the sampler
     'local_charge_conservation': 0,  # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
 
