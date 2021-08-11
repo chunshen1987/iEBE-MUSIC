@@ -72,7 +72,8 @@ def get_initial_condition(database, initial_type, iev, seed_add,
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
-                        seed_add + iev*ran), shell=True)
+                                                        seed_add + iev*ran),
+                     shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
             else:
