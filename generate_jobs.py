@@ -660,6 +660,7 @@ def main():
                         default='-1',
                         help='Random Seed (-1: according to system time)')
     parser.add_argument('--nocopy', action='store_true')
+    parser.add_argument("--continueFlag", action="store_true")
     args = parser.parse_args()
 
     # print out all the arguments
@@ -745,6 +746,10 @@ def main():
             parameter_dict.mcglauber_dict['database_name'])
 
     working_folder_name = path.abspath(working_folder_name)
+
+    if path.exists(working_folder_name) and args.continueFlag:
+        return
+
     create_a_working_folder(working_folder_name)
 
     shutil.copy(args.par_dict, working_folder_name)
