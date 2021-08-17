@@ -209,7 +209,7 @@ def main():
     # copy script to collect final results
     pwd = path.abspath(".")
     script_path = path.join(code_package_path, "utilities")
-    shutil.copy(path.join(script_path, 'collect_events.sh'), pwd)
+    shutil.copy(path.join(script_path, 'collect_events_singularity.sh'), pwd)
     shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'), pwd)
 
     if cluster_name == "wsugrid":
