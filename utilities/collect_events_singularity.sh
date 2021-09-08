@@ -42,9 +42,9 @@ do
     for iev in `ls --color=none ${eventsPath} | grep "RESULTS"`
     do
         mv ${eventsPath}/${iev} $target_spvn_folder
-        mv ${eventsPath}/temp/playground/HYDRO_RESULTS/${hydro_folder_name}* $target_hydro_folder
-        mv ${eventsPath}/temp/playground/URQMD_RESULTS/${UrQMD_file_name}* $target_urqmd_folder
     done
+    mv ${eventsPath}/temp/playground/HYDRO_RESULTS/${hydro_folder_name}* $target_hydro_folder 2>/dev/null
+    mv ${eventsPath}/temp/playground/URQMD_RESULTS/${UrQMD_file_name}* $target_urqmd_folder 2>/dev/null
 done
 
 if [ -f ${target_folder}/${folderName}.h5 ]; then
