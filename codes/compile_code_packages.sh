@@ -26,8 +26,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p 3dMCGlauber
-cp 3dMCGlauber_code/input 3dMCGlauber/
 
 # compile IPGlasma
 echo -e "${Green}compile IPGlasma ... ${NC}"
@@ -39,8 +37,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p ipglasma
-cp ipglasma_code/input ipglasma/
 
 # compile KoMPoST
 echo -e "${Green}compile KoMPoST ... ${NC}"
@@ -52,8 +48,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p kompost
-cp kompost_code/setup.ini kompost/
 
 # compile MUSIC
 echo -e "${Green}compile MUSIC ... ${NC}"
@@ -69,10 +63,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p MUSIC
-cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
-cp MUSIC_code/utilities/sweeper.sh MUSIC/
-(cd MUSIC; mkdir -p initial)
 
 # download iSS particle sampler
 echo -e "${Green}compile iSS ... ${NC}"
@@ -88,8 +78,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p iSS
-cp -r iSS_code/iSS_parameters.dat iSS/
 
 # download UrQMD afterburner
 echo -e "${Green}compile UrQMD ... ${NC}"

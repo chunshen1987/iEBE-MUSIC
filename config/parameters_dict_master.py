@@ -41,6 +41,7 @@ ipglasma_dict = {
     'g': 1.,                # strong coupling constant
     'BG': 4.,
     'BGq': 0.3,
+    'dqMin': 0.0,
     'useSmoothNucleus': 0,
     'useConstituentQuarkProton': 0,
     'shiftConstituentQuarkProtonOrigin': 1,
