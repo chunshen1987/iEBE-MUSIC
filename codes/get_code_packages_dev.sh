@@ -22,6 +22,11 @@ rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
 rm -fr MUSIC_code/.git
 
+# download photonCalculator
+rm -fr photonEmission_hydroInterface_code
+git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface -b Abel_dev photonEmission_hydroInterface_code
+rm -fr photonEmission_hydroInterface_code/.git
+
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=1 https://github.com/chunshen1987/iSS -b momentumSampler iSS_code
