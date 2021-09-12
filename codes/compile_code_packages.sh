@@ -63,6 +63,10 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
+mkdir -p MUSIC
+cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
+cp MUSIC_code/utilities/sweeper.sh MUSIC/
+(cd MUSIC; mkdir -p initial)
 
 # download iSS particle sampler
 echo -e "${Green}compile iSS ... ${NC}"

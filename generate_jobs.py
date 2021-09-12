@@ -497,7 +497,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
-    mkdir(path.join(event_folder, 'MUSIC'))
+    shutil.copytree(path.join(code_path, 'MUSIC'),
+                    path.join(event_folder, 'MUSIC'))
     shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
                     path.join(event_folder, 'MUSIC/music_input_mode_2'))
     for link_i in ['EOS', 'MUSIChydro']:
