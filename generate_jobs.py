@@ -319,18 +319,11 @@ def generate_script_photon(folder_name, nthreads, cluster_name):
 
     script = open(path.join(working_folder, "run_photon.sh"), "w")
 
-    results_folder = 'results'
     script.write("""#!/bin/bash
-
-results_folder={0:s}
-
 (
 cd photonEmission_hydroInterface
 
-mkdir -p $results_folder
-rm -fr $results_folder/*
-
-""".format(results_folder))
+"""
 
     if nthreads > 0:
         script.write("""
