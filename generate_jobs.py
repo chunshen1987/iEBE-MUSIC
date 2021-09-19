@@ -448,9 +448,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     if initial_condition_database == "self":
         if initial_condition_type in ("3DMCGlauber_dynamical",
                                       "3DMCGlauber_consttau"):
-            shutil.copytree(path.join(code_path, '3dMCGlauber'),
-                            path.join(event_folder, '3dMCGlauber'),
-                            symlinks=True)
+            mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
                             path.join(event_folder, '3dMCGlauber/input'))
             for link_i in ['3dMCGlb.e', 'eps09', 'tables']:
@@ -463,9 +461,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
             generate_script_ipglasma(event_folder, n_threads, cluster_name,
                                      event_id)
-            shutil.copytree(path.join(code_path, 'ipglasma'),
-                            path.join(event_folder, 'ipglasma'),
-                            symlinks=True)
+            mkdir(path.join(event_folder, 'ipglasma'))
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
             link_list = [
@@ -489,9 +485,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
-        shutil.copytree(path.join(code_path, 'kompost'),
-                        path.join(event_folder, 'kompost'),
-                        symlinks=True)
+        mkdir(path.join(event_folder, 'kompost'))
         shutil.copyfile(path.join(param_folder, 'KoMPoST/setup.ini'),
                         path.join(event_folder, 'kompost/setup.ini'))
         for link_i in ['EKT', 'KoMPoST.exe']:
@@ -504,8 +498,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
     shutil.copytree(path.join(code_path, 'MUSIC'),
-                    path.join(event_folder, 'MUSIC'),
-                    symlinks=True)
+                    path.join(event_folder, 'MUSIC'))
     shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
                     path.join(event_folder, 'MUSIC/music_input_mode_2'))
     for link_i in ['EOS', 'MUSIChydro']:
@@ -523,8 +516,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                      'event_{0:d}'.format(event_id),
                                      'UrQMDev_{0:d}'.format(iev))
         mkdir(sub_event_folder)
-        shutil.copytree(path.join(code_path, 'iSS'),
-                        path.join(sub_event_folder, 'iSS'))
+        mkdir(path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
         for link_i in ['iSS_tables', 'iSS.e']:
@@ -542,9 +534,10 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(sub_event_folder, "urqmd/urqmd.e")),
                         shell=True)
         if HBT_flag:
-            shutil.copytree(
-                path.join(code_path, 'hadronic_afterburner_toolkit'),
-                path.join(sub_event_folder, 'hadronic_afterburner_toolkit'))
+            shutil.copytree(path.join(code_path,
+                                      'hadronic_afterburner_toolkit'),
+                            path.join(sub_event_folder,
+                                      'hadronic_afterburner_toolkit'))
             shutil.copyfile(
                 path.join(param_folder,
                           'hadronic_afterburner_toolkit/parameters.dat'),
