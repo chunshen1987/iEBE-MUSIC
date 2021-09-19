@@ -213,6 +213,57 @@ def run_kompost(final_results_folder, event_id):
     return (kompost_success, kompost_folder_name)
 
 
+def prepare_evolution_files_for_photon(final_results_folder, hydro_folder_name):
+    """This function prepares hydro evolution file for photon radiation"""
+    evoFileName = "evolution_all_xyeta.dat"
+    evo_file = path.join(final_results_folder, hydro_folder_name,
+                         evoFileName)
+    photonFolderPath = path.join('photonEmission_hydroInterface', 'results')
+    if path.exists(photonFolderPath):
+        shutil.rmtree(photonFolderPath)
+    mkdir(photonFolderPath)
+    call("ln -s {0:s} {1:s}".format(path.abspath(evo_file),
+                                    path.join(photonFolderPath, evoFileName)),
+         shell=True)
+    shutil.copy(path.join(final_results_folder, hydro_folder_name,
+                          "music_input"),
+                photonFolderPath)
+
+
+def run_photon(final_results_folder, event_id):
+    """This functions run photon radiation"""
+    logo = "\U0001F3B6"
+    photon_folder_name = "photon_results_{}".format(event_id)
+    results_folder = path.join(final_results_folder, photon_folder_name)
+    photon_success = False
+
+    if path.exists(results_folder):
+        # check whether KoMPoST has already run or not
+        print("{} photon results {} exist ...".format(logo,
+                                                      photon_folder_name),
+              flush=True)
+        photon_success = True
+        if photon_success:
+            print("{} no need to rerun photon".format(logo), flush=True)
+        else:
+            print("{} photon radiation failed, rerun ...".format(logo),
+                  flush=True)
+            shutil.rmtree(results_folder)
+
+    if not photon_success:
+        curr_time = time.asctime()
+        print("\U0001F3B6  [{}] Run photon ... ".format(curr_time), flush=True)
+        call("bash ./run_photon.sh", shell=True)
+
+        photon_success = True
+        if photon_success:
+            # collect results
+            shutil.move("photonEmission_hydroInterface/results",
+                        results_folder)
+
+    return (photon_success, photon_folder_name)
+
+
 def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
                                     n_urqmd):
     """This function prepares hydro surface for hadronic casade"""
@@ -536,9 +587,15 @@ def main(para_dict_):
                 path.join(final_results_folder, hydro_folder_name,
                           "strings_{}.dat".format(event_id)))
 
+        # if hydro finishes properly, we continue to do photon radiation
+        prepare_evolution_files_for_photon(final_results_folder,
+                                           hydro_folder_name)
+        photon_success, photon_folder_name = run_photon(final_results_folder,
+                                                        event_id)
+
         # if hydro finishes properly, we continue to do hadronic transport
-        prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
-                                        n_urqmd)
+        prepare_surface_files_for_urqmd(final_results_folder,
+                                        hydro_folder_name, n_urqmd)
 
         # then run UrQMD events in parallel
         urqmd_success, urqmd_file_path = run_urqmd_shell(

@@ -341,14 +341,12 @@ export OMP_NUM_THREADS={0:d}
         script.write("""
 # perform photon radiation
 ./hydro_photonEmission.e > run.log
-mv $results_folder photon_results
 )
 """)
     else:
         script.write("""
 # perform photon radiation
 ./hydro_photonEmission.e
-mv $results_folder photon_results
 )
 """)
     script.close()
