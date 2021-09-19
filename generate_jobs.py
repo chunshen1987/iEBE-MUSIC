@@ -495,6 +495,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(event_folder, "kompost/{}".format(link_i))),
                             shell=True)
 
+    # MUSIC
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
     shutil.copytree(path.join(code_path, 'MUSIC'),
@@ -507,6 +508,22 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
                         shell=True)
 
+    # photon
+    mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
+    shutil.copyfile(path.join(param_folder, 'photonEmission_hydroInterface',
+                              'parameters.dat'),
+                    path.join(event_folder, 'photonEmission_hydroInterface',
+                              'parameters.dat'))
+    for link_i in ['ph_rates', 'hydro_photonEmission.e']:
+        orgFilePath = path.abspath(path.join(code_path,
+                                   'photonEmission_hydroInterface_code',
+                                   '{}'.format(link_i)))
+        trgFilePath = path.join(event_folder, "photonEmission_hydroInterface",
+                                "{}".format(link_i))
+        subprocess.call("ln -s {0:s} {1:s}".format(orgFilePath, trgFilePath),
+                        shell=True)
+
+    # particlization + hadronic afterburner
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)

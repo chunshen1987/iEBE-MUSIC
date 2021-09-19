@@ -78,9 +78,6 @@ status=$?
 if [ $status -ne 0 ]; then
     exit $status
 fi
-mkdir -p photonEmission_hydroInterface
-cp photonEmission_hydroInterface_code/parameters.dat photonEmission_hydroInterface/
-
 
 # download iSS particle sampler
 echo -e "${Green}compile iSS ... ${NC}"
