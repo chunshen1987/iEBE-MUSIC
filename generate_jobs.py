@@ -313,6 +313,47 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
+def generate_script_photon(folder_name, nthreads, cluster_name):
+    """This function generates script for photon radiation"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "run_photon.sh"), "w")
+
+    results_folder = 'results'
+    script.write("""#!/bin/bash
+
+results_folder={0:s}
+
+(
+cd photonEmission_hydroInterface
+
+mkdir -p $results_folder
+rm -fr $results_folder/*
+
+""".format(results_folder))
+
+    if nthreads > 0:
+        script.write("""
+export OMP_NUM_THREADS={0:d}
+""".format(nthreads))
+
+    if cluster_name != "OSG":
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e > run.log
+mv $results_folder photon_results
+)
+""")
+    else:
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e
+mv $results_folder photon_results
+)
+""")
+    script.close()
+
+
 def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
@@ -509,6 +550,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                         shell=True)
 
     # photon
+    generate_script_photon(event_folder, n_threads, cluster_name)
     mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
     shutil.copyfile(path.join(param_folder, 'photonEmission_hydroInterface',
                               'parameters.dat'),
