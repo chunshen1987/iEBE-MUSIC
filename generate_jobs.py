@@ -323,8 +323,7 @@ def generate_script_photon(folder_name, nthreads, cluster_name):
 (
 cd photonEmission_hydroInterface
 
-"""
-
+""")
     if nthreads > 0:
         script.write("""
 export OMP_NUM_THREADS={0:d}
