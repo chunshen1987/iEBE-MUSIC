@@ -331,13 +331,17 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
     time_stamp = para_dict['time_stamp_str']
-    initial_state_filelist = [
-        'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
-        'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
-        'NcollList{}.dat'.format(event_id), 'NpartList{}.dat'.format(event_id),
+    initial_state_filelist1 = [
+        'NcollList{}.dat'.format(event_id),
+        'NpartList{}.dat'.format(event_id),
         'NpartdNdy-t0.6-{}.dat'.format(event_id),
         'NgluonEstimators{}.dat'.format(event_id)
     ]
+    initial_state_filelist2 = [
+        'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
+        'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
+    ]
+
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
     ]
@@ -362,15 +366,19 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
 
         if para_dict['initial_condition'] == "self":
             # save initial conditions
-            if ("IPGlasma" in para_dict['initial_type']
-                    and para_dict['save_ipglasma']):
+            if ("IPGlasma" in para_dict['initial_type'])
                 initial_folder = path.join(
                     final_results_folder,
                     "ipglasma_results_{}".format(event_id))
-                for inifilename in initial_state_filelist:
+                for inifilename in initial_state_filelist1:
                     inifile = path.join(initial_folder, inifilename)
                     if path.isfile(inifile):
                         shutil.move(inifile, spvnfolder)
+                if para_dict['save_ipglasma']:
+                    for inifilename in initial_state_filelist2:
+                        inifile = path.join(initial_folder, inifilename)
+                        if path.isfile(inifile):
+                            shutil.move(inifile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
