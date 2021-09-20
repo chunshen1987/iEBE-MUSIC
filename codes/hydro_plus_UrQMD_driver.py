@@ -366,7 +366,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
 
         if para_dict['initial_condition'] == "self":
             # save initial conditions
-            if ("IPGlasma" in para_dict['initial_type'])
+            if "IPGlasma" in para_dict['initial_type']:
                 initial_folder = path.join(
                     final_results_folder,
                     "ipglasma_results_{}".format(event_id))
