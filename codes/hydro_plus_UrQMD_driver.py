@@ -399,10 +399,14 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
         "vorticity_*.dat", "strings_*.dat"
     ]
+    photon_filepattern = ['*_Spvn*.dat']
 
     hydrofolder = path.join(final_results_folder,
                             "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
+    photonFolder = path.join(final_results_folder,
+                             "photon_results_{}".format(event_id))
+
 
     status = check_an_event_is_good(spvnfolder)
     if status:
@@ -439,6 +443,13 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             for ihydrofile in hydro_info_list:
                 if path.isfile(ihydrofile):
                     shutil.move(ihydrofile, spvnfolder)
+
+        # save photon results
+        for ipattern in photon_filepattern:
+            photonFileList = glob(path.join(photonFolder, ipattern))
+            for photonFile_i in photonFileList:
+                if path.isfile(photonFile_i):
+                    shutil.move(photonFile_i, spvnfolder)
 
         hf = h5py.File("{0}.h5".format(results_name), "w")
         gtemp = hf.create_group("{0}".format(results_name))
