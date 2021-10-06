@@ -1,6 +1,6 @@
 universe = vanilla
 executable = run_singularity.sh
-arguments = parameters_dict_user_IPGlasma.py $(Process) 1 12311
+arguments = parameters_dict_user_IPGlasma.py $(Process) 1 1 12311
 JobBatchName = IPG
 
 should_transfer_files = YES
