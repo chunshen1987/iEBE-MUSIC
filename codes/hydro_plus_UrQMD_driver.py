@@ -3,7 +3,7 @@
 
 from multiprocessing import Pool
 from subprocess import call
-from os import path, mkdir, remove, makedirs
+from os import path, mkdir, remove, makedirs, stat
 from glob import glob
 import sys
 import time
@@ -93,7 +93,7 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   initial_type))
-        exit(1)
+        sys.exit(1)
 
 
 def run_ipglasma(iev):
@@ -218,6 +218,8 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
     """This function prepares hydro surface for hadronic casade"""
     surface_file = glob(
         path.join(final_results_folder, hydro_folder_name, "surface*.dat"))
+    if stat(surface_file[0]).st_size == 0:
+        return False
     for iev in range(n_urqmd):
         hydro_surface_folder = "UrQMDev_{0:d}/hydro_event".format(iev)
         if path.exists(hydro_surface_folder):
@@ -230,6 +232,7 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(
             path.join(final_results_folder, hydro_folder_name, "music_input"),
             hydro_surface_folder)
+    return True
 
 
 def run_urqmd_event(event_id):
@@ -465,6 +468,7 @@ def main(para_dict_):
 
     idx0 = para_dict_['hydro_id0']
     nev = para_dict_['n_hydro']
+    exitErrorTrigger = False
     for iev in range(idx0, idx0 + nev):
         curr_time = time.asctime()
 
@@ -534,6 +538,7 @@ def main(para_dict_):
             print("\U000026D4  {} did not finsh properly, skipped.".format(
                 hydro_folder_name),
                   flush=True)
+            exitErrorTrigger = True
             continue
 
         if (initial_type == "3DMCGlauber_dynamical"
@@ -545,8 +550,12 @@ def main(para_dict_):
                           "strings_{}.dat".format(event_id)))
 
         # if hydro finishes properly, we continue to do hadronic transport
-        prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
-                                        n_urqmd)
+        status_success = prepare_surface_files_for_urqmd(final_results_folder,
+                                                         hydro_folder_name,
+                                                         n_urqmd)
+        if not status_success:
+            exitErrorTrigger = True
+            continue
 
         # then run UrQMD events in parallel
         urqmd_success, urqmd_file_path = run_urqmd_shell(
@@ -572,6 +581,8 @@ def main(para_dict_):
                                     para_dict_['save_kompost'],
                                     para_dict_['save_hydro'],
                                     para_dict_['save_urqmd'])
+    if exitErrorTrigger:
+        sys.exit(73)
 
 
 if __name__ == "__main__":
@@ -590,7 +601,7 @@ if __name__ == "__main__":
         TIME_STAMP = str(sys.argv[12])
     except IndexError:
         print_usage()
-        exit(0)
+        sys.exit(0)
 
     known_initial_types = [
         "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
@@ -601,7 +612,7 @@ if __name__ == "__main__":
               + "Do not recognize the initial condition type: {}".format(
                   INITIAL_CONDITION_TYPE),
               flush=True)
-        exit(1)
+        sys.exit(1)
 
     para_dict = {
         'initial_condition': INITIAL_CONDITION_DATABASE,
