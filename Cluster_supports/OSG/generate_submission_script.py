@@ -96,18 +96,17 @@ printf "Job running as user: `/usr/bin/id`\\n"
     if para_dict_["bayesFlag"]:
         script.write("""bayesFile=$6
 
-/home/IPGlasmaFramework/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th 1 -n_ev ${nev} -seed ${seed} -b ${bayesFile} --continueFlag
+/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_ev ${nHydroEvents} -seed ${seed} -b ${bayesFile} --continueFlag
 """)
     else:
         script.write("""
-/home/IPGlasmaFramework/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th 1 -n_ev ${nev} -seed ${seed} --continueFlag
+/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads}  -n_ev ${nHydroEvents} -seed ${seed} --continueFlag
 """)
 
     script.write("""(
     cd playground/event_0
     bash submit_job.pbs
 )
-exit 0
 """)
     script.close()
 
