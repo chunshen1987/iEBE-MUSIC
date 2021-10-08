@@ -103,10 +103,13 @@ printf "Job running as user: `/usr/bin/id`\\n"
 /home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --continueFlag
 """)
 
-    script.write("""(
-    cd playground/event_0
-    bash submit_job.pbs
-)
+    script.write("""
+cd playground/event_0
+bash submit_job.pbs
+status=$?
+if [ $status -ne 0 ]; then
+    exit $status
+fi
 """)
     script.close()
 

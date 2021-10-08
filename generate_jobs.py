@@ -168,16 +168,16 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
-    if cluster_name != "OSG":
-        script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} > run.log
-""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
-    else:
-        script.write("""
+    script.write("""
 python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+    script.write("""
+
+status=$?
+if [ $status -ne 0 ]; then
+    exit $status
+fi""")
     script.close()
 
 

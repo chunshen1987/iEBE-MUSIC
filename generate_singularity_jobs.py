@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""This script generate all the running jobs.""" 
+"""
+    This script generate all the running jobs to run with the pre-built
+    singularity container
+"""
+
 import sys
 from os import path, mkdir
 import shutil
