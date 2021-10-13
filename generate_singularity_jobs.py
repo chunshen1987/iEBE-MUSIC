@@ -143,7 +143,7 @@ def main():
                         '--executeScript',
                         metavar='',
                         type=str,
-                        default='Cluster_supports/OSG/run_singularity.sh',
+                        default='Cluster_supports/WSUgrid/run_singularity.sh',
                         help='job running script')
     parser.add_argument('-b',
                         '--bayes_file',
