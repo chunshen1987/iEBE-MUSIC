@@ -641,11 +641,11 @@ def main():
                         default='',
                         help='parameters from bayesian analysis')
     parser.add_argument('-id',
-                        '--OSG_process_id',
+                        '--job_process_id',
                         metavar='',
                         type=int,
                         default='0',
-                        help='OSG job process id number')
+                        help='Job process id number')
     parser.add_argument('-seed',
                         '--random_seed',
                         metavar='',
@@ -671,7 +671,7 @@ def main():
         n_hydro_per_job = args.n_hydro_per_job
         n_urqmd_per_hydro = args.n_urqmd_per_hydro
         n_threads = args.n_threads
-        osg_job_id = args.OSG_process_id
+        job_id = args.job_process_id
         seed = args.random_seed
     except:
         parser.print_help()
@@ -693,7 +693,7 @@ def main():
     if cluster_name == "OSG":
         if seed == -1:
             seed = 0
-        seed += osg_job_id
+        seed += job_id
         print("seed = ", seed)
         args.nocopy = True
 
@@ -782,7 +782,7 @@ def main():
         n_jobs, " "*toolbar_width))
     sys.stdout.flush()
     sys.stdout.write("\b"*(toolbar_width + 1))
-    event_id_offset = 0
+    event_id_offset = job_id
     n_hydro_rescaled = n_hydro_per_job
     for iev in range(n_jobs):
         progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
@@ -803,8 +803,6 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
-        if cluster_name == "OSG":
-            event_id_offset = osg_job_id
         GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
         ipglasma_flag = False
         if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
