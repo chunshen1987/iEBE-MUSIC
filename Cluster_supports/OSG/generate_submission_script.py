@@ -58,6 +58,9 @@ error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
 
+# remove the failed jobs
+periodic_remove = (ExitCode == 73)
+
 # Send the job to Held state on failure.
 on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 

@@ -431,6 +431,7 @@ hadronic_afterburner_toolkit_dict = {
     'intrinsic_dtau': 0.01,         # dtau in the output samples
     'intrinsic_dx': 0.1,            # dx in the output samples
     # Parameters for HBT correlation functions
+    'long_comoving_boost': 0,              # whether qlong will be boost by the pair velocity
     'needed_number_of_pairs': 30000000,    # number of pairs for eack K point
     'number_of_oversample_events': 100,    # number of the combined events in the numerator
     'number_of_mixed_events': 50,          # number of the mixed events in the denorminator
