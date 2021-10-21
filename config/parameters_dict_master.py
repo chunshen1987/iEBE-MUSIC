@@ -121,6 +121,7 @@ mcglauber_dict = {
                                  # see arXiv:nucl-th/9602027
     'lambdaB': 0.2,              # parameter the controls the strength of
                                  # the baryon junction stopping
+    'BG': 4.,                    # Gaussian width for sampling the valence quark positions
     'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'fluct_Nstrings_per_NN_collision': 1,        # fluctuate number of strings produced per NN collision
     'QCD_string_production_mode': 1,    # string production mode
