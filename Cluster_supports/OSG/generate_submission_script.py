@@ -135,7 +135,7 @@ if __name__ == "__main__":
         SINGULARITY_IMAGE_PATH = sys.argv[4]
         SINGULARITY_IMAGE = SINGULARITY_IMAGE_PATH.split("/")[-1]
         PARAMFILE = sys.argv[5]
-        JOBID = int(sys.argv[6])
+        JOBID = sys.argv[6]
         if len(sys.argv) == 8:
             bayesFile = sys.argv[7]
             bayesFlag = True
