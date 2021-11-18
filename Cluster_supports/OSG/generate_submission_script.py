@@ -59,7 +59,8 @@ transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results
 error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
-+JobDurationCategory = “Long”
+
++JobDurationCategory = "Long"
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
