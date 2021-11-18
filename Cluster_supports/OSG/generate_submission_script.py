@@ -38,18 +38,20 @@ should_transfer_files = YES
 WhenToTransferOutput = ON_EXIT
 
 +SingularityImage = "./{1}"
-Requirements = HAS_SINGULARITY == TRUE && SINGULARITY_MODE == "privileged" && (GLIDEIN_ResourceName != "cinvestav")
+Requirements = SINGULARITY_CAN_USE_SIF
 """.format(jobName, para_dict_["image_name"]))
 
+    imagePathHeader = "stash:///osgconnect"
     if para_dict_['bayesFlag']:
         script.write("""
 transfer_input_files = {0}, {1}, {2}
 """.format(para_dict_['paraFile'], para_dict_['bayesFile'],
-           para_dict_['image_with_path']))
+           imagePathHeader + para_dict_['image_with_path']))
     else:
         script.write("""
 transfer_input_files = {0}, {1}
-""".format(para_dict_['paraFile'], para_dict_['image_with_path']))
+""".format(para_dict_['paraFile'],
+           imagePathHeader + para_dict_['image_with_path']))
 
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
@@ -57,6 +59,7 @@ transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results
 error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
++JobDurationCategory = “Long”
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
@@ -136,7 +139,7 @@ if __name__ == "__main__":
         if len(sys.argv) == 8:
             bayesFile = sys.argv[7]
             bayesFlag = True
-    except IndexError:
+    except (IndexError, ValueError) as e:
         print_usage()
         exit(0)
 
