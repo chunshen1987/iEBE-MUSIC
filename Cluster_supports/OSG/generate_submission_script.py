@@ -38,18 +38,20 @@ should_transfer_files = YES
 WhenToTransferOutput = ON_EXIT
 
 +SingularityImage = "./{1}"
-Requirements = HAS_SINGULARITY == TRUE && SINGULARITY_MODE == "privileged" && (GLIDEIN_ResourceName != "cinvestav")
+Requirements = SINGULARITY_CAN_USE_SIF
 """.format(jobName, para_dict_["image_name"]))
 
+    imagePathHeader = "stash:///osgconnect"
     if para_dict_['bayesFlag']:
         script.write("""
 transfer_input_files = {0}, {1}, {2}
 """.format(para_dict_['paraFile'], para_dict_['bayesFile'],
-           para_dict_['image_with_path']))
+           imagePathHeader + para_dict_['image_with_path']))
     else:
         script.write("""
 transfer_input_files = {0}, {1}
-""".format(para_dict_['paraFile'], para_dict_['image_with_path']))
+""".format(para_dict_['paraFile'],
+           imagePathHeader + para_dict_['image_with_path']))
 
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
@@ -57,6 +59,8 @@ transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results
 error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
+
++JobDurationCategory = "Long"
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
@@ -99,11 +103,11 @@ printf "Job running as user: `/usr/bin/id`\\n"
     if para_dict_["bayesFlag"]:
         script.write("""bayesFile=$6
 
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --continueFlag
+/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
 """)
     else:
         script.write("""
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --continueFlag
+/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --nocopy --continueFlag
 """)
 
     script.write("""
@@ -132,11 +136,11 @@ if __name__ == "__main__":
         SINGULARITY_IMAGE_PATH = sys.argv[4]
         SINGULARITY_IMAGE = SINGULARITY_IMAGE_PATH.split("/")[-1]
         PARAMFILE = sys.argv[5]
-        JOBID = int(sys.argv[6])
+        JOBID = sys.argv[6]
         if len(sys.argv) == 8:
             bayesFile = sys.argv[7]
             bayesFlag = True
-    except IndexError:
+    except (IndexError, ValueError) as e:
         print_usage()
         exit(0)
 
