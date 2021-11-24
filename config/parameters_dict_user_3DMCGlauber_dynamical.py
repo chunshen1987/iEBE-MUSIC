@@ -19,7 +19,7 @@ mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
     'Projectile':  "dipole",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
-    'roots'     :   867,        # collision energy (GeV)
+    'roots'     :   867.,        # collision energy (GeV)
     'seed'      :   -1,          # random seed (-1: system)
     'baryon_junctions': 1,       # 0: baryon number assumed to be at string end
                                  # 1: baryon number transported assuming baryon
