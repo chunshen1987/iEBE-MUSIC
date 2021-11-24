@@ -3,8 +3,7 @@
 # download the code package
 
 # download 3DMCGlauber
-git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-
+git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber.git --branch UPC 3dMCGlauber_code
 # download KoMPoST
 git clone --depth=1 https://github.com/j-f-paquet/kompost kompost_code
 
