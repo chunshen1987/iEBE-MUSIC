@@ -7,11 +7,11 @@ name: CI to Docker Hub
 
 on:
   push:
-    branches: [ iEBE-MUSIC-dev-UPC ]
+    branches: [ dev-UPC ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
-    branches: [ iEBE-MUSIC-dev-UPC ]
+    branches: [ dev-UPC ]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -58,6 +58,6 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile_dev
           push: ${{ github.event_name != 'pull_request' }}
-          tags: chunshen1987/iebe-music:iEBE-MUSIC-dev-UPC
+          tags: chunshen1987/iebe-music:dev-UPC
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
