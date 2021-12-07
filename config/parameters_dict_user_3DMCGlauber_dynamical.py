@@ -95,6 +95,7 @@ iss_dict = {
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
     'event_buffer_size': 100000,       # the number of events read in at once
+    'rap_shift': 0.0,                # the rapidity shift for the final hadrons
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
