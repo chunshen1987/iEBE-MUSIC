@@ -666,6 +666,10 @@ def main():
     parser.add_argument("--continueFlag", action="store_true")
     args = parser.parse_args()
 
+    if len(sys.argv) < 2:
+        parser.print_help()
+        exit(0)
+
     # print out all the arguments
     print("="*40)
     print("\U0000269B   Input parameters")
