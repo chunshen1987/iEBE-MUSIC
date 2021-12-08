@@ -235,7 +235,7 @@ def run_urqmd_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
 
 
-def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
+def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict):
     """This function runs urqmd events in parallel"""
     logo = "\U0001F5FF"
     urqmd_results_name = "particle_list_{}.gz".format(event_id)
@@ -252,6 +252,11 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id):
         print("{}  [{}] Running UrQMD ... ".format(logo, curr_time), flush=True)
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
+
+        if para_dict["save_polarization"]:
+            spin_folder_name = "spin_results_{}".format(event_id)
+            spin_folder = path.join(final_results_folder, spin_folder_name)
+            shutil.move("UrQMDev_0/iSS/results", spin_folder)
 
         for iev in range(1, n_urqmd):
             call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
@@ -350,10 +355,16 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
         "vorticity_*.dat", "strings_*.dat"
     ]
+    spin_filepattern = [
+        "Smu_dpTdphi_*.dat", "Smu_phi_*.dat", "Smu_pT_*.dat", "Smu_y_*.dat",
+        "Smu_Thermal_*.dat"
+    ]
 
     hydrofolder = path.join(final_results_folder,
                             "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
+    spinfolder = path.join(final_results_folder,
+                           "spin_results_{}".format(event_id))
 
     status = check_an_event_is_good(spvnfolder)
     if status:
@@ -395,6 +406,15 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 if path.isfile(ihydrofile):
                     shutil.move(ihydrofile, spvnfolder)
 
+        # save spin informaiton
+        if para_dict["save_polarization"]:
+            for ipattern in spin_filepattern:
+                spin_list = glob(path.join(spinfolder, ipattern))
+                for ispinfile in spin_list:
+                    if path.isfile(ispinfile):
+                        shutil.move(ispinfile, spvnfolder)
+
+
         hf = h5py.File("{0}.h5".format(results_name), "w")
         gtemp = hf.create_group("{0}".format(results_name))
         file_list = glob(path.join(spvnfolder, "*"))
@@ -419,33 +439,33 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     return (status)
 
 
-def remove_unwanted_outputs(final_results_folder,
-                            event_id,
-                            save_ipglasma=True,
-                            save_kompost=True,
-                            save_hydro=True,
-                            save_urqmd=True):
+def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
     """
         This function removes all hydro surface file and UrQMD results
         if they are unwanted to save space
 
     """
-    if not save_ipglasma:
+    if not para_dict["save_ipglasma"]:
         ipglasmafolder = path.join(final_results_folder,
                                    "ipglasma_results_{}".format(event_id))
         shutil.rmtree(ipglasmafolder, ignore_errors=True)
 
-    if not save_kompost:
+    if not para_dict["save_kompost"]:
         kompostfolder = path.join(final_results_folder,
                                   "kompost_results_{}".format(event_id))
         shutil.rmtree(kompostfolder, ignore_errors=True)
 
-    if not save_hydro:
+    if not para_dict["save_hydro"]:
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder, ignore_errors=True)
 
-    if not save_urqmd:
+    if not para_dict["save_polarization"]:
+        spinfolder = path.join(final_results_folder,
+                               "spin_results_{}".format(event_id))
+        shutil.rmtree(spinfolder, ignore_errors=True)
+
+    if not para_dict["save_urqmd"]:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
 
@@ -558,7 +578,7 @@ def main(para_dict_):
 
         # then run UrQMD events in parallel
         urqmd_success, urqmd_file_path = run_urqmd_shell(
-            n_urqmd, final_results_folder, event_id)
+            n_urqmd, final_results_folder, event_id, para_dict_)
         if not urqmd_success:
             print("\U000026D4  {} did not finsh properly, skipped.".format(
                 urqmd_file_path),
@@ -575,11 +595,8 @@ def main(para_dict_):
 
         # remove the unwanted outputs if event is finished properly
         if status:
-            remove_unwanted_outputs(final_results_folder, event_id,
-                                    para_dict_['save_ipglasma'],
-                                    para_dict_['save_kompost'],
-                                    para_dict_['save_hydro'],
-                                    para_dict_['save_urqmd'])
+            remove_unwanted_outputs(final_results_folder, event_id, para_dict_)
+
     if exitErrorTriggerInitial:
         sys.exit(71)
 
@@ -616,6 +633,7 @@ if __name__ == "__main__":
               flush=True)
         sys.exit(1)
 
+    SAVE_POLARIZATION = True
     para_dict = {
         'initial_condition': INITIAL_CONDITION_DATABASE,
         'initial_type': INITIAL_CONDITION_TYPE,
@@ -627,6 +645,7 @@ if __name__ == "__main__":
         'save_kompost': SAVE_KOMPOST,
         'save_hydro': SAVE_HYDRO,
         'save_urqmd': SAVE_URQMD,
+        'save_polarization': SAVE_POLARIZATION,
         'seed_add': SEED_ADD,
         'time_stamp_str': TIME_STAMP,
     }
