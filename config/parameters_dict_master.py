@@ -17,6 +17,7 @@ control_dict = {
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
+    'save_polarization': False,       # flag to save spin polarization results
 }
 
 

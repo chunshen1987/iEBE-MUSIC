@@ -618,6 +618,7 @@ if __name__ == "__main__":
         SAVE_URQMD = (sys.argv[10].lower() == "true")
         SEED_ADD = int(sys.argv[11])
         TIME_STAMP = str(sys.argv[12])
+        SAVE_POLARIZATION = (sys.argv[13].lower() == "true")
     except IndexError:
         print_usage()
         sys.exit(0)
@@ -633,7 +634,6 @@ if __name__ == "__main__":
               flush=True)
         sys.exit(1)
 
-    SAVE_POLARIZATION = True
     para_dict = {
         'initial_condition': INITIAL_CONDITION_DATABASE,
         'initial_type': INITIAL_CONDITION_TYPE,

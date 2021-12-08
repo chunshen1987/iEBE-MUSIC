@@ -157,8 +157,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, para_dict,
+                             time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -169,9 +169,14 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+           para_dict.control_dict["save_ipglasma_result"],
+           para_dict.control_dict["save_kompost_results"],
+           para_dict.control_dict["save_hydro_surfaces"],
+           para_dict.control_dict["save_UrQMD_files"],
+           time_stamp,
+           para_dict.control_dict["save_polarization"]))
     script.write("""
 
 status=$?
@@ -430,8 +435,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, ipglasma_flag, kompost_flag, hydro_flag,
-                           urqmd_flag, GMC_flag, HBT_flag):
+                           time_stamp, para_dict):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -478,10 +482,11 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                 shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database, initial_condition_type,
+                             initial_condition_database,
+                             initial_condition_type,
                              n_hydro_per_job, event_id_offset,
-                             n_urqmd_per_hydro, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp)
+                             n_urqmd_per_hydro, n_threads, para_dict,
+                             time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
@@ -507,14 +512,19 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
                         shell=True)
 
+    GMC_flag = para_dict.iss_dict['global_momentum_conservation']
+    HBT_flag = False
+    if "analyze_HBT" in para_dict.hadronic_afterburner_toolkit_dict:
+        if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
+            HBT_flag = True
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
-                                     'event_{0:d}'.format(event_id),
-                                     'UrQMDev_{0:d}'.format(iev))
+                                     'event_{}'.format(event_id),
+                                     'UrQMDev_{}'.format(iev))
         mkdir(sub_event_folder)
         mkdir(path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
@@ -803,28 +813,17 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
-        GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
-        ipglasma_flag = False
-        if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
-                and initial_condition_database == "self"):
-            ipglasma_flag = parameter_dict.control_dict['save_ipglasma_results']
-        kompost_flag = False
-        if initial_condition_type == "IPGlasma+KoMPoST":
-            kompost_flag = parameter_dict.control_dict['save_kompost_results']
-        hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
-        urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
-        HBT_flag = False
-        if "analyze_HBT" in parameter_dict.hadronic_afterburner_toolkit_dict:
-            if parameter_dict.hadronic_afterburner_toolkit_dict[
-                    'analyze_HBT'] == 1:
-                HBT_flag = True
+        if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
+                or initial_condition_database != "self"):
+            parameter_dict.control_dict['save_ipglasma_results'] = False
+        if initial_condition_type != "IPGlasma+KoMPoST":
+            parameter_dict.control_dict['save_kompost_results'] = False
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, code_package_path,
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, ipglasma_flag, kompost_flag,
-                               hydro_flag, urqmd_flag, GMC_flag, HBT_flag)
+                               IPGlasma_time_stamp, parameter_dict)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
