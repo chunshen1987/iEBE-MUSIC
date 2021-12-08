@@ -171,7 +171,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write("""
 python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           para_dict.control_dict["save_ipglasma_result"],
+           para_dict.control_dict["save_ipglasma_results"],
            para_dict.control_dict["save_kompost_results"],
            para_dict.control_dict["save_hydro_surfaces"],
            para_dict.control_dict["save_UrQMD_files"],
@@ -781,6 +781,14 @@ def main():
                 working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
 
+    if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
+            or initial_condition_database != "self"):
+        parameter_dict.control_dict['save_ipglasma_results'] = False
+    if initial_condition_type != "IPGlasma+KoMPoST":
+        parameter_dict.control_dict['save_kompost_results'] = False
+    if 'save_polarization' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['save_polarization'] = False
+
     cent_label = "XXX"
     cent_label_pre = cent_label
     if initial_condition_database == "self":
@@ -817,11 +825,6 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
-        if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
-                or initial_condition_database != "self"):
-            parameter_dict.control_dict['save_ipglasma_results'] = False
-        if initial_condition_type != "IPGlasma+KoMPoST":
-            parameter_dict.control_dict['save_kompost_results'] = False
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, code_package_path,
                                code_path, working_folder_name, cluster_name,
