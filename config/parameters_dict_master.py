@@ -547,6 +547,9 @@ def update_parameters_dict(par_dict_path, ran_seed):
     else:
         parameters_dict.iss_dict['hydro_mode'] = 2
 
+    if 'calculate_polarization' in parameters_dict.iss_dict.keys():
+        if parameters_dict.iss_dict['calculate_polarization'] == 1:
+            parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
     iss_dict.update(parameters_dict.iss_dict)

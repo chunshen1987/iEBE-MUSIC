@@ -790,7 +790,6 @@ def main():
         parameter_dict.control_dict['save_polarization'] = False
     if 'calculate_polarization' in parameter_dict.iss_dict.keys():
         if parameter_dict.iss_dict['calculate_polarization'] == 1:
-            parameter_dict.music_dict['output_vorticity'] = 1
             parameter_dict.control_dict['save_polarization'] = True
 
     cent_label = "XXX"
