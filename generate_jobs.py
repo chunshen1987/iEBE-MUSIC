@@ -545,7 +545,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
                         shell=True)
 
-    if par_dict.control_dict['compute_photon_emission']:
+    if para_dict.control_dict['compute_photon_emission']:
         # photon
         generate_script_photon(event_folder, n_threads, cluster_name)
         mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
