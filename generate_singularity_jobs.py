@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""This script generate all the running jobs.""" 
+"""
+    This script generate all the running jobs to run with the pre-built
+    singularity container
+"""
+
 import sys
 from os import path, mkdir
 import shutil
@@ -7,7 +11,6 @@ import subprocess
 import argparse
 from math import ceil
 from glob import glob
-import random
 
 known_initial_types = [
     "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
@@ -45,12 +48,11 @@ cd {4:s}
 
 def generate_event_folders(workingFolder, clusterName, eventId,
                            singularityRepoPath, executeScript, parameterFile,
-                           eventId0, nHydroEvents, nThreads, wallTime):
+                           eventId0, nHydroEvents, nThreads, seed, wallTime):
     """This function creates the event folder structure"""
     eventFolder = path.join(workingFolder, 'event_{}'.format(eventId))
     mkdir(eventFolder)
 
-    randomSeed = random.SystemRandom().randint(0, 10000000)
     # generate job running script
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
@@ -64,7 +66,7 @@ mkdir -p temp
 ./collect_events.sh playground temp
 mv temp/playground/playground.h5 RESULTS_{7}.h5
 """.format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nThreads, randomSeed, eventId))
+           eventId0, nHydroEvents, nThreads, seed, eventId))
     script.close()
 
     # copy files
@@ -139,7 +141,7 @@ def main():
                         '--executeScript',
                         metavar='',
                         type=str,
-                        default='Cluster_supports/OSG/run_singularity.sh',
+                        default='Cluster_supports/WSUgrid/run_singularity.sh',
                         help='job running script')
     parser.add_argument('-b',
                         '--bayes_file',
@@ -154,6 +156,10 @@ def main():
                         default='-1',
                         help='Random Seed (-1: according to system time)')
     args = parser.parse_args()
+
+    if len(sys.argv) < 2:
+        parser.print_help()
+        exit(0)
 
     # print out all the arguments
     print("="*40)
@@ -202,7 +208,7 @@ def main():
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
                                parameterFile, i_job*n_hydro_per_job,
-                               n_hydro_per_job, n_threads, wallTime)
+                               n_hydro_per_job, n_threads, seed, wallTime)
     sys.stdout.write("\n")
     sys.stdout.flush()
 

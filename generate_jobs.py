@@ -157,8 +157,8 @@ wait
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, para_dict,
+                             time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -168,16 +168,21 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
-    if cluster_name != "OSG":
-        script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} > run.log
+    script.write("""
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
-    else:
-        script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s}
-""".format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+           para_dict.control_dict["save_ipglasma_results"],
+           para_dict.control_dict["save_kompost_results"],
+           para_dict.control_dict["save_hydro_surfaces"],
+           para_dict.control_dict["save_UrQMD_files"],
+           time_stamp,
+           para_dict.control_dict["save_polarization"]))
+    script.write("""
+
+status=$?
+if [ $status -ne 0 ]; then
+    exit $status
+fi""")
     script.close()
 
 
@@ -461,8 +466,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, ipglasma_flag, kompost_flag, hydro_flag,
-                           urqmd_flag, GMC_flag, HBT_flag):
+                           time_stamp, para_dict):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -509,10 +513,11 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                 shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database, initial_condition_type,
+                             initial_condition_database,
+                             initial_condition_type,
                              n_hydro_per_job, event_id_offset,
-                             n_urqmd_per_hydro, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp)
+                             n_urqmd_per_hydro, n_threads, para_dict,
+                             time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
@@ -556,14 +561,20 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                         shell=True)
 
     # particlization + hadronic afterburner
+    GMC_flag = para_dict.iss_dict['global_momentum_conservation']
+    HBT_flag = False
+    if "analyze_HBT" in para_dict.hadronic_afterburner_toolkit_dict:
+        if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
+            HBT_flag = True
+
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
     for iev in range(n_urqmd_per_hydro):
         sub_event_folder = path.join(working_folder,
-                                     'event_{0:d}'.format(event_id),
-                                     'UrQMDev_{0:d}'.format(iev))
+                                     'event_{}'.format(event_id),
+                                     'UrQMDev_{}'.format(iev))
         mkdir(sub_event_folder)
         mkdir(path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
@@ -690,11 +701,11 @@ def main():
                         default='',
                         help='parameters from bayesian analysis')
     parser.add_argument('-id',
-                        '--OSG_process_id',
+                        '--job_process_id',
                         metavar='',
                         type=int,
                         default='0',
-                        help='OSG job process id number')
+                        help='Job process id number')
     parser.add_argument('-seed',
                         '--random_seed',
                         metavar='',
@@ -704,6 +715,10 @@ def main():
     parser.add_argument('--nocopy', action='store_true')
     parser.add_argument("--continueFlag", action="store_true")
     args = parser.parse_args()
+
+    if len(sys.argv) < 2:
+        parser.print_help()
+        exit(0)
 
     # print out all the arguments
     print("="*40)
@@ -720,7 +735,7 @@ def main():
         n_hydro_per_job = args.n_hydro_per_job
         n_urqmd_per_hydro = args.n_urqmd_per_hydro
         n_threads = args.n_threads
-        osg_job_id = args.OSG_process_id
+        job_id = args.job_process_id
         seed = args.random_seed
     except:
         parser.print_help()
@@ -742,7 +757,7 @@ def main():
     if cluster_name == "OSG":
         if seed == -1:
             seed = 0
-        seed += osg_job_id
+        seed += job_id
         print("seed = ", seed)
         args.nocopy = True
 
@@ -816,6 +831,17 @@ def main():
                 working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
 
+    if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
+            or initial_condition_database != "self"):
+        parameter_dict.control_dict['save_ipglasma_results'] = False
+    if initial_condition_type != "IPGlasma+KoMPoST":
+        parameter_dict.control_dict['save_kompost_results'] = False
+    if 'save_polarization' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['save_polarization'] = False
+    if 'calculate_polarization' in parameter_dict.iss_dict.keys():
+        if parameter_dict.iss_dict['calculate_polarization'] == 1:
+            parameter_dict.control_dict['save_polarization'] = True
+
     cent_label = "XXX"
     cent_label_pre = cent_label
     if initial_condition_database == "self":
@@ -831,7 +857,7 @@ def main():
         n_jobs, " "*toolbar_width))
     sys.stdout.flush()
     sys.stdout.write("\b"*(toolbar_width + 1))
-    event_id_offset = 0
+    event_id_offset = job_id
     n_hydro_rescaled = n_hydro_per_job
     for iev in range(n_jobs):
         progress_i = (int(float(iev + 1)/n_jobs*toolbar_width)
@@ -852,30 +878,12 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
-        if cluster_name == "OSG":
-            event_id_offset = osg_job_id
-        GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
-        ipglasma_flag = False
-        if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
-                and initial_condition_database == "self"):
-            ipglasma_flag = parameter_dict.control_dict['save_ipglasma_results']
-        kompost_flag = False
-        if initial_condition_type == "IPGlasma+KoMPoST":
-            kompost_flag = parameter_dict.control_dict['save_kompost_results']
-        hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
-        urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
-        HBT_flag = False
-        if "analyze_HBT" in parameter_dict.hadronic_afterburner_toolkit_dict:
-            if parameter_dict.hadronic_afterburner_toolkit_dict[
-                    'analyze_HBT'] == 1:
-                HBT_flag = True
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, code_package_path,
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, ipglasma_flag, kompost_flag,
-                               hydro_flag, urqmd_flag, GMC_flag, HBT_flag)
+                               IPGlasma_time_stamp, parameter_dict)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()

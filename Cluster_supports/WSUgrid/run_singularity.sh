@@ -15,8 +15,11 @@ printf "Start time: `/bin/date`\n"
 printf "Job is running on node: `/bin/hostname`\n"
 printf "system kernel: `uname -r`\n"
 printf "Job running as user: `/usr/bin/id`\n"
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nthreads} -seed ${seed} --continueFlag
-(
-    cd playground/event_0
-    bash submit_job.pbs
-)
+/home/iEBE-MUSIC/generate_jobs.py -w playground -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nthreads} -seed ${seed} --nocopy --continueFlag
+
+cd playground/event_0
+bash submit_job.pbs
+status=$?
+if [ $status -ne 0 ]; then
+    exit $status
+fi

@@ -18,6 +18,7 @@ control_dict = {
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
     'compute_photon_emission_flag': False,   # flag to compute EM radiation from hydrodynamic medium
+    'save_polarization': False,       # flag to save spin polarization results
 }
 
 
@@ -122,6 +123,7 @@ mcglauber_dict = {
                                  # see arXiv:nucl-th/9602027
     'lambdaB': 0.2,              # parameter the controls the strength of
                                  # the baryon junction stopping
+    'BG': 4.,                    # Gaussian width for sampling the valence quark positions
     'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'fluct_Nstrings_per_NN_collision': 1,        # fluctuate number of strings produced per NN collision
     'QCD_string_production_mode': 1,    # string production mode
@@ -498,6 +500,7 @@ hadronic_afterburner_toolkit_dict = {
     'intrinsic_dtau': 0.01,         # dtau in the output samples
     'intrinsic_dx': 0.1,            # dx in the output samples
     # Parameters for HBT correlation functions
+    'long_comoving_boost': 0,              # whether qlong will be boost by the pair velocity
     'needed_number_of_pairs': 30000000,    # number of pairs for eack K point
     'number_of_oversample_events': 100,    # number of the combined events in the numerator
     'number_of_mixed_events': 50,          # number of the mixed events in the denorminator
@@ -613,6 +616,9 @@ def update_parameters_dict(par_dict_path, ran_seed):
     else:
         parameters_dict.iss_dict['hydro_mode'] = 2
 
+    if 'calculate_polarization' in parameters_dict.iss_dict.keys():
+        if parameters_dict.iss_dict['calculate_polarization'] == 1:
+            parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
     iss_dict.update(parameters_dict.iss_dict)

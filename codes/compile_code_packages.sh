@@ -31,7 +31,7 @@ fi
 echo -e "${Green}compile IPGlasma ... ${NC}"
 (
     cd ipglasma_code
-    ./compile_IPGlasma.sh
+    ./compile_IPGlasma.sh noMPI
 )
 status=$?
 if [ $status -ne 0 ]; then
