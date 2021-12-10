@@ -641,7 +641,7 @@ def main(para_dict_):
                                                hydro_folder_name)
             photon_success, photon_folder_name = run_photon(
                                 final_results_folder, event_id)
-            if not photon_success
+            if not photon_success:
                 exitErrorTrigger = True
                 continue
 
