@@ -17,8 +17,8 @@ control_dict = {
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
-    'compute_photon_emission_flag': False,   # flag to compute EM radiation from hydrodynamic medium
-    'save_polarization': False,       # flag to save spin polarization results
+    'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
+    'compute_polarization': False,       # flag to save spin polarization results
 }
 
 
@@ -621,6 +621,10 @@ def update_parameters_dict(par_dict_path, ran_seed):
             parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
+    if 'compute_photon_emission' in parameters_dict.control_dict:
+        if parameters_dict.control_dict['compute_photon_emission']:
+            music_dict['output_evolution_data'] = 2
+
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     hadronic_afterburner_toolkit_dict.update(
