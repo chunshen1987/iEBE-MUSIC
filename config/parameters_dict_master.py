@@ -625,6 +625,8 @@ def update_parameters_dict(par_dict_path, ran_seed):
         if parameters_dict.control_dict['compute_photon_emission']:
             music_dict['output_evolution_data'] = 2
 
+    if 'photon_dict' in dir(parameters_dict):
+        photon_dict.update(parameters_dict.photon_dict)
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     hadronic_afterburner_toolkit_dict.update(
