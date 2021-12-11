@@ -308,6 +308,7 @@ iss_dict = {
 
     'perform_decays': 0,             # flag to perform resonance decay
     'perform_checks': 0,             # flag to perform tests for the sampler
+    'include_spectators': 0,         # flag to include spectators
     'local_charge_conservation': 0,  # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
 
