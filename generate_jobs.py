@@ -341,6 +341,7 @@ do
     rm -fr results/*
     mv ../hydro_event/$iev results/surface.dat
     mv ../hydro_event/music_input results/music_input
+    mv ../hydro_event/spectators.dat results/spectators.dat
     if [ $SubEventId = "0" ]; then
     """)
     script.write("    ./iSS.e {0}".format(logfile))

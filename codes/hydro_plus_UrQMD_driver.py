@@ -71,6 +71,7 @@ def get_initial_condition(database, initial_type, iev, seed_add,
     elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
             file_name = "strings_event_{}.dat".format(iev)
+            specFilename = "spectators_event_{}.dat".format(iev)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
@@ -78,12 +79,17 @@ def get_initial_condition(database, initial_type, iev, seed_add,
                      shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
+                call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                                                specFilename), shell=True)
             else:
                 print("3D MC-Glauber event exists ...")
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
             shutil.copy(file_name, path.join(final_results_folder,
                                              "strings_{}.dat".format(iev)))
+            shutil.copy(specFilename,
+                        path.join(final_results_folder,
+                                  "spectators_{}.dat".format(iev)))
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, iev)
@@ -213,6 +219,7 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
     """This function prepares hydro surface for hadronic casade"""
     surface_file = glob(
         path.join(final_results_folder, hydro_folder_name, "surface*.dat"))
+    spectatorFile = glob(path.join(final_results_folder, "spectator*.dat"))[0]
     if stat(surface_file[0]).st_size == 0:
         return False
     for iev in range(n_urqmd):
@@ -227,6 +234,9 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(
             path.join(final_results_folder, hydro_folder_name, "music_input"),
             hydro_surface_folder)
+        shutil.copy(
+            path.join(final_results_folder, spectatorFile),
+            path.join(hydro_surface_folder, "spectators.dat"))
     return True
 
 
@@ -339,6 +349,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
     ]
+    glauber_filelist = ["strings_{}.dat".format(event_id),
+                        "spectators_{}.dat".format(event_id)]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
@@ -348,7 +360,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
-        "vorticity_*.dat", "strings_*.dat"
+        "vorticity_*.dat"
     ]
 
     hydrofolder = path.join(final_results_folder,
@@ -377,6 +389,11 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         inifile = path.join(initial_folder, inifilename)
                         if path.isfile(inifile):
                             shutil.move(inifile, spvnfolder)
+            if "3DMCGlauber" in para_dict['initial_type']:
+                for iniFilename in glauber_filelist:
+                    iniFile = path.join(final_results_folder, iniFilename)
+                    if path.isfile(iniFile):
+                        shutil.move(iniFile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
