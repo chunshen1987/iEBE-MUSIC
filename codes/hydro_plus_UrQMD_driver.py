@@ -234,9 +234,8 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(
             path.join(final_results_folder, hydro_folder_name, "music_input"),
             hydro_surface_folder)
-        shutil.copy(
-            path.join(final_results_folder, spectatorFile),
-            path.join(hydro_surface_folder, "spectators.dat"))
+        shutil.copy(spectatorFile,
+                    path.join(hydro_surface_folder, "spectators.dat"))
     return True
 
 
