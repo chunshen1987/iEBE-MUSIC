@@ -357,7 +357,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     ]
     spin_filepattern = [
         "Smu_dpTdphi_*.dat", "Smu_phi_*.dat", "Smu_pT_*.dat", "Smu_y_*.dat",
-        "Smu_Thermal_*.dat"
+        "Smu_Thermal_*.dat", "Rspin_*.dat"
     ]
 
     hydrofolder = path.join(final_results_folder,
