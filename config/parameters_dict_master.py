@@ -410,6 +410,7 @@ hadronic_afterburner_toolkit_dict = {
                                                            # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
+    'rapidity_shift': 0.,
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
