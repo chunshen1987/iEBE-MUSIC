@@ -39,7 +39,7 @@ should_transfer_files = YES
 WhenToTransferOutput = ON_EXIT
 
 +SingularityImage = "{1}"
-Requirements = SINGULARITY_CAN_USE_SIF
+Requirements = SINGULARITY_CAN_USE_SIF && StringListIMember("stash", HasFileTransferPluginMethods)
 """.format(jobName, imagePathHeader + para_dict_["image_with_path"]))
 
     if para_dict_['bayesFlag']:
