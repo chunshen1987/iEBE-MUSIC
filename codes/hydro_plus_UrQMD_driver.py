@@ -355,11 +355,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
     ]
     hydro_info_filepattern = [
-        "eccentricities_evo_eta_*.dat", "momentum_anisotropy_eta_*.dat",
+        "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
+        "meanpT_estimators_tau_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
-        "vorticity_*.dat"
+        "vorticity_evo_*.dat"
     ]
 
     hydrofolder = path.join(final_results_folder,
