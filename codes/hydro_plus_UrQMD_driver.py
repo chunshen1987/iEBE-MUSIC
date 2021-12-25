@@ -219,7 +219,10 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
     """This function prepares hydro surface for hadronic casade"""
     surface_file = glob(
         path.join(final_results_folder, hydro_folder_name, "surface*.dat"))
-    spectatorFile = glob(path.join(final_results_folder, "spectator*.dat"))[0]
+    spectatorFileList = glob(path.join(final_results_folder, "spectator*.dat"))
+    spectatorFile = ""
+    if spectatorFileList != []:
+        spectatorFile = spectatorFileList[0]
     if stat(surface_file[0]).st_size == 0:
         return False
     for iev in range(n_urqmd):
@@ -234,8 +237,9 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(
             path.join(final_results_folder, hydro_folder_name, "music_input"),
             hydro_surface_folder)
-        shutil.copy(spectatorFile,
-                    path.join(hydro_surface_folder, "spectators.dat"))
+        if spectatorFileList != "":
+            shutil.copy(spectatorFile,
+                        path.join(hydro_surface_folder, "spectators.dat"))
     return True
 
 
