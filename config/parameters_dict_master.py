@@ -197,6 +197,10 @@ music_dict = {
     'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
 
+    # parameters for Initial_profile == 13 or 131
+    'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
+    'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
+
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
