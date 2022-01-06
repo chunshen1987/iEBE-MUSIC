@@ -256,6 +256,7 @@ music_dict = {
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
     'Do_FreezeOut_lowtemp': 1,          # flag to include cold corona
+    'freeze_out_tau_start_max': 2,      # the maximum freeze-out starting time [fm/c]
     'freeze_out_method': 4,             # method for hyper-surface finder
                                         # 4: Cornelius
     'freeze_surface_in_binary': 1,      # switch to output surface file in binary format
