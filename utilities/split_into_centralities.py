@@ -55,7 +55,7 @@ for icen in range(len(centrality_cut_list) - 1):
         hydro_folder, "C{0:d}-{1:d}".format(int(centrality_cut_list[icen]),
                                             int(centrality_cut_list[icen + 1]))
     )
-    
+
     urqmd_directory_path = path.join(
         urqmd_folder, "C{0:d}-{1:d}".format(int(centrality_cut_list[icen]),
                                             int(centrality_cut_list[icen + 1]))
@@ -65,7 +65,7 @@ for icen in range(len(centrality_cut_list) - 1):
         if path.exists(hydro_directory_path):
             shutil.rmtree(hydro_directory_path)
         mkdir(hydro_directory_path)
-    
+
     if urqmd_flag:
         if path.exists(urqmd_directory_path):
             shutil.rmtree(urqmd_directory_path)
