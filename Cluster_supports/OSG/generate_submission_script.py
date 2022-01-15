@@ -68,12 +68,12 @@ on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 
 # The below are good base requirements for first testing jobs on OSG,
 # if you don't have a good idea of memory and disk usage.
-request_cpus = 1
+request_cpus = {0:d}
 request_memory = 2 GB
 request_disk = 1 GB
 
 # Queue one job with the above specifications.
-queue {0}""".format(para_dict_["n_jobs"]))
+queue {1:d}""".format(para_dict_["n_threads"], para_dict_["n_jobs"]))
     script.close()
 
 
