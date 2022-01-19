@@ -199,6 +199,10 @@ music_dict = {
     'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
 
+    # parameters for Initial_profile == 13 or 131
+    'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
+    'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
+
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
@@ -254,6 +258,7 @@ music_dict = {
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
     'Do_FreezeOut_lowtemp': 1,          # flag to include cold corona
+    'freeze_out_tau_start_max': 2,      # the maximum freeze-out starting time [fm/c]
     'freeze_out_method': 4,             # method for hyper-surface finder
                                         # 4: Cornelius
     'freeze_surface_in_binary': 1,      # switch to output surface file in binary format
@@ -376,6 +381,7 @@ iss_dict = {
 
     'perform_decays': 0,             # flag to perform resonance decay
     'perform_checks': 0,             # flag to perform tests for the sampler
+    'include_spectators': 0,         # flag to include spectators
     'local_charge_conservation': 0,  # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
 
@@ -477,6 +483,7 @@ hadronic_afterburner_toolkit_dict = {
                                                            # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
+    'rapidity_shift': 0.,
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation

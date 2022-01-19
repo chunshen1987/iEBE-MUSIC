@@ -18,6 +18,7 @@ def print_usage():
 def write_submission_script(para_dict_):
     jobName = "iEBEMUSIC_{}".format(para_dict_["job_id"])
     random_seed = random.SystemRandom().randint(0, 10000000)
+    imagePathHeader = "stash:///osgconnect"
     script = open(FILENAME, "w")
     if para_dict_["bayesFlag"]:
         script.write("""universe = vanilla
@@ -37,21 +38,18 @@ JobBatchName = {0}
 should_transfer_files = YES
 WhenToTransferOutput = ON_EXIT
 
-+SingularityImage = "./{1}"
-Requirements = SINGULARITY_CAN_USE_SIF
-""".format(jobName, para_dict_["image_name"]))
++SingularityImage = "{1}"
+Requirements = SINGULARITY_CAN_USE_SIF && StringListIMember("stash", HasFileTransferPluginMethods)
+""".format(jobName, imagePathHeader + para_dict_["image_with_path"]))
 
-    imagePathHeader = "stash:///osgconnect"
     if para_dict_['bayesFlag']:
         script.write("""
-transfer_input_files = {0}, {1}, {2}
-""".format(para_dict_['paraFile'], para_dict_['bayesFile'],
-           imagePathHeader + para_dict_['image_with_path']))
+transfer_input_files = {0}, {1}
+""".format(para_dict_['paraFile'], para_dict_['bayesFile']))
     else:
         script.write("""
-transfer_input_files = {0}, {1}
-""".format(para_dict_['paraFile'],
-           imagePathHeader + para_dict_['image_with_path']))
+transfer_input_files = {0}
+""".format(para_dict_['paraFile']))
 
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
@@ -70,12 +68,12 @@ on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 
 # The below are good base requirements for first testing jobs on OSG,
 # if you don't have a good idea of memory and disk usage.
-request_cpus = 1
+request_cpus = {0:d}
 request_memory = 2 GB
 request_disk = 1 GB
 
 # Queue one job with the above specifications.
-queue {0}""".format(para_dict_["n_jobs"]))
+queue {1:d}""".format(para_dict_["n_threads"], para_dict_["n_jobs"]))
     script.close()
 
 
