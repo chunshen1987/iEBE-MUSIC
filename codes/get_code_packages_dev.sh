@@ -32,7 +32,6 @@ rm -fr urqmd_code
 git clone --depth=1 https://Chunshen1987@bitbucket.org/Chunshen1987/urqmd_afterburner.git urqmd_code
 rm -fr urqmd_code/.git
 
-
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit --branch UPC hadronic_afterburner_toolkit_code
