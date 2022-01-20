@@ -251,9 +251,9 @@ music_dict = {
     'output_evolution_T_cut': 0.145,
     'outputBinaryEvolution': 1,     # output evolution file in binary format
     'output_evolution_every_N_eta': 1,  # output evolution file every Neta steps
-    'output_evolution_every_N_x':  2,   # output evolution file every Nx steps
-    'output_evolution_every_N_y': 2,    # output evolution file every Ny steps
-    'output_evolution_every_N_timesteps':1,  # output evolution every Ntime steps
+    'output_evolution_every_N_x':  1,   # output evolution file every Nx steps
+    'output_evolution_every_N_y': 1,    # output evolution file every Ny steps
+    'output_evolution_every_N_timesteps': 10,  # output evolution every Ntime steps
 
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
@@ -285,9 +285,9 @@ photon_dict = {
                               # steps from the medium file
                               # (only works for hydro_flag = 1)
     'Xmin': -15.0,            # minimum points along x direction
-    'dx': 0.3,                # lattice spacing along x direction
+    'dx': 0.1,                # lattice spacing along x direction
     'Ymin': -15.0,            # minimum points along y direction
-    'dy': 0.3,                # lattice spacing along y direction
+    'dy': 0.1,                # lattice spacing along y direction
     'tau_start': 0.4,         # emission start time (fm)
     'tau_end': 30.0,          # emission end time (fm)
     'dTau': 0.1,              # lattice spacing along tau direction
