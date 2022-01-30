@@ -68,17 +68,6 @@ cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
 cp MUSIC_code/utilities/sweeper.sh MUSIC/
 (cd MUSIC; mkdir -p initial)
 
-# compile photonEmission_hydroInterface
-echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"
-(
-    cd photonEmission_hydroInterface_code
-    ./compile.sh
-)
-status=$?
-if [ $status -ne 0 ]; then
-    exit $status
-fi
-
 # download iSS particle sampler
 echo -e "${Green}compile iSS ... ${NC}"
 (
