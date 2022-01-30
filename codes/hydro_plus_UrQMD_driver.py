@@ -71,6 +71,7 @@ def get_initial_condition(database, initial_type, iev, seed_add,
     elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
             file_name = "strings_event_{}.dat".format(iev)
+            specFilename = "spectators_event_{}.dat".format(iev)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
@@ -78,12 +79,17 @@ def get_initial_condition(database, initial_type, iev, seed_add,
                      shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
+                call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                                                specFilename), shell=True)
             else:
                 print("3D MC-Glauber event exists ...")
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
             shutil.copy(file_name, path.join(final_results_folder,
                                              "strings_{}.dat".format(iev)))
+            shutil.copy(specFilename,
+                        path.join(final_results_folder,
+                                  "spectators_{}.dat".format(iev)))
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, iev)
@@ -208,11 +214,66 @@ def run_kompost(final_results_folder, event_id):
     return (kompost_success, kompost_folder_name)
 
 
+def prepare_evolution_files_for_photon(final_results_folder, hydro_folder_name):
+    """This function prepares hydro evolution file for photon radiation"""
+    evoFileName = "evolution_all_xyeta.dat"
+    evo_file = path.join(final_results_folder, hydro_folder_name,
+                         evoFileName)
+    photonFolderPath = path.join('photonEmission_hydroInterface', 'results')
+    if path.exists(photonFolderPath):
+        shutil.rmtree(photonFolderPath)
+    mkdir(photonFolderPath)
+    call("ln -s {0:s} {1:s}".format(path.abspath(evo_file),
+                                    path.join(photonFolderPath, evoFileName)),
+         shell=True)
+    shutil.copy(path.join(final_results_folder, hydro_folder_name,
+                          "music_input"),
+                photonFolderPath)
+
+
+def run_photon(final_results_folder, event_id):
+    """This functions run photon radiation"""
+    logo = "\U0001F3B6"
+    photon_folder_name = "photon_results_{}".format(event_id)
+    results_folder = path.join(final_results_folder, photon_folder_name)
+    photon_success = False
+
+    if path.exists(results_folder):
+        # check whether KoMPoST has already run or not
+        print("{} photon results {} exist ...".format(logo,
+                                                      photon_folder_name),
+              flush=True)
+        photon_success = True
+        if photon_success:
+            print("{} no need to rerun photon".format(logo), flush=True)
+        else:
+            print("{} photon radiation failed, rerun ...".format(logo),
+                  flush=True)
+            shutil.rmtree(results_folder)
+
+    if not photon_success:
+        curr_time = time.asctime()
+        print("\U0001F3B6  [{}] Run photon ... ".format(curr_time), flush=True)
+        call("bash ./run_photon.sh", shell=True)
+
+        photon_success = True
+        if photon_success:
+            # collect results
+            shutil.move("photonEmission_hydroInterface/results",
+                        results_folder)
+
+    return (photon_success, photon_folder_name)
+
+
 def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
                                     n_urqmd):
     """This function prepares hydro surface for hadronic casade"""
     surface_file = glob(
         path.join(final_results_folder, hydro_folder_name, "surface*.dat"))
+    spectatorFileList = glob(path.join(final_results_folder, "spectator*.dat"))
+    spectatorFile = ""
+    if spectatorFileList != []:
+        spectatorFile = spectatorFileList[0]
     if stat(surface_file[0]).st_size == 0:
         return False
     for iev in range(n_urqmd):
@@ -227,6 +288,9 @@ def prepare_surface_files_for_urqmd(final_results_folder, hydro_folder_name,
         shutil.copy(
             path.join(final_results_folder, hydro_folder_name, "music_input"),
             hydro_surface_folder)
+        if spectatorFile != "":
+            shutil.copy(spectatorFile,
+                        path.join(hydro_surface_folder, "spectators.dat"))
     return True
 
 
@@ -249,14 +313,19 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict):
 
     if not urqmd_success:
         curr_time = time.asctime()
-        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time), flush=True)
-        with Pool(processes=n_urqmd) as pool1:
-            pool1.map(run_urqmd_event, range(n_urqmd))
-
-        if para_dict["save_polarization"]:
+        if para_dict["compute_polarization"]:
+            print("{}  [{}] Running spin calculations ... ".format(logo,
+                                                                   curr_time),
+                  flush=True)
+            run_urqmd_event(n_urqmd)
             spin_folder_name = "spin_results_{}".format(event_id)
             spin_folder = path.join(final_results_folder, spin_folder_name)
-            shutil.move("UrQMDev_0/iSS/results", spin_folder)
+            shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
+
+        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
+              flush=True)
+        with Pool(processes=n_urqmd) as pool1:
+            pool1.map(run_urqmd_event, range(n_urqmd))
 
         for iev in range(1, n_urqmd):
             call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
@@ -303,8 +372,8 @@ def check_an_event_is_good(event_folder):
     """This function checks the given event contains all required files"""
     required_files_list = [
         'particle_9999_vndata_eta_-0.5_0.5.dat',
-        'particle_9999_vndata_diff_eta_0.5_2.dat',
-        'particle_9999_vndata_eta_-2_2.dat',
+        'particle_9999_vndata_diff_eta_0.5_2.5.dat',
+        'particle_9999_vndata_eta_-2.5_2.5.dat',
         'particle_211_vndata_diff_y_-0.5_0.5.dat',
         'particle_321_vndata_diff_y_-0.5_0.5.dat',
         'particle_2212_vndata_diff_y_-0.5_0.5.dat',
@@ -344,17 +413,21 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
     ]
+    glauber_filelist = ["strings_{}.dat".format(event_id),
+                        "spectators_{}.dat".format(event_id)]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
     ]
     hydro_info_filepattern = [
-        "eccentricities_evo_eta_*.dat", "momentum_anisotropy_eta_*.dat",
+        "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
+        "meanpT_estimators_tau_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
-        "vorticity_*.dat", "strings_*.dat"
+        "vorticity_evo_*.dat"
     ]
+    photon_filepattern = ['*_Spvn*.dat']
     spin_filepattern = [
         "Smu_dpTdphi_*.dat", "Smu_phi_*.dat", "Smu_pT_*.dat", "Smu_y_*.dat",
         "Smu_Thermal_*.dat", "Rspin_*.dat"
@@ -363,6 +436,9 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     hydrofolder = path.join(final_results_folder,
                             "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
+    photonFolder = path.join(final_results_folder,
+                             "photon_results_{}".format(event_id))
+
     spinfolder = path.join(final_results_folder,
                            "spin_results_{}".format(event_id))
 
@@ -388,6 +464,11 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         inifile = path.join(initial_folder, inifilename)
                         if path.isfile(inifile):
                             shutil.move(inifile, spvnfolder)
+            if "3DMCGlauber" in para_dict['initial_type']:
+                for iniFilename in glauber_filelist:
+                    iniFile = path.join(final_results_folder, iniFilename)
+                    if path.isfile(iniFile):
+                        shutil.move(iniFile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
@@ -406,8 +487,16 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 if path.isfile(ihydrofile):
                     shutil.move(ihydrofile, spvnfolder)
 
+        # save photon results
+        if para_dict['compute_photons']:
+            for ipattern in photon_filepattern:
+                photonFileList = glob(path.join(photonFolder, ipattern))
+                for photonFile_i in photonFileList:
+                    if path.isfile(photonFile_i):
+                        shutil.move(photonFile_i, spvnfolder)
+
         # save spin informaiton
-        if para_dict["save_polarization"]:
+        if para_dict["compute_polarization"]:
             for ipattern in spin_filepattern:
                 spin_list = glob(path.join(spinfolder, ipattern))
                 for ispinfile in spin_list:
@@ -460,7 +549,7 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder, ignore_errors=True)
 
-    if not para_dict["save_polarization"]:
+    if para_dict["compute_polarization"]:
         spinfolder = path.join(final_results_folder,
                                "spin_results_{}".format(event_id))
         shutil.rmtree(spinfolder, ignore_errors=True)
@@ -468,6 +557,11 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
     if not para_dict["save_urqmd"]:
         urqmd_results_name = "particle_list_{}.gz".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
+
+    if para_dict["compute_photons"]:
+        photonfolder = path.join(final_results_folder,
+                                "photon_results_{}".format(event_id))
+        shutil.rmtree(photonfolder, ignore_errors=True)
 
 
 def main(para_dict_):
@@ -567,11 +661,23 @@ def main(para_dict_):
                 "MUSIC/initial/strings.dat",
                 path.join(final_results_folder, hydro_folder_name,
                           "strings_{}.dat".format(event_id)))
+        if para_dict_['compute_photons']:
+            # if hydro finishes properly, we continue to do photon radiation
+            prepare_evolution_files_for_photon(final_results_folder,
+                                               hydro_folder_name)
+            photon_success, photon_folder_name = run_photon(
+                                final_results_folder, event_id)
+            if not photon_success:
+                exitErrorTrigger = True
+                continue
 
+        nUrQMDFolder = n_urqmd
+        if para_dict["compute_polarization"]:
+            nUrQMDFolder += 1
         # if hydro finishes properly, we continue to do hadronic transport
         status_success = prepare_surface_files_for_urqmd(final_results_folder,
                                                          hydro_folder_name,
-                                                         n_urqmd)
+                                                         nUrQMDFolder)
         if not status_success:
             exitErrorTrigger = True
             continue
@@ -618,7 +724,8 @@ if __name__ == "__main__":
         SAVE_URQMD = (sys.argv[10].lower() == "true")
         SEED_ADD = int(sys.argv[11])
         TIME_STAMP = str(sys.argv[12])
-        SAVE_POLARIZATION = (sys.argv[13].lower() == "true")
+        COMP_POLARIZATION = (sys.argv[13].lower() == "true")
+        COMP_PHOTONS = (sys.argv[14].lower() == "true")
     except IndexError:
         print_usage()
         sys.exit(0)
@@ -645,7 +752,8 @@ if __name__ == "__main__":
         'save_kompost': SAVE_KOMPOST,
         'save_hydro': SAVE_HYDRO,
         'save_urqmd': SAVE_URQMD,
-        'save_polarization': SAVE_POLARIZATION,
+        'compute_polarization': COMP_POLARIZATION,
+        'compute_photons': COMP_PHOTONS,
         'seed_add': SEED_ADD,
         'time_stamp_str': TIME_STAMP,
     }

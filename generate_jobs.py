@@ -169,14 +169,15 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            para_dict.control_dict["save_ipglasma_results"],
            para_dict.control_dict["save_kompost_results"],
            para_dict.control_dict["save_hydro_surfaces"],
            para_dict.control_dict["save_UrQMD_files"],
            time_stamp,
-           para_dict.control_dict["save_polarization"]))
+           para_dict.control_dict["compute_polarization"],
+           para_dict.control_dict["compute_photon_emission"]))
     script.write("""
 
 status=$?
@@ -318,6 +319,37 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
+def generate_script_photon(folder_name, nthreads, cluster_name):
+    """This function generates script for photon radiation"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "run_photon.sh"), "w")
+
+    script.write("""#!/bin/bash
+(
+cd photonEmission_hydroInterface
+
+""")
+    if nthreads > 0:
+        script.write("""
+export OMP_NUM_THREADS={0:d}
+""".format(nthreads))
+
+    if cluster_name != "OSG":
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e > run.log
+)
+""")
+    else:
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e
+)
+""")
+    script.close()
+
+
 def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
@@ -346,6 +378,7 @@ do
     rm -fr results/*
     mv ../hydro_event/$iev results/surface.dat
     mv ../hydro_event/music_input results/music_input
+    mv ../hydro_event/spectators.dat results/spectators.dat
     if [ $SubEventId = "0" ]; then
     """)
     script.write("    ./iSS.e {0}".format(logfile))
@@ -471,7 +504,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             link_list = [
                 'qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
                 'carbon_alpha_3.in', 'carbon_plaintext.in', 'oxygen_alpha_3.in',
-                'oxygen_plaintext.in'
+                'oxygen_plaintext.in', 'he3_plaintext.in'
             ]
             for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
@@ -500,6 +533,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(event_folder, "kompost/{}".format(link_i))),
                             shell=True)
 
+    # MUSIC
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
     shutil.copytree(path.join(code_path, 'MUSIC'),
@@ -512,11 +546,32 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
                         shell=True)
 
+    if para_dict.control_dict['compute_photon_emission']:
+        # photon
+        generate_script_photon(event_folder, n_threads, cluster_name)
+        mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
+        shutil.copyfile(path.join(param_folder, 'photonEmission_hydroInterface',
+                                  'parameters.dat'),
+                        path.join(event_folder, 'photonEmission_hydroInterface',
+                                  'parameters.dat'))
+        for link_i in ['ph_rates', 'hydro_photonEmission.e']:
+            orgFilePath = path.abspath(path.join(code_path,
+                                       'photonEmission_hydroInterface_code',
+                                       '{}'.format(link_i)))
+            trgFilePath = path.join(event_folder,
+                                    "photonEmission_hydroInterface",
+                                    "{}".format(link_i))
+            subprocess.call("ln -s {0:s} {1:s}".format(orgFilePath,
+                                                       trgFilePath),
+                            shell=True)
+
+    # particlization + hadronic afterburner
     GMC_flag = para_dict.iss_dict['global_momentum_conservation']
     HBT_flag = False
     if "analyze_HBT" in para_dict.hadronic_afterburner_toolkit_dict:
         if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
             HBT_flag = True
+
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
@@ -786,11 +841,14 @@ def main():
         parameter_dict.control_dict['save_ipglasma_results'] = False
     if initial_condition_type != "IPGlasma+KoMPoST":
         parameter_dict.control_dict['save_kompost_results'] = False
-    if 'save_polarization' not in parameter_dict.control_dict.keys():
-        parameter_dict.control_dict['save_polarization'] = False
+    if 'compute_polarization' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['compute_polarization'] = False
     if 'calculate_polarization' in parameter_dict.iss_dict.keys():
         if parameter_dict.iss_dict['calculate_polarization'] == 1:
-            parameter_dict.control_dict['save_polarization'] = True
+            parameter_dict.control_dict['compute_polarization'] = True
+    if 'compute_photon_emission' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['compute_photon_emission'] = False
+
 
     cent_label = "XXX"
     cent_label_pre = cent_label

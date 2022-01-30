@@ -17,7 +17,8 @@ control_dict = {
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
-    'save_polarization': False,       # flag to save spin polarization results
+    'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
+    'compute_polarization': False,       # flag to save spin polarization results
 }
 
 
@@ -198,6 +199,10 @@ music_dict = {
     'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
 
+    # parameters for Initial_profile == 13 or 131
+    'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
+    'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
+
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
@@ -246,13 +251,14 @@ music_dict = {
     'output_evolution_T_cut': 0.145,
     'outputBinaryEvolution': 1,     # output evolution file in binary format
     'output_evolution_every_N_eta': 1,  # output evolution file every Neta steps
-    'output_evolution_every_N_x':  2,   # output evolution file every Nx steps
-    'output_evolution_every_N_y': 2,    # output evolution file every Ny steps
-    'output_evolution_every_N_timesteps':1,  # output evolution every Ntime steps
+    'output_evolution_every_N_x':  1,   # output evolution file every Nx steps
+    'output_evolution_every_N_y': 1,    # output evolution file every Ny steps
+    'output_evolution_every_N_timesteps': 10,  # output evolution every Ntime steps
 
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
     'Do_FreezeOut_lowtemp': 1,          # flag to include cold corona
+    'freeze_out_tau_start_max': 2,      # the maximum freeze-out starting time [fm/c]
     'freeze_out_method': 4,             # method for hyper-surface finder
                                         # 4: Cornelius
     'freeze_surface_in_binary': 1,      # switch to output surface file in binary format
@@ -265,6 +271,72 @@ music_dict = {
     'eps_freeze_min': 0.18,
     'use_eps_for_freeze_out': 1,  # find freeze-out surface 
                                   # 0: use temperature, 1: use energy density
+}
+
+
+# photon_emission
+photon_dict = {
+    'hydro_flag': 2,          # read in mode for hydro medium
+                              # 0: read in hdf5 file
+                              # 1: read in binary file output from MUSIC
+                              # 2: read in binary file output from new MUSIC (no grid)
+                              # 3: read in binary file output from new MUSIC (on grid)
+    'hydro_nskip_tau': 1,     # read in hydro slice every hydro_nskip_tau
+                              # steps from the medium file
+                              # (only works for hydro_flag = 1)
+    'Xmin': -15.0,            # minimum points along x direction
+    'dx': 0.1,                # lattice spacing along x direction
+    'Ymin': -15.0,            # minimum points along y direction
+    'dy': 0.1,                # lattice spacing along y direction
+    'tau_start': 0.4,         # emission start time (fm)
+    'tau_end': 30.0,          # emission end time (fm)
+    'dTau': 0.1,              # lattice spacing along tau direction
+
+    'neta': 10,               # number of points in eta direction
+    'eta_i': 0.0,             # beginning value of eta slice
+    'eta_f': 3.0,             # end value of eta slice
+
+    'np': 20,                 # number of points for photon momentum
+    'nphi': 40,               # number of points for angles of photons momenta
+    'nrapidity': 1,           # number of points for photon rapidity
+
+    'photon_q_i': 0.2,        # the smallest photon momentum to be calculated
+    'photon_q_f': 4.0,        # the largest photon momentum to be calculated
+    'photon_phi_q_i': 0.0,    # the smallest angle of photon momentum
+    'photon_phi_q_f': 6.2831853,    # the largest angle of photon momentum
+    'photon_y_i': 0.0,        # the smallest photon rapidity
+    'photon_y_f': 0.0,        # the largest photon rapidity
+
+    'norder': 10,             # calculate photon vn to norder
+
+    'T_dec': 0.105,           # freeze out temperature (GeV)
+    'T_sw_high': 0.180,       # high end of the switching temperature
+    'T_sw_low': 0.1795,       # low end of the switching temperature
+    'T_cuthigh': 0.80,        # maximum allowed emission T (GeV)
+    'T_cutlow': 0.10,         # minimum allowed emission T (GeV)
+
+    'calHGIdFlag': 0,         # Flag to decide whether to calculate individual HG channels
+
+    'PhotonemRatetableInfo_Emin': 0.05,   # minimum photon energy in the photon rate tables
+    'PhotonemRatetableInfo_Tmin': 0.10,   # minimum temperature in the photon rate tables
+    'PhotonemRatetableInfo_dE': 0.05,     # lattice space of energy in the photon rate tables
+    'PhotonemRatetableInfo_dT': 0.002,    # lattice space of temperature in the photon rate tables
+
+    'HydroinfoVisflag': 1,         # determine whether to read in the viscous evolution information
+    'HydroinfoBuffersize': 500,    # set the buffer size for hydro evolution profile
+
+    'turn_off_transverse_flow': 0,      # flag to turn off transverse flow in the photon calculation
+    'enable_polyakov_suppression': 0,   # apply the polyakov suppression to QGP photon rates
+
+    'differential_flag': 0,  # determine whether to output differential photon yield and vn
+                             # 1: differential in T and tau
+                             # 2: differential in x and tau
+                             # 10: differeitial in all options above
+    'nTaucut': 50,           # number of points in tau (range of tau is specified by tau_start and tau_end)
+    'nTcut': 50,             # number of points in T (range of T is specified by T_cuthigh and T_cutlow)
+    'n_xperp_cut': 101,      # number of points in x
+    'xperp_cuthigh': 10.0,   # maximum value in x (fm)
+    'xperp_cutlow': -10.0,   # minimum value in x (fm)
 }
 
 
@@ -309,6 +381,7 @@ iss_dict = {
 
     'perform_decays': 0,             # flag to perform resonance decay
     'perform_checks': 0,             # flag to perform tests for the sampler
+    'include_spectators': 0,         # flag to include spectators
     'local_charge_conservation': 0,  # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
 
@@ -410,6 +483,7 @@ hadronic_afterburner_toolkit_dict = {
                                                            # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
+    'rapidity_shift': 0.,
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
@@ -475,6 +549,7 @@ Parameters_list = [
     (kompost_dict, "setup.ini", 4),
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 2),
+    (photon_dict, "parameters.dat", 1),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
 ]
@@ -484,6 +559,7 @@ path_list = [
     'model_parameters/KoMPoST/',
     'model_parameters/3dMCGlauber/',
     'model_parameters/MUSIC/',
+    'model_parameters/photonEmission_hydroInterface/',
     'model_parameters/iSS/',
     'model_parameters/hadronic_afterburner_toolkit/'
 ]
@@ -552,6 +628,12 @@ def update_parameters_dict(par_dict_path, ran_seed):
             parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
+    if 'compute_photon_emission' in parameters_dict.control_dict:
+        if parameters_dict.control_dict['compute_photon_emission']:
+            music_dict['output_evolution_data'] = 2
+
+    if 'photon_dict' in dir(parameters_dict):
+        photon_dict.update(parameters_dict.photon_dict)
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     hadronic_afterburner_toolkit_dict.update(
