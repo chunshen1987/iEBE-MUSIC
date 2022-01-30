@@ -576,7 +576,10 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
-    for iev in range(n_urqmd_per_hydro):
+    nUrQMDFolders = n_urqmd_per_hydro
+    if parameter_dict.control_dict['compute_polarization']:
+        nUrQMDFolders += 1
+    for iev in range(nUrQMDFolders):
         sub_event_folder = path.join(working_folder,
                                      'event_{}'.format(event_id),
                                      'UrQMDev_{}'.format(iev))
