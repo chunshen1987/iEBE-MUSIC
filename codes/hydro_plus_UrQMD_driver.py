@@ -313,14 +313,19 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict):
 
     if not urqmd_success:
         curr_time = time.asctime()
-        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time), flush=True)
-        with Pool(processes=n_urqmd) as pool1:
-            pool1.map(run_urqmd_event, range(n_urqmd))
-
         if para_dict["compute_polarization"]:
+            print("{}  [{}] Running spin calculations ... ".format(logo,
+                                                                   curr_time),
+                  flush=True)
+            run_urqmd_event(n_urqmd)
             spin_folder_name = "spin_results_{}".format(event_id)
             spin_folder = path.join(final_results_folder, spin_folder_name)
-            shutil.move("UrQMDev_0/iSS/results", spin_folder)
+            shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
+
+        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
+              flush=True)
+        with Pool(processes=n_urqmd) as pool1:
+            pool1.map(run_urqmd_event, range(n_urqmd))
 
         for iev in range(1, n_urqmd):
             call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
@@ -666,10 +671,13 @@ def main(para_dict_):
                 exitErrorTrigger = True
                 continue
 
+        nUrQMDFolder = n_urqmd
+        if para_dict["compute_polarization"]:
+            nUrQMDFolder += 1
         # if hydro finishes properly, we continue to do hadronic transport
         status_success = prepare_surface_files_for_urqmd(final_results_folder,
                                                          hydro_folder_name,
-                                                         n_urqmd)
+                                                         nUrQMDFolder)
         if not status_success:
             exitErrorTrigger = True
             continue
