@@ -588,9 +588,11 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         mkdir(path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
-        if para_dict.control_dict['compute_polarization'] and iev < nUrQMDFolders:
+        if para_dict.control_dict['compute_polarization']
+           and iev < n_urqmd_per_hydro:
             f1 = open("temp.dat", "w")
-            with open(path.join(sub_event_folder, 'iSS/iSS_parameters.dat')) as f:
+            with open(path.join(sub_event_folder,
+                                'iSS/iSS_parameters.dat')) as f:
                 for line in f:
                     line2 = re.sub("calculate_polarization = 1",
                                    "calculate_polarization = 0", line)
