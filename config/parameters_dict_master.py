@@ -308,6 +308,7 @@ photon_dict = {
     'photon_y_f': 0.0,        # the largest photon rapidity
 
     'norder': 10,             # calculate photon vn to norder
+    'turn_on_muB': 1,         # flag to include muB dependence in photon rates
 
     'T_dec': 0.105,           # freeze out temperature (GeV)
     'T_sw_high': 0.180,       # high end of the switching temperature
