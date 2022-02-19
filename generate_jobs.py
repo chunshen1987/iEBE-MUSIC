@@ -17,7 +17,8 @@ centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.95, 1.00, '90-100', 0.10)]
 
 known_initial_types = [
-    "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
+    "IPGlasma", "IPGlasma+KoMPoST",
+    "3DMCGlauber_dynamical", "3DMCGlauber_participants",
     "3DMCGlauber_consttau"
 ]
 
@@ -447,8 +448,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                   'fetch_3DMCGlauber_event_from_hdf5_database.py'),
         event_folder)
     if initial_condition_database == "self":
-        if initial_condition_type in ("3DMCGlauber_dynamical",
-                                      "3DMCGlauber_consttau"):
+        if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
                             path.join(event_folder, '3dMCGlauber/input'))

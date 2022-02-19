@@ -189,7 +189,8 @@ music_dict = {
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
 
     # parameters for the eta profiles in entropy density and net baryon density
-    # Initial_profile == 11 or 111
+    # Initial_profile == 11, 111, 112, 113
+    'Initial_participantList_Filename': 'initial/participants_event.dat',
     'ecm': 200.,                    # collision energy
     'Eta_plateau_size': 5.4,        # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
     'Eta_fall_off': 0.3,            # Gaussian width fall off for entropy density
