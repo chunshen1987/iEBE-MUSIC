@@ -12,11 +12,6 @@ import argparse
 from math import ceil
 from glob import glob
 
-known_initial_types = [
-    "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
-    "3DMCGlauber_consttau"
-]
-
 support_cluster_list = ["wsugrid", "OSG", "local",]
 
 

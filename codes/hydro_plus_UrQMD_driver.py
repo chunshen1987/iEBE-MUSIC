@@ -94,6 +94,27 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         else:
             file_name = fecth_an_3DMCGlauber_event(database, iev)
             return status, file_name
+    elif initial_type == "3DMCGlauber_participants":
+        file_name = "participants_event_{}.dat".format(iev)
+        specFilename = "spectators_event_{}.dat".format(iev)
+        ran = np.random.default_rng().integers(1e8)
+        if not path.exists(file_name):
+            call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
+                                                    seed_add + iev*ran),
+                 shell=True)
+            call("mv 3dMCGlauber/participants_event_0.dat {}".format(file_name),
+                 shell=True)
+            call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                                            specFilename), shell=True)
+        else:
+            print("3D MC-Glauber event exists ...")
+            print("No need to rerun ...")
+        shutil.copy(file_name, "MUSIC/initial/participants_event.dat")
+        shutil.copy(file_name, path.join(final_results_folder, file_name))
+        shutil.copy(specFilename,
+                    path.join(final_results_folder,
+                              "spectators_{}.dat".format(iev)))
+        return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
         file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
         return status, file_name
@@ -414,7 +435,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
     ]
     glauber_filelist = ["strings_{}.dat".format(event_id),
-                        "spectators_{}.dat".format(event_id)]
+                        "spectators_{}.dat".format(event_id),
+                        "participants_event_{}.dat".format(event_id)]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
@@ -731,8 +753,9 @@ if __name__ == "__main__":
         sys.exit(0)
 
     known_initial_types = [
-        "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
-        "3DMCGlauber_consttau"
+        "IPGlasma", "IPGlasma+KoMPoST",
+        "3DMCGlauber_dynamical", "3DMCGlauber_participants",
+        "3DMCGlauber_consttau",
     ]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
