@@ -23,7 +23,7 @@ jobs:
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: Install dependent libraries
         run: |
-           sudo apt-get install libfftw3-dev hdf5-tools libhdf5-dev openmpi-bin libopenmpi-dev
+           sudo apt-get install libfftw3-dev hdf5-tools libhdf5-dev
       - name: Build the iEBE-MUSIC framework
         run: |
           cd codes/
