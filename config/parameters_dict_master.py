@@ -358,6 +358,9 @@ iss_dict = {
     'deltaf_max_ratio': 1.0,   # the maximum allowed size of delta f w.r.t f0
     'quantum_statistics': 1,   # include quantum statistics (1: yes, 0: no)
 
+    'calculate_polarization': 0,   # switch to compute Lambda's polarization
+    'polarizationRapType': 1,      # 0: rapidity; 1: pseudorapidity; 2: both
+
     'randomSeed': -1,   # If <0, use system clock.
     'calculate_vn': 0,  # 1/0: whether to calculate the 
     'MC_sampling': 4,   # 0/1/2/3: whether to perform Monte-Carlo sampling
