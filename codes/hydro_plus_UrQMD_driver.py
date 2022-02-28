@@ -589,6 +589,7 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
 
 def main(para_dict_):
     """This is the main function"""
+    startTime = time.time()
     initial_condition = para_dict_['initial_condition']
     initial_type = para_dict_['initial_type']
     num_threads = para_dict_['num_threads']
@@ -602,6 +603,7 @@ def main(para_dict_):
     nev = para_dict_['n_hydro']
     exitErrorTrigger = False
     exitErrorTriggerInitial = False
+    checkPointTrigger = True
     for iev in range(idx0, idx0 + nev):
         curr_time = time.asctime()
 
@@ -619,6 +621,7 @@ def main(para_dict_):
             tar = tarfile.open("{}".CHECKPOINT_FILENAME, 'r:gz')
             tar.extractall()
             tar.close()
+            checkPointTrigger = False
         except FileNotFoundError:
             pass
 
@@ -695,12 +698,13 @@ def main(para_dict_):
                 path.join(final_results_folder, hydro_folder_name,
                           "strings_{}.dat".format(event_id)))
 
-        if para_dict_["checkpointFlag"]:
-            remove(CHECKPOINT_FILENAME)
-            tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'w:gz')
-            tar.add(final_results_folder)
-            tar.close()
-            sys.exit(85)
+        if para_dict_["checkpointFlag"] and checkPointTrigger:
+            checkPointTime = time.time()
+            if checkPointTime - startTime > 64800:
+                tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'w:gz')
+                tar.add(final_results_folder)
+                tar.close()
+                sys.exit(85)
 
         if para_dict_['compute_photons']:
             # if hydro finishes properly, we continue to do photon radiation
