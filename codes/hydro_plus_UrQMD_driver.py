@@ -618,7 +618,7 @@ def main(para_dict_):
         # setup OSG checkpoint file
         CHECKPOINT_FILENAME = "{}.tar.gz".format(final_results_folder)
         try:
-            tar = tarfile.open("{}".CHECKPOINT_FILENAME, 'r:gz')
+            tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'r:gz')
             tar.extractall()
             tar.close()
             checkPointTrigger = False
