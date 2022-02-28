@@ -4,6 +4,7 @@
 from multiprocessing import Pool
 from subprocess import call
 from os import path, mkdir, remove, makedirs, stat
+import tarfile
 from glob import glob
 import sys
 import time
@@ -611,6 +612,16 @@ def main(para_dict_):
             event_id = initial_database_name + "_" + event_id
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
+
+        # setup OSG checkpoint file
+        CHECKPOINT_FILENAME = "{}.tar.gz".format(final_results_folder)
+        try:
+            tar = tarfile.open("{}".CHECKPOINT_FILENAME, 'r:gz')
+            tar.extractall()
+            tar.close()
+        except FileNotFoundError:
+            pass
+
         if path.exists(final_results_folder):
             print("{} exists ...".format(final_results_folder), flush=True)
             results_file = path.join(final_results_folder,
@@ -683,6 +694,14 @@ def main(para_dict_):
                 "MUSIC/initial/strings.dat",
                 path.join(final_results_folder, hydro_folder_name,
                           "strings_{}.dat".format(event_id)))
+
+        if para_dict_["checkpointFlag"]:
+            remove(CHECKPOINT_FILENAME)
+            tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'w:gz')
+            tar.add(final_results_folder)
+            tar.close()
+            sys.exit(85)
+
         if para_dict_['compute_photons']:
             # if hydro finishes properly, we continue to do photon radiation
             prepare_evolution_files_for_photon(final_results_folder,
@@ -780,5 +799,7 @@ if __name__ == "__main__":
         'seed_add': SEED_ADD,
         'time_stamp_str': TIME_STAMP,
     }
+
+    para_dict['checkpointFlag'] = True
 
     main(para_dict)
