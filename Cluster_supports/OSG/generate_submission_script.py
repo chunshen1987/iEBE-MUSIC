@@ -52,7 +52,7 @@ transfer_input_files = {0}
 """.format(para_dict_['paraFile']))
 
     script.write(
-            "transfer_checkpoint_files = EVENT_RESULTS_$(Process).tar.gz\n")
+            "transfer_checkpoint_files = playground/event_0/EVENT_RESULTS_$(Process).tar.gz\n")
 
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
@@ -115,6 +115,7 @@ printf "Job running as user: `/usr/bin/id`\\n"
 
     script.write("""
 cd playground/event_0
+mv EVENT_RESULTS_${processId}.tar.gz playground/event_0
 bash submit_job.pbs
 status=$?
 if [ $status -ne 0 ]; then

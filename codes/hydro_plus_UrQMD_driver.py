@@ -700,7 +700,7 @@ def main(para_dict_):
 
         if para_dict_["checkpointFlag"] and checkPointTrigger:
             checkPointTime = time.time()
-            if checkPointTime - startTime > 64800:
+            if checkPointTime - startTime > 100:
                 tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'w:gz')
                 tar.add(final_results_folder)
                 tar.close()
