@@ -347,7 +347,7 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
             spin_folder = path.join(final_results_folder, spin_folder_name)
             shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
 
-            if para_dict_["check_point_flag"]:
+            if para_dict["check_point_flag"]:
                 checkPoint(startTime, checkPointFileName, final_results_folder)
 
         print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
