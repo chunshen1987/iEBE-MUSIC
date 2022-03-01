@@ -348,7 +348,7 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
             shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
 
             if para_dict_["check_point_flag"]:
-                checkpoint(startTime, checkPointFileName, final_results_folder)
+                checkPoint(startTime, checkPointFileName, final_results_folder)
 
         print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
               flush=True)
@@ -714,7 +714,7 @@ def main(para_dict_):
                                   "strings_{}.dat".format(event_id)))
 
         if para_dict_["check_point_flag"]:
-            checkpoint(startTime, CHECKPOINT_FILENAME, final_results_folder)
+            checkPoint(startTime, CHECKPOINT_FILENAME, final_results_folder)
 
         if para_dict_['compute_photons']:
             # if hydro finishes properly, we continue to do photon radiation
@@ -726,7 +726,7 @@ def main(para_dict_):
                 exitErrorTrigger = True
                 continue
             if para_dict_["check_point_flag"]:
-                checkpoint(startTime, CHECKPOINT_FILENAME,
+                checkPoint(startTime, CHECKPOINT_FILENAME,
                            final_results_folder)
 
         nUrQMDFolder = n_urqmd
