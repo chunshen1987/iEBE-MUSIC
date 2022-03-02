@@ -644,6 +644,8 @@ def main(para_dict_):
             tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'r:gz')
             tar.extractall()
             tar.close()
+            # remove the tar file to save disk space
+            remove(CHECKPOINT_FILENAME)
         except FileNotFoundError:
             pass
 
