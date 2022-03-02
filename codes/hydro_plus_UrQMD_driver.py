@@ -263,7 +263,7 @@ def run_photon(final_results_folder, event_id):
     photon_success = False
 
     if path.exists(results_folder):
-        # check whether KoMPoST has already run or not
+        # check whether photon has already run or not
         print("{} photon results {} exist ...".format(logo,
                                                       photon_folder_name),
               flush=True)
@@ -339,16 +339,22 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
     if not urqmd_success:
         curr_time = time.asctime()
         if para_dict["compute_polarization"]:
-            print("{}  [{}] Running spin calculations ... ".format(logo,
-                                                                   curr_time),
-                  flush=True)
-            run_urqmd_event(n_urqmd)
             spin_folder_name = "spin_results_{}".format(event_id)
             spin_folder = path.join(final_results_folder, spin_folder_name)
-            shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
-
-            if para_dict["check_point_flag"]:
-                checkPoint(startTime, checkPointFileName, final_results_folder)
+            if path.exists(spin_folder):
+                print("{} spin results {} exist ... ".format(logo,
+                                                             spin_folder),
+                      flush=True)
+            else:
+                print("{}  [{}] Running spin calculations ... ".format(logo,
+                                                                   curr_time),
+                      flush=True)
+                run_urqmd_event(n_urqmd)
+                shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd),
+                            spin_folder)
+                if para_dict["check_point_flag"]:
+                    checkPoint(startTime, checkPointFileName,
+                               final_results_folder)
 
         print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
               flush=True)
