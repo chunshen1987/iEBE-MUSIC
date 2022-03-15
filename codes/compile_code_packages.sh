@@ -49,7 +49,8 @@ if [ $status -ne 0 ]; then
     exit $status
 fi
 
-# compile MUSIC echo -e "${Green}compile MUSIC ... ${NC}"
+# compile MUSIC
+echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
     mkdir -p build
