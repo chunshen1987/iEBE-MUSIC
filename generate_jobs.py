@@ -2,6 +2,7 @@
 """This script generate all the running jobs."""
 
 import sys
+import re
 from os import path, mkdir
 import shutil
 import subprocess
@@ -165,12 +166,17 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     event_id = working_folder.split('/')[-1]
     walltime = '100:00:00'
 
+    if cluster_name == "OSG":
+        enableCheckPoint = True
+    else:
+        enableCheckPoint = False
+
     script = open(path.join(working_folder, "submit_job.pbs"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            para_dict.control_dict["save_ipglasma_results"],
            para_dict.control_dict["save_kompost_results"],
@@ -178,7 +184,8 @@ python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {
            para_dict.control_dict["save_UrQMD_files"],
            time_stamp,
            para_dict.control_dict["compute_polarization"],
-           para_dict.control_dict["compute_photon_emission"]))
+           para_dict.control_dict["compute_photon_emission"],
+           enableCheckPoint))
     script.write("""
 
 status=$?
@@ -576,7 +583,10 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
-    for iev in range(n_urqmd_per_hydro):
+    nUrQMDFolders = n_urqmd_per_hydro
+    if para_dict.control_dict['compute_polarization']:
+        nUrQMDFolders += 1
+    for iev in range(nUrQMDFolders):
         sub_event_folder = path.join(working_folder,
                                      'event_{}'.format(event_id),
                                      'UrQMDev_{}'.format(iev))
@@ -584,6 +594,19 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         mkdir(path.join(sub_event_folder, 'iSS'))
         shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
                         path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
+        if (para_dict.control_dict['compute_polarization']
+            and iev < n_urqmd_per_hydro):
+            f1 = open("temp.dat", "w")
+            with open(path.join(sub_event_folder,
+                                'iSS/iSS_parameters.dat')) as f:
+                for line in f:
+                    line2 = re.sub("calculate_polarization = 1",
+                                   "calculate_polarization = 0", line)
+                    f1.write(line2)
+            f1.close()
+            shutil.copyfile("temp.dat", path.join(sub_event_folder,
+                                                  'iSS/iSS_parameters.dat'))
+
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(
                 path.abspath(path.join(code_path,

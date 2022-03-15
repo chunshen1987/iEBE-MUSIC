@@ -4,6 +4,7 @@
 from multiprocessing import Pool
 from subprocess import call
 from os import path, mkdir, remove, makedirs, stat
+import tarfile
 from glob import glob
 import sys
 import time
@@ -18,9 +19,11 @@ from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_even
 def print_usage():
     """This function prints out help messages"""
     print("\U0001F3B6  " + "Usage: {} ".format(sys.argv[0])
-          + "initial_condition_database "
-          + "initial_condition_type n_hydro_events hydro_event_id n_UrQMD "
-          + "n_threads save_hydro_flag save_urqmd_flag seed_add tau0")
+          + "initial_condition_type initial_condition_database "
+          + "n_hydro_events hydro_event_id n_UrQMD n_threads "
+          + "save_ipglasma_flag save_kompost_flag save_hydro_flag "
+          + "save_urqmd_flag seed_add tau0 compute_polarization_flag "
+          + "compute_photons_flag enableCheckPoint")
 
 
 def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
@@ -260,7 +263,7 @@ def run_photon(final_results_folder, event_id):
     photon_success = False
 
     if path.exists(results_folder):
-        # check whether KoMPoST has already run or not
+        # check whether photon has already run or not
         print("{} photon results {} exist ...".format(logo,
                                                       photon_folder_name),
               flush=True)
@@ -320,7 +323,8 @@ def run_urqmd_event(event_id):
     call("bash ./run_afterburner.sh {0:d}".format(event_id), shell=True)
 
 
-def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict):
+def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
+                    startTime, checkPointFileName):
     """This function runs urqmd events in parallel"""
     logo = "\U0001F5FF"
     urqmd_results_name = "particle_list_{}.gz".format(event_id)
@@ -335,13 +339,22 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict):
     if not urqmd_success:
         curr_time = time.asctime()
         if para_dict["compute_polarization"]:
-            print("{}  [{}] Running spin calculations ... ".format(logo,
-                                                                   curr_time),
-                  flush=True)
-            run_urqmd_event(n_urqmd)
             spin_folder_name = "spin_results_{}".format(event_id)
             spin_folder = path.join(final_results_folder, spin_folder_name)
-            shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd), spin_folder)
+            if path.exists(spin_folder):
+                print("{} spin results {} exist ... ".format(logo,
+                                                             spin_folder),
+                      flush=True)
+            else:
+                print("{}  [{}] Running spin calculations ... ".format(logo,
+                                                                   curr_time),
+                      flush=True)
+                run_urqmd_event(n_urqmd)
+                shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd),
+                            spin_folder)
+                if para_dict["check_point_flag"]:
+                    checkPoint(startTime, checkPointFileName,
+                               final_results_folder)
 
         print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
               flush=True)
@@ -452,7 +465,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     photon_filepattern = ['*_Spvn*.dat']
     spin_filepattern = [
         "Smu_dpTdphi_*.dat", "Smu_phi_*.dat", "Smu_pT_*.dat", "Smu_y_*.dat",
-        "Smu_Thermal_*.dat"
+        "Smu_Thermal_*.dat", "Rspin_*.dat"
     ]
 
     hydrofolder = path.join(final_results_folder,
@@ -586,8 +599,21 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
         shutil.rmtree(photonfolder, ignore_errors=True)
 
 
+def checkPoint(startTime, checkPointFileName, finalResultsFolder):
+    checkPointTime = time.time()
+    if checkPointTime - startTime > 43200:
+        # trigger the checkpoint when the simulation runs longer than 12 hours
+        if path.exists(checkPointFileName):
+            remove(checkPointFileName)
+        tar = tarfile.open(checkPointFileName, 'w:gz')
+        tar.add(finalResultsFolder)
+        tar.close()
+        sys.exit(85)
+
+
 def main(para_dict_):
     """This is the main function"""
+    startTime = time.time()
     initial_condition = para_dict_['initial_condition']
     initial_type = para_dict_['initial_type']
     num_threads = para_dict_['num_threads']
@@ -611,6 +637,18 @@ def main(para_dict_):
             event_id = initial_database_name + "_" + event_id
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
+
+        # setup OSG checkpoint file
+        CHECKPOINT_FILENAME = "{}.tar.gz".format(final_results_folder)
+        try:
+            tar = tarfile.open("{}".format(CHECKPOINT_FILENAME), 'r:gz')
+            tar.extractall()
+            tar.close()
+            # remove the tar file to save disk space
+            remove(CHECKPOINT_FILENAME)
+        except FileNotFoundError:
+            pass
+
         if path.exists(final_results_folder):
             print("{} exists ...".format(final_results_folder), flush=True)
             results_file = path.join(final_results_folder,
@@ -679,10 +717,13 @@ def main(para_dict_):
         if (initial_type == "3DMCGlauber_dynamical"
                 and initial_condition == "self"):
             # save the initial condition
-            shutil.move(
-                "MUSIC/initial/strings.dat",
-                path.join(final_results_folder, hydro_folder_name,
-                          "strings_{}.dat".format(event_id)))
+            shutil.move("MUSIC/initial/strings.dat",
+                        path.join(final_results_folder, hydro_folder_name,
+                                  "strings_{}.dat".format(event_id)))
+
+        if para_dict_["check_point_flag"]:
+            checkPoint(startTime, CHECKPOINT_FILENAME, final_results_folder)
+
         if para_dict_['compute_photons']:
             # if hydro finishes properly, we continue to do photon radiation
             prepare_evolution_files_for_photon(final_results_folder,
@@ -697,6 +738,9 @@ def main(para_dict_):
                                         hydro_folder_name,
                                         "evolution_all_xyeta.dat")
                 shutil.rmtree(evoFileName, ignore_errors=True)
+            if para_dict_["check_point_flag"]:
+                checkPoint(startTime, CHECKPOINT_FILENAME,
+                           final_results_folder)
 
         nUrQMDFolder = n_urqmd
         if para_dict["compute_polarization"]:
@@ -711,7 +755,8 @@ def main(para_dict_):
 
         # then run UrQMD events in parallel
         urqmd_success, urqmd_file_path = run_urqmd_shell(
-            n_urqmd, final_results_folder, event_id, para_dict_)
+            n_urqmd, final_results_folder, event_id, para_dict_,
+            startTime, CHECKPOINT_FILENAME)
         if not urqmd_success:
             print("\U000026D4  {} did not finsh properly, skipped.".format(
                 urqmd_file_path),
@@ -753,6 +798,7 @@ if __name__ == "__main__":
         TIME_STAMP = str(sys.argv[12])
         COMP_POLARIZATION = (sys.argv[13].lower() == "true")
         COMP_PHOTONS = (sys.argv[14].lower() == "true")
+        CHECK_POINT = (sys.argv[15].lower() == "true")
     except IndexError:
         print_usage()
         sys.exit(0)
@@ -784,6 +830,7 @@ if __name__ == "__main__":
         'compute_photons': COMP_PHOTONS,
         'seed_add': SEED_ADD,
         'time_stamp_str': TIME_STAMP,
+        'check_point_flag': CHECK_POINT,
     }
 
     main(para_dict)

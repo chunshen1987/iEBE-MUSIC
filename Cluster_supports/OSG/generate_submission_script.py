@@ -51,6 +51,9 @@ transfer_input_files = {0}, {1}
 transfer_input_files = {0}
 """.format(para_dict_['paraFile']))
 
+    script.write(
+            "transfer_checkpoint_files = playground/event_0/EVENT_RESULTS_$(Process).tar.gz\n")
+
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
 
@@ -62,6 +65,8 @@ log = ../log/job.$(Cluster).$(Process).log
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
+
+checkpoint_exit_code = 85
 
 # Send the job to Held state on failure.
 on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
@@ -110,6 +115,7 @@ printf "Job running as user: `/usr/bin/id`\\n"
 
     script.write("""
 cd playground/event_0
+mv EVENT_RESULTS_${processId}.tar.gz playground/event_0
 bash submit_job.pbs
 status=$?
 if [ $status -ne 0 ]; then
