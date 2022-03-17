@@ -75,7 +75,7 @@ on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 # if you don't have a good idea of memory and disk usage.
 request_cpus = {0:d}
 request_memory = 2 GB
-request_disk = 1 GB
+request_disk = 2 GB
 
 # Queue one job with the above specifications.
 queue {1:d}""".format(para_dict_["n_threads"], para_dict_["n_jobs"]))
