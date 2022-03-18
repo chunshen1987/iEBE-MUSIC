@@ -368,6 +368,8 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                  shell=True)
         urqmd_success = True
         shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz", results_folder)
+        for iev in range(1, n_urqmd):
+            remove("UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev))
 
     return (urqmd_success, results_folder)
 
