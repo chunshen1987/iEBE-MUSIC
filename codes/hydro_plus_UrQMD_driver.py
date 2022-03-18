@@ -327,7 +327,7 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                     startTime, checkPointFileName):
     """This function runs urqmd events in parallel"""
     logo = "\U0001F5FF"
-    urqmd_results_name = "particle_list_{}.gz".format(event_id)
+    urqmd_results_name = "particle_list_{}.bin".format(event_id)
     results_folder = path.join(final_results_folder, urqmd_results_name)
     urqmd_success = False
 
@@ -362,14 +362,14 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
             pool1.map(run_urqmd_event, range(n_urqmd))
 
         for iev in range(1, n_urqmd):
-            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
-                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
-                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+            call("cat UrQMDev_{}/UrQMD_results/particle_list.bin ".format(iev)
+                 + ">> UrQMDev_0/UrQMD_results/particle_list.bin",
                  shell=True)
         urqmd_success = True
-        shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz", results_folder)
+        shutil.move("UrQMDev_0/UrQMD_results/particle_list.bin",
+                    results_folder)
         for iev in range(1, n_urqmd):
-            remove("UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev))
+            remove("UrQMDev_{}/UrQMD_results/particle_list.bin".format(iev))
 
     return (urqmd_success, results_folder)
 
@@ -592,7 +592,7 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
         shutil.rmtree(spinfolder, ignore_errors=True)
 
     if not para_dict["save_urqmd"]:
-        urqmd_results_name = "particle_list_{}.gz".format(event_id)
+        urqmd_results_name = "particle_list_{}.bin".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
 
     if para_dict["compute_photons"]:

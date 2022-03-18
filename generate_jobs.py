@@ -418,7 +418,7 @@ do
     mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr OSCAR.input
     cd ..
-    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat
+    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat binary
     rm -fr UrQMD_results/particle_list.dat
 """)
     if HBT_flag:
@@ -426,7 +426,7 @@ do
     cd hadronic_afterburner_toolkit
     mkdir -p results
     cd results; rm -fr *
-    ln -s ../../UrQMD_results/particle_list.gz particle_list.dat
+    ln -s ../../UrQMD_results/particle_list.bin particle_list.dat
     cd ..
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
