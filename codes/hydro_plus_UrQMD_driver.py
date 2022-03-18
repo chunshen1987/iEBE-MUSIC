@@ -327,12 +327,12 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                     startTime, checkPointFileName):
     """This function runs urqmd events in parallel"""
     logo = "\U0001F5FF"
-    urqmd_results_name = "particle_list_{}.bin".format(event_id)
-    results_folder = path.join(final_results_folder, urqmd_results_name)
+    urqmdResults = "particle_list_{}.bin".format(event_id)
+    results_folder = path.join(final_results_folder, urqmdResults)
     urqmd_success = False
 
     if path.exists(results_folder):
-        print("{} UrQMD results {} exist ... ".format(logo, urqmd_results_name),
+        print("{} UrQMD results {} exist ... ".format(logo, urqmdResults),
               flush=True)
         urqmd_success = True
 
@@ -362,14 +362,13 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
             pool1.map(run_urqmd_event, range(n_urqmd))
 
         for iev in range(1, n_urqmd):
-            call("cat UrQMDev_{}/UrQMD_results/particle_list.bin ".format(iev)
-                 + ">> UrQMDev_0/UrQMD_results/particle_list.bin",
+            call("cat UrQMDev_{}/UrQMD_results/{} ".format(iev, urqmdResults)
+                 + ">> UrQMDev_0/UrQMD_results/{}".format(urqmdResults),
                  shell=True)
+            remove("UrQMDev_{}/UrQMD_results/{}".format(iev, urqmdResults))
         urqmd_success = True
-        shutil.move("UrQMDev_0/UrQMD_results/particle_list.bin",
+        shutil.move("UrQMDev_0/UrQMD_results/{}".format(urqmdResults),
                     results_folder)
-        for iev in range(1, n_urqmd):
-            remove("UrQMDev_{}/UrQMD_results/particle_list.bin".format(iev))
 
     return (urqmd_success, results_folder)
 
