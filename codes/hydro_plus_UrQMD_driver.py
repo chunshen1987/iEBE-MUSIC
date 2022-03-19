@@ -387,7 +387,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     mkdir(spvn_folder)
     call("ln -s {0:s} {1:s}".format(path.abspath(urqmd_file_path),
                                     path.join(spvn_folder,
-                                              "particle_list.dat")),
+                                              "particle_list.bin")),
          shell=True)
     # finally collect results
     curr_time = time.asctime()
@@ -400,7 +400,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time),
           flush=True)
 
-    call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
+    call("rm {}/particle_list.bin".format(spvn_folder), shell=True)
     shutil.move(spvn_folder, final_results_folder)
 
 
