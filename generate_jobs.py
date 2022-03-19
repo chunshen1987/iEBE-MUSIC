@@ -3,7 +3,7 @@
 
 import sys
 import re
-from os import path, mkdir
+from os import path, mkdir, remove
 import shutil
 import subprocess
 import argparse
@@ -358,6 +358,41 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
+def generate_script_spinPol(folder_name, cluster_name):
+    """This function generates script for spin polarization"""
+    working_folder = folder_name
+
+    logfile = ""
+    if cluster_name != "OSG":
+        logfile = " >> run.log"
+
+    script = open(path.join(working_folder, "run_spinPol.sh"), "w")
+    script.write("""#!/bin/bash
+
+unalias ls 2>/dev/null
+
+SubEventId=$1
+
+(
+cd UrQMDev_$SubEventId
+
+mkdir -p UrQMD_results
+rm -fr UrQMD_results/*
+
+cd iSS
+mkdir -p results
+rm -fr results/*
+mv ../hydro_event/$iev results/surface.dat
+mv ../hydro_event/music_input results/music_input
+mv ../hydro_event/spectators.dat results/spectators.dat
+
+""")
+    script.write("./iSS.e {0}\n".format(logfile))
+    script.write(")")
+
+    script.close()
+
+
 def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
@@ -579,6 +614,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
             HBT_flag = True
 
+    if para_dict.control_dict['compute_polarization']:
+        generate_script_spinPol(event_folder, cluster_name)
+
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
@@ -616,6 +654,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 f1.close()
                 shutil.copyfile("temp.dat", path.join(sub_event_folder,
                                                       iSSParamFile))
+            remove("temp.dat")
 
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(

@@ -349,7 +349,7 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                 print("{}  [{}] Running spin calculations ... ".format(logo,
                                                                    curr_time),
                       flush=True)
-                run_urqmd_event(n_urqmd)
+                call("bash ./run_spinPol.sh {}".format(n_urqmd), shell=True)
                 shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd),
                             spin_folder)
                 if para_dict["check_point_flag"]:
