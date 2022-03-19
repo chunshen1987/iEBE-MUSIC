@@ -361,13 +361,14 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
 
+        urqmdResFile = "particle_list.bin"
         for iev in range(1, n_urqmd):
-            call("cat UrQMDev_{}/UrQMD_results/{} ".format(iev, urqmdResults)
-                 + ">> UrQMDev_0/UrQMD_results/{}".format(urqmdResults),
+            call("cat UrQMDev_{}/UrQMD_results/{} ".format(iev, urqmdResFile)
+                 + ">> UrQMDev_0/UrQMD_results/{}".format(urqmdResFile),
                  shell=True)
-            remove("UrQMDev_{}/UrQMD_results/{}".format(iev, urqmdResults))
+            remove("UrQMDev_{}/UrQMD_results/{}".format(iev, urqmdResFile))
         urqmd_success = True
-        shutil.move("UrQMDev_0/UrQMD_results/{}".format(urqmdResults),
+        shutil.move("UrQMDev_0/UrQMD_results/{}".format(urqmdResFile),
                     results_folder)
 
     return (urqmd_success, results_folder)
