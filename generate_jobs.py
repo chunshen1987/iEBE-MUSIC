@@ -390,7 +390,7 @@ mv ../hydro_event/spectators.dat results/spectators.dat
     script.write("./iSS.e {0}\n".format(logfile))
     script.write("""
 
-rm -fr hydro_event
+rm -fr ../hydro_event
 )
 """)
     script.close()
