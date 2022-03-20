@@ -740,7 +740,7 @@ def main(para_dict_):
                            final_results_folder)
 
         nUrQMDFolder = n_urqmd
-        if para_dict["compute_polarization"]:
+        if para_dict_["compute_polarization"]:
             nUrQMDFolder += 1
         # if hydro finishes properly, we continue to do hadronic transport
         status_success = prepare_surface_files_for_urqmd(final_results_folder,
