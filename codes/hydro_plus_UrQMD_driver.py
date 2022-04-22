@@ -368,6 +368,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'NpartList{}.dat'.format(event_id),
         'NpartdNdy-t0.6-{}.dat'.format(event_id),
         'NgluonEstimators{}.dat'.format(event_id)
+        'usedParameters{}.dat'.format(event_id),
     ]
     initial_state_filelist2 = [
         'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
@@ -443,17 +444,24 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         file_list = glob(path.join(spvnfolder, "*"))
         for file_path in file_list:
             file_name = file_path.split("/")[-1]
-            dtemp = np.loadtxt(file_path)
-            h5data = gtemp.create_dataset("{0}".format(file_name),
-                                          data=dtemp,
-                                          compression="gzip",
-                                          compression_opts=9)
-            # save header
-            ftemp = open(file_path, "r")
-            header_text = str(ftemp.readline())
-            ftemp.close()
-            if header_text.startswith("#"):
-                h5data.attrs.create("header", np.string_(header_text))
+            if "usedParameters" in file_name:
+                parafile = open(file_path)
+                for iline, rawline in enumerate(parafile.readlines()):
+                    paraline = rawline.strip('\n')
+                    gtemp.attrs.create("{0}".format(iline),
+                                       np.string_(paraline))
+            else:
+                dtemp = np.loadtxt(file_path)
+                h5data = gtemp.create_dataset("{0}".format(file_name),
+                                              data=dtemp,
+                                              compression="gzip",
+                                              compression_opts=9)
+                # save header
+                ftemp = open(file_path, "r")
+                header_text = str(ftemp.readline())
+                ftemp.close()
+                if header_text.startswith("#"):
+                    h5data.attrs.create("header", np.string_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
         shutil.rmtree(spvnfolder, ignore_errors=True)
