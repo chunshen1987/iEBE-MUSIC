@@ -383,7 +383,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     ]
     hydro_info_filepattern = [
         "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
-        "meanpT_estimators_tau_*.dat",
+        "meanpT_estimators_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
