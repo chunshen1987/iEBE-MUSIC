@@ -283,7 +283,8 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     curr_time = time.asctime()
     print("\U0001F3CD  [{}] Running spvn analysis ... ".format(curr_time),
           flush=True)
-
+    call("mv 3dMCGlauber/rapidity_shift hadronic_afterburner_toolkit/rapidity_shift",
+         shell=True)
     call("bash ./run_analysis_spvn.sh", shell=True)
 
     curr_time = time.asctime()
