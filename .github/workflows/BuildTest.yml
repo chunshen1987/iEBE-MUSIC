@@ -8,7 +8,7 @@ on:
       - '*'
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -27,5 +27,5 @@ jobs:
       - name: Build the iEBE-MUSIC framework
         run: |
           cd codes/
-          ./get_code_packages_dev.sh
+          ./get_code_packages.sh
           ./compile_code_packages.sh
