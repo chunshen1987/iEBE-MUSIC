@@ -41,6 +41,32 @@ cd {4:s}
         exit(1)
 
 
+def generate_Stampede2_mpi_job_script(folder_name, n_nodes, n_jobs, n_threads,
+                                      walltime):
+    """This function generates job script for Stampede2"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -o job.e%j
+#SBATCH -p skx-normal
+#SBATCH -N {0:d}
+#SBATCH -n {1:d}
+#SBATCH -t {2:s}
+#SBATCH -A TG-PHY200093
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS={3:d}
+
+ibrun python job_MPI_wrapper.py
+
+""".format(n_nodes, n_jobs, walltime, n_threads))
+    script.close()
+
+
 def generate_event_folders(workingFolder, clusterName, eventId,
                            singularityRepoPath, executeScript, parameterFile,
                            eventId0, nHydroEvents, nThreads, seed, wallTime):
@@ -217,6 +243,16 @@ def main():
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/WSUgrid/submit_all_jobs.sh'), pwd)
+
+    if cluster_name == "stampede2":
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/48))
+        generate_Stampede2_mpi_job_script(
+                working_folder_name, n_nodes, n_jobs, n_threads,
+                wallTime)
 
 
 if __name__ == "__main__":
