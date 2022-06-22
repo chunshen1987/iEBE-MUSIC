@@ -18,7 +18,7 @@ printf "Job running as user: `/usr/bin/id`\n"
 /home/iEBE-MUSIC/generate_jobs.py -w playground -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nthreads} -seed ${seed} --nocopy --continueFlag
 
 cd playground/event_0
-bash submit_job.pbs
+bash submit_job.script
 status=$?
 if [ $status -ne 0 ]; then
     exit $status

@@ -12,7 +12,7 @@ import argparse
 from math import ceil
 from glob import glob
 
-support_cluster_list = ["wsugrid", "OSG", "local",]
+support_cluster_list = ["wsugrid", "OSG", "local", "stampede2"]
 
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
@@ -33,7 +33,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in ("local", "OSG"):
+    elif cluster in ("local", "OSG", "stampede2"):
         script.write("#!/bin/bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -51,7 +51,7 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     # generate job running script
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
-    script = open(path.join(eventFolder, "submit_job.pbs"), "w")
+    script = open(path.join(eventFolder, "submit_job.script"), "w")
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""

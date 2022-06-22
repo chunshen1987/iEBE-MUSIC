@@ -26,7 +26,7 @@ for ijob in `ls --color=none | grep "event"`;
 do
     echo "submit job in " ${workFolder}/${ijob}
     cd ${ijob}
-    sbatch -q ${queue} submit_job.pbs | awk {'print $4'} > job_id
+    sbatch -q ${queue} submit_job.script | awk {'print $4'} > job_id
     cd ..
     ((Numjobs++))
 done
