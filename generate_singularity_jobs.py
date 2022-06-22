@@ -41,29 +41,33 @@ cd {4:s}
         exit(1)
 
 
-def generate_Stampede2_mpi_job_script(folder_name, n_nodes, n_jobs, n_threads,
-                                      walltime):
+def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
+                                      n_threads, walltime):
     """This function generates job script for Stampede2"""
     working_folder = folder_name
+
+    queueName = '{}-normal'.format(nodeType)
+    if nodeType == "knl":
+        queueName = 'normal'
 
     script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
     script.write("""#!/bin/bash -l
 #SBATCH -J iEBEMUSIC
 #SBATCH -o job.o%j
 #SBATCH -o job.e%j
-#SBATCH -p skx-normal
-#SBATCH -N {0:d}
-#SBATCH -n {1:d}
-#SBATCH -t {2:s}
+#SBATCH -p {0:s}
+#SBATCH -N {1:d}
+#SBATCH -n {2:d}
+#SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
-export OMP_NUM_THREADS={3:d}
+export OMP_NUM_THREADS={4:d}
 
 ibrun python3 job_MPI_wrapper.py
 
-""".format(n_nodes, n_jobs, walltime, n_threads))
+""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
 
 
@@ -125,9 +129,13 @@ def main():
                         '--cluster_name',
                         metavar='',
                         type=str,
-                        choices=support_cluster_list,
                         default='local',
                         help='name of the cluster')
+    parser.add_argument('--node_type',
+                        metavar='',
+                        type=str,
+                        default='SKX',
+                        help='name of the queue (work on stampede2)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
@@ -192,7 +200,7 @@ def main():
 
     try:
         working_folder_name = args.working_folder_name
-        cluster_name = args.cluster_name
+        cluster_name = args.cluster_name.lower()
         n_jobs = args.n_jobs
         n_hydro_per_job = args.n_hydro_per_job
         n_threads = args.n_threads
@@ -245,14 +253,24 @@ def main():
                       'Cluster_supports/WSUgrid/submit_all_jobs.sh'), pwd)
 
     if cluster_name == "stampede2":
+        nThreadsPerNode = 1
+        if args.node_type.lower() == "skx":
+            nThreadsPerNode = 96
+        elif args.node_type.lower() == "knl":
+            nThreadsPerNode = 272
+        elif args.node_type.lower() == "icx":
+            nThreadsPerNode = 160
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
             working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/48))
-        generate_Stampede2_mpi_job_script(
-                working_folder_name, n_nodes, n_jobs, n_threads,
-                wallTime)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_Stampede2_mpi_job_script(working_folder_name,
+                                          args.node_type.lower(),
+                                          n_nodes, n_jobs, n_threads, wallTime)
 
 
 if __name__ == "__main__":
