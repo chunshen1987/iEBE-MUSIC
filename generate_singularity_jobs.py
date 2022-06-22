@@ -61,7 +61,7 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={3:d}
 
-ibrun python job_MPI_wrapper.py
+ibrun python3 job_MPI_wrapper.py
 
 """.format(n_nodes, n_jobs, walltime, n_threads))
     script.close()
