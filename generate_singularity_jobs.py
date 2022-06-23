@@ -33,8 +33,12 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in ("local", "OSG", "stampede2"):
+    elif cluster in ("local", "OSG"):
         script.write("#!/bin/bash")
+    elif cluster == "stampede2":
+        script.write("""#!/usr/bin/env bash
+module load tacc-singulairty
+""")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
         print("Available options: ", support_cluster_list)
