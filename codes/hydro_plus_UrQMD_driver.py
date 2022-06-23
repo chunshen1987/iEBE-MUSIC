@@ -11,6 +11,7 @@ import shutil
 import re
 import h5py
 import numpy as np
+import os
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
 from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
 
@@ -68,7 +69,7 @@ def get_initial_condition(database, initial_type, iev, seed_add,
             collect_ipglasma_event(res_path)
         connect_ipglasma_event(res_path, initial_type, file_name)
         return status, file_name
-    elif initial_type == "3DMCGlauber_dynamical":
+    elif initial_type in ("3DMCGlauber_dynamical", "3DMCGlauber_dynamical_eccentricity"):
         if database == "self":
             file_name = "strings_event_{}.dat".format(iev)
             ran = np.random.default_rng().integers(1e8)
@@ -326,7 +327,7 @@ def check_an_event_is_good(event_folder):
     return True
 
 
-def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
+def zip_results_into_hdf5(only_initial, final_results_folder, event_id, para_dict):
     """This function combines all the results into hdf5"""
     results_name = "spvn_results_{}".format(event_id)
     time_stamp = para_dict['time_stamp_str']
@@ -346,6 +347,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     ]
     hydro_info_filepattern = [
         "eccentricities_evo_*.dat", "momentum_anisotropy_eta_*.dat",
+        'meanpT_estimators_tau_*.dat',
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
@@ -356,7 +358,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                             "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
 
-    status = check_an_event_is_good(spvnfolder)
+    if (only_initial == 1):
+        if not os.path.exists(spvnfolder):
+            os.makedirs(spvnfolder)
+        status = True
+    else:
+        status = check_an_event_is_good(spvnfolder)
     if status:
         curr_time = time.asctime()
         print("[{}] {} is good, converting results to hdf5".format(
@@ -420,7 +427,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     return (status)
 
 
-def remove_unwanted_outputs(final_results_folder,
+def remove_unwanted_outputs(initial_only, final_results_folder,
                             event_id,
                             save_ipglasma=True,
                             save_kompost=True,
@@ -445,10 +452,10 @@ def remove_unwanted_outputs(final_results_folder,
         hydrofolder = path.join(final_results_folder,
                                 "hydro_results_{}".format(event_id))
         shutil.rmtree(hydrofolder, ignore_errors=True)
-
-    if not save_urqmd:
-        urqmd_results_name = "particle_list_{}.gz".format(event_id)
-        remove(path.join(final_results_folder, urqmd_results_name))
+    if (initial_only == 0):
+        if not save_urqmd:
+            urqmd_results_name = "particle_list_{}.gz".format(event_id)
+            remove(path.join(final_results_folder, urqmd_results_name))
 
 
 def main(para_dict_):
@@ -466,6 +473,11 @@ def main(para_dict_):
     nev = para_dict_['n_hydro']
     exitErrorTrigger = False
     exitErrorTriggerInitial = False
+    if (initial_type == "3DMCGlauber_dynamical_eccentricity"
+                and initial_condition == "self"):
+       initial_only = 1
+    else:
+       initial_only = 0
     for iev in range(idx0, idx0 + nev):
         curr_time = time.asctime()
 
@@ -487,6 +499,8 @@ def main(para_dict_):
                                        "spvn_results_{}".format(event_id))
                 if path.exists(spvnfolder):
                     status = check_an_event_is_good(spvnfolder)
+                    if (initial_only == 1):
+                        status = True
             if status:
                 print(
                     "{} finished properly. No need to rerun.".format(event_id),
@@ -533,6 +547,27 @@ def main(para_dict_):
         hydro_success, hydro_folder_name = run_hydro_event(
             final_results_folder, event_id)
 
+        if (initial_type == "3DMCGlauber_dynamical_eccentricity"
+                and initial_condition == "self"):
+            # save the initial condition
+            shutil.move(
+                "MUSIC/initial/strings.dat",
+                path.join(final_results_folder, hydro_folder_name,
+                          "strings_{}.dat".format(event_id)))
+            status = zip_results_into_hdf5(1, final_results_folder, event_id,
+                                           para_dict_)
+
+            # remove the unwanted outputs if event is finished properly
+
+            if status:
+                remove_unwanted_outputs(initial_only, final_results_folder, event_id,
+                                        para_dict_['save_ipglasma'],
+                                        para_dict_['save_kompost'],
+                                        para_dict_['save_hydro'],
+                                        para_dict_['save_urqmd'])
+
+            continue
+
         if not hydro_success:
             # if hydro didn't finish properly, just skip this event
             print("\U000026D4  {} did not finsh properly, skipped.".format(
@@ -571,12 +606,12 @@ def main(para_dict_):
                           event_id)
 
         # zip results into a hdf5 database
-        status = zip_results_into_hdf5(final_results_folder, event_id,
+        status = zip_results_into_hdf5(0, final_results_folder, event_id,
                                        para_dict_)
 
         # remove the unwanted outputs if event is finished properly
         if status:
-            remove_unwanted_outputs(final_results_folder, event_id,
+            remove_unwanted_outputs(initial_only, final_results_folder, event_id,
                                     para_dict_['save_ipglasma'],
                                     para_dict_['save_kompost'],
                                     para_dict_['save_hydro'],
@@ -608,7 +643,7 @@ if __name__ == "__main__":
 
     known_initial_types = [
         "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
-        "3DMCGlauber_consttau"
+        "3DMCGlauber_consttau", "3DMCGlauber_dynamical_eccentricity"
     ]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
         print("\U0001F6AB  "
