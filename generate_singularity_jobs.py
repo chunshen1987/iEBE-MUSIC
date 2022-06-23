@@ -141,7 +141,7 @@ def main():
                         metavar='',
                         type=str,
                         default='SKX',
-                        help='name of the queue (work on stampede2)')
+                        help='node type (work on stampede2)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
