@@ -3,6 +3,20 @@
 Green='\033[0;32m'
 NC='\033[0m'
 
+CCFlag=$1
+CXXFlag=$2
+FCFlag=$3
+
+if [ -z "$CCFlag" ]; then
+    CCFlag=gcc
+fi
+if [ -z "$CXXFlag" ]; then
+    CXXFlag=g++
+fi
+if [ -z "$FCFlag" ]; then
+    FCFlag=gfortran
+fi
+
 machine="$(uname -s)"
 case "${machine}" in
     Linux*)     number_of_cores=`nproc --all`;;
@@ -16,9 +30,10 @@ echo -e "${Green}compile 3dMCGlauber ... ${NC}"
 (
     cd 3dMCGlauber_code
     ./get_LHAPDF.sh
+    rm -fr build
     mkdir -p build
     cd build
-    cmake .. -Dlink_with_lib=OFF
+    CC=${CCFlag} CXX=${CXXFlag} cmake .. -Dlink_with_lib=OFF
     make -j${number_of_cores_to_compile}
     make install
 )
@@ -31,7 +46,12 @@ fi
 echo -e "${Green}compile IPGlasma ... ${NC}"
 (
     cd ipglasma_code
-    ./compile_IPGlasma.sh noMPI
+    rm -fr build
+    mkdir -p build
+    cd build
+    CC=${CCFlag} CXX=${CXXFlag} cmake .. -DdisableMPI=ON
+    make -j${number_of_cores_to_compile}
+    make install
 )
 status=$?
 if [ $status -ne 0 ]; then
@@ -42,7 +62,7 @@ fi
 echo -e "${Green}compile KoMPoST ... ${NC}"
 (
     cd kompost_code
-    make
+    CXX=${CXXFlag} make
 )
 status=$?
 if [ $status -ne 0 ]; then
@@ -53,9 +73,10 @@ fi
 echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
+    rm -fr build
     mkdir -p build
     cd build
-    cmake .. -Dlink_with_lib=OFF
+    CC=${CCFlag} CXX=${CXXFlag} cmake .. -Dlink_with_lib=OFF
     make -j${number_of_cores_to_compile}
     make install
 )
@@ -72,9 +93,10 @@ cp MUSIC_code/utilities/sweeper.sh MUSIC/
 echo -e "${Green}compile iSS ... ${NC}"
 (
     cd iSS_code
+    rm -fr build
     mkdir -p build
     cd build
-    cmake .. -Dlink_with_lib=OFF
+    CC=${CCFlag} CXX=${CXXFlag} cmake .. -Dlink_with_lib=OFF
     make -j${number_of_cores_to_compile}
     make install
 )
@@ -87,7 +109,7 @@ fi
 echo -e "${Green}compile UrQMD ... ${NC}"
 (
     cd urqmd_code
-    make -j${number_of_cores_to_compile}
+    FC=${FCFlag} make -j${number_of_cores_to_compile}
 )
 status=$?
 if [ $status -ne 0 ]; then
@@ -104,15 +126,16 @@ cp urqmd_code/urqmd/uqmd.burner urqmd/
 echo -e "${Green}compile hadronic afterburner toolkit ... ${NC}"
 (
     cd hadronic_afterburner_toolkit_code
+    rm -fr build
     mkdir -p build
     cd build
-    cmake .. -Dlink_with_lib=OFF
+    CC=${CCFlag} CXX=${CXXFlag} cmake .. -Dlink_with_lib=OFF
     make -j${number_of_cores_to_compile}
     make install
     cd ../ebe_scripts
-    g++ convert_to_binary.cpp -lz -o convert_to_binary.e
+    ${CXXFlag} convert_to_binary.cpp -lz -o convert_to_binary.e
     mv convert_to_binary.e ../
-    g++ concatenate_binary_files.cpp -lz -o concatenate_binary_files.e
+    ${CXXFlag} concatenate_binary_files.cpp -lz -o concatenate_binary_files.e
     mv concatenate_binary_files.e ../
 )
 status=$?
