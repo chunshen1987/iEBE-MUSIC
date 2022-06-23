@@ -65,6 +65,8 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
+module load python3
+
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
