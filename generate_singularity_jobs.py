@@ -37,7 +37,7 @@ cd {4:s}
         script.write("#!/bin/bash")
     elif cluster == "stampede2":
         script.write("""#!/usr/bin/env bash
-module load tacc-singulairty
+module load tacc-singularity
 """)
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
