@@ -422,7 +422,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
         "   ./hadronic_afterburner_tools.e analyze_HBT=0 {0}\n".format(logfile))
     if HBT_flag:
         script.write(
-            "    python ./average_event_HBT_correlation_function.py .. results\n"
+            "    python3 ./average_event_HBT_correlation_function.py .. results\n"
         )
     script.write(")\n")
     script.close()
