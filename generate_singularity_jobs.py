@@ -58,7 +58,7 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
     script.write("""#!/bin/bash -l
 #SBATCH -J iEBEMUSIC
 #SBATCH -o job.o%j
-#SBATCH -o job.e%j
+#SBATCH -e job.e%j
 #SBATCH -p {0:s}
 #SBATCH -N {1:d}
 #SBATCH -n {2:d}
