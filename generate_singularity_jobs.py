@@ -79,7 +79,8 @@ ibrun python3 job_MPI_wrapper.py
 
 def generate_event_folders(workingFolder, clusterName, eventId,
                            singularityRepoPath, executeScript, parameterFile,
-                           eventId0, nHydroEvents, nThreads, seed, wallTime):
+                           eventId0, nHydroEvents, nUrQMD, nThreads, seed,
+                           wallTime):
     """This function creates the event folder structure"""
     eventFolder = path.join(workingFolder, 'event_{}'.format(eventId))
     mkdir(eventFolder)
@@ -91,10 +92,10 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-singularity exec {0} ./{1} {2} {3} {4} {5} {6}
+singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7}
 
 """.format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nThreads, seed))
+           eventId0, nHydroEvents, nUrQMD, nThreads, seed))
     if clusterName == "stampede2":
         script.write("""
 source $WORK/venv/bin/activate
@@ -225,6 +226,10 @@ def main():
         parser.print_help()
         exit(0)
 
+    nUrQMD = n_threads
+    if args.node_type == "knl":
+        nUrQMD = max(1, int(n_threads/4))
+
     code_package_path = path.abspath(path.dirname(__file__))
     par_diretory = path.dirname(path.abspath(args.par_dict))
     sys.path.insert(0, par_diretory)
@@ -250,7 +255,8 @@ def main():
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
                                parameterFile, i_job*n_hydro_per_job,
-                               n_hydro_per_job, n_threads, seed, wallTime)
+                               n_hydro_per_job, nUrQMD, n_threads, seed,
+                               wallTime)
     sys.stdout.write("\n")
     sys.stdout.flush()
 
