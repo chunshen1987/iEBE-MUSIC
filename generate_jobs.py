@@ -78,11 +78,8 @@ cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
     elif cluster == "stampede2":
         script.write("""#!/usr/bin/env bash
-module load fftw3
-module load python3
-module load hdf5
-module load eigen
-module load gsl
+
+source $WORK/venv/bin/activate
 """)
     elif cluster in ("local", "OSG"):
         script.write("#!/bin/bash")
@@ -112,7 +109,7 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
-module load python3
+source $WORK/venv/bin/activate
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads

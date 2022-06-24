@@ -65,7 +65,7 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
-module load python3
+source $WORK/venv/bin/activate
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
@@ -95,8 +95,12 @@ singularity exec {0} ./{1} {2} {3} {4} {5} {6}
 
 """.format(singularityRepoPath, executeScriptName, parameterFileName,
            eventId0, nHydroEvents, nThreads, seed))
-    if clusterName != "stampede2":
+    if clusterName == "stampede2":
         script.write("""
+source $WORK/venv/bin/activate
+
+""")
+    script.write("""
 mkdir -p temp
 ./collect_events.sh playground temp
 mv temp/playground/playground.h5 RESULTS_{0}.h5
