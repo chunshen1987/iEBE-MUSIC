@@ -37,7 +37,8 @@ cd {4:s}
         script.write("#!/bin/bash")
     elif cluster == "stampede2":
         script.write("""#!/usr/bin/env bash
-module load tacc-singularity
+
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 """)
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -65,7 +66,7 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
-source $WORK/venv/bin/activate
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
@@ -94,18 +95,11 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     script.write("""
 singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7}
 
-""".format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nUrQMD, nThreads, seed))
-    if clusterName == "stampede2":
-        script.write("""
-source $WORK/venv/bin/activate
-
-""")
-    script.write("""
 mkdir -p temp
 ./collect_events.sh playground temp
-mv temp/playground/playground.h5 RESULTS_{0}.h5
-""".format(eventId))
+mv temp/playground/playground.h5 RESULTS_{8}.h5
+""".format(singularityRepoPath, executeScriptName, parameterFileName,
+           eventId0, nHydroEvents, nUrQMD, nThreads, seed, eventId))
     script.close()
 
     # copy files

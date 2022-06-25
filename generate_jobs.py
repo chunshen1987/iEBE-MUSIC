@@ -79,7 +79,7 @@ cd {4:s}
     elif cluster == "stampede2":
         script.write("""#!/usr/bin/env bash
 
-source $WORK/venv/bin/activate
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 """)
     elif cluster in ("local", "OSG"):
         script.write("#!/bin/bash")
@@ -109,7 +109,7 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -t {3:s}
 #SBATCH -A TG-PHY200093
 
-source $WORK/venv/bin/activate
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
