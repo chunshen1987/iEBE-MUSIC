@@ -242,6 +242,8 @@ def main():
     create_a_working_folder(working_folder_name)
 
     shutil.copy(args.par_dict, working_folder_name)
+    if args.bayes_file != "":
+        shutil.copy(args.bayes_file, working_folder_name)
 
     toolbar_width = 40
     sys.stdout.write("\U0001F375  Generating {} jobs [{}]".format(
