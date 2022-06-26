@@ -221,7 +221,7 @@ def main():
         exit(0)
 
     nUrQMD = n_threads
-    if args.node_type == "knl":
+    if args.node_type.lower() == "knl":
         nUrQMD = max(1, int(n_threads/4))
 
     code_package_path = path.abspath(path.dirname(__file__))
