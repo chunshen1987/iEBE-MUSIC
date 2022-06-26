@@ -88,8 +88,8 @@ cp temp/* $WORK/RESULTS/
 
 def generate_event_folders(workingFolder, clusterName, eventId,
                            singularityRepoPath, executeScript, parameterFile,
-                           eventId0, nHydroEvents, nUrQMD, nThreads, seed,
-                           wallTime):
+                           bayesParamFile, eventId0, nHydroEvents, nUrQMD,
+                           nThreads, seed, wallTime):
     """This function creates the event folder structure"""
     eventFolder = path.join(workingFolder, 'event_{}'.format(eventId))
     mkdir(eventFolder)
@@ -101,18 +101,22 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7}
+singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8}
 
 mkdir -p temp
 ./collect_events.sh playground temp
-mv temp/playground/playground.h5 RESULTS_{8}.h5
+mv temp/playground/playground.h5 RESULTS_{9}.h5
 """.format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nUrQMD, nThreads, seed, eventId))
+           eventId0, nHydroEvents, nUrQMD, nThreads, seed, bayesParamFile,
+           eventId))
     script.close()
 
     # copy files
     shutil.copy(executeScript, eventFolder)
     shutil.copy(parameterFile, eventFolder)
+    if bayesParamFile != "":
+        shutil.copy(bayesParamFile, eventFolder)
+
 
 
 def create_a_working_folder(workfolder_path):
@@ -258,7 +262,8 @@ def main():
             sys.stdout.flush()
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
-                               parameterFile, i_job*n_hydro_per_job,
+                               parameterFile, args.bayes_file,
+                               i_job*n_hydro_per_job,
                                n_hydro_per_job, nUrQMD, n_threads, seed,
                                wallTime)
     sys.stdout.write("\n")
