@@ -74,6 +74,14 @@ export OMP_NUM_THREADS={4:d}
 
 ibrun python3 job_MPI_wrapper.py
 
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $WORK
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $WORK/RESULTS
+cp temp/* $WORK/RESULTS/
+
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
 
@@ -284,6 +292,10 @@ def main():
         generate_Stampede2_mpi_job_script(working_folder_name,
                                           args.node_type.lower(),
                                           n_nodes, n_jobs, n_threads, wallTime)
+        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
 
 
 if __name__ == "__main__":
