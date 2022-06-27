@@ -80,7 +80,7 @@ rm -fr temp
 mkdir temp
 ./collect_events_singularity.sh `pwd` temp
 mkdir -p $WORK/RESULTS
-cp temp/* $WORK/RESULTS/
+cp -r temp/* $WORK/RESULTS/
 
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
