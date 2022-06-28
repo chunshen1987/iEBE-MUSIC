@@ -2,13 +2,13 @@ name: Build Test
 
 on:
   # Trigger the workflow on push or pull request,
-  # but only for the main branch
   push:
     branches:
       - '*'
   pull_request:
     branches:
-      - master
+      - main
+      - dev
 
 jobs:
   build:
@@ -27,5 +27,5 @@ jobs:
       - name: Build the iEBE-MUSIC framework
         run: |
           cd codes/
-          ./get_code_packages_dev.sh
+          ./get_code_packages.sh
           ./compile_code_packages.sh
