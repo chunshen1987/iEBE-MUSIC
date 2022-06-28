@@ -118,7 +118,7 @@ num_of_nodes={0:d}
 for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
 do
     export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
+    srun -N 1 -n {3:d} -c {2:d} python3 job_MPI_wrapper.py {3:d} $nodeid &
 done
 wait
 """.format(n_nodes, walltime, n_threads, n_jobs_per_node))
@@ -150,7 +150,7 @@ num_of_nodes={0:d}
 for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
 do
     export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
+    srun -N 1 -n {3:d} -c {2:d} python3 job_MPI_wrapper.py {3:d} $nodeid &
 done
 wait
 """.format(n_nodes, walltime, n_threads, n_jobs_per_node))
@@ -422,7 +422,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
         "   ./hadronic_afterburner_tools.e analyze_HBT=0 {0}\n".format(logfile))
     if HBT_flag:
         script.write(
-            "    python ./average_event_HBT_correlation_function.py .. results\n"
+            "    python3 ./average_event_HBT_correlation_function.py .. results\n"
         )
     script.write(")\n")
     script.close()
