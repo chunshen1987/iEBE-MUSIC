@@ -58,6 +58,6 @@ jobs:
           context: ./docker
           file: ./docker/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
-          tags: chunshen1987/iebe-music:${GITHUB_REF##*/}
+          tags: chunshen1987/iebe-music:${{ GITHUB_REF##*/ }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
