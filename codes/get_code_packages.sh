@@ -19,12 +19,12 @@ rm -fr kompost_code/.git
 
 # download MUSIC
 rm -fr MUSIC_code
-git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b v3.1 MUSIC_code
+git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC MUSIC_code
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
-git clone --depth=1 https://github.com/chunshen1987/iSS -b v1.1 iSS_code
+git clone --depth=1 https://github.com/chunshen1987/iSS iSS_code
 rm -fr iSS_code/.git
 
 # download UrQMD afterburner
