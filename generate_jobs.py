@@ -23,7 +23,7 @@ known_initial_types = [
 ]
 
 support_cluster_list = [
-    'nersc', 'wsugrid', "OSG", "local", "guillimin", "McGill",
+    'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
     'stampede2'
 ]
 
@@ -52,7 +52,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #PBS -q sw
 #PBS -d {3:s}
 """.format(event_id, n_threads, walltime, working_folder))
-    elif cluster == "McGill":
+    elif cluster == "mcgill":
         script.write("""#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}:irulan
@@ -81,7 +81,7 @@ cd {4:s}
 
 source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 """)
-    elif cluster in ("local", "OSG"):
+    elif cluster in ("local", "osg"):
         script.write("#!/bin/bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -207,7 +207,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("sleep {}".format(event_id))
         script.write("""
 # IPGlasma evolution (run 1 event)
@@ -256,7 +256,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # KoMPoST EKT evolution
 ./KoMPoST.exe setup.ini 1> run.log 2> run.err
@@ -297,7 +297,7 @@ rm -fr $results_folder
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # hydro evolution
 ./MUSIChydro music_input_mode_2 1> run.log 2> run.err
@@ -319,7 +319,7 @@ def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
@@ -409,7 +409,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
@@ -699,7 +699,7 @@ def main():
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
 
-    if cluster_name == "OSG":
+    if cluster_name == "osg":
         if seed == -1:
             seed = 0
         seed += job_id
