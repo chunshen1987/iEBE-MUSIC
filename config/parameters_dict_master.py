@@ -462,10 +462,11 @@ iss_dict = {
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
     'echo_level': 9,    # control the mount of print messages
-    'read_in_mode': 2,  # mode for reading in particle information
+    'read_in_mode': 21, # mode for reading in particle information
                         # 0: reads outputs from OSCAR outputs
                         # 1: reads outputs from UrQMD outputs
                         # 2: reads outputs from zipped UrQMD outputs
+                        # 21: reads outputs from binary UrQMD outputs
                         # 3: reads outputs from Sangwook's UrQMD outputs 
                         #    (without header lines)
                         # 4: reads outputs from UrQMD 3.3p2 outputs

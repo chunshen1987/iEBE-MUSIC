@@ -3,7 +3,7 @@
 
 import sys
 import re
-from os import path, mkdir
+from os import path, mkdir, remove
 import shutil
 import subprocess
 import argparse
@@ -358,6 +358,44 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
+def generate_script_spinPol(folder_name, cluster_name):
+    """This function generates script for spin polarization"""
+    working_folder = folder_name
+
+    logfile = ""
+    if cluster_name != "OSG":
+        logfile = " >> run.log"
+
+    script = open(path.join(working_folder, "run_spinPol.sh"), "w")
+    script.write("""#!/bin/bash
+
+unalias ls 2>/dev/null
+
+SubEventId=$1
+
+(
+cd UrQMDev_$SubEventId
+
+mkdir -p UrQMD_results
+rm -fr UrQMD_results/*
+
+cd iSS
+mkdir -p results
+rm -fr results/*
+mv ../hydro_event/surface.dat results/surface.dat
+mv ../hydro_event/music_input results/music_input
+mv ../hydro_event/spectators.dat results/spectators.dat
+
+""")
+    script.write("./iSS.e {0}\n".format(logfile))
+    script.write("""
+
+rm -fr ../hydro_event
+)
+""")
+    script.close()
+
+
 def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
@@ -418,7 +456,7 @@ do
     mv particle_list.dat ../UrQMD_results/particle_list.dat
     rm -fr OSCAR.input
     cd ..
-    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat
+    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat binary
     rm -fr UrQMD_results/particle_list.dat
 """)
     if HBT_flag:
@@ -426,7 +464,7 @@ do
     cd hadronic_afterburner_toolkit
     mkdir -p results
     cd results; rm -fr *
-    ln -s ../../UrQMD_results/particle_list.gz particle_list.dat
+    ln -s ../../UrQMD_results/particle_list.bin particle_list.dat
     cd ..
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
@@ -579,6 +617,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
             HBT_flag = True
 
+    if para_dict.control_dict['compute_polarization']:
+        generate_script_spinPol(event_folder, cluster_name)
+
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
@@ -592,20 +633,31 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                      'UrQMDev_{}'.format(iev))
         mkdir(sub_event_folder)
         mkdir(path.join(sub_event_folder, 'iSS'))
-        shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
-                        path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
-        if (para_dict.control_dict['compute_polarization']
-            and iev < n_urqmd_per_hydro):
-            f1 = open("temp.dat", "w")
-            with open(path.join(sub_event_folder,
-                                'iSS/iSS_parameters.dat')) as f:
-                for line in f:
-                    line2 = re.sub("calculate_polarization = 1",
-                                   "calculate_polarization = 0", line)
-                    f1.write(line2)
-            f1.close()
-            shutil.copyfile("temp.dat", path.join(sub_event_folder,
-                                                  'iSS/iSS_parameters.dat'))
+        iSSParamFile = 'iSS/iSS_parameters.dat'
+        shutil.copyfile(path.join(param_folder, iSSParamFile),
+                        path.join(sub_event_folder, iSSParamFile))
+        if para_dict.control_dict['compute_polarization']:
+            if iev < n_urqmd_per_hydro:
+                f1 = open("temp.dat", "w")
+                with open(path.join(sub_event_folder, iSSParamFile)) as f:
+                    for line in f:
+                        line2 = re.sub("calculate_polarization = 1",
+                                       "calculate_polarization = 0", line)
+                        f1.write(line2)
+                f1.close()
+                shutil.copyfile("temp.dat", path.join(sub_event_folder,
+                                                      iSSParamFile))
+            if iev == n_urqmd_per_hydro:
+                f1 = open("temp.dat", "w")
+                with open(path.join(sub_event_folder, iSSParamFile)) as f:
+                    for line in f:
+                        line2 = re.sub("MC_sampling = 4",
+                                       "MC_sampling = 0", line)
+                        f1.write(line2)
+                f1.close()
+                shutil.copyfile("temp.dat", path.join(sub_event_folder,
+                                                      iSSParamFile))
+            remove("temp.dat")
 
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(

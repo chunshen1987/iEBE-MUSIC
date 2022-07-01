@@ -327,12 +327,12 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                     startTime, checkPointFileName):
     """This function runs urqmd events in parallel"""
     logo = "\U0001F5FF"
-    urqmd_results_name = "particle_list_{}.gz".format(event_id)
-    results_folder = path.join(final_results_folder, urqmd_results_name)
+    urqmdResults = "particle_list_{}.bin".format(event_id)
+    results_folder = path.join(final_results_folder, urqmdResults)
     urqmd_success = False
 
     if path.exists(results_folder):
-        print("{} UrQMD results {} exist ... ".format(logo, urqmd_results_name),
+        print("{} UrQMD results {} exist ... ".format(logo, urqmdResults),
               flush=True)
         urqmd_success = True
 
@@ -349,7 +349,7 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                 print("{}  [{}] Running spin calculations ... ".format(logo,
                                                                    curr_time),
                       flush=True)
-                run_urqmd_event(n_urqmd)
+                call("bash ./run_spinPol.sh {}".format(n_urqmd), shell=True)
                 shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd),
                             spin_folder)
                 if para_dict["check_point_flag"]:
@@ -361,13 +361,15 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
 
+        urqmdResFile = "particle_list.bin"
         for iev in range(1, n_urqmd):
-            call("./hadronic_afterburner_toolkit/concatenate_binary_files.e "
-                 + "UrQMDev_0/UrQMD_results/particle_list.gz "
-                 + "UrQMDev_{}/UrQMD_results/particle_list.gz".format(iev),
+            call("cat UrQMDev_{}/UrQMD_results/{} ".format(iev, urqmdResFile)
+                 + ">> UrQMDev_0/UrQMD_results/{}".format(urqmdResFile),
                  shell=True)
+            remove("UrQMDev_{}/UrQMD_results/{}".format(iev, urqmdResFile))
         urqmd_success = True
-        shutil.move("UrQMDev_0/UrQMD_results/particle_list.gz", results_folder)
+        shutil.move("UrQMDev_0/UrQMD_results/{}".format(urqmdResFile),
+                    results_folder)
 
     return (urqmd_success, results_folder)
 
@@ -385,7 +387,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     mkdir(spvn_folder)
     call("ln -s {0:s} {1:s}".format(path.abspath(urqmd_file_path),
                                     path.join(spvn_folder,
-                                              "particle_list.dat")),
+                                              "particle_list.bin")),
          shell=True)
     # finally collect results
     curr_time = time.asctime()
@@ -398,7 +400,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time),
           flush=True)
 
-    call("rm {}/particle_list.dat".format(spvn_folder), shell=True)
+    call("rm {}/particle_list.bin".format(spvn_folder), shell=True)
     shutil.move(spvn_folder, final_results_folder)
 
 
@@ -598,7 +600,7 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
         shutil.rmtree(spinfolder, ignore_errors=True)
 
     if not para_dict["save_urqmd"]:
-        urqmd_results_name = "particle_list_{}.gz".format(event_id)
+        urqmd_results_name = "particle_list_{}.bin".format(event_id)
         remove(path.join(final_results_folder, urqmd_results_name))
 
     if para_dict["compute_photons"]:
@@ -751,7 +753,7 @@ def main(para_dict_):
                            final_results_folder)
 
         nUrQMDFolder = n_urqmd
-        if para_dict["compute_polarization"]:
+        if para_dict_["compute_polarization"]:
             nUrQMDFolder += 1
         # if hydro finishes properly, we continue to do hadronic transport
         status_success = prepare_surface_files_for_urqmd(final_results_folder,
