@@ -741,6 +741,11 @@ def main(para_dict_):
             if not photon_success:
                 exitErrorTrigger = True
                 continue
+            if not para_dict["save_hydro"]:
+                evoFileName = path.join(final_results_folder,
+                                        hydro_folder_name,
+                                        "evolution_all_xyeta.dat")
+                shutil.rmtree(evoFileName, ignore_errors=True)
             if para_dict_["check_point_flag"]:
                 checkPoint(startTime, CHECKPOINT_FILENAME,
                            final_results_folder)
