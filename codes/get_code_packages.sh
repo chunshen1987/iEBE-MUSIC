@@ -27,6 +27,11 @@ rm -fr iSS_code
 git clone --depth=1 https://github.com/chunshen1987/iSS -b dev iSS_code
 rm -fr iSS_code/.git
 
+# download photonEmission wrapper
+rm -fr photonEmission_hydroInterface_code
+git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface photonEmission_hydroInterface_code
+rm -fr photonEmission_hydroInterface_code/.git
+
 # download UrQMD afterburner
 rm -fr urqmd_code
 git clone --depth=1 https://Chunshen1987@bitbucket.org/Chunshen1987/urqmd_afterburner.git urqmd_code
