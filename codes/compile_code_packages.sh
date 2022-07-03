@@ -93,7 +93,12 @@ cp MUSIC_code/utilities/sweeper.sh MUSIC/
 echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"
 (
     cd photonEmission_hydroInterface_code
-    ./compile.sh
+    rm -fr build
+    mkdir -p build
+    cd build
+    CC=${CCFlag} CXX=${CXXFlag} cmake ..
+    make -j${number_of_cores_to_compile}
+    make install
 )
 status=$?
 if [ $status -ne 0 ]; then
