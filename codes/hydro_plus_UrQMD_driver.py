@@ -451,7 +451,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                     gtemp.attrs.create("{0}".format(iline),
                                        np.string_(paraline))
             else:
-                dtemp = np.loadtxt(file_path)
+                dtemp = np.loadtxt(file_path, dtype="float32")
                 h5data = gtemp.create_dataset("{0}".format(file_name),
                                               data=dtemp,
                                               compression="gzip",
