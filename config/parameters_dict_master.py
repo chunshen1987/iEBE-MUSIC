@@ -509,6 +509,8 @@ hadronic_afterburner_toolkit_dict = {
     'vn_rapidity_dis_pT_min': 0.20,  # the minimum value of pT for vn rap. distr.
     'vn_rapidity_dis_pT_max': 3.0,   # the maximum value of pT for vn rap. distr.
 
+    'rapidityPTDistributionFlag': 0,  # output Qn vectors in (eta, pT)
+
     'check_spatial_dis': 0,         # flag to check dN/dtau distribution
     'intrinsic_detas': 0.1,         # deta_s in the output samples
     'intrinsic_dtau': 0.01,         # dtau in the output samples
