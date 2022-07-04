@@ -38,7 +38,7 @@ do
         echo "Job finished, restarting ..."
         (
             cd ${eventsPath}
-            sbatch -q requeue submit_job.pbs | awk {'print $4'} > job_id
+            sbatch -q requeue submit_job.script | awk {'print $4'} > job_id
         )
     else
         echo ${output}

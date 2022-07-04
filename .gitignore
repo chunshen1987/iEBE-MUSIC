@@ -125,3 +125,4 @@ docs/SphinxDoc/_build/
 average_event_spvn_h5.py
 collect_events.sh
 combine_multiple_hdf5.py
+collect_events_singularity.sh

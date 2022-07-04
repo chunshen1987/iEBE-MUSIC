@@ -5,8 +5,6 @@ import sys
 import os
 from numpy import *
 
-n_order = 7
-
 
 def help_message():
     print("{0} database_file event_id".format(sys.argv[0]))
@@ -32,4 +30,4 @@ for file_i in list(h5_group.keys()):
     vn_data = nan_to_num(vn_data)
 
     savetxt("{}/{}".format(group_name, file_i), vn_data,
-            fmt="%.4e", delimiter="  ")
+            fmt="%.6e", delimiter="  ")

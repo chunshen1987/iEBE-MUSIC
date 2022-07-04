@@ -21,4 +21,4 @@ rank = comm.Get_rank()
 
 event_id = rank + n_threads*(job_id - 1)
 chdir("event_{}".format(event_id))
-call("bash submit_job.pbs {}".format(rank), shell=True)
+call("bash submit_job.script {}".format(rank), shell=True)

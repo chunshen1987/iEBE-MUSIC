@@ -116,7 +116,7 @@ printf "Job running as user: `/usr/bin/id`\\n"
     script.write("""
 cd playground/event_0
 mv EVENT_RESULTS_${processId}.tar.gz playground/event_0
-bash submit_job.pbs
+bash submit_job.script
 status=$?
 if [ $status -ne 0 ]; then
     exit $status

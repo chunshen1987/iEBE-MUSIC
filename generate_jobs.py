@@ -24,7 +24,8 @@ known_initial_types = [
 ]
 
 support_cluster_list = [
-    'nersc', 'nerscKNL', 'wsugrid', "OSG", "local", "guillimin", "McGill"
+    'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
+    'stampede2'
 ]
 
 
@@ -39,16 +40,6 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #SBATCH -J {0:s}
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
-#SBATCH -C haswell
-""".format(event_id, walltime))
-    elif cluster == "nerscKNL":
-        script.write("""#!/bin/bash -l
-#SBATCH -p shared
-#SBATCH -n 1
-#SBATCH -J {0:s}
-#SBATCH -t {1:s}
-#SBATCH -L SCRATCH
-#SBATCH -C knl,quad,cache
 """.format(event_id, walltime))
     elif cluster == "guillimin":
         script.write("""#!/usr/bin/env bash
@@ -62,7 +53,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #PBS -q sw
 #PBS -d {3:s}
 """.format(event_id, n_threads, walltime, working_folder))
-    elif cluster == "McGill":
+    elif cluster == "mcgill":
         script.write("""#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}:irulan
@@ -86,7 +77,12 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in ("local", "OSG"):
+    elif cluster == "stampede2":
+        script.write("""#!/usr/bin/env bash
+
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+""")
+    elif cluster in ("local", "osg"):
         script.write("#!/bin/bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -94,12 +90,48 @@ cd {4:s}
         exit(1)
 
 
-def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
+def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
+                                      n_threads, walltime):
+    """This function generates job script for Stampede2"""
+    working_folder = folder_name
+
+    queueName = '{}-normal'.format(nodeType)
+    if nodeType == "knl":
+        queueName = 'normal'
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH -p {0:s}
+#SBATCH -N {1:d}
+#SBATCH -n {2:d}
+#SBATCH -t {3:s}
+#SBATCH -A TG-PHY200093
+
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS={4:d}
+
+ibrun python3 job_MPI_wrapper.py
+
+""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+    script.close()
+
+
+def generate_nersc_mpi_job_script(folder_name, nodeType, n_nodes, n_threads,
                                   n_jobs_per_node, walltime):
     """This function generates job script for NERSC"""
     working_folder = folder_name
 
-    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
+    nodeOption = "haswell"
+    if nodeType == "knl":
+        nodeOption = "knl,quad,cache"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
     script.write("""#!/bin/bash -l
 #SBATCH --qos=regular
 #SBATCH -N {0:d}
@@ -107,7 +139,7 @@ def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
 #SBATCH -J music
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
-#SBATCH -C haswell
+#SBATCH -C {2:s}
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=chunshen1987@gmail.com
 
@@ -118,43 +150,11 @@ num_of_nodes={0:d}
 # run all the job
 for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
 do
-    export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python3 job_MPI_wrapper.py {3:d} $nodeid &
+    export OMP_NUM_THREADS={3:d}
+    srun -N 1 -n {4:d} -c {3:d} python job_MPI_wrapper.py {4:d} $nodeid &
 done
 wait
-""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
-    script.close()
-
-
-def generate_nerscKNL_mpi_job_script(folder_name, n_nodes, n_threads,
-                                     n_jobs_per_node, walltime):
-    """This function generates job script for NERSC KNL"""
-    working_folder = folder_name
-
-    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
-    script.write("""#!/bin/bash -l
-#SBATCH --qos=regular
-#SBATCH -N {0:d}
-#SBATCH -A m1820
-#SBATCH -J music
-#SBATCH -t {1:s}
-#SBATCH -L SCRATCH
-#SBATCH -C knl,quad,cache
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=chunshen1987@gmail.com
-
-export OMP_PROC_BIND=true
-export OMP_PLACES=cores
-
-num_of_nodes={0:d}
-# run all the job
-for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
-do
-    export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python3 job_MPI_wrapper.py {3:d} $nodeid &
-done
-wait
-""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
+""".format(n_nodes, walltime, nodeOption, n_threads, n_jobs_per_node))
     script.close()
 
 
@@ -166,12 +166,12 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     event_id = working_folder.split('/')[-1]
     walltime = '100:00:00'
 
-    if cluster_name == "OSG":
+    if cluster_name == "osg":
         enableCheckPoint = True
     else:
         enableCheckPoint = False
 
-    script = open(path.join(working_folder, "submit_job.pbs"), "w")
+    script = open(path.join(working_folder, "submit_job.script"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
@@ -220,7 +220,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("sleep {}".format(event_id))
         script.write("""
 # IPGlasma evolution (run 1 event)
@@ -269,7 +269,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # KoMPoST EKT evolution
 ./KoMPoST.exe setup.ini 1> run.log 2> run.err
@@ -310,7 +310,7 @@ rm -fr $results_folder
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # hydro evolution
 ./MUSIChydro music_input_mode_2 1> run.log 2> run.err
@@ -343,7 +343,7 @@ cd photonEmission_hydroInterface
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # perform photon radiation
 ./hydro_photonEmission.e > run.log
@@ -363,7 +363,7 @@ def generate_script_spinPol(folder_name, cluster_name):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_spinPol.sh"), "w")
@@ -401,7 +401,7 @@ def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
@@ -491,7 +491,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
@@ -740,9 +740,13 @@ def main():
                         '--cluster_name',
                         metavar='',
                         type=str,
-                        choices=support_cluster_list,
                         default='local',
                         help='name of the cluster')
+    parser.add_argument('--node_type',
+                        metavar='',
+                        type=str,
+                        default='SKX',
+                        help='Node type (work on stampede2 & nersc)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
@@ -810,7 +814,7 @@ def main():
 
     try:
         working_folder_name = args.working_folder_name
-        cluster_name = args.cluster_name
+        cluster_name = args.cluster_name.lower()
         n_jobs = args.n_jobs
         n_hydro_per_job = args.n_hydro_per_job
         n_urqmd_per_hydro = args.n_urqmd_per_hydro
@@ -834,7 +838,7 @@ def main():
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
 
-    if cluster_name == "OSG":
+    if cluster_name == "osg":
         if seed == -1:
             seed = 0
         seed += job_id
@@ -989,24 +993,38 @@ def main():
             path.join(code_package_path,
                       'Cluster_supports/NERSC/job_MPI_wrapper.py'),
             working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/64))
-        generate_nersc_mpi_job_script(working_folder_name, n_nodes, n_threads,
-                                      int(n_jobs/n_nodes), walltime)
 
-    if cluster_name == "nerscKNL":
-        shutil.copy(
-            path.join(code_package_path,
-                      'Cluster_supports/NERSC/job_MPI_wrapper.py'),
-            working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/272))
-        generate_nerscKNL_mpi_job_script(working_folder_name, n_nodes,
-                                         n_threads, int(n_jobs/n_nodes),
-                                         walltime)
+        n_nodes = max(1, int(n_jobs*n_threads/64))
+        if args.node_type.lower() == "knl":
+            n_nodes = max(1, int(n_jobs*n_threads/272))
+        generate_nersc_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(), n_nodes,
+                                      n_threads, int(n_jobs/n_nodes), walltime)
 
     if cluster_name == "wsugrid":
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/WSUgrid/submit_all_jobs.sh'), pwd)
+
+    if cluster_name == "stampede2":
+        nThreadsPerNode = 1
+        if args.node_type.lower() == "skx":
+            nThreadsPerNode = 96
+        elif args.node_type.lower() == "knl":
+            nThreadsPerNode = 272
+        elif args.node_type.lower() == "icx":
+            nThreadsPerNode = 160
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_Stampede2_mpi_job_script(working_folder_name,
+                                          args.node_type.lower(),
+                                          n_nodes, n_jobs, n_threads, walltime)
 
 
 if __name__ == "__main__":
