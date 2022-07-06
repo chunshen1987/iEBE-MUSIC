@@ -108,7 +108,8 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
 #SBATCH -N {1:d}
 #SBATCH -n {2:d}
 #SBATCH -t {3:s}
-#SBATCH -A TG-PHY200093
+#SBATCH -A TG-PHY210068
+##SBATCH -A TG-PHY200093
 
 source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 
