@@ -150,7 +150,7 @@ def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
 #SBATCH --ntasks-per-node={2:d}
 #SBATCH --cpus-per-task={4:d}
 #SBATCH --time={3:s}
-#SBATCH -A TG-PHY210068
+#SBATCH -A phy210068
 
 source $PROJECT/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 source $PROJECT/venv/bin/activate
