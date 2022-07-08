@@ -152,7 +152,7 @@ def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
 #SBATCH --time={3:s}
 #SBATCH -A phy210068
 
-source $PROJECT/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
 source $PROJECT/venv/bin/activate
 
 export OMP_PROC_BIND=true
