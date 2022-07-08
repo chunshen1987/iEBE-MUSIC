@@ -645,6 +645,8 @@ def update_parameters_dict(par_dict_path, ran_seed):
         photon_dict.update(parameters_dict.photon_dict)
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
+    iss_dict['number_of_particles_needed'] = (
+            int(iss_dict['number_of_particles_needed']/10))
     hadronic_afterburner_toolkit_dict.update(
         parameters_dict.hadronic_afterburner_toolkit_dict)
     hadronic_afterburner_toolkit_dict['randomSeed'] = ran_seed
