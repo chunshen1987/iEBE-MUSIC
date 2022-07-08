@@ -25,7 +25,7 @@ known_initial_types = [
 
 support_cluster_list = [
     'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
-    'stampede2'
+    'stampede2', "anvil"
 ]
 
 
@@ -82,6 +82,12 @@ cd {4:s}
 
 source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 """)
+    elif cluster == "anvil":
+        script.write("""#!/usr/bin/env bash
+
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+source $PROJECT/venv/bin/activate
+""")
     elif cluster in ("local", "osg"):
         script.write("#!/bin/bash")
     else:
@@ -94,6 +100,9 @@ def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
                                       n_threads, walltime):
     """This function generates job script for Stampede2"""
     working_folder = folder_name
+
+    if nodeType not in ["skx", "icx", "knl"]:
+        nodeType = "skx"
 
     queueName = '{}-normal'.format(nodeType)
     if nodeType == "knl":
@@ -118,6 +127,47 @@ export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
 
 ibrun python3 job_MPI_wrapper.py
+
+""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+    script.close()
+
+
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
+                                  n_threads, walltime):
+    """This function generates job script for Anvil"""
+    working_folder = folder_name
+
+    if queueName not in ["wholenode", "wide", "shared"]:
+        queueName = "wholenode"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH -p {0:s}
+#SBATCH --nodes={1:d}
+#SBATCH --ntasks-per-node={2:d}
+#SBATCH --cpus-per-task={4:d}
+#SBATCH --time={3:s}
+#SBATCH -A TG-PHY210068
+
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+source $PROJECT/venv/bin/activate
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
+
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $PROJECT
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $PROJECT/RESULTS
+cp -r temp/* $PROJECT/RESULTS/
 
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
@@ -753,7 +803,7 @@ def main():
                         metavar='',
                         type=str,
                         default='SKX',
-                        help='Node type (work on stampede2 & nersc)')
+                        help='Node type (work on stampede2, Anvil & nersc)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
@@ -1032,6 +1082,24 @@ def main():
         generate_Stampede2_mpi_job_script(working_folder_name,
                                           args.node_type.lower(),
                                           n_nodes, n_jobs, n_threads, walltime)
+
+    if cluster_name == "anvil":
+        nThreadsPerNode = 128
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_Anvil_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(),
+                                      n_nodes, n_jobs, n_threads, wallTime)
+        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
 
 
 if __name__ == "__main__":
