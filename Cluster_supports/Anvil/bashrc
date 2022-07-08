@@ -1,0 +1,5 @@
+module load python/3.9.5
+module load fftw
+module load openmpi
+module load gsl
+module load hdf5
