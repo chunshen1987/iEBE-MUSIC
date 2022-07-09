@@ -476,7 +476,7 @@ do
     fi
     mkdir -p results
     rm -fr results/*
-    ln -s ../hydro_event/${surfaceFile} results/surface.dat
+    ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
     cp ../hydro_event/spectators.dat results/spectators.dat
     if [ $SubEventId = "0" ]; then
