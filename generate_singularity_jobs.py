@@ -43,7 +43,7 @@ source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
     elif cluster == "anvil":
         script.write("""#!/usr/bin/env bash
 
-source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+module purge
 """)
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -152,12 +152,18 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     script.write("""
 singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8}
 
+""".format(singularityRepoPath, executeScriptName, parameterFileName,
+           eventId0, nHydroEvents, nUrQMD, nThreads, seed, bayesParamFile))
+    if clusterName == "anvil":
+        script.write("""
+
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+""")
+    script.write("""
 mkdir -p temp
 ./collect_events.sh playground temp
-mv temp/playground/playground.h5 RESULTS_{9}.h5
-""".format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nUrQMD, nThreads, seed, bayesParamFile,
-           eventId))
+mv temp/playground/playground.h5 RESULTS_{0}.h5
+""".format(eventId))
     script.close()
 
     # copy files
