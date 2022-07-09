@@ -86,7 +86,6 @@ source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
         script.write("""#!/usr/bin/env bash
 
 source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
-source $PROJECT/venv/bin/activate
 """)
     elif cluster in ("local", "osg"):
         script.write("#!/bin/bash")
@@ -153,7 +152,6 @@ def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
 #SBATCH -A phy210068
 
 source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
-source $PROJECT/venv/bin/activate
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads

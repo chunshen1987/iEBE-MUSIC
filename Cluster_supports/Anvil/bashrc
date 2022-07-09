@@ -6,3 +6,4 @@ module load openmpi/4.0.6
 module load fftw/3.3.8
 module load gsl
 module load hdf5
+module load py-mpi4py
