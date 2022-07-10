@@ -526,11 +526,11 @@ hadronic_afterburner_toolkit_dict = {
                                     # 1: compute azimuthal dependent HBT correlation function
     'kT_differenitial_flag': 1,     # 0: integrate the pair momentum k_T over  a given kT range for correlation function
                                     # 1: compute the correlation function at each specifiec kT point
-    'n_KT': 6,      # number of the pair momentum k_T to calculate
-    'KT_min': 0.0,  # minimum value of the pair momentum k_T 
-    'KT_max': 1.0,  # maximum value of the pair momentum k_T 
-    'n_Kphi': 48,   # number of the azimuthal angles for the pair momentum k_T 
-                    # (range is assumed to be from 0 to 2*pi)
+    'n_KT': 5,         # number of the pair momentum k_T to calculate
+    'KT_min': 0.15,    # minimum value of the pair momentum k_T 
+    'KT_max': 0.55,    # maximum value of the pair momentum k_T 
+    'n_Kphi': 48,      # number of the azimuthal angles for the pair momentum k_T
+                       # (range is assumed to be from 0 to 2*pi)
     'Krap_min': -0.5,   # minimum accept pair momentum rapidity
     'Krap_max': 0.5,    # maximum accept pair momentum rapidity
     'buffer_rapidity': 5.0,     # collect particles with rapidity from [Krap_min - buffer_rapidity, Krap_max + buffer_rapidity]
