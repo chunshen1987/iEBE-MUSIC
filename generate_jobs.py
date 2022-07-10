@@ -521,7 +521,7 @@ done
     cd hadronic_afterburner_toolkit
     mkdir -p results
     cd results; rm -fr *
-    ln -s ../../UrQMD_results/particle_list.bin particle_list.dat
+    ln -s ../../UrQMD_results/particle_list.bin particle_list.bin
     cd ..
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
