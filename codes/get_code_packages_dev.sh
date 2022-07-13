@@ -24,7 +24,7 @@ rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
-git clone --depth=1 https://github.com/chunshen1987/iSS -b momentumSampler iSS_code
+git clone --depth=1 https://github.com/chunshen1987/iSS -b dev iSS_code
 rm -fr iSS_code/.git
 
 # download UrQMD afterburner
