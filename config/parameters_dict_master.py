@@ -516,7 +516,7 @@ hadronic_afterburner_toolkit_dict = {
     'intrinsic_dtau': 0.01,         # dtau in the output samples
     'intrinsic_dx': 0.1,            # dx in the output samples
     # Parameters for HBT correlation functions
-    'long_comoving_boost': 0,              # whether qlong will be boost by the pair velocity
+    'long_comoving_boost': 1,              # whether qlong will be boost by the pair velocity
     'needed_number_of_pairs': 30000000,    # number of pairs for eack K point
     'number_of_oversample_events': 100,    # number of the combined events in the numerator
     'number_of_mixed_events': 50,          # number of the mixed events in the denorminator
@@ -531,9 +531,9 @@ hadronic_afterburner_toolkit_dict = {
     'KT_max': 0.55,    # maximum value of the pair momentum k_T 
     'n_Kphi': 48,      # number of the azimuthal angles for the pair momentum k_T
                        # (range is assumed to be from 0 to 2*pi)
-    'Krap_min': -0.5,   # minimum accept pair momentum rapidity
-    'Krap_max': 0.5,    # maximum accept pair momentum rapidity
-    'buffer_rapidity': 5.0,     # collect particles with rapidity from [Krap_min - buffer_rapidity, Krap_max + buffer_rapidity]
+    'HBTrap_min': -0.5,         # minimum accept rapidity for particle pair
+    'HBTrap_max': 0.5,          # maximum accept rapidity for particle pair
+
     'qnpts': 31,    # number of points for momentum q (difference of the pair momentum) for correlaction function
     'q_min': -0.15,     # minimum value for momentum q (GeV)
     'q_max': 0.15,      # maximum value for momentum q (GeV)
