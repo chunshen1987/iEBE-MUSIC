@@ -2,9 +2,9 @@
 
 # download the code package
 
-# download 3DMCGlauber
+# download 3DMCGlauber-UPC
 rm -fr 3dMCGlauber_code
-git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
+git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber.git --branch isobar 3dMCGlauber_code
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -14,23 +14,18 @@ rm -fr ipglasma_code/.git
 
 # download KoMPoST
 rm -fr kompost_code
-git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
+git clone --depth=1 https://github.com/j-f-paquet/kompost kompost_code
 rm -fr kompost_code/.git
 
 # download MUSIC
 rm -fr MUSIC_code
-git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
+git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b wenbin-dev MUSIC_code
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
-git clone --depth=1 https://github.com/chunshen1987/iSS -b dev iSS_code
+git clone --depth=1 https://github.com/chunshen1987/iSS -b momentumSampler iSS_code
 rm -fr iSS_code/.git
-
-# download photonEmission wrapper
-rm -fr photonEmission_hydroInterface_code
-git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface photonEmission_hydroInterface_code
-rm -fr photonEmission_hydroInterface_code/.git
 
 # download UrQMD afterburner
 rm -fr urqmd_code
