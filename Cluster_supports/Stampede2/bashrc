@@ -1,0 +1,10 @@
+module purge xalt
+
+module load intel/19.1.1
+module load cmake
+module load hdf5
+module load gsl
+module load impi
+module load tacc-singularity
+module load fftw3/3.3.8
+module load python3/3.9.6

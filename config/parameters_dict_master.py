@@ -17,6 +17,8 @@ control_dict = {
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
+    'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
+    'compute_polarization': False,       # flag to save spin polarization results
 }
 
 
@@ -189,13 +191,19 @@ music_dict = {
                             #   -- 131: 3dMCGlauber with zero nucleus thickness
 
     # parameters for the eta profiles in entropy density and net baryon density
-    # Initial_profile == 11 or 111
+    # Initial_profile == 11, 111, 112, 113
+    'Initial_participantList_Filename': 'initial/participants_event.dat',
     'ecm': 200.,                    # collision energy
     'Eta_plateau_size': 5.4,        # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
     'Eta_fall_off': 0.3,            # Gaussian width fall off for entropy density
     'eta_rhob_0': 1.5,              # peak position of the net baryon density
     'eta_rhob_width_1': 0.2,        # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,        # Gaussian width for |eta| < |eta_0|
+
+    # parameters for Initial_profile == 13 or 131
+    'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
+    'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
+    'stringTransverseShiftFrac': 0.0,  # control the shift of transverse coord as a function of eta for string
 
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
@@ -245,13 +253,14 @@ music_dict = {
     'output_evolution_T_cut': 0.145,
     'outputBinaryEvolution': 1,     # output evolution file in binary format
     'output_evolution_every_N_eta': 1,  # output evolution file every Neta steps
-    'output_evolution_every_N_x':  2,   # output evolution file every Nx steps
-    'output_evolution_every_N_y': 2,    # output evolution file every Ny steps
-    'output_evolution_every_N_timesteps':1,  # output evolution every Ntime steps
+    'output_evolution_every_N_x':  1,   # output evolution file every Nx steps
+    'output_evolution_every_N_y': 1,    # output evolution file every Ny steps
+    'output_evolution_every_N_timesteps': 10,  # output evolution every Ntime steps
 
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
     'Do_FreezeOut_lowtemp': 1,          # flag to include cold corona
+    'freeze_out_tau_start_max': 2,      # the maximum freeze-out starting time [fm/c]
     'freeze_out_method': 4,             # method for hyper-surface finder
                                         # 4: Cornelius
     'freeze_surface_in_binary': 1,      # switch to output surface file in binary format
@@ -264,6 +273,73 @@ music_dict = {
     'eps_freeze_min': 0.18,
     'use_eps_for_freeze_out': 1,  # find freeze-out surface 
                                   # 0: use temperature, 1: use energy density
+}
+
+
+# photon_emission
+photon_dict = {
+    'hydro_flag': 2,          # read in mode for hydro medium
+                              # 0: read in hdf5 file
+                              # 1: read in binary file output from MUSIC
+                              # 2: read in binary file output from new MUSIC (no grid)
+                              # 3: read in binary file output from new MUSIC (on grid)
+    'hydro_nskip_tau': 1,     # read in hydro slice every hydro_nskip_tau
+                              # steps from the medium file
+                              # (only works for hydro_flag = 1)
+    'Xmin': -15.0,            # minimum points along x direction
+    'dx': 0.1,                # lattice spacing along x direction
+    'Ymin': -15.0,            # minimum points along y direction
+    'dy': 0.1,                # lattice spacing along y direction
+    'tau_start': 0.4,         # emission start time (fm)
+    'tau_end': 30.0,          # emission end time (fm)
+    'dTau': 0.1,              # lattice spacing along tau direction
+
+    'neta': 10,               # number of points in eta direction
+    'eta_i': 0.0,             # beginning value of eta slice
+    'eta_f': 3.0,             # end value of eta slice
+
+    'np': 20,                 # number of points for photon momentum
+    'nphi': 40,               # number of points for angles of photons momenta
+    'nrapidity': 1,           # number of points for photon rapidity
+
+    'photon_q_i': 0.2,        # the smallest photon momentum to be calculated
+    'photon_q_f': 4.0,        # the largest photon momentum to be calculated
+    'photon_phi_q_i': 0.0,    # the smallest angle of photon momentum
+    'photon_phi_q_f': 6.2831853,    # the largest angle of photon momentum
+    'photon_y_i': 0.0,        # the smallest photon rapidity
+    'photon_y_f': 0.0,        # the largest photon rapidity
+
+    'norder': 10,             # calculate photon vn to norder
+    'turn_on_muB': 1,         # flag to include muB dependence in photon rates
+
+    'T_dec': 0.105,           # freeze out temperature (GeV)
+    'T_sw_high': 0.180,       # high end of the switching temperature
+    'T_sw_low': 0.1795,       # low end of the switching temperature
+    'T_cuthigh': 0.80,        # maximum allowed emission T (GeV)
+    'T_cutlow': 0.10,         # minimum allowed emission T (GeV)
+
+    'calHGIdFlag': 0,         # Flag to decide whether to calculate individual HG channels
+
+    'PhotonemRatetableInfo_Emin': 0.05,   # minimum photon energy in the photon rate tables
+    'PhotonemRatetableInfo_Tmin': 0.10,   # minimum temperature in the photon rate tables
+    'PhotonemRatetableInfo_dE': 0.05,     # lattice space of energy in the photon rate tables
+    'PhotonemRatetableInfo_dT': 0.002,    # lattice space of temperature in the photon rate tables
+
+    'HydroinfoVisflag': 1,         # determine whether to read in the viscous evolution information
+    'HydroinfoBuffersize': 500,    # set the buffer size for hydro evolution profile
+
+    'turn_off_transverse_flow': 0,      # flag to turn off transverse flow in the photon calculation
+    'enable_polyakov_suppression': 0,   # apply the polyakov suppression to QGP photon rates
+
+    'differential_flag': 0,  # determine whether to output differential photon yield and vn
+                             # 1: differential in T and tau
+                             # 2: differential in x and tau
+                             # 10: differeitial in all options above
+    'nTaucut': 50,           # number of points in tau (range of tau is specified by tau_start and tau_end)
+    'nTcut': 50,             # number of points in T (range of T is specified by T_cuthigh and T_cutlow)
+    'n_xperp_cut': 101,      # number of points in x
+    'xperp_cuthigh': 10.0,   # maximum value in x (fm)
+    'xperp_cutlow': -10.0,   # minimum value in x (fm)
 }
 
 
@@ -283,6 +359,9 @@ iss_dict = {
     'restrict_deltaf': 0,      # flag to apply restriction on the size of delta f
     'deltaf_max_ratio': 1.0,   # the maximum allowed size of delta f w.r.t f0
     'quantum_statistics': 1,   # include quantum statistics (1: yes, 0: no)
+
+    'calculate_polarization': 0,   # switch to compute Lambda's polarization
+    'polarizationRapType': 1,      # 0: rapidity; 1: pseudorapidity; 2: both
 
     'randomSeed': -1,   # If <0, use system clock.
     'calculate_vn': 0,  # 1/0: whether to calculate the 
@@ -308,6 +387,7 @@ iss_dict = {
 
     'perform_decays': 0,             # flag to perform resonance decay
     'perform_checks': 0,             # flag to perform tests for the sampler
+    'include_spectators': 0,         # flag to include spectators
     'local_charge_conservation': 0,  # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
 
@@ -382,10 +462,11 @@ iss_dict = {
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
     'echo_level': 9,    # control the mount of print messages
-    'read_in_mode': 2,  # mode for reading in particle information
+    'read_in_mode': 21, # mode for reading in particle information
                         # 0: reads outputs from OSCAR outputs
                         # 1: reads outputs from UrQMD outputs
                         # 2: reads outputs from zipped UrQMD outputs
+                        # 21: reads outputs from binary UrQMD outputs
                         # 3: reads outputs from Sangwook's UrQMD outputs 
                         #    (without header lines)
                         # 4: reads outputs from UrQMD 3.3p2 outputs
@@ -409,6 +490,7 @@ hadronic_afterburner_toolkit_dict = {
                                                            # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
+    'rapidity_shift': 0.,
     'order_max': 9,     # the maximum harmonic order of anisotropic flow
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
@@ -427,12 +509,14 @@ hadronic_afterburner_toolkit_dict = {
     'vn_rapidity_dis_pT_min': 0.20,  # the minimum value of pT for vn rap. distr.
     'vn_rapidity_dis_pT_max': 3.0,   # the maximum value of pT for vn rap. distr.
 
+    'rapidityPTDistributionFlag': 0,  # output Qn vectors in (eta, pT)
+
     'check_spatial_dis': 0,         # flag to check dN/dtau distribution
     'intrinsic_detas': 0.1,         # deta_s in the output samples
     'intrinsic_dtau': 0.01,         # dtau in the output samples
     'intrinsic_dx': 0.1,            # dx in the output samples
     # Parameters for HBT correlation functions
-    'long_comoving_boost': 0,              # whether qlong will be boost by the pair velocity
+    'long_comoving_boost': 1,              # whether qlong will be boost by the pair velocity
     'needed_number_of_pairs': 30000000,    # number of pairs for eack K point
     'number_of_oversample_events': 100,    # number of the combined events in the numerator
     'number_of_mixed_events': 50,          # number of the mixed events in the denorminator
@@ -442,14 +526,14 @@ hadronic_afterburner_toolkit_dict = {
                                     # 1: compute azimuthal dependent HBT correlation function
     'kT_differenitial_flag': 1,     # 0: integrate the pair momentum k_T over  a given kT range for correlation function
                                     # 1: compute the correlation function at each specifiec kT point
-    'n_KT': 6,      # number of the pair momentum k_T to calculate
-    'KT_min': 0.0,  # minimum value of the pair momentum k_T 
-    'KT_max': 1.0,  # maximum value of the pair momentum k_T 
-    'n_Kphi': 48,   # number of the azimuthal angles for the pair momentum k_T 
-                    # (range is assumed to be from 0 to 2*pi)
-    'Krap_min': -0.5,   # minimum accept pair momentum rapidity
-    'Krap_max': 0.5,    # maximum accept pair momentum rapidity
-    'buffer_rapidity': 5.0,     # collect particles with rapidity from [Krap_min - buffer_rapidity, Krap_max + buffer_rapidity]
+    'n_KT': 5,         # number of the pair momentum k_T to calculate
+    'KT_min': 0.15,    # minimum value of the pair momentum k_T 
+    'KT_max': 0.55,    # maximum value of the pair momentum k_T 
+    'n_Kphi': 48,      # number of the azimuthal angles for the pair momentum k_T
+                       # (range is assumed to be from 0 to 2*pi)
+    'HBTrap_min': -0.5,         # minimum accept rapidity for particle pair
+    'HBTrap_max': 0.5,          # maximum accept rapidity for particle pair
+
     'qnpts': 31,    # number of points for momentum q (difference of the pair momentum) for correlaction function
     'q_min': -0.15,     # minimum value for momentum q (GeV)
     'q_max': 0.15,      # maximum value for momentum q (GeV)
@@ -474,6 +558,7 @@ Parameters_list = [
     (kompost_dict, "setup.ini", 4),
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 2),
+    (photon_dict, "parameters.dat", 1),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
 ]
@@ -483,6 +568,7 @@ path_list = [
     'model_parameters/KoMPoST/',
     'model_parameters/3dMCGlauber/',
     'model_parameters/MUSIC/',
+    'model_parameters/photonEmission_hydroInterface/',
     'model_parameters/iSS/',
     'model_parameters/hadronic_afterburner_toolkit/'
 ]
@@ -546,10 +632,21 @@ def update_parameters_dict(par_dict_path, ran_seed):
     else:
         parameters_dict.iss_dict['hydro_mode'] = 2
 
+    if 'calculate_polarization' in parameters_dict.iss_dict.keys():
+        if parameters_dict.iss_dict['calculate_polarization'] == 1:
+            parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
+    if 'compute_photon_emission' in parameters_dict.control_dict:
+        if parameters_dict.control_dict['compute_photon_emission']:
+            music_dict['output_evolution_data'] = 2
+
+    if 'photon_dict' in dir(parameters_dict):
+        photon_dict.update(parameters_dict.photon_dict)
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
+    iss_dict['number_of_particles_needed'] = (
+            int(iss_dict['number_of_particles_needed']/10))
     hadronic_afterburner_toolkit_dict.update(
         parameters_dict.hadronic_afterburner_toolkit_dict)
     hadronic_afterburner_toolkit_dict['randomSeed'] = ran_seed

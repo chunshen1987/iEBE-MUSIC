@@ -17,9 +17,9 @@ control_dict = {
 # 3DMCGlauber model
 mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
-    'Projectile':  "dipole",         # projectile nucleus name
+    'Projectile':  "Pb",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
-    'roots'     :   867.,        # collision energy (GeV)
+    'roots'     :   17.3,        # collision energy (GeV)
     'seed'      :   -1,          # random seed (-1: system)
     'baryon_junctions': 1,       # 0: baryon number assumed to be at string end
                                  # 1: baryon number transported assuming baryon
@@ -95,7 +95,6 @@ iss_dict = {
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
     'event_buffer_size': 100000,       # the number of events read in at once
-    'rap_shift': 0.0,                # the rapidity shift for the final hadrons
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation

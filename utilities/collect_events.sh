@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage="./collect_events_onlyh5.sh fromFolder toFolder"
+usage="$0 fromFolder toFolder"
 
 fromFolder=$1
 toFolder=$2

@@ -2,7 +2,8 @@
 """This script generate all the running jobs."""
 
 import sys
-from os import path, mkdir
+import re
+from os import path, mkdir, remove
 import shutil
 import subprocess
 import argparse
@@ -17,12 +18,14 @@ centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.95, 1.00, '90-100', 0.10)]
 
 known_initial_types = [
-    "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
-    "3DMCGlauber_consttau", "3DMCGlauber_dynamical_eccentricity"
+    "IPGlasma", "IPGlasma+KoMPoST",
+    "3DMCGlauber_dynamical", "3DMCGlauber_participants",
+    "3DMCGlauber_consttau"
 ]
 
 support_cluster_list = [
-    'nersc', 'nerscKNL', 'wsugrid', "OSG", "local", "guillimin", "McGill"
+    'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
+    'stampede2', "anvil"
 ]
 
 
@@ -37,16 +40,6 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #SBATCH -J {0:s}
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
-#SBATCH -C haswell
-""".format(event_id, walltime))
-    elif cluster == "nerscKNL":
-        script.write("""#!/bin/bash -l
-#SBATCH -p shared
-#SBATCH -n 1
-#SBATCH -J {0:s}
-#SBATCH -t {1:s}
-#SBATCH -L SCRATCH
-#SBATCH -C knl,quad,cache
 """.format(event_id, walltime))
     elif cluster == "guillimin":
         script.write("""#!/usr/bin/env bash
@@ -60,7 +53,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #PBS -q sw
 #PBS -d {3:s}
 """.format(event_id, n_threads, walltime, working_folder))
-    elif cluster == "McGill":
+    elif cluster == "mcgill":
         script.write("""#!/usr/bin/env bash
 #PBS -N {0:s}
 #PBS -l nodes=1:ppn={1:d}:irulan
@@ -84,7 +77,17 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 
 cd {4:s}
 """.format(event_id, n_threads, mem, walltime, working_folder))
-    elif cluster in ("local", "OSG"):
+    elif cluster == "stampede2":
+        script.write("""#!/usr/bin/env bash
+
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+""")
+    elif cluster == "anvil":
+        script.write("""#!/usr/bin/env bash
+
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+""")
+    elif cluster in ("local", "osg"):
         script.write("#!/bin/bash")
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -92,12 +95,92 @@ cd {4:s}
         exit(1)
 
 
-def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
+def generate_Stampede2_mpi_job_script(folder_name, nodeType, n_nodes, n_jobs,
+                                      n_threads, walltime):
+    """This function generates job script for Stampede2"""
+    working_folder = folder_name
+
+    if nodeType not in ["skx", "icx", "knl"]:
+        nodeType = "skx"
+
+    queueName = '{}-normal'.format(nodeType)
+    if nodeType == "knl":
+        queueName = 'normal'
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH -p {0:s}
+#SBATCH -N {1:d}
+#SBATCH -n {2:d}
+#SBATCH -t {3:s}
+#SBATCH -A TG-PHY210068
+##SBATCH -A TG-PHY200093
+
+source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS={4:d}
+
+ibrun python3 job_MPI_wrapper.py
+
+""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+    script.close()
+
+
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
+                                  n_threads, walltime):
+    """This function generates job script for Anvil"""
+    working_folder = folder_name
+
+    if queueName not in ["wholenode", "wide", "shared"]:
+        queueName = "wholenode"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH -p {0:s}
+#SBATCH --nodes={1:d}
+#SBATCH --ntasks-per-node={2:d}
+#SBATCH --cpus-per-task={4:d}
+#SBATCH --time={3:s}
+#SBATCH -A phy210068
+
+source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
+
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $PROJECT
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $PROJECT/RESULTS
+cp -r temp/* $PROJECT/RESULTS/
+
+""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+    script.close()
+
+
+def generate_nersc_mpi_job_script(folder_name, nodeType, n_nodes, n_threads,
                                   n_jobs_per_node, walltime):
     """This function generates job script for NERSC"""
     working_folder = folder_name
 
-    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
+    nodeOption = "haswell"
+    if nodeType == "knl":
+        nodeOption = "knl,quad,cache"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
     script.write("""#!/bin/bash -l
 #SBATCH --qos=regular
 #SBATCH -N {0:d}
@@ -105,7 +188,7 @@ def generate_nersc_mpi_job_script(folder_name, n_nodes, n_threads,
 #SBATCH -J music
 #SBATCH -t {1:s}
 #SBATCH -L SCRATCH
-#SBATCH -C haswell
+#SBATCH -C {2:s}
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=chunshen1987@gmail.com
 
@@ -116,62 +199,42 @@ num_of_nodes={0:d}
 # run all the job
 for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
 do
-    export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
+    export OMP_NUM_THREADS={3:d}
+    srun -N 1 -n {4:d} -c {3:d} python job_MPI_wrapper.py {4:d} $nodeid &
 done
 wait
-""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
-    script.close()
-
-
-def generate_nerscKNL_mpi_job_script(folder_name, n_nodes, n_threads,
-                                     n_jobs_per_node, walltime):
-    """This function generates job script for NERSC KNL"""
-    working_folder = folder_name
-
-    script = open(path.join(working_folder, "submit_MPI_jobs.pbs"), "w")
-    script.write("""#!/bin/bash -l
-#SBATCH --qos=regular
-#SBATCH -N {0:d}
-#SBATCH -A m1820
-#SBATCH -J music
-#SBATCH -t {1:s}
-#SBATCH -L SCRATCH
-#SBATCH -C knl,quad,cache
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=chunshen1987@gmail.com
-
-export OMP_PROC_BIND=true
-export OMP_PLACES=cores
-
-num_of_nodes={0:d}
-# run all the job
-for (( nodeid=1; nodeid <= $num_of_nodes; nodeid++ ))
-do
-    export OMP_NUM_THREADS={2:d}
-    srun -N 1 -n {3:d} -c {2:d} python job_MPI_wrapper.py {3:d} $nodeid &
-done
-wait
-""".format(n_nodes, walltime, n_threads, n_jobs_per_node))
+""".format(n_nodes, walltime, nodeOption, n_threads, n_jobs_per_node))
     script.close()
 
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
-                             n_hydro, ev0_id, n_urqmd, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp):
+                             n_hydro, ev0_id, n_urqmd, n_threads, para_dict,
+                             time_stamp):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
     walltime = '100:00:00'
 
-    script = open(path.join(working_folder, "submit_job.pbs"), "w")
+    if cluster_name == "osg":
+        enableCheckPoint = True
+    else:
+        enableCheckPoint = False
+
+    script = open(path.join(working_folder, "submit_job.script"), "w")
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           ipglasma_flag, kompost_flag, hydro_flag, urqmd_flag, time_stamp))
+           para_dict.control_dict["save_ipglasma_results"],
+           para_dict.control_dict["save_kompost_results"],
+           para_dict.control_dict["save_hydro_surfaces"],
+           para_dict.control_dict["save_UrQMD_files"],
+           time_stamp,
+           para_dict.control_dict["compute_polarization"],
+           para_dict.control_dict["compute_photon_emission"],
+           enableCheckPoint))
     script.write("""
 
 status=$?
@@ -206,7 +269,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("sleep {}".format(event_id))
         script.write("""
 # IPGlasma evolution (run 1 event)
@@ -255,7 +318,7 @@ rm -fr $results_folder/*
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # KoMPoST EKT evolution
 ./KoMPoST.exe setup.ini 1> run.log 2> run.err
@@ -296,7 +359,7 @@ rm -fr $results_folder
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         script.write("""
 # hydro evolution
 ./MUSIChydro music_input_mode_2 1> run.log 2> run.err
@@ -313,12 +376,81 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
+def generate_script_photon(folder_name, nthreads, cluster_name):
+    """This function generates script for photon radiation"""
+    working_folder = folder_name
+
+    script = open(path.join(working_folder, "run_photon.sh"), "w")
+
+    script.write("""#!/bin/bash
+(
+cd photonEmission_hydroInterface
+
+""")
+    if nthreads > 0:
+        script.write("""
+export OMP_NUM_THREADS={0:d}
+""".format(nthreads))
+
+    if cluster_name != "osg":
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e > run.log
+)
+""")
+    else:
+        script.write("""
+# perform photon radiation
+./hydro_photonEmission.e
+)
+""")
+    script.close()
+
+
+def generate_script_spinPol(folder_name, cluster_name):
+    """This function generates script for spin polarization"""
+    working_folder = folder_name
+
+    logfile = ""
+    if cluster_name != "osg":
+        logfile = " >> run.log"
+
+    script = open(path.join(working_folder, "run_spinPol.sh"), "w")
+    script.write("""#!/bin/bash
+
+unalias ls 2>/dev/null
+
+SubEventId=$1
+
+(
+cd UrQMDev_$SubEventId
+
+mkdir -p UrQMD_results
+rm -fr UrQMD_results/*
+
+cd iSS
+mkdir -p results
+rm -fr results/*
+mv ../hydro_event/surface.dat results/surface.dat
+mv ../hydro_event/music_input results/music_input
+mv ../hydro_event/spectators.dat results/spectators.dat
+
+""")
+    script.write("./iSS.e {0}\n".format(logfile))
+    script.write("""
+
+rm -fr ../hydro_event
+)
+""")
+    script.close()
+
+
 def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_afterburner.sh"), "w")
@@ -334,19 +466,25 @@ cd UrQMDev_$SubEventId
 mkdir -p UrQMD_results
 rm -fr UrQMD_results/*
 
-for iev in `ls hydro_event | grep "surface"`
+surfaceFile=`ls hydro_event | grep "surface"`
+for iev in {0..9}
 do
     cd iSS
+    RANDOMSEED=`cat iSS_parameters.dat | grep "randomSeed" | cut -f 3 -d " "`
+    if [ $RANDOMSEED != "-1" ]; then
+        RANDOMSEED=$((RANDOMSEED + iev))
+    fi
     mkdir -p results
     rm -fr results/*
-    mv ../hydro_event/$iev results/surface.dat
-    mv ../hydro_event/music_input results/music_input
+    ln -s ../../hydro_event/${surfaceFile} results/surface.dat
+    cp ../hydro_event/music_input results/music_input
+    cp ../hydro_event/spectators.dat results/spectators.dat
     if [ $SubEventId = "0" ]; then
     """)
-    script.write("    ./iSS.e {0}".format(logfile))
+    script.write("    ./iSS.e randomSeed=$RANDOMSEED {0}".format(logfile))
     script.write("""
     else
-        ./iSS.e > run.log
+        ./iSS.e randomSeed=$RANDOMSEED > run.log
     fi
     """)
 
@@ -369,18 +507,21 @@ do
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
     ./runqmd.sh >> run.log
-    mv particle_list.dat ../UrQMD_results/particle_list.dat
+    mv particle_list.dat ../UrQMD_results/particle_list_${iev}.dat
     rm -fr OSCAR.input
     cd ..
-    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list.dat
-    rm -fr UrQMD_results/particle_list.dat
+    ../hadronic_afterburner_toolkit/convert_to_binary.e UrQMD_results/particle_list_${iev}.dat binary
+    rm -fr UrQMD_results/particle_list_${iev}.dat
+    cat UrQMD_results/particle_list_${iev}.bin >> UrQMD_results/particle_list.bin
+    rm -fr UrQMD_results/particle_list_${iev}.bin
+done
 """)
     if HBT_flag:
         script.write("""
     cd hadronic_afterburner_toolkit
     mkdir -p results
     cd results; rm -fr *
-    ln -s ../../UrQMD_results/particle_list.gz particle_list.dat
+    ln -s ../../UrQMD_results/particle_list.bin particle_list.bin
     cd ..
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
@@ -394,8 +535,6 @@ do
         script.write("    fi\n")
         script.write("    mv results/HBT* ../UrQMD_results/ \n")
     script.write("""
-    done
-
     rm -fr hydro_event
 )
 """)
@@ -407,7 +546,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
     working_folder = folder_name
 
     logfile = ""
-    if cluster_name != "OSG":
+    if cluster_name != "osg":
         logfile = " >> run.log"
 
     script = open(path.join(working_folder, "run_analysis_spvn.sh"), "w")
@@ -420,7 +559,7 @@ def generate_script_analyze_spvn(folder_name, cluster_name, HBT_flag):
         "   ./hadronic_afterburner_tools.e analyze_HBT=0 {0}\n".format(logfile))
     if HBT_flag:
         script.write(
-            "    python ./average_event_HBT_correlation_function.py .. results\n"
+            "    python3 ./average_event_HBT_correlation_function.py .. results\n"
         )
     script.write(")\n")
     script.close()
@@ -430,8 +569,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, ipglasma_flag, kompost_flag, hydro_flag,
-                           urqmd_flag, GMC_flag, HBT_flag):
+                           time_stamp, para_dict):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -446,9 +584,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                   'fetch_3DMCGlauber_event_from_hdf5_database.py'),
         event_folder)
     if initial_condition_database == "self":
-        if initial_condition_type in ("3DMCGlauber_dynamical",
-                                      "3DMCGlauber_consttau",
-                                      "3DMCGlauber_dynamical_eccentricity"):
+        if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
                             path.join(event_folder, '3dMCGlauber/input'))
@@ -479,10 +615,11 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                 shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database, initial_condition_type,
+                             initial_condition_database,
+                             initial_condition_type,
                              n_hydro_per_job, event_id_offset,
-                             n_urqmd_per_hydro, n_threads, ipglasma_flag,
-                             kompost_flag, hydro_flag, urqmd_flag, time_stamp)
+                             n_urqmd_per_hydro, n_threads, para_dict,
+                             time_stamp)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
@@ -496,6 +633,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(event_folder, "kompost/{}".format(link_i))),
                             shell=True)
 
+    # MUSIC
     generate_script_hydro(event_folder, n_threads, cluster_name)
 
     shutil.copytree(path.join(code_path, 'MUSIC'),
@@ -508,18 +646,74 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             path.join(event_folder, "MUSIC/{}".format(link_i))),
                         shell=True)
 
+    if para_dict.control_dict['compute_photon_emission']:
+        # photon
+        generate_script_photon(event_folder, n_threads, cluster_name)
+        mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
+        shutil.copyfile(path.join(param_folder, 'photonEmission_hydroInterface',
+                                  'parameters.dat'),
+                        path.join(event_folder, 'photonEmission_hydroInterface',
+                                  'parameters.dat'))
+        for link_i in ['ph_rates', 'hydro_photonEmission.e']:
+            orgFilePath = path.abspath(path.join(code_path,
+                                       'photonEmission_hydroInterface_code',
+                                       '{}'.format(link_i)))
+            trgFilePath = path.join(event_folder,
+                                    "photonEmission_hydroInterface",
+                                    "{}".format(link_i))
+            subprocess.call("ln -s {0:s} {1:s}".format(orgFilePath,
+                                                       trgFilePath),
+                            shell=True)
+
+    # particlization + hadronic afterburner
+    GMC_flag = para_dict.iss_dict['global_momentum_conservation']
+    HBT_flag = False
+    if "analyze_HBT" in para_dict.hadronic_afterburner_toolkit_dict:
+        if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
+            HBT_flag = True
+
+    if para_dict.control_dict['compute_polarization']:
+        generate_script_spinPol(event_folder, cluster_name)
+
     generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
-    for iev in range(n_urqmd_per_hydro):
+    nUrQMDFolders = n_urqmd_per_hydro
+    if para_dict.control_dict['compute_polarization']:
+        nUrQMDFolders += 1
+    for iev in range(nUrQMDFolders):
         sub_event_folder = path.join(working_folder,
-                                     'event_{0:d}'.format(event_id),
-                                     'UrQMDev_{0:d}'.format(iev))
+                                     'event_{}'.format(event_id),
+                                     'UrQMDev_{}'.format(iev))
         mkdir(sub_event_folder)
         mkdir(path.join(sub_event_folder, 'iSS'))
-        shutil.copyfile(path.join(param_folder, 'iSS/iSS_parameters.dat'),
-                        path.join(sub_event_folder, 'iSS/iSS_parameters.dat'))
+        iSSParamFile = 'iSS/iSS_parameters.dat'
+        shutil.copyfile(path.join(param_folder, iSSParamFile),
+                        path.join(sub_event_folder, iSSParamFile))
+        if para_dict.control_dict['compute_polarization']:
+            if iev < n_urqmd_per_hydro:
+                f1 = open("temp.dat", "w")
+                with open(path.join(sub_event_folder, iSSParamFile)) as f:
+                    for line in f:
+                        line2 = re.sub("calculate_polarization = 1",
+                                       "calculate_polarization = 0", line)
+                        f1.write(line2)
+                f1.close()
+                shutil.copyfile("temp.dat", path.join(sub_event_folder,
+                                                      iSSParamFile))
+            if iev == n_urqmd_per_hydro:
+                f1 = open("temp.dat", "w")
+                with open(path.join(sub_event_folder, iSSParamFile)) as f:
+                    for line in f:
+                        line2 = re.sub("MC_sampling = 4",
+                                       "MC_sampling = 0", line)
+                        f1.write(line2)
+                f1.close()
+                shutil.copyfile("temp.dat", path.join(sub_event_folder,
+                                                      iSSParamFile))
+            remove("temp.dat")
+
         for link_i in ['iSS_tables', 'iSS.e']:
             subprocess.call("ln -s {0:s} {1:s}".format(
                 path.abspath(path.join(code_path,
@@ -601,9 +795,13 @@ def main():
                         '--cluster_name',
                         metavar='',
                         type=str,
-                        choices=support_cluster_list,
                         default='local',
                         help='name of the cluster')
+    parser.add_argument('--node_type',
+                        metavar='',
+                        type=str,
+                        default='SKX',
+                        help='Node type (work on stampede2, Anvil & nersc)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
@@ -657,6 +855,10 @@ def main():
     parser.add_argument("--continueFlag", action="store_true")
     args = parser.parse_args()
 
+    if len(sys.argv) < 2:
+        parser.print_help()
+        exit(0)
+
     # print out all the arguments
     print("="*40)
     print("\U0000269B   Input parameters")
@@ -667,7 +869,7 @@ def main():
 
     try:
         working_folder_name = args.working_folder_name
-        cluster_name = args.cluster_name
+        cluster_name = args.cluster_name.lower()
         n_jobs = args.n_jobs
         n_hydro_per_job = args.n_hydro_per_job
         n_urqmd_per_hydro = args.n_urqmd_per_hydro
@@ -691,7 +893,7 @@ def main():
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
 
-    if cluster_name == "OSG":
+    if cluster_name == "osg":
         if seed == -1:
             seed = 0
         seed += job_id
@@ -768,6 +970,20 @@ def main():
                 working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
 
+    if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
+            or initial_condition_database != "self"):
+        parameter_dict.control_dict['save_ipglasma_results'] = False
+    if initial_condition_type != "IPGlasma+KoMPoST":
+        parameter_dict.control_dict['save_kompost_results'] = False
+    if 'compute_polarization' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['compute_polarization'] = False
+    if 'calculate_polarization' in parameter_dict.iss_dict.keys():
+        if parameter_dict.iss_dict['calculate_polarization'] == 1:
+            parameter_dict.control_dict['compute_polarization'] = True
+    if 'compute_photon_emission' not in parameter_dict.control_dict.keys():
+        parameter_dict.control_dict['compute_photon_emission'] = False
+
+
     cent_label = "XXX"
     cent_label_pre = cent_label
     if initial_condition_database == "self":
@@ -804,28 +1020,12 @@ def main():
                         cent_label_pre = cent_label
                         event_id_offset = 0
                     break
-        GMC_flag = parameter_dict.iss_dict['global_momentum_conservation']
-        ipglasma_flag = False
-        if (initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST")
-                and initial_condition_database == "self"):
-            ipglasma_flag = parameter_dict.control_dict['save_ipglasma_results']
-        kompost_flag = False
-        if initial_condition_type == "IPGlasma+KoMPoST":
-            kompost_flag = parameter_dict.control_dict['save_kompost_results']
-        hydro_flag = parameter_dict.control_dict['save_hydro_surfaces']
-        urqmd_flag = parameter_dict.control_dict['save_UrQMD_files']
-        HBT_flag = False
-        if "analyze_HBT" in parameter_dict.hadronic_afterburner_toolkit_dict:
-            if parameter_dict.hadronic_afterburner_toolkit_dict[
-                    'analyze_HBT'] == 1:
-                HBT_flag = True
         generate_event_folders(initial_condition_database.format(cent_label),
                                initial_condition_type, code_package_path,
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, ipglasma_flag, kompost_flag,
-                               hydro_flag, urqmd_flag, GMC_flag, HBT_flag)
+                               IPGlasma_time_stamp, parameter_dict)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
@@ -848,24 +1048,56 @@ def main():
             path.join(code_package_path,
                       'Cluster_supports/NERSC/job_MPI_wrapper.py'),
             working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/64))
-        generate_nersc_mpi_job_script(working_folder_name, n_nodes, n_threads,
-                                      int(n_jobs/n_nodes), walltime)
 
-    if cluster_name == "nerscKNL":
-        shutil.copy(
-            path.join(code_package_path,
-                      'Cluster_supports/NERSC/job_MPI_wrapper.py'),
-            working_folder_name)
-        n_nodes = max(1, int(n_jobs*n_threads/272))
-        generate_nerscKNL_mpi_job_script(working_folder_name, n_nodes,
-                                         n_threads, int(n_jobs/n_nodes),
-                                         walltime)
+        n_nodes = max(1, int(n_jobs*n_threads/64))
+        if args.node_type.lower() == "knl":
+            n_nodes = max(1, int(n_jobs*n_threads/272))
+        generate_nersc_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(), n_nodes,
+                                      n_threads, int(n_jobs/n_nodes), walltime)
 
     if cluster_name == "wsugrid":
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/WSUgrid/submit_all_jobs.sh'), pwd)
+
+    if cluster_name == "stampede2":
+        nThreadsPerNode = 1
+        if args.node_type.lower() == "skx":
+            nThreadsPerNode = 96
+        elif args.node_type.lower() == "knl":
+            nThreadsPerNode = 272
+        elif args.node_type.lower() == "icx":
+            nThreadsPerNode = 160
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_Stampede2_mpi_job_script(working_folder_name,
+                                          args.node_type.lower(),
+                                          n_nodes, n_jobs, n_threads, walltime)
+
+    if cluster_name == "anvil":
+        nThreadsPerNode = 128
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_Anvil_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(),
+                                      n_nodes, n_jobs, n_threads, wallTime)
+        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
 
 
 if __name__ == "__main__":
