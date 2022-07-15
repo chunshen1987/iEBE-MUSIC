@@ -269,6 +269,7 @@ music_dict = {
     'freeze_Ncell_eta_step': 1,
     'freeze_eps_flag': 0,
     'N_freeze_out': 1,
+    'eps_switch': 0.18,
     'eps_freeze_max': 0.18,
     'eps_freeze_min': 0.18,
     'use_eps_for_freeze_out': 1,  # find freeze-out surface 
