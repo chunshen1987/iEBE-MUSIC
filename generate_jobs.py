@@ -131,8 +131,8 @@ ibrun python3 job_MPI_wrapper.py
     script.close()
 
 
-def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
-                                  n_threads, walltime):
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes,
+                                  nTaskPerNode, n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
@@ -163,11 +163,11 @@ mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
 # and transfer it to $PROJECT
 rm -fr temp
 mkdir temp
-./collect_events_singularity.sh `pwd` temp
+./collect_events.sh `pwd` temp
 mkdir -p $PROJECT/RESULTS
 cp -r temp/* $PROJECT/RESULTS/
 
-""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()
 
 
@@ -1085,16 +1085,18 @@ def main():
         nThreadsPerNode = 128
         shutil.copy(
             path.join(code_package_path,
-                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+                      'Cluster_supports/Anvil/job_MPI_wrapper.py'),
             working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        nTaskPerNode = int(nThreadsPerNode/n_threads)
         if n_nodes*nThreadsPerNode < n_jobs*n_threads:
             n_nodes += 1
 
         generate_Anvil_mpi_job_script(working_folder_name,
-                                      args.node_type.lower(),
-                                      n_nodes, n_jobs, n_threads, wallTime)
-        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                                      args.node_type.lower(), n_nodes,
+                                      nTaskPerNode, n_threads, walltime)
+        script_path = path.join(code_package_path, "utilities")
+        shutil.copy(path.join(script_path, 'collect_events.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
                     working_folder_name)
