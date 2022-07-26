@@ -90,6 +90,7 @@ mkdir temp
 ./collect_events_singularity.sh `pwd` temp
 mkdir -p $WORK/RESULTS
 cp -r temp/* $WORK/RESULTS/
+rm -fr *
 
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
@@ -130,6 +131,7 @@ mkdir temp
 ./collect_events_singularity.sh `pwd` temp
 mkdir -p $PROJECT/RESULTS
 cp -r temp/* $PROJECT/RESULTS/
+rm -fr *
 
 """.format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()

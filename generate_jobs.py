@@ -127,6 +127,15 @@ export OMP_NUM_THREADS={4:d}
 
 ibrun python3 job_MPI_wrapper.py
 
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $WORK
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $WORK/RESULTS
+cp -r temp/* $WORK/RESULTS/
+rm -fr *
+
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
 
@@ -166,6 +175,7 @@ mkdir temp
 ./collect_events.sh `pwd` temp
 mkdir -p $PROJECT/RESULTS
 cp -r temp/* $PROJECT/RESULTS/
+rm -fr *
 
 """.format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()
@@ -1080,6 +1090,11 @@ def main():
         generate_Stampede2_mpi_job_script(working_folder_name,
                                           args.node_type.lower(),
                                           n_nodes, n_jobs, n_threads, walltime)
+        script_path = path.join(code_package_path, "utilities")
+        shutil.copy(path.join(script_path, 'collect_events.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
 
     if cluster_name == "anvil":
         nThreadsPerNode = 128
