@@ -149,7 +149,8 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     mkdir(eventFolder)
 
     # generate job running script
-    workFolderPath = "playground_{}".format(eventId)
+    workingFolderName = workingFolder.split('/')[-1]
+    workFolderPath = "playground_{0}_{1}".format(workingFolderName, eventId)
     if clusterName == "stampede2":
         workFolderPath = "/tmp/" + workFolderPath
     workFolderName = workFolderPath.split('/')[-1]
