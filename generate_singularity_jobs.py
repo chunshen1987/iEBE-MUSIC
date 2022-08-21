@@ -81,6 +81,9 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
 
+module load ooops
+set_io_param_batch $SLURM_JOBID 0 low
+
 ibrun python3 job_MPI_wrapper.py
 
 # after all runs finish, collect results into one hdf5 file
@@ -146,16 +149,22 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     mkdir(eventFolder)
 
     # generate job running script
+    workingFolderName = workingFolder.split('/')[-1]
+    workFolderPath = "playground_{0}_{1}".format(workingFolderName, eventId)
+    if clusterName == "stampede2":
+        workFolderPath = "/tmp/" + workFolderPath
+    workFolderName = workFolderPath.split('/')[-1]
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
     script = open(path.join(eventFolder, "submit_job.script"), "w")
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8}
+singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
 
-""".format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nUrQMD, nThreads, seed, bayesParamFile))
+""".format(singularityRepoPath, executeScriptName, workFolderPath,
+           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
+           seed, bayesParamFile))
     if clusterName == "anvil":
         script.write("""
 
@@ -163,9 +172,9 @@ source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
 """)
     script.write("""
 mkdir -p temp
-./collect_events.sh playground temp
-mv temp/playground/playground.h5 RESULTS_{0}.h5
-""".format(eventId))
+./collect_events.sh {0} temp
+mv temp/{1}/{1}.h5 RESULTS_{2}.h5
+""".format(workFolderPath, workFolderName, eventId))
     script.close()
 
     # copy files

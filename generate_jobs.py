@@ -125,6 +125,9 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
 
+module load ooops
+set_io_param_batch $SLURM_JOBID 0 low
+
 ibrun python3 job_MPI_wrapper.py
 
 # after all runs finish, collect results into one hdf5 file
