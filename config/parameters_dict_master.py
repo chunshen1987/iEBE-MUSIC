@@ -377,6 +377,7 @@ iss_dict = {
                                                # particle numbers is reached
     'number_of_repeated_sampling': 10,         # number of repeaded sampling
     'number_of_particles_needed': 100000,      # number of hadrons to sample
+    'maximum_sampling_events': 10000,
 
     'sample_y_minus_eta_s_range': 4,    # y_minus_eta_s will be sampled
     'sample_pT_up_to': -1,  # Up to this value will pT be sampled; 
