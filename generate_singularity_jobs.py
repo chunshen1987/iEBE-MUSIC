@@ -160,7 +160,12 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
+h5Stat=`ls *.h5`
+
+if [ -z "${h5Stat} ]
+then
+
+    singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
 
 """.format(singularityRepoPath, executeScriptName, workFolderPath,
            parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
@@ -168,12 +173,13 @@ singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
     if clusterName == "anvil":
         script.write("""
 
-source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+    source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
 """)
     script.write("""
-mkdir -p temp
-./collect_events.sh {0} temp
-mv temp/{1}/{1}.h5 RESULTS_{2}.h5
+    mkdir -p temp
+    ./collect_events.sh {0} temp
+    mv temp/{1}/{1}.h5 RESULTS_{2}.h5
+fi
 """.format(workFolderPath, workFolderName, eventId))
     script.close()
 
