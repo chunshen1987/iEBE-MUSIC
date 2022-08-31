@@ -162,7 +162,7 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     script.write("""
 h5Stat=`ls *.h5`
 
-if [ -z "${h5Stat} ]
+if [ -z "$h5Stat" ]
 then
 
     singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
