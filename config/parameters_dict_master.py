@@ -204,6 +204,7 @@ music_dict = {
     'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
     'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
     'stringTransverseShiftFrac': 0.0,  # control the shift of transverse coord as a function of eta for string
+    'stringPreEqFlowFactor': 0.0,      # pre-Eq. flow factor
 
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
