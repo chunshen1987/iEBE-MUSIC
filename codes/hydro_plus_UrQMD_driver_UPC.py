@@ -80,19 +80,21 @@ def get_initial_condition(database, initial_type, iev, seed_add,
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
                                                         seed_add + iev*ran),
                      shell=True)
+                call("mv 3dMCGlauber/rapidity_shift hadronic_afterburner_toolkit/rapidity_shift",
+                     shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-                call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
-                                                specFilename), shell=True)
+                #call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                #                                specFilename), shell=True)
             else:
                 print("3D MC-Glauber event exists ...")
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
             shutil.copy(file_name, path.join(final_results_folder,
                                              "strings_{}.dat".format(iev)))
-            shutil.copy(specFilename,
-                        path.join(final_results_folder,
-                                  "spectators_{}.dat".format(iev)))
+            #shutil.copy(specFilename,
+            #            path.join(final_results_folder,
+            #                      "spectators_{}.dat".format(iev)))
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, iev)
@@ -450,9 +452,9 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
         'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
     ]
-    glauber_filelist = ["strings_{}.dat".format(event_id),
-                        "spectators_{}.dat".format(event_id),
-                        "participants_event_{}.dat".format(event_id)]
+    glauber_filelist = ["strings_{}.dat".format(event_id)]#,
+    #                    "spectators_{}.dat".format(event_id),
+    #                    "participants_event_{}.dat".format(event_id)]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
