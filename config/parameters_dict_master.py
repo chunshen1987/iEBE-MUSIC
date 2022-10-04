@@ -53,6 +53,8 @@ ipglasma_dict = {
     'muZero': 0.3,
     'minimumQs2ST': 0.,
     'setWSDeformParams': 0,
+    'R_WS': 6.6,
+    'a_WS': 0.52,
     'beta2': 0.28,
     'beta3': 0.0,
     'beta4': 0.0,
