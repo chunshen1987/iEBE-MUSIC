@@ -121,6 +121,7 @@ mcglauber_dict = {
     'b_max'     :   20.,         # maximum impact parameter (fm)
     'seed'      :   -1,          # random seed (-1: system)
     'only_event_statistics': 0,  # flag to only output the event_summary file
+    'batch_density_output': 0,   # flag to generate density profiles in a batch
     'cache_tables': 1,           # 1: use pre-generated tables for valence quark x
                                  # 0: re-generate tables for valence quark x
     'baryon_junctions': 0,       # 0: baryon number assumed to be at string end
