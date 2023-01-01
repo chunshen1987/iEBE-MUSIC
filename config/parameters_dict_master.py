@@ -192,7 +192,7 @@ kompost_dict = {
 # MUSIC
 music_dict = {
     'echo_level':  1,       # control the mount of message output to screen
-    'fastMode': 0,
+    'beastMode': 0,
     'mode': 2,              # MUSIC running mode 2: Evolution only.
     'Initial_profile': 9,   # type of initial condition 
                             # 9: IPGlasma (full Tmunu),
