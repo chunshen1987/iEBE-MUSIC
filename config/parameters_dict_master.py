@@ -103,6 +103,7 @@ ipglasma_dict = {
     'detaOutput': 0,
     'writeOutputs': 5,
     'writeEvolution': 0,
+    'readInitialWilsonLines': 0,
     'writeInitialWilsonLines': 0,
     'writeOutputsToHDF5': 0
 }
