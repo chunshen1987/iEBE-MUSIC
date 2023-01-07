@@ -666,6 +666,7 @@ def main(para_dict_):
             status = False
             if path.exists(results_file):
                 status = True
+            else:
                 spvnfolder = path.join(final_results_folder,
                                        "spvn_results_{}".format(event_id))
                 if path.exists(spvnfolder):
