@@ -34,22 +34,23 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
     return (filelist[iev])
 
 
-def get_initial_condition(database, initial_type, iev, seed_add,
+def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                           final_results_folder, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     status = True
     if "IPGlasma" in initial_type:
         ipglasma_local_folder = "ipglasma/ipglasma_results"
         res_path = path.join(path.abspath(final_results_folder),
-                             "ipglasma_results_{}".format(iev))
+                             "ipglasma_results_{}".format(event_id))
         file_name = ("epsilon-u-Hydro-t{0:s}-{1}.dat".format(
-                                                time_stamp_str, iev))
+                                                time_stamp_str, event_id))
         if "KoMPoST" in initial_type:
-            file_name = ("Tmunu-t{0:s}-{1}.dat".format(time_stamp_str, iev))
+            file_name = ("Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
+                                                       event_id))
         if database == "self":
             # check existing events ...
             if not path.exists(path.join(res_path, file_name)):
-                run_ipglasma(iev)
+                run_ipglasma(event_id)
                 collect_ipglasma_event(res_path)
                 if not path.exists(path.join(res_path, file_name)):
                     # IPGlasma event failed
@@ -61,10 +62,10 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         else:
             if "KoMPoST" in initial_type:
                 file_temp = fecth_an_IPGlasma_event_Tmunu(
-                                            database, time_stamp_str, iev)
+                                            database, time_stamp_str, event_id)
             else:
                 file_temp = fecth_an_IPGlasma_event(database, time_stamp_str,
-                                                    iev)
+                                                    event_id)
             makedirs(ipglasma_local_folder, exist_ok=True)
             shutil.move(file_temp,
                         path.join(ipglasma_local_folder, file_name))
@@ -73,12 +74,14 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         return status, file_name
     elif initial_type == "3DMCGlauber_dynamical":
         if database == "self":
-            file_name = "strings_event_{}.dat".format(iev)
-            specFilename = "spectators_event_{}.dat".format(iev)
+            file_name = "strings_event_{}.dat".format(event_id)
+            specFilename = "spectators_event_{}.dat".format(event_id)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
-                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
-                                                        seed_add + iev*ran),
+                cenMin = event_id % 100
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                     + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
+                                                         cenMin, cenMin+1),
                      shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
@@ -89,17 +92,17 @@ def get_initial_condition(database, initial_type, iev, seed_add,
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
             shutil.copy(file_name, path.join(final_results_folder,
-                                             "strings_{}.dat".format(iev)))
+                                             "strings_{}.dat".format(event_id)))
             shutil.copy(specFilename,
                         path.join(final_results_folder,
-                                  "spectators_{}.dat".format(iev)))
+                                  "spectators_{}.dat".format(event_id)))
             return status, file_name
         else:
-            file_name = fecth_an_3DMCGlauber_event(database, iev)
+            file_name = fecth_an_3DMCGlauber_event(database, event_id)
             return status, file_name
     elif initial_type == "3DMCGlauber_participants":
-        file_name = "participants_event_{}.dat".format(iev)
-        specFilename = "spectators_event_{}.dat".format(iev)
+        file_name = "participants_event_{}.dat".format(event_id)
+        specFilename = "spectators_event_{}.dat".format(event_id)
         ran = np.random.default_rng().integers(1e8)
         if not path.exists(file_name):
             call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
@@ -116,10 +119,10 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         shutil.copy(file_name, path.join(final_results_folder, file_name))
         shutil.copy(specFilename,
                     path.join(final_results_folder,
-                              "spectators_{}.dat".format(iev)))
+                              "spectators_{}.dat".format(event_id)))
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
-        file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
+        file_name = fecth_an_3DMCGlauber_smooth_event(database, event_id)
         return status, file_name
     else:
         print("\U0001F6AB  "
@@ -128,10 +131,10 @@ def get_initial_condition(database, initial_type, iev, seed_add,
         sys.exit(1)
 
 
-def run_ipglasma(iev):
+def run_ipglasma(event_id):
     """This functions run IPGlasma"""
     print("\U0001F3B6  Run IPGlasma ... ")
-    call("bash ./run_ipglasma.sh {}".format(iev), shell=True)
+    call("bash ./run_ipglasma.sh {}".format(event_id), shell=True)
 
 
 def collect_ipglasma_event(final_results_folder):
@@ -637,10 +640,10 @@ def main(para_dict_):
     nev = para_dict_['n_hydro']
     exitErrorTrigger = False
     exitErrorTriggerInitial = False
-    for iev in range(idx0, idx0 + nev):
+    for iev in range(nev):
         curr_time = time.asctime()
 
-        event_id = str(iev)
+        event_id = str(iev + idx0)
         if para_dict_['initial_condition'] != "self":
             initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
@@ -684,6 +687,7 @@ def main(para_dict_):
 
         initStauts, ifile = get_initial_condition(initial_condition,
                                                   initial_type, iev,
+                                                  idx0 + iev,
                                                   para_dict_['seed_add'],
                                                   final_results_folder,
                                                   para_dict_['time_stamp_str'])

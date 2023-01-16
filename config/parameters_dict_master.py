@@ -120,6 +120,8 @@ mcglauber_dict = {
     'Q2'        :   1.,          # the scale when evaluating the pdf
     'b_min'     :   0.,          # minimum impact parameter (fm)
     'b_max'     :   20.,         # maximum impact parameter (fm)
+    'cenMin'    :   0,           # centrality cut lower bound (%)
+    'cenMax'    :   100,         # centrality cut upper bound (%)
     'seed'      :   -1,          # random seed (-1: system)
     'only_event_statistics': 0,  # flag to only output the event_summary file
     'batch_density_output': 0,   # flag to generate density profiles in a batch
