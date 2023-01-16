@@ -34,6 +34,22 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
     return (filelist[iev])
 
 
+def mapEventIdToCentrality(event_id):
+    """This function maps the event_id to centrality bin for 3D-Glauber model
+       It makes sure the centrality are evenly distributed over different
+       simulation jobs when nev > 1
+    """
+    event_id = event_id % 100
+    b = event_id % 10
+    a = int((event_id - b)/10)
+    centrality = 0
+    if (b % 2) == 0:
+        centrality = b/2*10 + a
+    else:
+        centrality = (9 - (b - 1)/2)*10 + a
+    return(centrality)
+
+
 def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                           final_results_folder, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
@@ -78,7 +94,7 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
             specFilename = "spectators_event_{}.dat".format(event_id)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
-                cenMin = event_id % 100
+                cenMin = mapEventIdToCentrality(event_id)
                 call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
                      + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
                                                          cenMin, cenMin+1),
@@ -105,8 +121,10 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         specFilename = "spectators_event_{}.dat".format(event_id)
         ran = np.random.default_rng().integers(1e8)
         if not path.exists(file_name):
-            call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
-                                                    seed_add + iev*ran),
+            cenMin = mapEventIdToCentrality(event_id)
+            call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                 + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
+                                                     cenMin, cenMin+1),
                  shell=True)
             call("mv 3dMCGlauber/participants_event_0.dat {}".format(file_name),
                  shell=True)
