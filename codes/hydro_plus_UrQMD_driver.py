@@ -89,16 +89,20 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         connect_ipglasma_event(res_path, initial_type, file_name)
         return status, file_name
     elif initial_type == "3DMCGlauber_dynamical":
-        if database == "self":
+        if database == "self" or "fixCentrality":
             file_name = "strings_event_{}.dat".format(event_id)
             specFilename = "spectators_event_{}.dat".format(event_id)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
-                cenMin = mapEventIdToCentrality(event_id)
-                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                     + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
-                                                         cenMin, cenMin+1),
-                     shell=True)
+                if database == "self":
+                    cenMin = mapEventIdToCentrality(event_id)
+                    call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                         + "{} cenMin={} cenMax={};)".format(seed_add+iev*ran,
+                                                             cenMin, cenMin+1),
+                         shell=True)
+                else:
+                    call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                         + "{};)".format(seed_add+iev*ran), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
                 call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
@@ -121,11 +125,15 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         specFilename = "spectators_event_{}.dat".format(event_id)
         ran = np.random.default_rng().integers(1e8)
         if not path.exists(file_name):
-            cenMin = mapEventIdToCentrality(event_id)
-            call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                 + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
-                                                     cenMin, cenMin+1),
-                 shell=True)
+            if database == "self":
+                cenMin = mapEventIdToCentrality(event_id)
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                     + "{} cenMin={} cenMax={};)".format(seed_add + iev*ran,
+                                                         cenMin, cenMin+1),
+                     shell=True)
+            else:
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
+                     + "{};)".format(seed_add + iev*ran), shell=True)
             call("mv 3dMCGlauber/participants_event_0.dat {}".format(file_name),
                  shell=True)
             call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
