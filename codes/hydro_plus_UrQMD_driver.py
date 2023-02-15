@@ -516,7 +516,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             curr_time, spvnfolder),
               flush=True)
 
-        if para_dict['initial_condition'] == "self":
+        if para_dict['initial_condition'] == "self" or "fixCentrality":
             # save initial conditions
             if "IPGlasma" in para_dict['initial_type']:
                 initial_folder = path.join(
@@ -670,7 +670,8 @@ def main(para_dict_):
         curr_time = time.asctime()
 
         event_id = str(iev + idx0)
-        if para_dict_['initial_condition'] != "self":
+        if (para_dict_['initial_condition'] != "self"
+            and para_dict_['initial_condition'] != "fixCentrality"):
             initial_database_name = (
                     initial_condition.split("/")[-1].split(".h5")[0])
             event_id = initial_database_name + "_" + event_id
@@ -756,7 +757,7 @@ def main(para_dict_):
             continue
 
         if (initial_type == "3DMCGlauber_dynamical"
-                and initial_condition == "self"):
+                and (initial_condition == "self" or "fixCentrality")):
             # save the initial condition
             shutil.move("MUSIC/initial/strings.dat",
                         path.join(final_results_folder, hydro_folder_name,

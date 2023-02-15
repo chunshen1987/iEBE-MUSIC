@@ -596,7 +596,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         path.join(package_root_path, '3DMCGlauber_database',
                   'fetch_3DMCGlauber_event_from_hdf5_database.py'),
         event_folder)
-    if initial_condition_database == "self":
+    if initial_condition_database == "self" or "fixCentrality":
         if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
@@ -999,7 +999,7 @@ def main():
 
     cent_label = "XXX"
     cent_label_pre = cent_label
-    if initial_condition_database == "self":
+    if initial_condition_database == "self" or "fixCentrality":
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
