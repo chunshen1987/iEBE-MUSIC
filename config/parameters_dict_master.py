@@ -41,6 +41,12 @@ ipglasma_dict = {
     'UVdamp': 0.,
     'Jacobianm': 0.35,
     'g': 1.,                # strong coupling constant
+    'SubNucleonParamType': 0,    # 0: do not use posterior parameter sets
+                                 # 1: use subnucleon parameters from variant Nq posterior distribution
+                                 # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
+    'SubNucleonParamSet': -1,    # -1: choose a random set from the posterior distribution
+                                 # 0: choose the MAP parameter set
+                                 # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'BG': 4.,
     'BGq': 0.3,
     'BGqVar': 0.0,
