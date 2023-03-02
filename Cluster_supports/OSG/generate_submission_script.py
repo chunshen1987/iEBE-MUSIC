@@ -62,6 +62,7 @@ output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
 
 +JobDurationCategory = "Long"
+max_idle = 5000
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
