@@ -500,6 +500,7 @@ hadronic_afterburner_toolkit_dict = {
                         #    (without header lines)
                         # 4: reads outputs from UrQMD 3.3p2 outputs
                         # 10: reads outputf from gzip outputs
+    'ecoOutput': 1,     # 1: only save Qn without errorbars
     'analyze_flow': 1,                  # 0/1: flag to perform flow analysis
     'analyze_HBT': 0,                   # 0/1: flag to perform HBT analysis
     'analyze_balance_function': 0,      # 0/1: flag to analyze Balance function
@@ -520,7 +521,8 @@ hadronic_afterburner_toolkit_dict = {
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
     'rapidity_shift': 0.,
-    'order_max': 9,     # the maximum harmonic order of anisotropic flow
+    'order_max': 10,                # the maximum harmonic order (= order_max - 1 ) of anisotropic flow
+                                    # for charged hadron; order_max = 6 for identified particles
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
