@@ -101,7 +101,7 @@ ipglasma_dict = {
     'SigmaNN': 42.,
     'gaussianWounding': 1,
     'inverseQsForMaxTime': 0,
-    'maxtime': 0.6,
+    'maxtime': 0.4,
     'dtau': 0.1,
     'LOutput': 30,
     'sizeOutput': 512,
