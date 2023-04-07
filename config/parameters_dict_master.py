@@ -101,7 +101,7 @@ ipglasma_dict = {
     'SigmaNN': 42.,
     'gaussianWounding': 1,
     'inverseQsForMaxTime': 0,
-    'maxtime': 0.6,
+    'maxtime': 0.4,
     'dtau': 0.1,
     'LOutput': 30,
     'sizeOutput': 512,
@@ -250,6 +250,7 @@ music_dict = {
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
     'Grid_size_in_x': 200,      # number of the grid points in x direction
     'Grid_size_in_y': 200,      # number of the grid points in y direction
+    'gridPadding': 3,           # grid padding size in the transverse plane (fm)
 
     'EOS_to_use': 9,            # type of the equation of state
                                 # 0: ideal gas

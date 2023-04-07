@@ -492,7 +492,7 @@ do
     ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
     cp ../hydro_event/spectators.dat results/spectators.dat
-    if [ $SubEventId = "0" ]; then
+    if [ $SubEventId = "0" ] && [ $iev -eq "0" ]; then
     """)
     script.write("    ./iSS.e randomSeed=$RANDOMSEED {0}".format(logfile))
     script.write("""
@@ -509,13 +509,9 @@ do
     """)
     script.write("""
     cd ../osc2u
-    if [ $SubEventId = "0" ]; then
     """)
-    script.write("    ./osc2u.e < ../iSS/OSCAR.DAT {0}".format(logfile))
     script.write("""
-    else
-        ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
-    fi
+    ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
