@@ -24,6 +24,7 @@ mcglauber_dict = {
     'Projectile':  "dipole",          # projectile nucleus name
     'Target'    :  "Au",         # target nucleus name
     'roots'     :   54.4,        # collision energy (GeV)
+    'lightNucleusOption':   2,
     'seed'      :   -1,          # random seed (-1: system)
     'baryon_junctions': 1,       # 0: baryon number assumed to be at string end
                                  # 1: baryon number transported assuming baryon
