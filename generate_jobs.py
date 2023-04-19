@@ -70,7 +70,6 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #SBATCH -N 1
 #SBATCH -n {1:d}
 #SBATCH --mem={2:.0f}G
-#SBATCH --constraint=intel
 #SBATCH -t {3:s}
 #SBATCH -e job.err
 #SBATCH -o job.log

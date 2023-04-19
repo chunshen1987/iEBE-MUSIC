@@ -23,10 +23,10 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
         script.write("""#!/usr/bin/env bash
 #SBATCH --job-name event_{0}
 #SBATCH -q primary
+#SBATCH --exclude=asx[1-20],wsu[1-117]
 #SBATCH -N 1
 #SBATCH -n {1}
 #SBATCH --mem={2:.0f}G
-#SBATCH --constraint=intel
 #SBATCH -t {3:s}
 #SBATCH -e job.err
 #SBATCH -o job.log
