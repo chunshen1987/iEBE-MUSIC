@@ -506,15 +506,14 @@ do
     ./correct_momentum_conservation.py OSCAR.DAT
     mv OSCAR_w_GMC.DAT OSCAR.DAT
     """)
+
     script.write("""
     cd ../osc2u
-    """)
-    script.write("""
-    ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
+    ./osc2u.e < ../iSS/OSCAR.DAT > run.log
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    ./runqmd.sh >> run.log
+    ./runqmd.sh > run.log
     mv particle_list.dat ../UrQMD_results/particle_list_${iev}.dat
     rm -fr OSCAR.input
     cd ..
