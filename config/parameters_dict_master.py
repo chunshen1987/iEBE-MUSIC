@@ -522,6 +522,7 @@ hadronic_afterburner_toolkit_dict = {
                                                            # turn on only for Lambda (monval=3122)
                                                            # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
+    'collect_neutral_particles': 0, # flag to collect neutral particle observables
     # Parameters for single particle spectra and vn
     'rapidity_shift': 0.,
     'order_max': 10,                # the maximum harmonic order (= order_max - 1 ) of anisotropic flow
