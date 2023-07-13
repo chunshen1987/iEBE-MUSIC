@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """This script combine multiple hdf5 data files to one"""
 
 import sys
@@ -91,6 +91,7 @@ EVENT_LIST = glob(path.join(RESULTS_PATH, "*.h5"))
 
 exist_group_keys = []
 
+h5Res = h5py.File("{}.h5".format(RESULTS_NAME), "a")
 for ievent, event_path in enumerate(EVENT_LIST):
     print("processing {0} ... ".format(event_path))
     event_folder = "/".join(event_path.split("/")[0:-1])
@@ -100,7 +101,6 @@ for ievent, event_path in enumerate(EVENT_LIST):
     try:
         hftemp = h5py.File(event_path, "r")
         glist = list(hftemp.keys())
-        hftemp.close()
         for igroup, gtemp in enumerate(glist):
             gtemp2 = gtemp
             random_string_len = 1
@@ -115,9 +115,10 @@ for ievent, event_path in enumerate(EVENT_LIST):
             if gtemp2 != gtemp:
                 print("Conflict in mergeing {0}, use {1}".format(gtemp, gtemp2))
             exist_group_keys.append(gtemp2)
-            system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
-                event_path, RESULTS_NAME, gtemp, gtemp2))
-            remove(event_path)
+            h5py.h5o.copy(hftemp.id, gtemp.encode('UTF-8'),
+                          h5Res.id, gtemp2.encode('UTF-8'))
+        hftemp.close()
+        remove(event_path)
     except:
         continue
-
+h5Res.close()

@@ -65,6 +65,8 @@ ipglasma_dict = {
     'beta3': 0.0,
     'beta4': 0.0,
     'gamma': 0.0,
+    'force_dmin_flag': 1,    # flag to force d_min for deformed nuclei
+    'd_min': 0.9,            # fm
     'c': 0.2,
     'g2mu': 0.1,
     'useFatTails': 0,
