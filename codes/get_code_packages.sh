@@ -22,8 +22,8 @@ rm -fr kompost_code/.git
 
 # download 4D EoS 
 rm -fr 4DEoS
-git clone --depth=1 https://github.com/gpihan/4DEoS 4DEoS
-(cd 4DEoS; git checkout 42e954a20608daea6b11b8ff8142c695ff89daa2)
+git clone --depth=1 https://github.com/gpihanatWayne/4DEoS 4DEoS
+(cd 4DEoS; git checkout 62b5d02a556d081a08aada117e16a4b98602fda6)
 rm -fr 4DEoS/.git
 
 # download MUSIC
