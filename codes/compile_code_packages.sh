@@ -69,6 +69,12 @@ if [ $status -ne 0 ]; then
     exit $status
 fi
 
+# update 4DEoS 
+
+unzip neos4D.zip
+rm -rf MUSIC_code/EOS/neos4D/neos4d_*.dat
+mv 4DEoS/neos4d_*.dat MUSIC_code/EOS/neos4D/
+
 # compile MUSIC
 echo -e "${Green}compile MUSIC ... ${NC}"
 (

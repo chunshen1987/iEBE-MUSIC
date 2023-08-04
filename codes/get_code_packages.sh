@@ -20,6 +20,12 @@ git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
 (cd kompost_code; git checkout 3a8f873bcf8e20ec8522cb851d20ae5e66610085)
 rm -fr kompost_code/.git
 
+# download 4D EoS 
+rm -fr 4DEoS
+git clone --depth=1 https://github.com/gpihan/4DEoS 4DEoS
+(cd 4DEoS; git checkout 42e954a20608daea6b11b8ff8142c695ff89daa2)
+rm -fr 4DEoS/.git
+
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
