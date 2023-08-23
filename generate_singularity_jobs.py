@@ -23,10 +23,10 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
         script.write("""#!/usr/bin/env bash
 #SBATCH --job-name event_{0}
 #SBATCH -q primary
+#SBATCH --exclude=asx[1-20],wsu[1-117]
 #SBATCH -N 1
 #SBATCH -n {1}
 #SBATCH --mem={2:.0f}G
-#SBATCH --constraint=intel
 #SBATCH -t {3:s}
 #SBATCH -e job.err
 #SBATCH -o job.log
@@ -81,6 +81,9 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
 
+module load ooops
+set_io_param_batch $SLURM_JOBID 0 low
+
 ibrun python3 job_MPI_wrapper.py
 
 # after all runs finish, collect results into one hdf5 file
@@ -90,6 +93,7 @@ mkdir temp
 ./collect_events_singularity.sh `pwd` temp
 mkdir -p $WORK/RESULTS
 cp -r temp/* $WORK/RESULTS/
+rm -fr `pwd`
 
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
@@ -130,6 +134,7 @@ mkdir temp
 ./collect_events_singularity.sh `pwd` temp
 mkdir -p $PROJECT/RESULTS
 cp -r temp/* $PROJECT/RESULTS/
+rm -fr `pwd`
 
 """.format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()
@@ -144,26 +149,38 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     mkdir(eventFolder)
 
     # generate job running script
+    workingFolderName = workingFolder.split('/')[-1]
+    workFolderPath = "playground_{0}_{1}".format(workingFolderName, eventId)
+    if clusterName == "stampede2":
+        workFolderPath = "/tmp/" + workFolderPath
+    workFolderName = workFolderPath.split('/')[-1]
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
     script = open(path.join(eventFolder, "submit_job.script"), "w")
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8}
+h5Stat=`ls *.h5`
 
-""".format(singularityRepoPath, executeScriptName, parameterFileName,
-           eventId0, nHydroEvents, nUrQMD, nThreads, seed, bayesParamFile))
+if [ -z "$h5Stat" ]
+then
+
+    singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
+
+""".format(singularityRepoPath, executeScriptName, workFolderPath,
+           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
+           seed, bayesParamFile))
     if clusterName == "anvil":
         script.write("""
 
-source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
+    source $PROJECT/iEBE-MUSIC/Cluster_supports/Anvil/bashrc
 """)
     script.write("""
-mkdir -p temp
-./collect_events.sh playground temp
-mv temp/playground/playground.h5 RESULTS_{0}.h5
-""".format(eventId))
+    mkdir -p temp
+    ./collect_events.sh {0} temp
+    mv temp/{1}/{1}.h5 RESULTS_{2}.h5
+fi
+""".format(workFolderPath, workFolderName, eventId))
     script.close()
 
     # copy files

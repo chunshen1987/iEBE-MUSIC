@@ -70,7 +70,6 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
 #SBATCH -N 1
 #SBATCH -n {1:d}
 #SBATCH --mem={2:.0f}G
-#SBATCH --constraint=intel
 #SBATCH -t {3:s}
 #SBATCH -e job.err
 #SBATCH -o job.log
@@ -125,14 +124,26 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS={4:d}
 
+module load ooops
+set_io_param_batch $SLURM_JOBID 0 low
+
 ibrun python3 job_MPI_wrapper.py
+
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $WORK
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $WORK/RESULTS
+cp -r temp/* $WORK/RESULTS/
+rm -fr `pwd`
 
 """.format(queueName, n_nodes, n_jobs, walltime, n_threads))
     script.close()
 
 
-def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, n_jobs,
-                                  n_threads, walltime):
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes,
+                                  nTaskPerNode, n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
@@ -163,11 +174,12 @@ mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
 # and transfer it to $PROJECT
 rm -fr temp
 mkdir temp
-./collect_events_singularity.sh `pwd` temp
+./collect_events.sh `pwd` temp
 mkdir -p $PROJECT/RESULTS
 cp -r temp/* $PROJECT/RESULTS/
+rm -fr `pwd`
 
-""".format(queueName, n_nodes, n_jobs, walltime, n_threads))
+""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()
 
 
@@ -479,7 +491,7 @@ do
     ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
     cp ../hydro_event/spectators.dat results/spectators.dat
-    if [ $SubEventId = "0" ]; then
+    if [ $SubEventId = "0" ] && [ $iev -eq "0" ]; then
     """)
     script.write("    ./iSS.e randomSeed=$RANDOMSEED {0}".format(logfile))
     script.write("""
@@ -494,19 +506,14 @@ do
     ./correct_momentum_conservation.py OSCAR.DAT
     mv OSCAR_w_GMC.DAT OSCAR.DAT
     """)
+
     script.write("""
     cd ../osc2u
-    if [ $SubEventId = "0" ]; then
-    """)
-    script.write("    ./osc2u.e < ../iSS/OSCAR.DAT {0}".format(logfile))
-    script.write("""
-    else
-        ./osc2u.e < ../iSS/OSCAR.DAT >> run.log
-    fi
+    ./osc2u.e < ../iSS/OSCAR.DAT > run.log
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    ./runqmd.sh >> run.log
+    ./runqmd.sh > run.log
     mv particle_list.dat ../UrQMD_results/particle_list_${iev}.dat
     rm -fr OSCAR.input
     cd ..
@@ -583,7 +590,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         path.join(package_root_path, '3DMCGlauber_database',
                   'fetch_3DMCGlauber_event_from_hdf5_database.py'),
         event_folder)
-    if initial_condition_database == "self":
+    if initial_condition_database == "self" or "fixCentrality":
         if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
@@ -604,7 +611,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             link_list = [
                 'qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
                 'carbon_alpha_3.in', 'carbon_plaintext.in', 'oxygen_alpha_3.in',
-                'oxygen_plaintext.in', 'he3_plaintext.in'
+                'oxygen_plaintext.in', 'he3_plaintext.in', 'tables',
             ]
             for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
@@ -986,7 +993,7 @@ def main():
 
     cent_label = "XXX"
     cent_label_pre = cent_label
-    if initial_condition_database == "self":
+    if initial_condition_database == "self" or "fixCentrality":
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
@@ -1080,21 +1087,28 @@ def main():
         generate_Stampede2_mpi_job_script(working_folder_name,
                                           args.node_type.lower(),
                                           n_nodes, n_jobs, n_threads, walltime)
+        script_path = path.join(code_package_path, "utilities")
+        shutil.copy(path.join(script_path, 'collect_events.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
 
     if cluster_name == "anvil":
         nThreadsPerNode = 128
         shutil.copy(
             path.join(code_package_path,
-                      'Cluster_supports/Stampede2/job_MPI_wrapper.py'),
+                      'Cluster_supports/Anvil/job_MPI_wrapper.py'),
             working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        nTaskPerNode = int(nThreadsPerNode/n_threads)
         if n_nodes*nThreadsPerNode < n_jobs*n_threads:
             n_nodes += 1
 
         generate_Anvil_mpi_job_script(working_folder_name,
-                                      args.node_type.lower(),
-                                      n_nodes, n_jobs, n_threads, wallTime)
-        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                                      args.node_type.lower(), n_nodes,
+                                      nTaskPerNode, n_threads, walltime)
+        script_path = path.join(code_package_path, "utilities")
+        shutil.copy(path.join(script_path, 'collect_events.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
                     working_folder_name)

@@ -18,7 +18,7 @@ def print_usage():
 def write_submission_script(para_dict_):
     jobName = "iEBEMUSIC_{}".format(para_dict_["job_id"])
     random_seed = random.SystemRandom().randint(0, 10000000)
-    imagePathHeader = "stash:///osgconnect"
+    imagePathHeader = "osdf://"
     script = open(FILENAME, "w")
     if para_dict_["bayesFlag"]:
         script.write("""universe = vanilla
@@ -61,7 +61,8 @@ error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
 
-+JobDurationCategory = "Long"
+#+JobDurationCategory = "Long"
+max_idle = 1000
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
