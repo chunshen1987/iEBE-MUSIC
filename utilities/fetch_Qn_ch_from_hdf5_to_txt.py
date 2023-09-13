@@ -6,12 +6,9 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "STAR1": {"pTmin": 0.2, "pTmax": 2.0, "etamin": -0.5, "etamax": 0.5},
-    "STAR2": {"pTmin": 0.3, "pTmax": 2.0, "etamin": -0.5, "etamax": 0.5},
-    "STAR3": {"pTmin": 0.5, "pTmax": 2.0, "etamin": -0.5, "etamax": 0.5},
-    "STAR4": {"pTmin": 0.2, "pTmax": 2.0, "etamin": -0.8, "etamax": 0.8},
-    "STAR5": {"pTmin": 0.3, "pTmax": 2.0, "etamin": -0.8, "etamax": 0.8},
-    "STAR6": {"pTmin": 0.5, "pTmax": 2.0, "etamin": -0.8, "etamax": 0.8},
+    "ALICE": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
+    "CMS": {"pTmin": 0.3, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
+    "ATLAS": {"pTmin": 0.5, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
 }
 
 
@@ -75,15 +72,21 @@ except:
 h5_data = h5py.File(database_file, "r")
 eventList = list(h5_data.keys())
 
+outFileList = []
+for expName in kinematicCutsDict:
+    outFile = open("Qn_vectors_{}.txt".format(expName), "w")
+    outFile.write("# Nch  <pT>(GeV)  Qn_real  Qn_imag (n=0,{})\n".format(NORDER))
+    outFileList.append(outFile)
 for ievent, event_i in enumerate(eventList):
-    print("fetching event: {0} from the database {1} ...".format(
-        event_i, database_file))
+    if ievent % 100 == 0:
+        print("fetching event: {0} from the database {1} ...".format(
+            event_i, database_file))
     eventGroup = h5_data.get(event_i)
     vn_filename = "particle_9999_vndata_diff_eta_-0.5_0.5.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
     Qn_vector = []
-    for expName in kinematicCutsDict:
+    for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         vn_filename = 'particle_9999_vndata_diff_eta_{}_{}.dat'.format(
                                         pTetacut["etamin"], pTetacut["etamax"])
@@ -92,11 +95,11 @@ for ievent, event_i in enumerate(eventList):
                                        vn_data)
 
     # output Qn vectors
-    output = np.array(dN_vector + Qn_vector)
-    output = output.reshape(1, len(output))
-    np.savetxt("Qn_vectors_{}.txt".format(event_i), output, fmt="%.4e",
-               delimiter="  ",
-               header="Nch  <pT>(GeV)  Qn_real  Qn_imag (n=0,{})".format(
-                                                                    NORDER)
-    )
+    output = dN_vector + Qn_vector
+    for val in output:
+        outFileList[exp_i].write("{:.4e}  ".format(val))
+    outFileList[exp_i].write("\n")
 
+h5_data.close()
+for outFile in outFileList:
+    outFile.close()
