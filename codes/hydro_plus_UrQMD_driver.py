@@ -492,7 +492,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
-        "vorticity_evo_*.dat"
+        "vorticity_evo_*.dat", "FO_nBvseta.dat",
     ]
     photon_filepattern = ['*_Spvn*.dat']
     spin_filepattern = [
