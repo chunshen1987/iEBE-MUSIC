@@ -437,21 +437,9 @@ def check_an_event_is_good(event_folder):
     """This function checks the given event contains all required files"""
     required_files_list = [
         'particle_9999_vndata_eta_-0.5_0.5.dat',
-        'particle_9999_vndata_diff_eta_0.5_2.5.dat',
-        'particle_9999_vndata_eta_-2.5_2.5.dat',
         'particle_211_vndata_diff_y_-0.5_0.5.dat',
         'particle_321_vndata_diff_y_-0.5_0.5.dat',
         'particle_2212_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-211_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-321_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-2212_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3122_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3312_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3334_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3122_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3312_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3334_vndata_diff_y_-0.5_0.5.dat',
-        'particle_333_vndata_diff_y_-0.5_0.5.dat',
     ]
     event_file_list = glob(path.join(event_folder, "*"))
     for ifile in required_files_list:
