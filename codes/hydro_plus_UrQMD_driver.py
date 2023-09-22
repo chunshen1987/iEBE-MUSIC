@@ -530,10 +530,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         if path.isfile(inifile):
                             shutil.move(inifile, spvnfolder)
             if "3DMCGlauber" in para_dict['initial_type']:
-                for iniFilename in glauber_filelist:
-                    iniFile = path.join(final_results_folder, iniFilename)
-                    if path.isfile(iniFile):
-                        shutil.move(iniFile, spvnfolder)
+                for iniFilenamePattern in glauber_filelist:
+                    iniFileList = glob(path.join(final_results_folder,
+                                                 iniFilenamePattern))
+                    for iniFile in iniFileList:
+                        if path.isfile(iniFile):
+                            shutil.move(iniFile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
