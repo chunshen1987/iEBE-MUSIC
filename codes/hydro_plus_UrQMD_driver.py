@@ -116,6 +116,13 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
             shutil.copy(specFilename,
                         path.join(final_results_folder,
                                   "spectators_{}.dat".format(event_id)))
+            filePatterns = ["ed_etas", "nB_etas", "ecc_ed"]
+            call("mv 3dMCGlauber/ed_etas_*.dat {}".format(
+                                    final_results_folder), shell=True)
+            call("mv 3dMCGlauber/nB_etas_*.dat {}".format(
+                                    final_results_folder), shell=True)
+            call("mv 3dMCGlauber/ecc_ed*.dat {}".format(
+                                    final_results_folder), shell=True)
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, event_id)
@@ -469,7 +476,10 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     ]
     glauber_filelist = ["strings_{}.dat".format(event_id),
                         "spectators_{}.dat".format(event_id),
-                        "participants_event_{}.dat".format(event_id)]
+                        "participants_event_{}.dat".format(event_id),
+                        "ed_etas_distribution_*.dat",
+                        "nB_etas_distribution_*.dat",
+                        "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
