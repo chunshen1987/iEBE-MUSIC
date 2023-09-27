@@ -7,9 +7,9 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
-    "CMS": {"pTmin": 0.3, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
-    "ATLAS": {"pTmin": 0.5, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
+    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
+    "ALICE_eta_-1_-0p5": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -1, "etamax": -0.5},
+    "ALICE_eta_0p5_1": {"pTmin": 0.2, "pTmax": 3.0, "etamin": 0.5, "etamax": 1},
 }
 
 
@@ -87,9 +87,12 @@ for ievent, event_i in enumerate(eventList):
             outdata[event_i]["nucleonPos"] = NpartData
     vn_filename = "particle_9999_vndata_diff_eta_-0.5_0.5.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+    ecc_filename = "eccentricities_evo_ed_tau_0.4.dat"
+    eccn_data = np.nan_to_num(eventGroup.get(ecc_filename))
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
     outdata[event_i]["Nch"] = dN_vector[0]
     outdata[event_i]["mean_pT_ch"] = dN_vector[1]
+    outdata[event_i]["ecc_n"] = eccn_data[2:]
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         vn_filename = 'particle_9999_vndata_diff_eta_{}_{}.dat'.format(
@@ -97,7 +100,7 @@ for ievent, event_i in enumerate(eventList):
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         Qn_vector = calcualte_inte_Qn(pTetacut["pTmin"], pTetacut["pTmax"],
                                       vn_data)
-        outdata[event_i][expName] = Qn_vector
+        outdata[event_i][expName] = np.array(Qn_vector)
 
 with open('QnVectors.pickle', 'wb') as pf:
     pickle.dump(outdata, pf)
