@@ -610,8 +610,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             path.join(event_folder, 'ipglasma/input'))
             link_list = [
                 'qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
-                'carbon_alpha_3.in', 'carbon_plaintext.in', 'oxygen_alpha_3.in',
-                'oxygen_plaintext.in', 'he3_plaintext.in', 'tables',
+                'nucleusConfigurations', 'tables',
             ]
             for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
