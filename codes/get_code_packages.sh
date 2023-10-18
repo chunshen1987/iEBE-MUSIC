@@ -5,13 +5,13 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout  5ad879b6033c793cdacb9ae15b1505b82b823541)
+(cd 3dMCGlauber_code; git checkout 2cc0b48f1a4f6a28503f4962676b7e40f959228e)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
 rm -fr ipglasma_code
 git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
-(cd ipglasma_code; git checkout b9d4750a81afad3d0d0efa59d08822cdf25677c8)
+(cd ipglasma_code; git checkout 7195a564e131c3a19d6d1c174ce83aa0d92a2bff)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
