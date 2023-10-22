@@ -26,7 +26,6 @@ Particlization & hadronic transport:
 
 ## Usage:
 
-
 type `./generate_jobs.py -h` for help information
 
 ## Parameters:
