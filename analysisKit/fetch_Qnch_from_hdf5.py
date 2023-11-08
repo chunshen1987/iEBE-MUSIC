@@ -7,9 +7,9 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
-    "ALICE_eta_-1_-0p5": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -1, "etamax": -0.5},
-    "ALICE_eta_0p5_1": {"pTmin": 0.2, "pTmax": 3.0, "etamin": 0.5, "etamax": 1},
+    "STAR_eta_-0p5_0p5": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
+    "STAR_eta_-1_-0p5": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -1, "etamax": -0.5},
+    "STAR_eta_0p5_1": {"pTmin": 0.2, "pTmax": 3.0, "etamin": 0.5, "etamax": 1},
 }
 
 
@@ -18,7 +18,7 @@ def help_message():
     exit(0)
 
 
-def calcualte_inte_Qn(pT_low, pT_high, data):
+def calcualte_inte_Vn(pT_low, pT_high, data):
     """
         this function calculates the pT-integrated vn in a
         given pT range (pT_low, pT_high) for every event in the data
@@ -27,10 +27,14 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
     pT_inte_array = np.linspace(pT_low, pT_high, npT)
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
+    totalN_event = data[:, -1]
     pT_event = data[:, 0]
     dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
                                  np.log(dN_event+1e-30)))
+    totalN_interp = np.exp(np.interp(pT_inte_array, pT_event,
+                                     np.log(totalN_event+1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
+    totalN = np.sum(totalN_interp)*dpT/(pT_event[1] - pT_event[0])
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     temp_vn_array = [N, meanpT]
     for iorder in range(1, NORDER+1):
@@ -38,12 +42,12 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
         vn_imag_event = data[:, 2*iorder+1]
         vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
-        Qn_real_inte = 2.*np.pi*np.sum(
-                    vn_real_interp*dN_interp*pT_inte_array)*dpT
-        Qn_imag_inte = 2.*np.pi*np.sum(
-                    vn_imag_interp*dN_interp*pT_inte_array)*dpT
-        temp_vn_array.append(Qn_real_inte)
-        temp_vn_array.append(Qn_imag_inte)
+        Vn_real_inte = (np.sum(vn_real_interp*dN_interp*pT_inte_array)
+                        /np.sum(dN_interp*pT_inte_array))
+        Vn_imag_inte = (np.sum(vn_imag_interp*dN_interp*pT_inte_array)
+                        /np.sum(dN_interp*pT_inte_array))
+        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+    temp_vn_array.append(totalN)
     return(temp_vn_array)
 
 
@@ -81,10 +85,6 @@ for ievent, event_i in enumerate(eventList):
             event_i, database_file))
     eventGroup = h5_data.get(event_i)
     outdata[event_i] = {}
-    for fileName in eventGroup.keys():
-        if "NpartList" in fileName:
-            NpartData = np.nan_to_num(eventGroup.get(fileName))
-            outdata[event_i]["nucleonPos"] = NpartData
     vn_filename = "particle_9999_vndata_diff_eta_-0.5_0.5.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
     ecc_filename = "eccentricities_evo_ed_tau_0.4.dat"
@@ -98,10 +98,11 @@ for ievent, event_i in enumerate(eventList):
         vn_filename = 'particle_9999_vndata_diff_eta_{}_{}.dat'.format(
                                         pTetacut["etamin"], pTetacut["etamax"])
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-        Qn_vector = calcualte_inte_Qn(pTetacut["pTmin"], pTetacut["pTmax"],
+        Vn_vector = calcualte_inte_Vn(pTetacut["pTmin"], pTetacut["pTmax"],
                                       vn_data)
-        outdata[event_i][expName] = np.array(Qn_vector)
+        outdata[event_i][expName] = np.array(Vn_vector)
 
+print("nev = {}".format(len(eventList)))
 with open('QnVectors.pickle', 'wb') as pf:
     pickle.dump(outdata, pf)
 
