@@ -123,6 +123,7 @@ mcglauber_dict = {
     'Projectile':  "Pb",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
     'nucleon_configuration_from_file': 0,
+    'light_nucleus_option':  0,  # light nucleus configurations from different nuclear structure theory
     'roots'     :   17.3,        # collision energy (GeV)
     'useQuarks' :   1,           # switch to use valence quarks
     'Q2'        :   1.,          # the scale when evaluating the pdf
@@ -131,8 +132,10 @@ mcglauber_dict = {
     'cenMin'    :   0,           # centrality cut lower bound (%)
     'cenMax'    :   100,         # centrality cut upper bound (%)
     'seed'      :   -1,          # random seed (-1: system)
+    'N_sea_partons':  1,         # the number of soft gluon hot spots
     'only_event_statistics': 0,  # flag to only output the event_summary file
     'batch_density_output': 0,   # flag to generate density profiles in a batch
+    'outputInitialEst': 1,       # flag to output initial state var vs. eta_s
     'cache_tables': 1,           # 1: use pre-generated tables for valence quark x
                                  # 0: re-generate tables for valence quark x
     'baryon_junctions': 0,       # 0: baryon number assumed to be at string end

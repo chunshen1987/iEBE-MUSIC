@@ -71,7 +71,7 @@ RUN yum -y install osg-ca-certs osg-wn-client && \
 RUN pip3 install --upgrade && \
     pip3 install numpy h5py scipy
 
-ENV HOME /home/
+ENV HOME /opt/
 ENV PATH="${PATH}:/usr/lib64/openmpi/bin:/usr/local/gsl/2.5/x86_64/bin"
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/gsl/2.5/x86_64/lib64"
 ENV GSL_ROOT_DIR="/usr/local/gsl/2.5/x86_64"

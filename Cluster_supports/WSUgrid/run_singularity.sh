@@ -22,9 +22,9 @@ printf "Job running as user: `/usr/bin/id`\n"
 
 if [ -z ${bayesFile} ]
 then
-    /home/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} --nocopy --continueFlag
+    /opt/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} --nocopy --continueFlag
 else
-    /home/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
+    /opt/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
 fi
 
 

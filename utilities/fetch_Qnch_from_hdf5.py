@@ -2,13 +2,14 @@
 
 import h5py
 import sys
+import pickle
 import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
-    "CMS": {"pTmin": 0.3, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
-    "ATLAS": {"pTmin": 0.5, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
+    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
+    "ALICE_eta_-1_-0p5": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -1, "etamax": -0.5},
+    "ALICE_eta_0p5_1": {"pTmin": 0.2, "pTmax": 3.0, "etamin": 0.5, "etamax": 1},
 }
 
 
@@ -72,34 +73,36 @@ except:
 h5_data = h5py.File(database_file, "r")
 eventList = list(h5_data.keys())
 
-outFileList = []
-for expName in kinematicCutsDict:
-    outFile = open("Qn_vectors_{}.txt".format(expName), "w")
-    outFile.write("# Nch  <pT>(GeV)  Qn_real  Qn_imag (n=0,{})\n".format(NORDER))
-    outFileList.append(outFile)
+outdata = {}
+
 for ievent, event_i in enumerate(eventList):
     if ievent % 100 == 0:
         print("fetching event: {0} from the database {1} ...".format(
             event_i, database_file))
     eventGroup = h5_data.get(event_i)
+    outdata[event_i] = {}
+    for fileName in eventGroup.keys():
+        if "NpartList" in fileName:
+            NpartData = np.nan_to_num(eventGroup.get(fileName))
+            outdata[event_i]["nucleonPos"] = NpartData
     vn_filename = "particle_9999_vndata_diff_eta_-0.5_0.5.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+    ecc_filename = "eccentricities_evo_ed_tau_0.4.dat"
+    eccn_data = np.nan_to_num(eventGroup.get(ecc_filename))
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
-    Qn_vector = []
+    outdata[event_i]["Nch"] = dN_vector[0]
+    outdata[event_i]["mean_pT_ch"] = dN_vector[1]
+    outdata[event_i]["ecc_n"] = eccn_data[2:]
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         vn_filename = 'particle_9999_vndata_diff_eta_{}_{}.dat'.format(
                                         pTetacut["etamin"], pTetacut["etamax"])
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-        Qn_vector += calcualte_inte_Qn(pTetacut["pTmin"], pTetacut["pTmax"],
-                                       vn_data)
+        Qn_vector = calcualte_inte_Qn(pTetacut["pTmin"], pTetacut["pTmax"],
+                                      vn_data)
+        outdata[event_i][expName] = np.array(Qn_vector)
 
-    # output Qn vectors
-    output = dN_vector + Qn_vector
-    for val in output:
-        outFileList[exp_i].write("{:.4e}  ".format(val))
-    outFileList[exp_i].write("\n")
+with open('QnVectors.pickle', 'wb') as pf:
+    pickle.dump(outdata, pf)
 
 h5_data.close()
-for outFile in outFileList:
-    outFile.close()

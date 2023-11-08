@@ -116,6 +116,13 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
             shutil.copy(specFilename,
                         path.join(final_results_folder,
                                   "spectators_{}.dat".format(event_id)))
+            filePatterns = ["ed_etas", "nB_etas", "ecc_ed"]
+            call("mv 3dMCGlauber/ed_etas_*.dat {}".format(
+                                    final_results_folder), shell=True)
+            call("mv 3dMCGlauber/nB_etas_*.dat {}".format(
+                                    final_results_folder), shell=True)
+            call("mv 3dMCGlauber/ecc_ed*.dat {}".format(
+                                    final_results_folder), shell=True)
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, event_id)
@@ -437,21 +444,9 @@ def check_an_event_is_good(event_folder):
     """This function checks the given event contains all required files"""
     required_files_list = [
         'particle_9999_vndata_eta_-0.5_0.5.dat',
-        'particle_9999_vndata_diff_eta_0.5_2.5.dat',
-        'particle_9999_vndata_eta_-2.5_2.5.dat',
         'particle_211_vndata_diff_y_-0.5_0.5.dat',
         'particle_321_vndata_diff_y_-0.5_0.5.dat',
         'particle_2212_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-211_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-321_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-2212_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3122_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3312_vndata_diff_y_-0.5_0.5.dat',
-        'particle_3334_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3122_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3312_vndata_diff_y_-0.5_0.5.dat',
-        'particle_-3334_vndata_diff_y_-0.5_0.5.dat',
-        'particle_333_vndata_diff_y_-0.5_0.5.dat',
     ]
     event_file_list = glob(path.join(event_folder, "*"))
     for ifile in required_files_list:
@@ -481,7 +476,10 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     ]
     glauber_filelist = ["strings_{}.dat".format(event_id),
                         "spectators_{}.dat".format(event_id),
-                        "participants_event_{}.dat".format(event_id)]
+                        "participants_event_{}.dat".format(event_id),
+                        "ed_etas_distribution_*.dat",
+                        "nB_etas_distribution_*.dat",
+                        "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
         'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
@@ -492,7 +490,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
         "global_conservation_laws.dat", "global_angular_momentum_*.dat",
-        "vorticity_evo_*.dat"
+        "vorticity_evo_*.dat", "FO_nBvseta.dat",
     ]
     photon_filepattern = ['*_Spvn*.dat']
     spin_filepattern = [
@@ -532,10 +530,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         if path.isfile(inifile):
                             shutil.move(inifile, spvnfolder)
             if "3DMCGlauber" in para_dict['initial_type']:
-                for iniFilename in glauber_filelist:
-                    iniFile = path.join(final_results_folder, iniFilename)
-                    if path.isfile(iniFile):
-                        shutil.move(iniFile, spvnfolder)
+                for iniFilenamePattern in glauber_filelist:
+                    iniFileList = glob(path.join(final_results_folder,
+                                                 iniFilenamePattern))
+                    for iniFile in iniFileList:
+                        if path.isfile(iniFile):
+                            shutil.move(iniFile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
