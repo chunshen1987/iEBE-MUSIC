@@ -4,8 +4,8 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 2cc0b48f1a4f6a28503f4962676b7e40f959228e)
+git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
+(cd 3dMCGlauber_code; git checkout 9af251c283e700a2abb9eb844a91da861136920f)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -46,7 +46,7 @@ rm -fr urqmd_code/.git
 
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
-git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
+git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
 (cd hadronic_afterburner_toolkit_code; git checkout a5e0901b3bd2b575b01630cd7d29948ee94b35e5)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
