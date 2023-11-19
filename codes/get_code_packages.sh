@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b electriCharge 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 931ab6bc0fff76e6dc9bb492aa5d45f8b3514fdd)
+(cd 3dMCGlauber_code; git checkout ed18f599bbfba89cde2e13ee31c7804317460757)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
