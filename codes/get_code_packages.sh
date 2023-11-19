@@ -20,16 +20,10 @@ git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
 (cd kompost_code; git checkout 3a8f873bcf8e20ec8522cb851d20ae5e66610085)
 rm -fr kompost_code/.git
 
-# download 4D EoS 
-rm -fr 4DEoS
-git clone --depth=1 https://github.com/gpihanatWayne/4DEoS 4DEoS
-(cd 4DEoS; git checkout 62b5d02a556d081a08aada117e16a4b98602fda6)
-rm -fr 4DEoS/.git
-
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout e36929e9ba550d9e307d395852c84db985fa5d4e)
+(cd MUSIC_code; git checkout 94f6872e8fd36fd4de1220ed97ffc6ff16b6ef80)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
