@@ -28,7 +28,7 @@ ipglasma_dict = {
     'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
     'maxtime': 0.1,
     'LOutput': 30,
-    'writeOutputs': 5,
+    'writeOutputs': 4,
 }
 
 
