@@ -25,6 +25,8 @@ ipglasma_dict = {
     'roots': 200.,
     'SigmaNN': 42.,
     'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'LOutput': 34,
+    'sizeOutput': 512,
 }
 
 

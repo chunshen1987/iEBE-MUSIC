@@ -109,7 +109,7 @@ ipglasma_dict = {
     'sizeOutput': 512,
     'etaSizeOutput': 1,
     'detaOutput': 0,
-    'writeOutputs': 5,
+    'writeOutputs': 1,
     'writeEvolution': 0,
     'readInitialWilsonLines': 0,
     'writeInitialWilsonLines': 0,
