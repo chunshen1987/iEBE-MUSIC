@@ -479,6 +479,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         "participants_event_{}.dat".format(event_id),
                         "ed_etas_distribution_*.dat",
                         "nB_etas_distribution_*.dat",
+                        "nQ_etas_distribution_*.dat",
                         "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
