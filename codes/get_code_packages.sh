@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout 94f6872e8fd36fd4de1220ed97ffc6ff16b6ef80)
+(cd MUSIC_code; git checkout 920034735b4ddffe4ca969c09e23f2c7510e3639)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -46,7 +46,7 @@ rm -fr urqmd_code/.git
 
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
-git clone --depth=1 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
+git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
 (cd hadronic_afterburner_toolkit_code; git checkout a5e0901b3bd2b575b01630cd7d29948ee94b35e5)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
