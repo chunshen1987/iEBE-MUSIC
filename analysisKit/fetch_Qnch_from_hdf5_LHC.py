@@ -22,6 +22,36 @@ def help_message():
     exit(0)
 
 
+def calcualte_inte_Qn_pT(pT_low, pT_high, data):
+    """
+        this function calculates the pT-integrated vn in a
+        given pT range (pT_low, pT_high) for every event in the data
+    """
+    npT = 50
+    pT_inte_array = np.linspace(pT_low, pT_high, npT)
+    dpT = pT_inte_array[1] - pT_inte_array[0]
+    dN_event = data[:, 1]
+    pT_event = data[:, 0]
+    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
+                                 np.log(dN_event+1e-30)))
+    N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
+    meanpT = (np.sum(dN_interp*pT_inte_array**2.)
+              / np.sum(dN_interp*pT_inte_array))
+    temp_vn_array = [N, meanpT]
+    for iorder in range(1, NORDER+1):
+        vn_real_event = data[:, 2*iorder]
+        vn_imag_event = data[:, 2*iorder+1]
+        vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
+        vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
+        Qn_real_inte = 2.*np.pi*np.sum(
+                    vn_real_interp*dN_interp*pT_inte_array)*dpT
+        Qn_imag_inte = 2.*np.pi*np.sum(
+                    vn_imag_interp*dN_interp*pT_inte_array)*dpT
+        temp_vn_array.append(Qn_real_inte)
+        temp_vn_array.append(Qn_imag_inte)
+    return temp_vn_array
+
+
 def calcualte_inte_Vn_eta(etaMin, etaMax, data):
     """
         this function calculates the eta-integrated vn in a
@@ -53,7 +83,7 @@ def calcualte_inte_Vn_eta(etaMin, etaMax, data):
         Vn_imag_inte = np.sum(vn_imag_interp*dN_interp)/np.sum(dN_interp)
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
     temp_vn_array.append(totalN)
-    return(temp_vn_array)
+    return temp_vn_array
 
 
 def calcualte_yield_and_meanpT(pT_low, pT_high, data):
@@ -71,7 +101,7 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     res_array = [N, meanpT]
-    return(res_array)
+    return res_array
 
 
 try:
