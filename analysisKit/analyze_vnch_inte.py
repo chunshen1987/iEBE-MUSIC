@@ -1,20 +1,65 @@
 #!/usr/bin/env python3
 
+import sys
+from os import path
 import pickle
 import numpy as np
-from os import path
 
 
+def help_message():
+    print("{0} database_file".format(sys.argv[0]))
+    exit(0)
+
+
+pidList = ['pi+', 'pi-', 'K+', 'K-', 'p', 'pbar']
 Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
                            60., 70., 80., 90., 100.]
-PHOBOS_cen_list = [0., 6., 15., 25., 35., 45., 55.]  # PHOBOS AuAu 200
-SPS_cen_list    = [5., 12.5, 23.5, 33.5, 43.5]       # SPS PbPb
-PHENIX_cen_list = [0., 20., 40., 60., 88.]           # PHENIX dAu
-STAR_cen_list   = [0., 10., 40., 80]                 # STAR v1
-ALICE_pp_list   = [0., 100., 0., 1., 5.,
-                   0., 5., 10., 15, 20., 30., 40., 50., 70., 100.]
 centralityCutList = Reg_centrality_cut_list
 dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+
+
+def calculate_pid_dN(dN_data_array, outputFilename, cenLabel):
+    """
+        This function computes the averaged value of the identified particle
+        yields for different centralities.
+    """
+    nev = len(dN_data_array[:, 0])
+    dN_mean = np.mean(dN_data_array, axis=0)
+    dN_err = np.std(dN_data_array, axis=0)/np.sqrt(nev)
+
+    if path.isfile(outputFilename):
+        f = open(outputFilename, 'a')
+    else:
+        f = open(outputFilename, 'w')
+        f.write("# cen  ch  pi+  pi-  K+  K-  p  pbar\n")
+    f.write("{:.3f}".format(cenLabel))
+    for i in range(len(dN_mean)):
+        f.write("  {:.5e}  {:.5e}".format(dN_mean[i], dN_err[i]))
+    f.write("\n")
+    f.close()
+    return
+
+
+def calculate_pid_meanpT(pT_data_array, outputFilename, cenLabel):
+    """
+        This function computes the averaged value of the identified particle
+        mean pT for different centralities.
+    """
+    nev = len(pT_data_array[:, 0])
+    meanpT_mean = np.mean(pT_data_array, axis=0)
+    meanpT_err = np.std(pT_data_array, axis=0)/np.sqrt(nev)
+
+    if path.isfile(outputFilename):
+        f = open(outputFilename, 'a')
+    else:
+        f = open(outputFilename, 'w')
+        f.write("# cen  ch  pi+  pi-  K+  K-  p  pbar\n")
+    f.write("{:.3f}".format(cenLabel))
+    for i in range(len(meanpT_mean)):
+        f.write("  {:.5e}  {:.5e}".format(meanpT_mean[i], meanpT_err[i]))
+    f.write("\n")
+    f.close()
+    return
 
 
 def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
@@ -36,7 +81,7 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
             vn{6} = (cn{6}/4)**(1/6)
             vn{4} = (2 <v_n*conj(v_n)>**2 - <(v_n*conj(v_n))**2.>)**(1/4)
         and compute skewness estimator gamma_1
-            gamma_1 = -6\sqrt{2}*vn{4}^2*(vn{4} - vn{6})
+            gamma_1 = -6\\sqrt{2}*vn{4}^2*(vn{4} - vn{6})
                                          /(vn{2}^2 - vn{4}^2)^(3/2)
 
         we will use Jackknife resampling method to estimate
@@ -47,7 +92,6 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     Q2 = dN*vn_data_array[:, 3]
     Q3 = dN*vn_data_array[:, 4]
     Q4 = dN*vn_data_array[:, 5]
-    Q5 = dN*vn_data_array[:, 6]
     Q6 = dN*vn_data_array[:, 7]
 
     # two-particle correlation
@@ -58,11 +102,11 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     # four-particle correlation
     N4_weight = dN*(dN - 1.)*(dN - 2.)*(dN - 3.)
     Q2_4 = ((np.abs(Q2)**4.) - 2.*np.real(Q4*np.conj(Q2)*np.conj(Q2))
-             - 4.*(dN - 2.)*(np.abs(Q2)**2.) + np.abs(Q4)**2.
-             + 2*dN*(dN - 3.))
+            - 4.*(dN - 2.)*(np.abs(Q2)**2.) + np.abs(Q4)**2.
+            + 2*dN*(dN - 3.))
     Q3_4 = ((np.abs(Q3)**4.) - 2.*np.real(Q6*np.conj(Q3)*np.conj(Q3))
-             - 4.*(dN - 2.)*(np.abs(Q3)**2.) + np.abs(Q6)**2.
-             + 2*dN*(dN - 3.))
+            - 4.*(dN - 2.)*(np.abs(Q3)**2.) + np.abs(Q6)**2.
+            + 2*dN*(dN - 3.))
 
     # six-particle correlation
     N6_weight = dN*(dN - 1.)*(dN - 2.)*(dN - 3.)*(dN - 4.)*(dN - 5.)
@@ -103,13 +147,12 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
             r2_array[iev] = v2_4/v2_2
             F2_array[iev] = np.nan_to_num(
                     np.sqrt((v2_2**2. - v2_4**2.)
-                            /(v2_2**2. + v2_4**2. + 1e-15)))
+                            / (v2_2**2. + v2_4**2. + 1e-15)))
             if C_2_6 > 0.:
                 v2_6 = (C_2_6/4.)**(1./6.)
                 r26_array[iev] = v2_6/v2_4
                 gamma1_array[iev] = (-6.*np.sqrt(2)*(v2_4**2.)*(v2_4 - v2_6)
-                                     /(v2_2**2. - v2_4**2.)**(1.5))
-
+                                     / (v2_2**2. - v2_4**2.)**(1.5))
 
         C_3_2 = np.mean(Q3_N2[array_idx])/np.mean(N2_weight[array_idx])
         C34_tmp = np.mean(Q3_4[array_idx])/np.mean(N4_weight[array_idx])
@@ -120,14 +163,14 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
             v3_2 = np.sqrt(C_3_2)
             r3_array[iev] = v3_4/v3_2
             F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)
-                                    /(v3_2**2. + v3_4**2. + 1e-15))
+                                    / (v3_2**2. + v3_4**2. + 1e-15))
 
     dN_mean = np.real(np.mean(vn_data_array[:, 0]))
     dN_err = np.std(vn_data_array[:, 0])/np.sqrt(nev)
     C2_4_mean = np.mean(C2_4_array)
-    C2_4_err  = np.sqrt((nev - 1.)/nev*np.sum((C2_4_array - C2_4_mean)**2.))
+    C2_4_err = np.sqrt((nev - 1.)/nev*np.sum((C2_4_array - C2_4_mean)**2.))
     C3_4_mean = np.mean(C3_4_array)
-    C3_4_err  = np.sqrt((nev - 1.)/nev*np.sum((C3_4_array - C3_4_mean)**2.))
+    C3_4_err = np.sqrt((nev - 1.)/nev*np.sum((C3_4_array - C3_4_mean)**2.))
 
     v2_4 = 0.0
     v2_4_err = 0.0
@@ -186,8 +229,8 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
         f = open(outputFileName64, 'a')
     else:
         f = open(outputFileName64, 'w')
-        f.write(
-        "# cen  Nch  vn{6}/vn{4}  (vn{6}/vn{4})_err  gamma_1  gamma_1_err\n")
+        f.write("# cen  Nch  vn{6}/vn{4}  (vn{6}/vn{4})_err  "
+                + "gamma_1  gamma_1_err\n")
     f.write("{:.3f}  {:.5e}  {:.5e}  {:.5e}  {:.5e}  {:.5e}  {:.5e}\n".format(
         cenLabel, dN_mean, dN_err, r26_mean, r26_err, gamma1_mean, gamma1_err))
     f.close()
@@ -261,7 +304,7 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
             v2_2 = np.sqrt(C_2_2)
             r2_array[iev] = v2_4/v2_2
             F2_array[iev] = np.sqrt((v2_2**2. - v2_4**2.)
-                                    /(v2_2**2. + v2_4**2. + 1e-15))
+                                    / (v2_2**2. + v2_4**2. + 1e-15))
 
         C_3_2 = np.mean(Q3_N2[array_idx])/np.mean(N2_weight[array_idx])
         C34_tmp = np.mean(Q3_N4[array_idx])/np.mean(N4_weight[array_idx])
@@ -272,12 +315,12 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
             v3_2 = np.sqrt(C_3_2)
             r3_array[iev] = v3_4/v3_2
             F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)
-                                    /(v3_2**2. + v3_4**2. + 1e-15))
+                                    / (v3_2**2. + v3_4**2. + 1e-15))
 
     C2_4_mean = np.mean(C2_4_array)
-    C2_4_err  = np.sqrt((nev - 1.)/nev*np.sum((C2_4_array - C2_4_mean)**2.))
+    C2_4_err = np.sqrt((nev - 1.)/nev*np.sum((C2_4_array - C2_4_mean)**2.))
     C3_4_mean = np.mean(C3_4_array)
-    C3_4_err  = np.sqrt((nev - 1.)/nev*np.sum((C3_4_array - C3_4_mean)**2.))
+    C3_4_err = np.sqrt((nev - 1.)/nev*np.sum((C3_4_array - C3_4_mean)**2.))
 
     v2_4 = 0.0
     v2_4_err = 0.0
@@ -295,7 +338,7 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
     dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              /np.sqrt(nev))
+              / np.sqrt(nev))
     if path.isfile(outputFileName_vn4):
         f = open(outputFileName_vn4, 'a')
     else:
@@ -354,7 +397,7 @@ def calcualte_vn_2_with_gap(vn_data_array_sub1, vn_data_array_sub2,
     dN_mean = np.real(np.mean(vn_data_array_sub1[:, 0]
                               + vn_data_array_sub2[:, 0]))
     dN_err = (np.std(vn_data_array_sub1[:, 0] + vn_data_array_sub2[:, 0])
-              /np.sqrt(nev))
+              / np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -368,23 +411,29 @@ def calcualte_vn_2_with_gap(vn_data_array_sub1, vn_data_array_sub2,
     return
 
 
-with open("QnVectors.pickle", "rb") as pf:
+try:
+    database_file = str(sys.argv[1])
+except IndexError:
+    help_message()
+
+with open(database_file, "rb") as pf:
     data = pickle.load(pf)
 
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
 dNdyList = - np.sort(-np.array(dNdyList))
-print("Number of good events: {}".format(len(dNdyList)))
+print(f"Number of good events: {len(dNdyList)}")
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]: continue
+    if centralityCutList[icen+1] < centralityCutList[icen]:
+        continue
     selected_events_list = []
 
     dN_dy_cut_high = dNdyList[
         int(len(dNdyList)*centralityCutList[icen]/100.)
     ]
-    dN_dy_cut_low  = dNdyList[
+    dN_dy_cut_low = dNdyList[
         min(len(dNdyList)-1,
             int(len(dNdyList)*centralityCutList[icen+1]/100.))
     ]
@@ -395,11 +444,12 @@ for icen in range(len(centralityCutList) - 1):
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
-            and data[event_name]['Nch'] <= dN_dy_cut_high):
+                and data[event_name]['Nch'] <= dN_dy_cut_high):
             selected_events_list.append(event_name)
 
     nev = len(selected_events_list)
-    if nev <= 0: continue
+    if nev <= 0:
+        continue
 
     cenLabel = (centralityCutList[icen] +
                 centralityCutList[icen+1])/2.
@@ -410,16 +460,32 @@ for icen in range(len(centralityCutList) - 1):
     QnArr1 = []
     QnArr2 = []
     QnArr3 = []
+    piddNArr = []
+    pidmeanpTArr = []
     for event_name in selected_events_list:
-        QnArr1.append(data[event_name]['STAR_eta_-0p5_0p5'])
-        QnArr2.append(data[event_name]['STAR_eta_-1_-0p5'])
-        QnArr3.append(data[event_name]['STAR_eta_0p5_1'])
+        QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
+        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
+        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
+        dNtmp = []
+        meanpTtmp = []
+        dNtmp.append(data[event_name]['Nch'])
+        meanpTtmp.append(data[event_name]['mean_pT_ch'])
+        for pidName in pidList:
+            tmp = data[event_name]['{}_dNdy_meanpT'.format(pidName)]
+            dNtmp.append(tmp[0])
+            meanpTtmp.append(tmp[1])
+        piddNArr.append(dNtmp)
+        pidmeanpTArr.append(meanpTtmp)
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)
+    piddNArr = np.array(piddNArr)
+    pidmeanpTArr = np.array(pidmeanpTArr)
 
     calcualte_vn_2_with_gap(QnArr2, QnArr3, "vn2_sub.dat", cenLabel)
     calculate_vn4_2sub(QnArr2, QnArr3, "vn4_2sub.dat",
                        "vn4_2sub_over_vn2.dat", cenLabel)
     calculate_vn4_vn6(QnArr1, "vn4.dat", "vn4_over_vn2.dat",
                       "vn6_over_vn4.dat", cenLabel)
+    calculate_pid_dN(piddNArr, "pid_dN.dat", cenLabel)
+    calculate_pid_meanpT(pidmeanpTArr, "pid_meanpT.dat", cenLabel)
