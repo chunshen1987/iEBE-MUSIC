@@ -7,10 +7,14 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE_eta_-0p4_0p4": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.4, "etamax": 0.4},
-    "ALICE_eta_-0p8_-0p4": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.8, "etamax": -0.4},
-    "ALICE_eta_0p4_0p8": {"pTmin": 0.2, "pTmax": 3, "etamin": 0.4, "etamax": 0.8},
-    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.8, "etamax": 0.8},
+    "ALICE_eta_-0p4_0p4": {"pTmin": 0.2, "pTmax": 3,
+                           "etamin": -0.4, "etamax": 0.4},
+    "ALICE_eta_-0p8_-0p4": {"pTmin": 0.2, "pTmax": 3,
+                            "etamin": -0.8, "etamax": -0.4},
+    "ALICE_eta_0p4_0p8": {"pTmin": 0.2, "pTmax": 3,
+                          "etamin": 0.4, "etamax": 0.8},
+    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3,
+                           "etamin": -0.8, "etamax": 0.8},
 }
 
 pidList = [('pi+', '211'), ('pi-', '-211'), ('K+', '321'), ('K-', '-321'),
@@ -22,7 +26,7 @@ LHCetaRangeList = ['-0.4_0.4', '-0.5_0.5', '-0.8_-0.4', '-2.4_-0.5',
                    '3.1_4.9', '2.8_5.1']
 
 def help_message():
-    print("{0} database_file".format(sys.argv[0]))
+    print("Usage: {0} database_file".format(sys.argv[0]))
     exit(0)
 
 
@@ -114,7 +118,7 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
 
 try:
     database_file = str(sys.argv[1])
-except:
+except IndexError:
     help_message()
 
 h5_data = h5py.File(database_file, "r")
@@ -151,7 +155,7 @@ for ievent, event_i in enumerate(eventList):
             vn_data = np.nan_to_num(eventGroup.get(vn_filename))
             Vn_vector = calcualte_inte_Vn_eta(
                         pTetacut['etamin'], pTetacut['etamax'], vn_data)
-        else if etalabel in LHCetaRangeList:
+        elif etalabel in LHCetaRangeList:
             vn_filename = f'particle_9999_vndata_diff_eta_{etalabel}.dat'
             vn_data = np.nan_to_num(eventGroup.get(vn_filename))
             Vn_vector = calcualte_inte_Vn_pT(
