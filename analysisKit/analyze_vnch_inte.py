@@ -471,7 +471,7 @@ for icen in range(len(centralityCutList) - 1):
         dNtmp.append(data[event_name]['Nch'])
         meanpTtmp.append(data[event_name]['mean_pT_ch'])
         for pidName in pidList:
-            tmp = data[event_name]['{}_dNdy_meanpT'.format(pidName)]
+            tmp = data[event_name][f'{pidName}_dNdy_meanpT']
             dNtmp.append(tmp[0])
             meanpTtmp.append(tmp[1])
         piddNArr.append(dNtmp)
