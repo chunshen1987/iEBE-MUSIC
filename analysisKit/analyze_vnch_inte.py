@@ -7,7 +7,7 @@ import numpy as np
 
 
 def help_message():
-    print("{0} database_file".format(sys.argv[0]))
+    print("Usage: {0} database_file".format(sys.argv[0]))
     exit(0)
 
 

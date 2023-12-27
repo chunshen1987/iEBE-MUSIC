@@ -111,7 +111,8 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
                                  np.log(dN_event+1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
-    meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
+    meanpT = (np.sum(dN_interp*pT_inte_array**2.)
+              / np.sum(dN_interp*pT_inte_array))
     res_array = [N, meanpT]
     return res_array
 
