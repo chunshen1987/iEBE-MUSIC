@@ -62,6 +62,184 @@ def calculate_pid_meanpT(pT_data_array, outputFilename, cenLabel):
     return
 
 
+def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
+                                      outputFileName, cenLabel):
+    """
+        this function computes the non-linear response coefficients
+
+        chi_422 = Re<V_4*conj(V_2)^2>/(<|V_2|^4>)
+        v_422 = Re<V_4*conj(V_2)^2>/sqrt(<|V_2|^4>)
+        rho_422 = Re<V_4*conj(V_2)^2>/sqrt(<|V_4|^2*<|V_2|^4>)
+        v4_L = sqrt(|V_4|^2 - Re<V_4*conj(V_2)^2>)
+
+        we use one flow vector for V_n and the other for conj(V_n)
+        we will use Jackknife resampling method to estimate
+        the statistical error
+    """
+    nev = len(vn_data_array1[:, 0])
+    dN1 = np.real(vn_data_array1[:, -1])
+    dN2 = np.real(vn_data_array2[:, -1])
+
+    Q2_1 = dN1*vn_data_array1[:, 3]
+    Q4_1 = dN1*vn_data_array1[:, 5]
+    Q2_2 = dN2*vn_data_array2[:, 3]
+    Q4_2 = dN2*vn_data_array2[:, 5]
+
+    # two-particle correlation
+    N2_weight = dN1*dN2
+    Q4_N2 = np.real(Q4_1*np.conj(Q4_2))
+
+    # four-particle correlation
+    N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
+    Q2_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
+             - np.real(Q4_1*np.conj(Q2_2)*np.conj(Q2_2))
+             - np.real(Q2_1*Q2_1*np.conj(Q4_2))
+             + np.real(Q4_1*np.conj(Q4_2)))
+
+    # three-particle correlation
+    N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
+    chi_422_num = (  Q4_1*np.conj(Q2_2)*np.conj(Q2_2) - Q4_1*np.conj(Q4_2)
+                   + Q4_2*np.conj(Q2_1)*np.conj(Q2_1) - Q4_2*np.conj(Q4_1))
+
+    chi_422_JK = np.zeros(nev)
+    v422_JK = np.zeros(nev)
+    rho422_JK = np.zeros(nev)
+    v4L_JK = np.zeros(nev)
+    for iev in range(nev):
+        array_idx = [True]*nev
+        array_idx[iev] = False
+        array_idx = np.array(array_idx)
+
+        num_JK = (np.real(np.mean(chi_422_num[array_idx]))
+                  / np.mean(N3_weight[array_idx]))
+        den_JK = (np.real(np.mean(Q2_N4[array_idx]))
+                  / np.mean(N4_weight[array_idx]))
+
+        v4_Psi4 = np.nan_to_num(np.sqrt(np.mean(Q4_N2[array_idx])
+                                        / np.mean(N2_weight[array_idx])))
+
+        chi_422_JK[iev] = num_JK/den_JK
+        v422_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
+        rho422_JK[iev] = v422_JK[iev]/v4_Psi4
+        v4L_JK[iev] = np.nan_to_num(np.sqrt(v4_Psi4**2 - v422_JK[iev]**2.))
+
+    chi_422_mean = np.mean(chi_422_JK)
+    chi_422_err = np.sqrt((nev - 1.)/nev
+                          *np.sum((chi_422_JK - chi_422_mean)**2.))
+    v422_mean = np.mean(v422_JK)
+    v422_err = np.sqrt((nev - 1.)/nev*np.sum((v422_JK - v422_mean)**2.))
+    rho422_mean = np.mean(rho422_JK)
+    rho422_err = np.sqrt((nev - 1.)/nev*np.sum((rho422_JK - rho422_mean)**2.))
+    v4L_mean = np.mean(v4L_JK)
+    v4L_err = np.sqrt((nev - 1.)/nev*np.sum((v4L_JK - v4L_mean)**2.))
+    results = [v4L_mean, v4L_err, v422_mean, v422_err, rho422_mean, rho422_err,
+               chi_422_mean, chi_422_err]
+
+    dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
+              / np.sqrt(nev))
+    if path.isfile(outputFileName):
+        f = open(outputFileName, 'a')
+    else:
+        f = open(outputFileName, 'w')
+        f.write("# cen  Nch  v4L  v_422  rho_422  chi422\n")
+    f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
+    for ires in results:
+        f.write("  {:.5e}".format(ires))
+    f.write("\n")
+    f.close()
+
+
+def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
+                                      outputFileName, cenLabel):
+    """
+        this function computes the non-linear response coefficients
+
+        chi_523 = Re<V_5*conj(V_2*V_3)>/(<|V_2|^2*|V_3|^2>)
+        v_523 = Re<V_5*conj(V_2*V_3)>/sqrt(<|V_2|^2*|V_3|^2>)
+        rho_523 = Re<V_5*conj(V_2*V_3)>/sqrt(<|V_5|^2><|V_2|^2*|V_3|^2>)
+        v5_L = sqrt(|V_5|^2 - Re<V_5*conj(V_2*V_3)>)
+
+        we use one flow vector for V_n and the other for conj(V_n)
+        we will use Jackknife resampling method to estimate
+        the statistical error
+    """
+    nev = len(vn_data_array1[:, 0])
+    dN1 = np.real(vn_data_array1[:, -1])
+    dN2 = np.real(vn_data_array2[:, -1])
+
+    Q2_1 = dN1*vn_data_array1[:, 3]
+    Q3_1 = dN1*vn_data_array1[:, 4]
+    Q5_1 = dN1*vn_data_array1[:, 6]
+    Q2_2 = dN2*vn_data_array2[:, 3]
+    Q3_2 = dN2*vn_data_array2[:, 4]
+    Q5_2 = dN2*vn_data_array2[:, 6]
+
+    # two-particle correlation
+    N2_weight = dN1*dN2
+    Q5_N2 = np.real(Q5_1*np.conj(Q5_2))
+
+    # four-particle correlation
+    N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
+    Q2Q3_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q3_1*np.conj(Q3_2))
+               - np.real(Q5_1*np.conj(Q2_2)*np.conj(Q3_2))
+               - np.real(Q2_1*Q3_1*np.conj(Q5_2))
+               + np.real(Q5_1*np.conj(Q5_2)))
+
+    # three-particle correlation
+    N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
+    chi_523_num = (  Q5_1*np.conj(Q2_2)*np.conj(Q3_2) - Q5_1*np.conj(Q5_2)
+                   + Q5_2*np.conj(Q2_1)*np.conj(Q3_1) - Q5_2*np.conj(Q5_1))
+
+    chi_523_JK = np.zeros(nev)
+    v523_JK = np.zeros(nev)
+    rho523_JK = np.zeros(nev)
+    v5L_JK = np.zeros(nev)
+    for iev in range(nev):
+        array_idx = [True]*nev
+        array_idx[iev] = False
+        array_idx = np.array(array_idx)
+
+        num_JK = (np.real(np.mean(chi_523_num[array_idx]))
+                  / np.mean(N3_weight[array_idx]))
+        den_JK = (np.real(np.mean(Q2Q3_N4[array_idx]))
+                  / np.mean(N4_weight[array_idx]))
+
+        v5_Psi5 = np.nan_to_num(np.sqrt(np.mean(Q5_N2[array_idx])
+                                        / np.mean(N2_weight[array_idx])))
+
+        chi_523_JK[iev] = num_JK/den_JK
+        v523_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
+        rho523_JK[iev] = v523_JK[iev]/v5_Psi5
+        v5L_JK[iev] = np.nan_to_num(np.sqrt(v5_Psi5**2 - v523_JK[iev]**2.))
+
+    chi_523_mean = np.mean(chi_523_JK)
+    chi_523_err = np.sqrt((nev - 1.)/nev
+                          *np.sum((chi_523_JK - chi_523_mean)**2.))
+    v523_mean = np.mean(v523_JK)
+    v523_err = np.sqrt((nev - 1.)/nev*np.sum((v523_JK - v523_mean)**2.))
+    rho523_mean = np.mean(rho523_JK)
+    rho523_err = np.sqrt((nev - 1.)/nev*np.sum((rho523_JK - rho523_mean)**2.))
+    v5L_mean = np.mean(v5L_JK)
+    v5L_err = np.sqrt((nev - 1.)/nev*np.sum((v5L_JK - v5L_mean)**2.))
+    results = [v5L_mean, v5L_err, v523_mean, v523_err, rho523_mean, rho523_err,
+               chi_523_mean, chi_523_err]
+
+    dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
+              / np.sqrt(nev))
+    if path.isfile(outputFileName):
+        f = open(outputFileName, 'a')
+    else:
+        f = open(outputFileName, 'w')
+        f.write("# cen  Nch  v5L  v_523  rho_523  chi523\n")
+    f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
+    for ires in results:
+        f.write("  {:.5e}".format(ires))
+    f.write("\n")
+    f.close()
+
+
 def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
                       outputFileName42, outputFileName64, cenLabel):
     """
@@ -272,12 +450,12 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
 
     # four-particle correlation
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
-    Q2_N4 = (np.real(Q2_1*np.conj(Q2_1)*Q2_1*np.conj(Q2_2))
+    Q2_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
              - np.real(Q4_1*np.conj(Q2_2)*np.conj(Q2_2))
              - np.real(Q2_1*Q2_1*np.conj(Q4_2))
              + np.real(Q4_1*np.conj(Q4_2)))
 
-    Q3_N4 = (np.real(Q3_1*np.conj(Q3_1)*Q3_1*np.conj(Q3_2))
+    Q3_N4 = (  np.real(Q3_1*np.conj(Q3_2)*Q3_1*np.conj(Q3_2))
              - np.real(Q6_1*np.conj(Q3_2)*np.conj(Q3_2))
              - np.real(Q3_1*Q3_1*np.conj(Q6_2))
              + np.real(Q6_1*np.conj(Q6_2)))
