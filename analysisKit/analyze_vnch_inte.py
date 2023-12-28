@@ -62,6 +62,99 @@ def calculate_pid_meanpT(pT_data_array, outputFilename, cenLabel):
     return
 
 
+def calculateSymmetricCumulant2sub(vn_data_arra1, vn_data_array2,
+                                   outputFileName, cenLabel):
+    """
+        this funciton computes the symmetric cumulant
+            SC(m,n) = <v_m*conj(v_m)*v_n*conj(v_n)>
+                      - <v_m*conj(v_m)>*<v_n*conj(v_n)>
+        we use one flow vecotor for v_{n,m} and another for conj(v_{n,m})
+        we use Jackknife resampling method to estimate the statistical error
+    """
+    nev = len(vn_data_array1[:, 0])
+    dN1 = np.real(vn_data_array1[:, -1])
+    dN2 = np.real(vn_data_array2[:, -1])
+
+    Q2_1 = dN1*vn_data_array1[:, 3]
+    Q3_1 = dN1*vn_data_array1[:, 4]
+    Q4_1 = dN1*vn_data_array1[:, 5]
+    Q5_1 = dN1*vn_data_array1[:, 6]
+    Q6_1 = dN1*vn_data_array1[:, 7]
+    Q2_2 = dN2*vn_data_array2[:, 3]
+    Q3_2 = dN2*vn_data_array2[:, 4]
+    Q4_2 = dN2*vn_data_array2[:, 5]
+    Q5_2 = dN2*vn_data_array2[:, 6]
+    Q6_2 = dN2*vn_data_array2[:, 7]
+
+    # two-particle correlation
+    N2_weight = dN1*dN2
+    Q2_N2 = np.real(Q2_1*np.conj(Q2_2))
+    Q3_N2 = np.real(Q3_1*np.conj(Q3_2))
+    Q4_N2 = np.real(Q4_1*np.conj(Q4_2))
+
+    # four-particle correlation
+    N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
+    Q2Q3_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q3_1*np.conj(Q3_2))
+               - np.real(Q5_1*np.conj(Q2_2)*np.conj(Q3_2))
+               - np.real(Q2_1*Q3_1*np.conj(Q5_2))
+               + np.real(Q5_1*np.conj(Q5_2)))
+    Q2Q4_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q4_1*np.conj(Q4_2))
+               - np.real(Q6_1*np.conj(Q2_2)*np.conj(Q4_2))
+               - np.real(Q2_1*Q4_1*np.conj(Q6_2))
+               + np.real(Q6_1*np.conj(Q6_2)))
+
+    # calcualte observables with Jackknife resampling method
+    SC32_array = np.zeros(nev)
+    SC42_array = np.zeros(nev)
+    NSC32_array = np.zeros(nev)
+    NSC42_array = np.zeros(nev)
+    for iev in range(nev):
+        array_idx = [True]*nev
+        array_idx[iev] = False
+        array_idx = np.array(array_idx)
+
+        # SC(3,2)
+        v2v3 = ((np.mean(Q3_N2[array_idx])*np.mean(Q2_N2[array_idx]))
+                /(np.mean(N2_weight[array_idx])**2.))
+        SC32_array[iev] = (np.mean(Q2Q3_N4[array_idx])
+                           / np.mean(N4_weight[array_idx]) - v2v3)
+        NSC32_array[iev] = SC32_array[iev]/v2v3
+
+        # SC(4,2)
+        v2v4 = ((np.mean(Q4_N2[array_idx])*np.mean(Q2_N2[array_idx]))
+                /(np.mean(N2_weight[array_idx])**2.))
+        SC42_array[iev] = (np.mean(Q2Q4_N4[array_idx])
+                           / np.mean(N4_weight[array_idx]) - v2v4)
+        NSC42_array[iev] = SC42_array[iev]/v2v4
+
+    SC32_mean = np.mean(SC32_array)
+    SC32_err = np.sqrt((nev - 1.)/nev*np.sum((SC32_array - SC32_mean)**2.))
+    NSC32_mean = np.mean(NSC32_array)
+    NSC32_err = np.sqrt((nev - 1.)/nev*np.sum((NSC32_array - NSC32_mean)**2.))
+
+    SC42_mean = np.mean(SC42_array)
+    SC42_err = np.sqrt((nev - 1.)/nev*np.sum((SC42_array - SC42_mean)**2.))
+    NSC42_mean = np.mean(NSC42_array)
+    NSC42_err = np.sqrt((nev - 1.)/nev*np.sum((NSC42_array - NSC42_mean)**2.))
+
+    results = [SC32_mean, SC32_err, NSC32_mean, NSC32_err,
+               SC42_mean, SC42_err, NSC42_mean, NSC42_err]
+    dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
+              / np.sqrt(nev))
+    if path.isfile(outputFileName):
+        f = open(outputFileName, 'a')
+    else:
+        f = open(outputFileName, 'w')
+        f.write("# cen  Nch  SC(23)  NSC(23)  SC(24)  NSC(24)\n")
+    f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
+    for ires in results:
+        f.write("  {:.5e}".format(ires))
+    f.write("\n")
+    f.close()
+
+
+
 def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
                                       outputFileName, cenLabel):
     """
@@ -671,3 +764,5 @@ for icen in range(len(centralityCutList) - 1):
                                       "nonLinearV4_2sub.dat", cenLabel)
     calculateNonLinearResponseV5_2sub(QnArr2, QnArr3,
                                       "nonLinearV5_2sub.dat", cenLabel)
+    calculateSymmetricCumulant2sub(QnArr2, QnArr3,
+                                   "symmetricCumulants_2sub.dat", cenLabel)
