@@ -62,7 +62,7 @@ def calculate_pid_meanpT(pT_data_array, outputFilename, cenLabel):
     return
 
 
-def calculateSymmetricCumulant2sub(vn_data_arra1, vn_data_array2,
+def calculateSymmetricCumulant2sub(vn_data_array1, vn_data_array2,
                                    outputFileName, cenLabel):
     """
         this funciton computes the symmetric cumulant
