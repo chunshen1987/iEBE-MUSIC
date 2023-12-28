@@ -667,3 +667,7 @@ for icen in range(len(centralityCutList) - 1):
                       "vn6_over_vn4.dat", cenLabel)
     calculate_pid_dN(piddNArr, "pid_dN.dat", cenLabel)
     calculate_pid_meanpT(pidmeanpTArr, "pid_meanpT.dat", cenLabel)
+    calculateNonLinearResponseV4_2sub(QnArr2, QnArr3,
+                                      "nonLinearV4_2sub.dat", cenLabel)
+    calculateNonLinearResponseV5_2sub(QnArr2, QnArr3,
+                                      "nonLinearV5_2sub.dat", cenLabel)
