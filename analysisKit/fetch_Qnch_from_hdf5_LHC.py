@@ -141,6 +141,12 @@ for ievent, event_i in enumerate(eventList):
     outdata[event_i]["Nch"] = dN_vector[0]
     outdata[event_i]["mean_pT_ch"] = dN_vector[1]
     outdata[event_i]["ecc_n"] = eccn_data[2:]
+    fileList = list(eventGroup.keys())
+    for filename in fileList:
+        if "NgluonEstimators" in filename:
+            data = np.nan_to_num(eventGroup.get(filename))
+            outdata[event_i]['NgluonEst'] = data[0]
+            continue
     for pidName, pid in pidList:
         vn_filename = "particle_{}_vndata_diff_y_-0.5_0.5.dat".format(pid)
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
