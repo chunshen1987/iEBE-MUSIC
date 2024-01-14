@@ -7,22 +7,30 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE_eta_-0p4_0p4": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.4, "etamax": 0.4},
-    "ALICE_eta_-0p8_-0p4": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.8, "etamax": -0.4},
-    "ALICE_eta_0p4_0p8": {"pTmin": 0.2, "pTmax": 3, "etamin": 0.4, "etamax": 0.8},
-    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3, "etamin": -0.8, "etamax": 0.8},
+    "ALICE_eta_-0p4_0p4": {"pTmin": 0.2, "pTmax": 3,
+                           "etamin": -0.4, "etamax": 0.4},
+    "ALICE_eta_-0p8_-0p4": {"pTmin": 0.2, "pTmax": 3,
+                            "etamin": -0.8, "etamax": -0.4},
+    "ALICE_eta_0p4_0p8": {"pTmin": 0.2, "pTmax": 3,
+                          "etamin": 0.4, "etamax": 0.8},
+    "ALICE_eta_-0p8_0p8": {"pTmin": 0.2, "pTmax": 3,
+                           "etamin": -0.8, "etamax": 0.8},
 }
 
 pidList = [('pi+', '211'), ('pi-', '-211'), ('K+', '321'), ('K-', '-321'),
            ('p', '2212'), ('pbar', '-2212')]
 
+LHCetaRangeList = ['-0.4_0.4', '-0.5_0.5', '-0.8_-0.4', '-2.4_-0.5',
+                   '-2.5_-0.5', '-3.7_-1.7', '-4.9_-3.1', '-5.1_-2.8',
+                   '0.4_0.8', '0.5_2.4', '0.5_2.5', '1.7_3.7', '2.8_5.1',
+                   '3.1_4.9', '2.8_5.1']
 
 def help_message():
-    print("{0} database_file".format(sys.argv[0]))
+    print("Usage: {0} database_file".format(sys.argv[0]))
     exit(0)
 
 
-def calcualte_inte_Qn_pT(pT_low, pT_high, data):
+def calcualte_inte_Vn_pT(pT_low, pT_high, data):
     """
         this function calculates the pT-integrated vn in a
         given pT range (pT_low, pT_high) for every event in the data
@@ -31,10 +39,14 @@ def calcualte_inte_Qn_pT(pT_low, pT_high, data):
     pT_inte_array = np.linspace(pT_low, pT_high, npT)
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
+    totalN_event = data[:, -1]
     pT_event = data[:, 0]
     dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
                                  np.log(dN_event+1e-30)))
+    totalN_interp = np.exp(np.interp(pT_inte_array, pT_event,
+                                     np.log(totalN_event+1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
+    totalN = np.sum(totalN_interp)*dpT/(pT_event[1] - pT_event[0])
     meanpT = (np.sum(dN_interp*pT_inte_array**2.)
               / np.sum(dN_interp*pT_inte_array))
     temp_vn_array = [N, meanpT]
@@ -43,12 +55,12 @@ def calcualte_inte_Qn_pT(pT_low, pT_high, data):
         vn_imag_event = data[:, 2*iorder+1]
         vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
-        Qn_real_inte = 2.*np.pi*np.sum(
-                    vn_real_interp*dN_interp*pT_inte_array)*dpT
-        Qn_imag_inte = 2.*np.pi*np.sum(
-                    vn_imag_interp*dN_interp*pT_inte_array)*dpT
-        temp_vn_array.append(Qn_real_inte)
-        temp_vn_array.append(Qn_imag_inte)
+        Vn_real_inte = (np.sum(vn_real_interp*dN_interp*pT_inte_array)
+                        / np.sum(dN_interp*pT_inte_array))
+        Vn_imag_inte = (np.sum(vn_imag_interp*dN_interp*pT_inte_array)
+                        / np.sum(dN_interp*pT_inte_array))
+        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+    temp_vn_array.append(totalN)
     return temp_vn_array
 
 
@@ -99,14 +111,15 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
                                  np.log(dN_event+1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
-    meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
+    meanpT = (np.sum(dN_interp*pT_inte_array**2.)
+              / np.sum(dN_interp*pT_inte_array))
     res_array = [N, meanpT]
     return res_array
 
 
 try:
     database_file = str(sys.argv[1])
-except:
+except IndexError:
     help_message()
 
 h5_data = h5py.File(database_file, "r")
@@ -128,6 +141,12 @@ for ievent, event_i in enumerate(eventList):
     outdata[event_i]["Nch"] = dN_vector[0]
     outdata[event_i]["mean_pT_ch"] = dN_vector[1]
     outdata[event_i]["ecc_n"] = eccn_data[2:]
+    fileList = list(eventGroup.keys())
+    for filename in fileList:
+        if "NgluonEstimators" in filename:
+            data = np.nan_to_num(eventGroup.get(filename))
+            outdata[event_i]['NgluonEst'] = data[0]
+            continue
     for pidName, pid in pidList:
         vn_filename = "particle_{}_vndata_diff_y_-0.5_0.5.dat".format(pid)
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
@@ -137,11 +156,17 @@ for ievent, event_i in enumerate(eventList):
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         pTlabel = "{}_{}".format(pTetacut['pTmin'], pTetacut['pTmax'])
+        etalabel = "{}_{}".format(pTetacut['etamin'], pTetacut['etamax'])
         if pTlabel in ['0.2_3', '0.3_3', '0.5_3']:
             vn_filename = 'particle_9999_dNdeta_pT_{}.dat'.format(pTlabel)
-        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-        Vn_vector = calcualte_inte_Vn_eta(
+            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+            Vn_vector = calcualte_inte_Vn_eta(
                         pTetacut['etamin'], pTetacut['etamax'], vn_data)
+        elif etalabel in LHCetaRangeList:
+            vn_filename = f'particle_9999_vndata_diff_eta_{etalabel}.dat'
+            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+            Vn_vector = calcualte_inte_Vn_pT(
+                        pTetacut['pTmin'], pTetacut['pTmax'], vn_data)
         outdata[event_i][expName] = np.array(Vn_vector)
 
 print("nev = {}".format(len(eventList)))
