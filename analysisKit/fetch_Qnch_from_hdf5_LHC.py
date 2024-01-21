@@ -98,6 +98,41 @@ def calcualte_inte_Vn_eta(etaMin, etaMax, data):
     return temp_vn_array
 
 
+def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
+    """
+        this function calculates the pT and eta-integrated vn in a
+        given pT range (pTMin, pTMax) and eta range (etaMin, etaMax)
+        for every event in the data
+    """
+    npT = 20; nEta = 71
+    pTArr = np.linspace(0, 3.8, npT)
+    dpT = pTArr[1] - pTArr[0]
+    pTMinIdx = int((pTMin - 0.)/dpT)
+    pTMaxIdx = min(npT, int((pTMax - 0.)/dpT) + 1)
+    etaArr = np.linspace(-7, 7, nEta)
+    deta = etaArr[1] - etaArr[0]
+    etaMinIdx = max(0, int((etaMin - etaArr[0])/deta))
+    etaMaxIdx = min(nEta, int((etaMax - etaArr[0])/deta) + 1)
+
+    pT_event = data[:, 1].reshape(nEta, npT)
+    dN_event = data[:, 2].reshape(nEta, npT)
+    N = np.sum(dN_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])
+    meanpT = (np.sum(pT_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx]
+                     *dN_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
+    totalN = N*Nevents
+    temp_vn_array = [N, meanpT]
+    for iorder in range(1, NORDER+1):
+        Qn_real_event = data[:, 2*iorder+2].reshape(nEta, npT)
+        Qn_imag_event = data[:, 2*iorder+3].reshape(nEta, npT)
+        Vn_real_inte = (
+            np.sum(Qn_real_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
+        Vn_imag_inte = (
+            np.sum(Qn_imag_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
+        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+    temp_vn_array.append(totalN)
+    return temp_vn_array
+
+
 def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     """
         this function calculates the pT-integrated particle yield and mean pT
@@ -153,20 +188,16 @@ for ievent, event_i in enumerate(eventList):
         dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
         outdata[event_i]["{}_dNdy_meanpT".format(pidName)] = dN_vector
     vn_filename = 'particle_9999_pTeta_distribution.dat'
+    vnInte_filename = 'particle_9999_vndata_eta_-0.5_0.5.dat'
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
-        pTlabel = "{}_{}".format(pTetacut['pTmin'], pTetacut['pTmax'])
-        etalabel = "{}_{}".format(pTetacut['etamin'], pTetacut['etamax'])
-        if pTlabel in ['0.2_3', '0.3_3', '0.5_3']:
-            vn_filename = 'particle_9999_dNdeta_pT_{}.dat'.format(pTlabel)
-            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-            Vn_vector = calcualte_inte_Vn_eta(
-                        pTetacut['etamin'], pTetacut['etamax'], vn_data)
-        elif etalabel in LHCetaRangeList:
-            vn_filename = f'particle_9999_vndata_diff_eta_{etalabel}.dat'
-            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-            Vn_vector = calcualte_inte_Vn_pT(
-                        pTetacut['pTmin'], pTetacut['pTmax'], vn_data)
+        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+        vnInte_data = np.nan_to_num(eventGroup.get(vnInte_filename))
+        N_hadronic_events = vnInte_data[-1, 2]
+        Vn_vector = calcualte_inte_Vn_pTeta(
+                    pTetacut['pTmin'], pTetacut['pTmax'],
+                    pTetacut['etamin'], pTetacut['etamax'],
+                    vn_data, N_hadronic_events)
         outdata[event_i][expName] = np.array(Vn_vector)
 
 print("nev = {}".format(len(eventList)))
