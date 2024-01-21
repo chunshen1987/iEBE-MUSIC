@@ -144,8 +144,8 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
         f = open(outputFileNameV5, 'a')
     else:
         f = open(outputFileNameV5, 'w')
-        f.write("# cen  Nch  Re{chi_422}  Re{chi_413}  "
-                + "v4L_rms  Im{chi_422}  Im{chi_413}\n")
+        f.write("# cen  Nch  Re{chi_523}  Re{chi_514}  "
+                + "v5L_rms  Im{chi_523}  Im{chi_514}\n")
     f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
     for ires in results:
         f.write("  {:.5e}".format(ires))
