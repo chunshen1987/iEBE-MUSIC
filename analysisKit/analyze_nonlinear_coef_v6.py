@@ -56,8 +56,6 @@ def calculateNonLinearResponseV6_2sub(vn_data_array1, vn_data_array2,
         for V6 = V6L + chi_6222 V2^3 + chi_633 V3^2 + chi_624 V2*V4L
     """
     nev = len(vn_data_array1[:, 0])
-    #dN1 = np.real(vn_data_array1[:, -1])
-    #dN2 = np.real(vn_data_array2[:, -1])
 
     V2_1 = vn_data_array1[:, 3]
     V3_1 = vn_data_array1[:, 4]
@@ -71,7 +69,6 @@ def calculateNonLinearResponseV6_2sub(vn_data_array1, vn_data_array2,
     chi_422 = calculate_chi_422(vn_data_array1, vn_data_array2)
     V4L_1 = V4_1 - chi_422*(V2_1**2)
     V4L_2 = V4_2 - chi_422*(V2_2**2)
-    print(f"chi_422 = {chi_422:.3f}")
 
     chi_6222_num = V6_1*(np.conj(V2_2)**3) + V6_2*(np.conj(V2_1)**3)
     V2_6 = 2*np.real((V2_1*np.conj(V2_2))**3)
