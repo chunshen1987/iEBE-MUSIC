@@ -23,6 +23,10 @@ known_initial_types = [
     "3DMCGlauber_consttau"
 ]
 
+known_afterburner_types = [
+    "UrQMD", "decay",
+]
+
 support_cluster_list = [
     'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
     'stampede2', "anvil"
@@ -221,7 +225,7 @@ wait
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                              n_hydro, ev0_id, n_urqmd, n_threads, para_dict,
-                             time_stamp):
+                             time_stamp, afterburner_type):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -237,7 +241,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13} {14:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            para_dict.control_dict["save_ipglasma_results"],
            para_dict.control_dict["save_kompost_results"],
@@ -246,7 +250,7 @@ python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {
            time_stamp,
            para_dict.control_dict["compute_polarization"],
            para_dict.control_dict["compute_photon_emission"],
-           enableCheckPoint))
+           enableCheckPoint, afterburner_type))
     script.write("""
 
 status=$?
@@ -457,7 +461,8 @@ rm -fr ../hydro_event
     script.close()
 
 
-def generate_script_afterburner(folder_name, cluster_name, HBT_flag, GMC_flag):
+def generate_script_afterburner(folder_name, cluster_name, HBT_flag,
+                                afterburner_type):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
 
@@ -500,14 +505,8 @@ do
     fi
     """)
 
-    if GMC_flag == 1:
+    if afterburner_type == "UrQMD":
         script.write("""
-    # turn on global momentum conservation
-    ./correct_momentum_conservation.py OSCAR.DAT
-    mv OSCAR_w_GMC.DAT OSCAR.DAT
-    """)
-
-    script.write("""
     cd ../osc2u
     ./osc2u.e < ../iSS/OSCAR.DAT > run.log
     mv fort.14 ../urqmd/OSCAR.input
@@ -523,6 +522,13 @@ do
     rm -fr UrQMD_results/particle_list_${iev}.bin
 done
 """)
+    elif afterburner_type == "decay":
+        script.write("""
+    cat particle_samples.bin >> ../UrQMD_results/particle_list.bin
+    rm -fr particle_samples.bin
+    cd ..
+done
+        """)
     if HBT_flag:
         script.write("""
     cd hadronic_afterburner_toolkit
@@ -576,7 +582,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, para_dict):
+                           time_stamp, para_dict, afterburner_type):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -625,7 +631,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                              initial_condition_type,
                              n_hydro_per_job, event_id_offset,
                              n_urqmd_per_hydro, n_threads, para_dict,
-                             time_stamp)
+                             time_stamp, afterburner_type)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, cluster_name)
@@ -672,7 +678,6 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             shell=True)
 
     # particlization + hadronic afterburner
-    GMC_flag = para_dict.iss_dict['global_momentum_conservation']
     HBT_flag = False
     if "analyze_HBT" in para_dict.hadronic_afterburner_toolkit_dict:
         if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
@@ -681,7 +686,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     if para_dict.control_dict['compute_polarization']:
         generate_script_spinPol(event_folder, cluster_name)
 
-    generate_script_afterburner(event_folder, cluster_name, HBT_flag, GMC_flag)
+    generate_script_afterburner(event_folder, cluster_name, HBT_flag,
+                                afterburner_type)
 
     generate_script_analyze_spvn(event_folder, cluster_name, HBT_flag)
 
@@ -726,14 +732,15 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                        'iSS_code/{}'.format(link_i))),
                 path.join(sub_event_folder, "iSS/{}".format(link_i))),
                             shell=True)
-        shutil.copytree(path.join(code_path, 'osc2u'),
-                        path.join(sub_event_folder, 'osc2u'))
-        shutil.copytree(path.join(code_path, 'urqmd'),
-                        path.join(sub_event_folder, 'urqmd'))
-        subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_path, 'urqmd_code/urqmd/urqmd.e')),
-            path.join(sub_event_folder, "urqmd/urqmd.e")),
-                        shell=True)
+        if afterburner_type == "UrQMD":
+            shutil.copytree(path.join(code_path, 'osc2u'),
+                            path.join(sub_event_folder, 'osc2u'))
+            shutil.copytree(path.join(code_path, 'urqmd'),
+                            path.join(sub_event_folder, 'urqmd'))
+            subprocess.call("ln -s {0:s} {1:s}".format(
+                path.abspath(path.join(code_path, 'urqmd_code/urqmd/urqmd.e')),
+                path.join(sub_event_folder, "urqmd/urqmd.e")),
+                            shell=True)
         if HBT_flag:
             shutil.copytree(path.join(code_path,
                                       'hadronic_afterburner_toolkit'),
@@ -906,11 +913,17 @@ def main():
         print("seed = ", seed)
         args.nocopy = True
 
-    initial_condition_type = (parameter_dict.control_dict['initial_state_type'])
+    initial_condition_type = parameter_dict.control_dict['initial_state_type']
     if initial_condition_type not in known_initial_types:
         print("\U0001F6AB  "
               + "Do not recognize the initial condition type: {}".format(
                   initial_condition_type))
+        exit(1)
+
+    afterburner_type = parameter_dict.control_dict['afterburner_type']
+    if afterburner_type not in known_afterburner_types:
+        print("\U0001F6AB  "
+              + f"Do not recognize the afterburner type: {afterburner_type}")
         exit(1)
 
     initial_condition_database = ""
@@ -1031,7 +1044,8 @@ def main():
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, parameter_dict)
+                               IPGlasma_time_stamp, parameter_dict,
+                               afterburner_type)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()

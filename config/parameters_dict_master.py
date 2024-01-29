@@ -10,9 +10,10 @@ import argparse
 
 # control parameters
 control_dict = {
+    'walltime': "10:00:00",  # walltime to run
     'initial_state_type': "3DMCGlauber_dynamical",  # options: IPGlasma, IPGlasma+KoMPoST,
                                                     #          3DMCGlauber_dynamical, 3DMCGlauber_consttau
-    'walltime': "10:00:00",  # walltime to run
+    'afterburner_type': "UrQMD",                    # options: UrQMD, decay
     'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
@@ -381,11 +382,11 @@ photon_dict = {
 
 # iSS
 iss_dict = {
-    'hydro_mode': 2,    # mode for reading in freeze out information 
-    'afterburner_type': 1,     # 0: PDG_Decay, 1: UrQMD, 2: SMASH
-    'turn_on_bulk': 0,  # read in bulk viscous pressure
-    'turn_on_rhob': 0,  # read in net baryon chemical potential
-    'turn_on_diff': 0,  # read in baryon diffusion current
+    'hydro_mode': 2,            # mode for reading in freeze out information
+    'afterburner_type': 1,      # 0: PDG_Decay, 1: UrQMD, 2: SMASH
+    'turn_on_bulk': 0,          # read in bulk viscous pressure
+    'turn_on_rhob': 0,          # read in net baryon chemical potential
+    'turn_on_diff': 0,          # read in baryon diffusion current
 
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
@@ -619,8 +620,7 @@ def update_parameters_dict(par_dict_path, ran_seed):
     sys.path.insert(0, par_diretory)
     print(par_diretory)
     parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
-    initial_condition_type = (
-                    parameters_dict.control_dict['initial_state_type'])
+    initial_condition_type = parameters_dict.control_dict['initial_state_type']
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
 
@@ -682,6 +682,8 @@ def update_parameters_dict(par_dict_path, ran_seed):
 
     if 'photon_dict' in dir(parameters_dict):
         photon_dict.update(parameters_dict.photon_dict)
+
+    afterburner_type = parameters_dict.control_dict['afterburner_type']
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     iss_dict['number_of_particles_needed'] = (
@@ -689,6 +691,11 @@ def update_parameters_dict(par_dict_path, ran_seed):
     hadronic_afterburner_toolkit_dict.update(
         parameters_dict.hadronic_afterburner_toolkit_dict)
     hadronic_afterburner_toolkit_dict['randomSeed'] = ran_seed
+    if afterburner_type == "decay":
+        iss_dict['use_OSCAR_format'] = 0
+        iss_dict['use_binary_format'] = 1
+        iss_dict['perform_decays'] = 1
+        hadronic_afterburner_toolkit_dict['read_in_mode'] = 9
 
 
 def update_parameters_bayesian(bayes_file):
