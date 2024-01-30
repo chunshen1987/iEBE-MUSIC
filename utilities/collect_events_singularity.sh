@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-usage="./collect_events_onlyh5.sh fromFolder toFolder"
+usage="$0 fromFolder toFolder"
 
 fromFolder=$1
 toFolder=$2
@@ -24,7 +24,7 @@ echo "collecting events from " $fromFolder " to " $toFolder
 folderName=`echo $fromFolder | rev | cut -d "/" -f 1 | rev`
 target_folder=${toFolder}/${folderName}
 mkdir -p ${target_folder}
-cp ${fromFolder}/parameters_dict_*.py ${target_folder}/
+cp ${fromFolder}/parameter* ${target_folder}/
 target_hydro_folder=${target_folder}/HYDRO_RESULTS
 mkdir -p ${target_hydro_folder}
 target_urqmd_folder=${target_folder}/URQMD_RESULTS

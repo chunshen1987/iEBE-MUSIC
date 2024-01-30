@@ -28,14 +28,13 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
 RUN pip3 install --upgrade && \
     pip3 install numpy h5py scipy
 
-ENV HOME /home/
+ENV HOME /opt/
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} \
-&& git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC \
+&& git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC -b dev \
 && cd iEBE-MUSIC/codes \
-#&& ./get_code_packages.sh \
-&& ./get_code_packages_dev.sh \
+&& ./get_code_packages.sh \
 && ./compile_code_packages.sh
 
 ENV PYTHONIOENCODING utf-8

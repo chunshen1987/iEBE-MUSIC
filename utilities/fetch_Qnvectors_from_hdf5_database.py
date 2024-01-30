@@ -20,14 +20,14 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
     npT = 50
     pT_inte_array = linspace(pT_low, pT_high, npT)
     dpT = pT_inte_array[1] - pT_inte_array[0]
-    dN_event = data[:, 2]
+    dN_event = data[:, 1]
     pT_event = data[:, 0]
     dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event+1e-30)))
     N = 2.*pi*sum(dN_interp*pT_inte_array)*dpT
     temp_vn_array = [N + 1j*0.0]
     for iorder in range(1, n_order):
-        vn_real_event = data[:, 4*iorder]
-        vn_imag_event = data[:, 4*iorder+2]
+        vn_real_event = data[:, 2*iorder]
+        vn_imag_event = data[:, 2*iorder+1]
         vn_real_interp = interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = interp(pT_inte_array, pT_event, vn_imag_event)
         Qn_real_inte = 2.*pi*sum(vn_real_interp*dN_interp*pT_inte_array)*dpT
@@ -45,7 +45,7 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data, pid):
     npT = 50
     pT_inte_array = linspace(pT_low, pT_high, npT)
     dpT = pT_inte_array[1] - pT_inte_array[0]
-    dN_event = data[:, 2]
+    dN_event = data[:, 1]
     pT_event = data[:, 0]
     dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event+1e-30)))
     N = 2.*pi*sum(dN_interp*pT_inte_array)*dpT
@@ -103,3 +103,9 @@ for ipart, filename in enumerate(particle_list):
     res_arr.append(dN_vector)
 savetxt("particle_yield_and_meanpT_{}.dat".format(event_id), array(res_arr),
         fmt="%d  " + "%.4e  "*2, header="pid  dN/dy  <pT> (GeV)")
+
+fileList = list(h5_group.keys())
+for fileName in fileList:
+    if "Ncoll" in fileName:
+        data = nan_to_num(h5_group.get(fileName))
+        savetxt("{}".format(fileName), data, fmt="%.2f", header="x(fm)  y(fm)")

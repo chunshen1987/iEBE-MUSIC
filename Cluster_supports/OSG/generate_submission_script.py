@@ -18,7 +18,7 @@ def print_usage():
 def write_submission_script(para_dict_):
     jobName = "iEBEMUSIC_{}".format(para_dict_["job_id"])
     random_seed = random.SystemRandom().randint(0, 10000000)
-    imagePathHeader = "stash:///osgconnect"
+    imagePathHeader = "osdf://"
     script = open(FILENAME, "w")
     if para_dict_["bayesFlag"]:
         script.write("""universe = vanilla
@@ -51,6 +51,9 @@ transfer_input_files = {0}, {1}
 transfer_input_files = {0}
 """.format(para_dict_['paraFile']))
 
+    script.write(
+            "transfer_checkpoint_files = playground/event_0/EVENT_RESULTS_$(Process).tar.gz\n")
+
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
 
@@ -58,10 +61,13 @@ error = ../log/job.$(Cluster).$(Process).error
 output = ../log/job.$(Cluster).$(Process).output
 log = ../log/job.$(Cluster).$(Process).log
 
-+JobDurationCategory = "Long"
+#+JobDurationCategory = "Long"
+max_idle = 1000
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
+
+checkpoint_exit_code = 85
 
 # Send the job to Held state on failure.
 on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
@@ -70,7 +76,7 @@ on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 # if you don't have a good idea of memory and disk usage.
 request_cpus = {0:d}
 request_memory = 2 GB
-request_disk = 1 GB
+request_disk = 2 GB
 
 # Queue one job with the above specifications.
 queue {1:d}""".format(para_dict_["n_threads"], para_dict_["n_jobs"]))
@@ -101,16 +107,17 @@ printf "Job running as user: `/usr/bin/id`\\n"
     if para_dict_["bayesFlag"]:
         script.write("""bayesFile=$6
 
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
+/opt/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
 """)
     else:
         script.write("""
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --nocopy --continueFlag
+/opt/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --nocopy --continueFlag
 """)
 
     script.write("""
 cd playground/event_0
-bash submit_job.pbs
+mv EVENT_RESULTS_${processId}.tar.gz playground/event_0
+bash submit_job.script
 status=$?
 if [ $status -ne 0 ]; then
     exit $status

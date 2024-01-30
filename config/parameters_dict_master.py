@@ -10,13 +10,16 @@ import argparse
 
 # control parameters
 control_dict = {
+    'walltime': "10:00:00",  # walltime to run
     'initial_state_type': "3DMCGlauber_dynamical",  # options: IPGlasma, IPGlasma+KoMPoST,
                                                     #          3DMCGlauber_dynamical, 3DMCGlauber_consttau
-    'walltime': "10:00:00",  # walltime to run
+    'afterburner_type': "UrQMD",                    # options: UrQMD, decay
     'save_ipglasma_results': False,   # flag to save IPGlasma results
     'save_kompost_results': False,    # flag to save kompost results
     'save_hydro_surfaces': False,     # flag to save hydro surfaces
     'save_UrQMD_files': False,        # flag to save UrQMD files
+    'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
+    'compute_polarization': False,       # flag to save spin polarization results
 }
 
 
@@ -39,6 +42,12 @@ ipglasma_dict = {
     'UVdamp': 0.,
     'Jacobianm': 0.35,
     'g': 1.,                # strong coupling constant
+    'SubNucleonParamType': 0,    # 0: do not use posterior parameter sets
+                                 # 1: use subnucleon parameters from variant Nq posterior distribution
+                                 # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
+    'SubNucleonParamSet': -1,    # -1: choose a random set from the posterior distribution
+                                 # 0: choose the MAP parameter set
+                                 # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'BG': 4.,
     'BGq': 0.3,
     'BGqVar': 0.0,
@@ -50,7 +59,15 @@ ipglasma_dict = {
     'runningCoupling': 0,
     'muZero': 0.3,
     'minimumQs2ST': 0.,
+    'setWSDeformParams': 0,
+    'R_WS': 6.6,
+    'a_WS': 0.52,
     'beta2': 0.28,
+    'beta3': 0.0,
+    'beta4': 0.0,
+    'gamma': 0.0,
+    'force_dmin_flag': 1,    # flag to force d_min for deformed nuclei
+    'd_min': 0.9,            # fm
     'c': 0.2,
     'g2mu': 0.1,
     'useFatTails': 0,
@@ -87,14 +104,15 @@ ipglasma_dict = {
     'SigmaNN': 42.,
     'gaussianWounding': 1,
     'inverseQsForMaxTime': 0,
-    'maxtime': 0.6,
+    'maxtime': 0.4,
     'dtau': 0.1,
     'LOutput': 30,
     'sizeOutput': 512,
     'etaSizeOutput': 1,
     'detaOutput': 0,
-    'writeOutputs': 5,
+    'writeOutputs': 1,
     'writeEvolution': 0,
+    'readInitialWilsonLines': 0,
     'writeInitialWilsonLines': 0,
     'writeOutputsToHDF5': 0
 }
@@ -106,13 +124,19 @@ mcglauber_dict = {
     'Projectile':  "Pb",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
     'nucleon_configuration_from_file': 0,
+    'light_nucleus_option':  0,  # light nucleus configurations from different nuclear structure theory
     'roots'     :   17.3,        # collision energy (GeV)
     'useQuarks' :   1,           # switch to use valence quarks
     'Q2'        :   1.,          # the scale when evaluating the pdf
     'b_min'     :   0.,          # minimum impact parameter (fm)
     'b_max'     :   20.,         # maximum impact parameter (fm)
+    'cenMin'    :   0,           # centrality cut lower bound (%)
+    'cenMax'    :   100,         # centrality cut upper bound (%)
     'seed'      :   -1,          # random seed (-1: system)
+    'N_sea_partons':  1,         # the number of soft gluon hot spots
     'only_event_statistics': 0,  # flag to only output the event_summary file
+    'batch_density_output': 0,   # flag to generate density profiles in a batch
+    'outputInitialEst': 1,       # flag to output initial state var vs. eta_s
     'cache_tables': 1,           # 1: use pre-generated tables for valence quark x
                                  # 0: re-generate tables for valence quark x
     'baryon_junctions': 0,       # 0: baryon number assumed to be at string end
@@ -121,6 +145,9 @@ mcglauber_dict = {
                                  # see arXiv:nucl-th/9602027
     'lambdaB': 0.2,              # parameter the controls the strength of
                                  # the baryon junction stopping
+    'lambdaBs': 1.0,             # Fraction of single-to-double string stopping
+    'baryonInStringProb': 1.0,   # the relative probility to put a baryon charge in the string
+                                 # rather than at the wounded nucleon remnant
     'BG': 4.,                    # Gaussian width for sampling the valence quark positions
     'shadowing_factor': 1.0,     # a shadowning factor for producing strings from multiple scatterings
     'fluct_Nstrings_per_NN_collision': 1,        # fluctuate number of strings produced per NN collision
@@ -130,12 +157,18 @@ mcglauber_dict = {
     'rapidity_loss_method': 2,          # 1: LEXUS
                                         # 2: parameterization
                                         # 3: parameterization with logit-normal fluctuation
+                                        # 4: piece-wise param. with logit-normal fluct.
     'remnant_energy_loss_fraction': 0.5,         # nucleon remnants energy loss fraction (fraction of string's y_loss) [0, 1]
     'yloss_param_slope': 1.50,          # the slope parameter for yloss parameterization [0., 1.]
     'yloss_param_alpha1': 2.50,         # the small y ~ y^alpha1 for yloss parameterization (>=1.)
     'yloss_param_alpha2': 0.25,         # the large y ~ y^alpha2 for yloss parameterization [0., 1.]
-    'yloss_param_fluct_var_RHIC': 0.60, # the variance ofthe logit-normal parameterized y_loss fluctuation
-    'yloss_param_fluct_var_LHC': 0.80,  # the variance ofthe logit-normal parameterized y_loss fluctuation
+    'yloss_param_fluct_var_RHIC': 0.60, # the variance of the logit-normal parameterized y_loss fluctuation
+    'yloss_param_fluct_var_LHC': 0.80,  # the variance of the logit-normal parameterized y_loss fluctuation
+    'ylossParam4At2': 1.60,             # rapidity_loss_method == 4: yloss at y_init = 2
+    'ylossParam4At4': 2.15,             # rapidity_loss_method == 4: yloss at y_init = 4
+    'ylossParam4At6': 2.45,             # rapidity_loss_method == 4: yloss at y_init = 6
+    'ylossParam4At10': 2.95,            # rapidity_loss_method == 4: yloss at y_init = 10
+    'ylossParam4var': 0.6,              # rapidity_loss_method == 4: variance of yloss fluct.
     'evolve_QCD_string_mode': 2,        # string evolution mode
                                         # 1: deceleration with fixed rapidity loss (m/sigma = 1 fm, dtau = 0.5 fm)
                                         # 2: deceleration with LEXUS sampled rapidit loss (both dtau and sigma fluctuate)
@@ -176,6 +209,7 @@ kompost_dict = {
 # MUSIC
 music_dict = {
     'echo_level':  1,       # control the mount of message output to screen
+    'beastMode': 0,
     'mode': 2,              # MUSIC running mode 2: Evolution only.
     'Initial_profile': 9,   # type of initial condition 
                             # 9: IPGlasma (full Tmunu),
@@ -202,6 +236,7 @@ music_dict = {
     'string_source_sigma_x': 0.5,   # the transverse size of the hotspot [fm]
     'string_source_sigma_eta': 0.5, # the smearning size of the hotspot in eta
     'stringTransverseShiftFrac': 0.0,  # control the shift of transverse coord as a function of eta for string
+    'stringPreEqFlowFactor': 0.0,      # pre-Eq. flow factor
 
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
@@ -221,6 +256,7 @@ music_dict = {
                                 # [-X_grid_size_in_fm/2, X_grid_size_in_fm/2]
     'Grid_size_in_x': 200,      # number of the grid points in x direction
     'Grid_size_in_y': 200,      # number of the grid points in y direction
+    'gridPadding': 3,           # grid padding size in the transverse plane (fm)
 
     'EOS_to_use': 9,            # type of the equation of state
                                 # 0: ideal gas
@@ -236,6 +272,8 @@ music_dict = {
     'Shear_to_S_ratio': 0.12,              # value of \eta/s
     'T_dependent_Shear_to_S_ratio': 0,     # flag to use temperature dep. \eta/s(T)
     'muB_dependent_Shear_to_S_ratio': 1,   # flag to use temperature dep. \eta/s(T, muB)
+    'shear_muBf0p2': 1.,                   # piece-wise eta/s(muB) for muB_dependent_Shear_to_S_ratio == 7
+    'shear_muBf0p4': 1.,                   # piece-wise eta/s(muB) for muB_dependent_Shear_to_S_ratio == 7
     'Include_Bulk_Visc_Yes_1_No_0': 1,     # include bulk viscous effect
     'T_dependent_zeta_over_s': 7,          # parameterization of \zeta/s(T)
     'Include_second_order_terms': 1,       # include second order non-linear coupling terms
@@ -251,9 +289,9 @@ music_dict = {
     'output_evolution_T_cut': 0.145,
     'outputBinaryEvolution': 1,     # output evolution file in binary format
     'output_evolution_every_N_eta': 1,  # output evolution file every Neta steps
-    'output_evolution_every_N_x':  2,   # output evolution file every Nx steps
-    'output_evolution_every_N_y': 2,    # output evolution file every Ny steps
-    'output_evolution_every_N_timesteps':1,  # output evolution every Ntime steps
+    'output_evolution_every_N_x':  1,   # output evolution file every Nx steps
+    'output_evolution_every_N_y': 1,    # output evolution file every Ny steps
+    'output_evolution_every_N_timesteps': 10,  # output evolution every Ntime steps
 
     # parameters for freeze out and Cooper-Frye 
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
@@ -267,6 +305,7 @@ music_dict = {
     'freeze_Ncell_eta_step': 1,
     'freeze_eps_flag': 0,
     'N_freeze_out': 1,
+    'eps_switch': 0.18,
     'eps_freeze_max': 0.18,
     'eps_freeze_min': 0.18,
     'use_eps_for_freeze_out': 1,  # find freeze-out surface 
@@ -274,13 +313,80 @@ music_dict = {
 }
 
 
+# photon_emission
+photon_dict = {
+    'hydro_flag': 2,          # read in mode for hydro medium
+                              # 0: read in hdf5 file
+                              # 1: read in binary file output from MUSIC
+                              # 2: read in binary file output from new MUSIC (no grid)
+                              # 3: read in binary file output from new MUSIC (on grid)
+    'hydro_nskip_tau': 1,     # read in hydro slice every hydro_nskip_tau
+                              # steps from the medium file
+                              # (only works for hydro_flag = 1)
+    'Xmin': -15.0,            # minimum points along x direction
+    'dx': 0.1,                # lattice spacing along x direction
+    'Ymin': -15.0,            # minimum points along y direction
+    'dy': 0.1,                # lattice spacing along y direction
+    'tau_start': 0.4,         # emission start time (fm)
+    'tau_end': 30.0,          # emission end time (fm)
+    'dTau': 0.1,              # lattice spacing along tau direction
+
+    'neta': 10,               # number of points in eta direction
+    'eta_i': 0.0,             # beginning value of eta slice
+    'eta_f': 3.0,             # end value of eta slice
+
+    'np': 20,                 # number of points for photon momentum
+    'nphi': 40,               # number of points for angles of photons momenta
+    'nrapidity': 1,           # number of points for photon rapidity
+
+    'photon_q_i': 0.2,        # the smallest photon momentum to be calculated
+    'photon_q_f': 4.0,        # the largest photon momentum to be calculated
+    'photon_phi_q_i': 0.0,    # the smallest angle of photon momentum
+    'photon_phi_q_f': 6.2831853,    # the largest angle of photon momentum
+    'photon_y_i': 0.0,        # the smallest photon rapidity
+    'photon_y_f': 0.0,        # the largest photon rapidity
+
+    'norder': 10,             # calculate photon vn to norder
+    'turn_on_muB': 1,         # flag to include muB dependence in photon rates
+
+    'T_dec': 0.105,           # freeze out temperature (GeV)
+    'T_sw_high': 0.180,       # high end of the switching temperature
+    'T_sw_low': 0.1795,       # low end of the switching temperature
+    'T_cuthigh': 0.80,        # maximum allowed emission T (GeV)
+    'T_cutlow': 0.10,         # minimum allowed emission T (GeV)
+
+    'calHGIdFlag': 0,         # Flag to decide whether to calculate individual HG channels
+
+    'PhotonemRatetableInfo_Emin': 0.05,   # minimum photon energy in the photon rate tables
+    'PhotonemRatetableInfo_Tmin': 0.10,   # minimum temperature in the photon rate tables
+    'PhotonemRatetableInfo_dE': 0.05,     # lattice space of energy in the photon rate tables
+    'PhotonemRatetableInfo_dT': 0.002,    # lattice space of temperature in the photon rate tables
+
+    'HydroinfoVisflag': 1,         # determine whether to read in the viscous evolution information
+    'HydroinfoBuffersize': 500,    # set the buffer size for hydro evolution profile
+
+    'turn_off_transverse_flow': 0,      # flag to turn off transverse flow in the photon calculation
+    'enable_polyakov_suppression': 0,   # apply the polyakov suppression to QGP photon rates
+
+    'differential_flag': 0,  # determine whether to output differential photon yield and vn
+                             # 1: differential in T and tau
+                             # 2: differential in x and tau
+                             # 10: differeitial in all options above
+    'nTaucut': 50,           # number of points in tau (range of tau is specified by tau_start and tau_end)
+    'nTcut': 50,             # number of points in T (range of T is specified by T_cuthigh and T_cutlow)
+    'n_xperp_cut': 101,      # number of points in x
+    'xperp_cuthigh': 10.0,   # maximum value in x (fm)
+    'xperp_cutlow': -10.0,   # minimum value in x (fm)
+}
+
+
 # iSS
 iss_dict = {
-    'hydro_mode': 2,    # mode for reading in freeze out information 
-    'afterburner_type': 1,     # 0: PDG_Decay, 1: UrQMD, 2: SMASH
-    'turn_on_bulk': 0,  # read in bulk viscous pressure
-    'turn_on_rhob': 0,  # read in net baryon chemical potential
-    'turn_on_diff': 0,  # read in baryon diffusion current
+    'hydro_mode': 2,            # mode for reading in freeze out information
+    'afterburner_type': 1,      # 0: PDG_Decay, 1: UrQMD, 2: SMASH
+    'turn_on_bulk': 0,          # read in bulk viscous pressure
+    'turn_on_rhob': 0,          # read in net baryon chemical potential
+    'turn_on_diff': 0,          # read in baryon diffusion current
 
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
@@ -290,6 +396,9 @@ iss_dict = {
     'restrict_deltaf': 0,      # flag to apply restriction on the size of delta f
     'deltaf_max_ratio': 1.0,   # the maximum allowed size of delta f w.r.t f0
     'quantum_statistics': 1,   # include quantum statistics (1: yes, 0: no)
+
+    'calculate_polarization': 0,   # switch to compute Lambda's polarization
+    'polarizationRapType': 1,      # 0: rapidity; 1: pseudorapidity; 2: both
 
     'randomSeed': -1,   # If <0, use system clock.
     'calculate_vn': 0,  # 1/0: whether to calculate the 
@@ -304,6 +413,7 @@ iss_dict = {
                                                # particle numbers is reached
     'number_of_repeated_sampling': 10,         # number of repeaded sampling
     'number_of_particles_needed': 100000,      # number of hadrons to sample
+    'maximum_sampling_events': 10000,
 
     'sample_y_minus_eta_s_range': 4,    # y_minus_eta_s will be sampled
     'sample_pT_up_to': -1,  # Up to this value will pT be sampled; 
@@ -390,14 +500,16 @@ iss_dict = {
 # hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
     'echo_level': 9,    # control the mount of print messages
-    'read_in_mode': 2,  # mode for reading in particle information
+    'read_in_mode': 21, # mode for reading in particle information
                         # 0: reads outputs from OSCAR outputs
                         # 1: reads outputs from UrQMD outputs
                         # 2: reads outputs from zipped UrQMD outputs
+                        # 21: reads outputs from binary UrQMD outputs
                         # 3: reads outputs from Sangwook's UrQMD outputs 
                         #    (without header lines)
                         # 4: reads outputs from UrQMD 3.3p2 outputs
                         # 10: reads outputf from gzip outputs
+    'ecoOutput': 1,     # 1: only save Qn without errorbars
     'analyze_flow': 1,                  # 0/1: flag to perform flow analysis
     'analyze_HBT': 0,                   # 0/1: flag to perform HBT analysis
     'analyze_balance_function': 0,      # 0/1: flag to analyze Balance function
@@ -418,7 +530,8 @@ hadronic_afterburner_toolkit_dict = {
     'net_particle_flag': 0,         # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
     'rapidity_shift': 0.,
-    'order_max': 9,     # the maximum harmonic order of anisotropic flow
+    'order_max': 10,                # the maximum harmonic order (= order_max - 1 ) of anisotropic flow
+                                    # for charged hadron; order_max = 6 for identified particles
     'compute_correlation': 0,       # flag to compute correlation function
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
@@ -436,12 +549,14 @@ hadronic_afterburner_toolkit_dict = {
     'vn_rapidity_dis_pT_min': 0.20,  # the minimum value of pT for vn rap. distr.
     'vn_rapidity_dis_pT_max': 3.0,   # the maximum value of pT for vn rap. distr.
 
+    'rapidityPTDistributionFlag': 0,  # output Qn vectors in (eta, pT)
+
     'check_spatial_dis': 0,         # flag to check dN/dtau distribution
     'intrinsic_detas': 0.1,         # deta_s in the output samples
     'intrinsic_dtau': 0.01,         # dtau in the output samples
     'intrinsic_dx': 0.1,            # dx in the output samples
     # Parameters for HBT correlation functions
-    'long_comoving_boost': 0,              # whether qlong will be boost by the pair velocity
+    'long_comoving_boost': 1,              # whether qlong will be boost by the pair velocity
     'needed_number_of_pairs': 30000000,    # number of pairs for eack K point
     'number_of_oversample_events': 100,    # number of the combined events in the numerator
     'number_of_mixed_events': 50,          # number of the mixed events in the denorminator
@@ -451,14 +566,14 @@ hadronic_afterburner_toolkit_dict = {
                                     # 1: compute azimuthal dependent HBT correlation function
     'kT_differenitial_flag': 1,     # 0: integrate the pair momentum k_T over  a given kT range for correlation function
                                     # 1: compute the correlation function at each specifiec kT point
-    'n_KT': 6,      # number of the pair momentum k_T to calculate
-    'KT_min': 0.0,  # minimum value of the pair momentum k_T 
-    'KT_max': 1.0,  # maximum value of the pair momentum k_T 
-    'n_Kphi': 48,   # number of the azimuthal angles for the pair momentum k_T 
-                    # (range is assumed to be from 0 to 2*pi)
-    'Krap_min': -0.5,   # minimum accept pair momentum rapidity
-    'Krap_max': 0.5,    # maximum accept pair momentum rapidity
-    'buffer_rapidity': 5.0,     # collect particles with rapidity from [Krap_min - buffer_rapidity, Krap_max + buffer_rapidity]
+    'n_KT': 5,         # number of the pair momentum k_T to calculate
+    'KT_min': 0.15,    # minimum value of the pair momentum k_T 
+    'KT_max': 0.55,    # maximum value of the pair momentum k_T 
+    'n_Kphi': 48,      # number of the azimuthal angles for the pair momentum k_T
+                       # (range is assumed to be from 0 to 2*pi)
+    'HBTrap_min': -0.5,         # minimum accept rapidity for particle pair
+    'HBTrap_max': 0.5,          # maximum accept rapidity for particle pair
+
     'qnpts': 31,    # number of points for momentum q (difference of the pair momentum) for correlaction function
     'q_min': -0.15,     # minimum value for momentum q (GeV)
     'q_max': 0.15,      # maximum value for momentum q (GeV)
@@ -483,6 +598,7 @@ Parameters_list = [
     (kompost_dict, "setup.ini", 4),
     (mcglauber_dict, "input", 0),
     (music_dict, "music_input_mode_2", 2),
+    (photon_dict, "parameters.dat", 1),
     (iss_dict, "iSS_parameters.dat", 1),
     (hadronic_afterburner_toolkit_dict, "parameters.dat", 1)
 ]
@@ -492,6 +608,7 @@ path_list = [
     'model_parameters/KoMPoST/',
     'model_parameters/3dMCGlauber/',
     'model_parameters/MUSIC/',
+    'model_parameters/photonEmission_hydroInterface/',
     'model_parameters/iSS/',
     'model_parameters/hadronic_afterburner_toolkit/'
 ]
@@ -503,8 +620,7 @@ def update_parameters_dict(par_dict_path, ran_seed):
     sys.path.insert(0, par_diretory)
     print(par_diretory)
     parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
-    initial_condition_type = (
-                    parameters_dict.control_dict['initial_state_type'])
+    initial_condition_type = parameters_dict.control_dict['initial_state_type']
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
 
@@ -555,13 +671,31 @@ def update_parameters_dict(par_dict_path, ran_seed):
     else:
         parameters_dict.iss_dict['hydro_mode'] = 2
 
+    if 'calculate_polarization' in parameters_dict.iss_dict.keys():
+        if parameters_dict.iss_dict['calculate_polarization'] == 1:
+            parameters_dict.music_dict['output_vorticity'] = 1
 
     music_dict.update(parameters_dict.music_dict)
+    if 'compute_photon_emission' in parameters_dict.control_dict:
+        if parameters_dict.control_dict['compute_photon_emission']:
+            music_dict['output_evolution_data'] = 2
+
+    if 'photon_dict' in dir(parameters_dict):
+        photon_dict.update(parameters_dict.photon_dict)
+
+    afterburner_type = parameters_dict.control_dict['afterburner_type']
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
+    iss_dict['number_of_particles_needed'] = (
+            int(iss_dict['number_of_particles_needed']/10))
     hadronic_afterburner_toolkit_dict.update(
         parameters_dict.hadronic_afterburner_toolkit_dict)
     hadronic_afterburner_toolkit_dict['randomSeed'] = ran_seed
+    if afterburner_type == "decay":
+        iss_dict['use_OSCAR_format'] = 0
+        iss_dict['use_binary_format'] = 1
+        iss_dict['perform_decays'] = 1
+        hadronic_afterburner_toolkit_dict['read_in_mode'] = 9
 
 
 def update_parameters_bayesian(bayes_file):

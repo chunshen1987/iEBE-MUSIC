@@ -2,13 +2,13 @@ name: Build Test
 
 on:
   # Trigger the workflow on push or pull request,
-  # but only for the main branch
   push:
     branches:
       - '*'
   pull_request:
     branches:
       - main
+      - dev
 
 jobs:
   build:
