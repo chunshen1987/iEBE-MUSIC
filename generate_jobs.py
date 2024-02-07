@@ -495,7 +495,7 @@ do
     rm -fr results/*
     ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
-    cp ../hydro_event/spectators.dat results/spectators.dat
+    cp ../hydro_event/spectators.dat results/spectators.dat > /dev/null
     if [ $SubEventId = "0" ] && [ $iev -eq "0" ]; then
     """)
     script.write("    ./iSS.e randomSeed=$RANDOMSEED {0}".format(logfile))
