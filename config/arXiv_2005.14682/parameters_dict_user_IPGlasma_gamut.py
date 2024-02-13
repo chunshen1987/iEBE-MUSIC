@@ -8,7 +8,7 @@
 control_dict = {
     'initial_state_type': "IPGlasma",  # 3DMCGlauber, IPGlasma
     'walltime': "10:00:00",  # walltime to run
-    'save_ipglasma_results': True,
+    'save_ipglasma_results': False,
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
 }
@@ -25,6 +25,8 @@ ipglasma_dict = {
     'roots': 200.,
     'SigmaNN': 42.,
     'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'LOutput': 34,
+    'sizeOutput': 512,
 }
 
 
@@ -54,8 +56,7 @@ music_dict = {
 
     # parameters for freeze out and Cooper-Frye
     'N_freeze_out': 1,
-    'eps_freeze_max': 0.18,
-    'eps_freeze_min': 0.18,
+    'eps_switch': 0.18,
 }
 
 
@@ -64,6 +65,7 @@ iss_dict = {
     'hydro_mode': 1,    # mode for reading in freeze out information 
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
+    'bulk_deltaf_kind': 1,          # 1: relaxation time approximation
     'sample_upto_desired_particle_number': 1,  # 1: flag to run sampling until desired
                                                # particle numbers is reached
     'number_of_particles_needed': 100000,      # number of hadrons to sample
@@ -79,4 +81,10 @@ hadronic_afterburner_toolkit_dict = {
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
+    'npT': 41,          # number of pT points for pT-differential spectra and vn
+    'pT_min': 0.05,     # the minimum value of transverse momentum (GeV)
+    'pT_max': 4.05,     # the maximum value of transverse momentum (GeV)
+    'n_rap': 141,                 # numpber of points in rapidity distr.
+    'rapidity_dis_min': -7.0,     # minimum value of particle rapidity distribution
+    'rapidity_dis_max': 7.0,      # maximum value of particle rapidity distribution
 }
