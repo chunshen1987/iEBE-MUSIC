@@ -35,7 +35,7 @@ rm -fr iSS_code/.git
 # download photonEmission wrapper
 rm -fr photonEmission_hydroInterface_code
 git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface photonEmission_hydroInterface_code
-(cd photonEmission_hydroInterface_code; git checkout 282397c2ca423886d806c755f120ea7b16572e03)
+(cd photonEmission_hydroInterface_code; git checkout a8a9f14c98a3e40519d9704090c3b42eba0107be)
 rm -fr photonEmission_hydroInterface_code/.git
 
 # download UrQMD afterburner
