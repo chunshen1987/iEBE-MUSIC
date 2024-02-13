@@ -47,7 +47,7 @@ rm -fr urqmd_code/.git
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout a5e0901b3bd2b575b01630cd7d29948ee94b35e5)
+(cd hadronic_afterburner_toolkit_code; git checkout f78e71ee68a5cc12b7c1d856c34cc445410d64eb)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
 # dowload 4D NEoS fomr bitbucket https://bitbucket.org/wayne_state_nuclear_theory/neos/src/main/EoS_UrQMD/
