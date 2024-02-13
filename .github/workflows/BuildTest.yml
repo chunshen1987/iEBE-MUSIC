@@ -9,7 +9,7 @@ on:
     branches:
       - main
       - dev
-      - 4DEoS 
+      - 4DEoS
 
 jobs:
   build:
