@@ -121,6 +121,8 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                                     final_results_folder), shell=True)
             call("mv 3dMCGlauber/nB_etas_*.dat {}".format(
                                     final_results_folder), shell=True)
+            call("mv 3dMCGlauber/nQ_etas_*.dat {}".format(
+                                    final_results_folder), shell=True)
             call("mv 3dMCGlauber/ecc_ed*.dat {}".format(
                                     final_results_folder), shell=True)
             return status, file_name

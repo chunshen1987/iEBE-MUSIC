@@ -93,12 +93,17 @@ cp MUSIC_code/utilities/sweeper.sh MUSIC/
 
 echo -e "${Green} Move 4D EoS into MUSIC EOS directory"
 
-mv neos4d_urqmd_cs_b.dat MUSIC_code/EOS/neos4D
-mv neos4d_urqmd_p_b.dat MUSIC_code/EOS/neos4D
-mv neos4d_urqmd_t_b.dat MUSIC_code/EOS/neos4D
-mv neos4d_urqmd_mub_b.dat MUSIC_code/EOS/neos4D
-mv neos4d_urqmd_muq_b.dat MUSIC_code/EOS/neos4D
-mv neos4d_urqmd_mus_b.dat MUSIC_code/EOS/neos4D
+EoSfolder="MUSIC_code/EOS/neos4D"
+if [ ! -d "$EoSfolder" ]; then
+    mkdir -p "$EoSfolder"
+fi
+
+mv neos4d_urqmd_cs_b.dat $EoSfolder 
+mv neos4d_urqmd_p_b.dat $EoSfolder
+mv neos4d_urqmd_t_b.dat $EoSfolder
+mv neos4d_urqmd_mub_b.dat $EoSfolder
+mv neos4d_urqmd_muq_b.dat $EoSfolder
+mv neos4d_urqmd_mus_b.dat $EoSfolder
 
 # compile photonEmission_hydroInterface
 echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"
