@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b electriCharge 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout ed18f599bbfba89cde2e13ee31c7804317460757)
+(cd 3dMCGlauber_code; git checkout 74dd7818bbccd28b8e217305f0ce8f9a68e180b4)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -61,8 +61,8 @@ BRANCH="main"
 API_BASE_URL="https://api.bitbucket.org/2.0/"
 
 # NEOS version and considered quantities
-EOS_TYPE="UrQMD"
-CS_FILE="on"
+EOS_TYPE="pdg"
+CS_FILE="off"
 
 # Check for cs file before downloading
 if [ "$CS_FILE"="on" ]; then
