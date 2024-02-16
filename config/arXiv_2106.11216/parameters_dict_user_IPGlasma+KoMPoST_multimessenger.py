@@ -8,10 +8,10 @@
 control_dict = {
     'initial_state_type': "IPGlasma+KoMPoST",
     'walltime': "10:00:00",  # walltime to run
-    'save_ipglasma_results': True,   # flag to save ipglasma results
-    'save_kompost_results': True,   # flag to save kompost results
-    'save_hydro_surfaces': True,   # flag to save hydro surfaces
-    'save_UrQMD_files': True,      # flag to save UrQMD files
+    'save_ipglasma_results': False,   # flag to save ipglasma results
+    'save_kompost_results': False,    # flag to save kompost results
+    'save_hydro_surfaces': False,     # flag to save hydro surfaces
+    'save_UrQMD_files': False,        # flag to save UrQMD files
 }
 
 
@@ -26,6 +26,9 @@ ipglasma_dict = {
     'roots': 200.,
     'SigmaNN': 42.,
     'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'maxtime': 0.1,
+    'LOutput': 30,
+    'writeOutputs': 4,
 }
 
 
@@ -36,7 +39,7 @@ kompost_dict = {
         'tOut': 0.8,
     },
     'KoMPoSTParameters': {
-        'EtaOverS': 0.12,                   # specific shear viscosity
+        'EtaOverS': 0.12,       # specific shear viscosity
     },
     'EventInput': {
         'normFactor': 0.287,    # Tmunu is normalized by this factor after being read in
@@ -70,8 +73,7 @@ music_dict = {
 
     # parameters for freeze out and Cooper-Frye
     'N_freeze_out': 1,
-    'eps_freeze_max': 0.18,
-    'eps_freeze_min': 0.18,
+    'eps_switch': 0.18,
 }
 
 
@@ -95,4 +97,10 @@ hadronic_afterburner_toolkit_dict = {
     'flag_charge_dependence': 0,    # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,      # flag to compute the rapidity dependent multi-particle correlation
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
+    'npT': 41,          # number of pT points for pT-differential spectra and vn
+    'pT_min': 0.05,     # the minimum value of transverse momentum (GeV)
+    'pT_max': 4.05,     # the maximum value of transverse momentum (GeV)
+    'n_rap': 141,                 # numpber of points in rapidity distr.
+    'rapidity_dis_min': -7.0,     # minimum value of particle rapidity distribution
+    'rapidity_dis_max': 7.0,      # maximum value of particle rapidity distribution
 }
