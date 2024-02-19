@@ -98,12 +98,12 @@ if [ ! -d "$EoSfolder" ]; then
     mkdir -p "$EoSfolder"
 fi
 
-mv neos4d_urqmd_cs_b.dat $EoSfolder 
-mv neos4d_urqmd_p_b.dat $EoSfolder
-mv neos4d_urqmd_t_b.dat $EoSfolder
-mv neos4d_urqmd_mub_b.dat $EoSfolder
-mv neos4d_urqmd_muq_b.dat $EoSfolder
-mv neos4d_urqmd_mus_b.dat $EoSfolder
+mv neos4d_cs_b.dat $EoSfolder 
+mv neos4d_p_b.dat $EoSfolder
+mv neos4d_t_b.dat $EoSfolder
+mv neos4d_mub_b.dat $EoSfolder
+mv neos4d_muq_b.dat $EoSfolder
+mv neos4d_mus_b.dat $EoSfolder
 
 # compile photonEmission_hydroInterface
 echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"

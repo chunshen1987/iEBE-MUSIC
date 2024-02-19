@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout 13e6c583ba1c73bd96b8e715d138545124cc7a70)
+(cd MUSIC_code; git checkout d15f155942fb31561e886449ef69ab9fec1929aa)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -61,15 +61,23 @@ BRANCH="main"
 API_BASE_URL="https://api.bitbucket.org/2.0/"
 
 # NEOS version and considered quantities
-EOS_TYPE="urqmd"
-FILE_NAME_LIST=("cs" "mub" "muq" "mus" "p" "t")
+EOS_TYPE="UrQMD"
+CS_FILE="on"
 
+# Check for cs file before downloading
+if [ "$CS_FILE"="on" ]; then
+    FILE_NAME_LIST=("cs" "mub" "muq" "mus" "p" "t")
+else
+    FILE_NAME_LIST=("mub" "muq" "mus" "p" "t")
+fi
+
+# Download 4D EoS
 for name in "${FILE_NAME_LIST[@]}"; do
     # Define file name
-    FILE_PATH="EoS_UrQMD/neos4d_${EOS_TYPE}_${name}_b.dat" 
+    FILE_PATH="EoS4D_${EOS_TYPE}/neos4d_${name}_b.dat" 
     # Set the name of URL
     API_FILE_URL="${API_BASE_URL}repositories/${USERNAME}/${REPO_SLUG}/src/${BRANCH}/${FILE_PATH}"
 
-    LOCAL_DESTINATION="neos4d_${EOS_TYPE}_${name}_b.dat"
+    LOCAL_DESTINATION="neos4d_${name}_b.dat"
     curl -L -o "$LOCAL_DESTINATION" "$API_FILE_URL"
 done
