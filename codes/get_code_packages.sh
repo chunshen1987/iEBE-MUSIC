@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=1 https://github.com/chunshen1987/3dMCGlauber -b electriCharge 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 74dd7818bbccd28b8e217305f0ce8f9a68e180b4)
+(cd 3dMCGlauber_code; git checkout ed18f599bbfba89cde2e13ee31c7804317460757)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout 13e6c583ba1c73bd96b8e715d138545124cc7a70)
+(cd MUSIC_code; git checkout d15f155942fb31561e886449ef69ab9fec1929aa)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -61,8 +61,8 @@ BRANCH="main"
 API_BASE_URL="https://api.bitbucket.org/2.0/"
 
 # NEOS version and considered quantities
-EOS_TYPE="pdg"
-CS_FILE="off"
+EOS_TYPE="UrQMD"
+CS_FILE="on"
 
 # Check for cs file before downloading
 if [ "$CS_FILE"="on" ]; then
