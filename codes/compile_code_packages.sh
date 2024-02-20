@@ -89,21 +89,6 @@ cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
 cp MUSIC_code/utilities/sweeper.sh MUSIC/
 (cd MUSIC; mkdir -p initial)
 
-# put 4D EoS in MUSIC folder
-
-echo -e "${Green} Move 4D EoS into MUSIC EOS directory"
-
-EoSfolder="MUSIC_code/EOS/neos4D"
-if [ ! -d "$EoSfolder" ]; then
-    mkdir -p "$EoSfolder"
-fi
-
-mv neos4d_cs_b.dat $EoSfolder 
-mv neos4d_p_b.dat $EoSfolder
-mv neos4d_t_b.dat $EoSfolder
-mv neos4d_mub_b.dat $EoSfolder
-mv neos4d_muq_b.dat $EoSfolder
-mv neos4d_mus_b.dat $EoSfolder
 
 # compile photonEmission_hydroInterface
 echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"
