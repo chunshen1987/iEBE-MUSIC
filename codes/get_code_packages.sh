@@ -29,7 +29,7 @@ rm -fr MUSIC_code/.git
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=1 https://github.com/chunshen1987/iSS -b 4DEoS iSS_code
-(cd iSS_code; git checkout 0a380a5da9e778db4a87ea83f50d902cd4712c33)
+(cd iSS_code; git checkout 3f20b591c52944358aacebba532abb3adb5b3047)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper
