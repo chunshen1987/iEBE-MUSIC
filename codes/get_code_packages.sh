@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout d15f155942fb31561e886449ef69ab9fec1929aa)
+(cd MUSIC_code; git checkout d8e4f8f43e0e8305091505b73d2bc07a40e6e404)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
