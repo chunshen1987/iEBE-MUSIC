@@ -683,7 +683,10 @@ def update_parameters_dict(par_dict_path, ran_seed):
     if 'photon_dict' in dir(parameters_dict):
         photon_dict.update(parameters_dict.photon_dict)
 
-    afterburner_type = parameters_dict.control_dict['afterburner_type']
+    try:
+        afterburner_type = parameters_dict.control_dict['afterburner_type']
+    except KeyError:
+        afterburner_type = "UrQMD"
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     iss_dict['number_of_particles_needed'] = (

@@ -29,13 +29,13 @@ rm -fr MUSIC_code/.git
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=1 https://github.com/chunshen1987/iSS -b dev iSS_code
-(cd iSS_code; git checkout b19766ec566b278308654d37462cbade9b941f0e)
+(cd iSS_code; git checkout 3b151fdd03f5cd0f41c19b11af68e379c4c5f571)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper
 rm -fr photonEmission_hydroInterface_code
 git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface photonEmission_hydroInterface_code
-(cd photonEmission_hydroInterface_code; git checkout 282397c2ca423886d806c755f120ea7b16572e03)
+(cd photonEmission_hydroInterface_code; git checkout a8a9f14c98a3e40519d9704090c3b42eba0107be)
 rm -fr photonEmission_hydroInterface_code/.git
 
 # download UrQMD afterburner

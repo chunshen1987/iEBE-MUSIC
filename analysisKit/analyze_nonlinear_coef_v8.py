@@ -268,7 +268,7 @@ def calculateNonLinearResponseV8_2sub(vn_data_array1, vn_data_array2,
         A23 = np.mean(V224_V233[array_idx])
         A24 = np.mean(V35_V233[array_idx])
         A25 = np.mean(V26_V233[array_idx])
-        A26 = np.mean(V44_V44[array_idx])
+        A26 = np.mean(V44_V233[array_idx])
 
         b3 = np.mean(chi_8224_num[array_idx])
         A31 = np.conj(A13)
@@ -469,9 +469,6 @@ for icen in range(len(centralityCutList) - 1):
     QnArr2 = []
     QnArr3 = []
     for event_name in selected_events_list:
-        #QnArr1.append(data[event_name]['STAR_eta_-0p5_0p5'])
-        #QnArr2.append(data[event_name]['STAR_eta_-1_-0p5'])
-        #QnArr3.append(data[event_name]['STAR_eta_0p5_1'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
         QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
         QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])

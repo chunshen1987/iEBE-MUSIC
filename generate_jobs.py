@@ -495,7 +495,7 @@ do
     rm -fr results/*
     ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
-    cp ../hydro_event/spectators.dat results/spectators.dat
+    cp ../hydro_event/spectators.dat results/spectators.dat > /dev/null
     if [ $SubEventId = "0" ] && [ $iev -eq "0" ]; then
     """)
     script.write("    ./iSS.e randomSeed=$RANDOMSEED {0}".format(logfile))
@@ -920,7 +920,10 @@ def main():
                   initial_condition_type))
         exit(1)
 
-    afterburner_type = parameter_dict.control_dict['afterburner_type']
+    try:
+        afterburner_type = parameter_dict.control_dict['afterburner_type']
+    except KeyError:
+        afterburner_type = "UrQMD"
     if afterburner_type not in known_afterburner_types:
         print("\U0001F6AB  "
               + f"Do not recognize the afterburner type: {afterburner_type}")

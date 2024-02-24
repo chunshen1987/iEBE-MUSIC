@@ -434,7 +434,7 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
     curr_time = time.asctime()
     print(f"\U0001F3CD  [{curr_time}] Finished spvn analysis ... ", flush=True)
 
-    call(f"rm {spvnfolder}/particle_list.bin", shell=True)
+    call(f"rm {spvn_folder}/particle_list.bin", shell=True)
     shutil.move(spvn_folder, final_results_folder)
 
 
