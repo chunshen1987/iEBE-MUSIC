@@ -279,6 +279,9 @@ music_dict = {
     'Include_second_order_terms': 1,       # include second order non-linear coupling terms
     'Include_vorticity_terms': 0,          # include vorticity coupling terms
     'Include_Rhob_Yes_1_No_0': 0,
+    'Include_QS_Yes_1_No_0': 0,
+    'use_BQ_ratios': 0,
+    'use_rhoQS_to_rhoB_ratios': 0,
     'turn_on_baryon_diffusion': 0,
     'kappa_coefficient': 0.4,
 
