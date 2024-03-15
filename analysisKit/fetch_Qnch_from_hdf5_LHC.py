@@ -182,6 +182,11 @@ for ievent, event_i in enumerate(eventList):
             data = np.nan_to_num(eventGroup.get(filename))
             outdata[event_i]['NgluonEst'] = data[0]
             continue
+    #for filename in fileList:
+    #    if "NpartList" in filename:
+    #        data = np.nan_to_num(eventGroup.get(filename))
+    #        outdata[event_i]['NpartList'] = data
+    #        continue
     for pidName, pid in pidList:
         vn_filename = "particle_{}_vndata_diff_y_-0.5_0.5.dat".format(pid)
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
