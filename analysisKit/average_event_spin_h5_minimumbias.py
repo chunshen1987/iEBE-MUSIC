@@ -1014,7 +1014,7 @@ def analyze_Rspin_y(hf_, eventList_, outputFolder_: str,
                           /mean(array(dNList[ifile]), axis=0))
         R_spin_err.append(std(array(RspinList[ifile]), axis=0)
                           /mean(array(dNList[ifile]), axis=0)/sqrt(nev))
-    fileName = f"averaged_Rspin_{vorticityType}_pT_{pTMin_}_{pTmax_}.txt"
+    fileName = f"averaged_Rspin_{vorticityType}_pT_{pTmin_}_{pTmax_}.txt"
     f = open(path.join(outputFolder_, fileName), "w")
     f.write("# eta  Rspin  Rspin_err "
             + "({0}  {0}+SIP(BBPP)  {0}+SIP(LY)  {0}+SIP+MuBIP(LY))\n".format(
