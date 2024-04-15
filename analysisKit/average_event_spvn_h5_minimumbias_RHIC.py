@@ -107,7 +107,7 @@ symmetric_cumulant_name_list = ['SC_32', 'SC_42']
 
 n_order = 10
 if FastFlag:
-    particle_list = particle_list[0:4]
+    particle_list = particle_list[0:7]
 
 
 def check_an_event_is_good(h5_event):
@@ -1739,15 +1739,15 @@ for icen in range(len(centralityCutList) - 1):
 
                 if not FastFlag:
                     # calculate vn distribution for charged hadrons
-                    output_filename = path.join(
-                        avg_folder,
-                        "charged_hadron_vn_distribution_{}.dat".format(expKey)
-                    )
-                    calculate_vn_distribution(vn_array2, output_filename)
+                    #output_filename = path.join(
+                    #    avg_folder,
+                    #    "charged_hadron_vn_distribution_{}.dat".format(expKey)
+                    #)
+                    #calculate_vn_distribution(vn_array2, output_filename)
 
                     # calculate rn ratios
-                    rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
-                                                 avg_folder)
+                    #rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
+                    #                             avg_folder)
 
                     # calculate flow event-plane correlation
                     output_filename = path.join(
