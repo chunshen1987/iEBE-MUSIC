@@ -67,6 +67,9 @@ max_idle = 1000
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
 
+# release the job if it is being held
+periodic_release = (JobStatus == 5)
+
 checkpoint_exit_code = 85
 
 # Send the job to Held state on failure.
