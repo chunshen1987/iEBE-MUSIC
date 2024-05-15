@@ -61,6 +61,9 @@ for ievent, event_i in enumerate(eventList):
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         # dN/(2pi pT dpT dy)
         outdata[event_i]["{}_sp".format(pidName)] = vn_data[:, 1]
+        # v2(pT)
+        outdata[event_i]["{}_v2pT".format(pidName)] = (
+            vn_data[:, 4] + 1j*vn_data[:, 5])
 
 print("nev = {}".format(len(eventList)))
 with open('pTdiff_Sp.pickle', 'wb') as pf:
