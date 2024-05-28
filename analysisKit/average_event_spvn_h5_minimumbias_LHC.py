@@ -23,42 +23,28 @@ from numpy import *
 import h5py
 import shutil
 
-# define colors
-purple = "\033[95m"
-green = "\033[92m"
-blue = "\033[94m"
-yellow = "\033[93m"
-red = "\033[91m"
-normal = "\033[0m"
-
 kinematicCutsDict = {
-        "PHENIX": {"pTmin": 0.20, "pTmax": 2.0},
-        "STAR1" : {"pTmin": 0.15, "pTmax": 2.0},
-        "STAR2" : {"pTmin": 0.20, "pTmax": 3.0},
+        "ALICE": {"pTmin": 0.20, "pTmax": 3.0},
+        "CMS" : {"pTmin": 0.30, "pTmax": 3.0},
+        "ATLAS" : {"pTmin": 0.50, "pTmax": 3.0},
 }
 
 Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
                            60., 70., 80., 90., 100.]
-PHOBOS_cen_list = [0., 6., 15., 25., 35., 45., 55.]  # PHOBOS AuAu 200
-SPS_cen_list    = [5., 12.5, 23.5, 33.5, 43.5]       # SPS PbPb
-PHENIX_cen_list = [0., 20., 40., 60., 88.]           # PHENIX dAu
-STAR_cen_list   = [0., 10., 40., 80]                 # STAR v1
 centralityCutList = Reg_centrality_cut_list
 dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
 
-#centralityCutList = Reg_centrality_cut_list + PHOBOS_cen_list
-#dNcutList = [1e5, 544.20, 448.98, 309.78, 204.20, 131.71, 83.02, 45.85,
-#             24.89, 11.73, 4.58, 0.16,
-#             1e5, 517.67, 362.21, 254.18, 161.67, 108.68, 61.31]
-
-RapidityTrigger = 0  # 0: mid-rapidity [-0.5, 0.5]
-                     # 1: PHENIX BBC trigger [-3.9, -3.1]
+RapidityTrigger = 2  # 0: mid-rapidity [-0.5, 0.5]
+                     # 1: ALICE V0A trigger [-5.1, -2.8]
+                     # 2: ATLAS forward trigger [-4.9, -3.1]
 FastFlag = True      # True: only analyze a subset of charged hadron obs.
                      # False: full analysis
 
 RapTrigLabel = "CL1"
 if RapidityTrigger == 1:
-    RapTrigLabel = "BBC"
+    RapTrigLabel = "V0A"
+elif RapidityTrigger == 2:
+    RapTrigLabel = "ATLAS"
 
 try:
     data_path = path.abspath(argv[1])
@@ -106,12 +92,12 @@ if FastFlag:
     particle_list = particle_list[0:7]
 
 
-def check_an_event_is_good(h5_event) -> Bool:
+def check_an_event_is_good(h5_event):
     """This function checks the given event contains all required files"""
     required_files_list = [
         'particle_9999_vndata_eta_-0.5_0.5.dat',
-        'particle_9999_vndata_eta_-2.5_-0.5.dat',
-        'particle_9999_vndata_eta_0.5_2.5.dat',
+        'particle_9999_vndata_eta_-5.1_-0.8.dat',
+        'particle_9999_vndata_eta_-4.9_-3.1.dat',
         'particle_211_vndata_diff_y_-0.5_0.5.dat',
         'particle_321_vndata_diff_y_-0.5_0.5.dat',
         'particle_2212_vndata_diff_y_-0.5_0.5.dat',
@@ -1506,8 +1492,10 @@ dNdyDict = {}
 dNdyList = []
 for ifolder, event_name in enumerate(event_list):
     file_name = "particle_9999_vndata_eta_-0.5_0.5.dat"
-    if RapidityTrigger == 1:      # PHENIX BBC Trigger
-        file_name = "particle_9999_vndata_eta_-3.9_-3.1.dat"
+    if RapidityTrigger == 1:
+        file_name = "particle_9999_vndata_eta_-5.1_-2.8.dat"
+    elif RapidityTrigger == 2:
+        file_name = "particle_9999_vndata_eta_-4.9_-3.1.dat"
     event_group = hf.get(event_name)
     #if check_an_event_is_good(event_group):
     temp_data = event_group.get(file_name)
@@ -1560,8 +1548,8 @@ for icen in range(len(centralityCutList) - 1):
 
         # first particle yield dN/dy
         if particle_id == '9999':
-            n_order = 10
             file_name = 'particle_9999_vndata_eta_-0.5_0.5.dat'
+            n_order = 10
         else:
             file_name = 'particle_%s_vndata_y_-0.5_0.5.dat' % particle_id
             n_order = 6
@@ -1580,8 +1568,8 @@ for icen in range(len(centralityCutList) - 1):
             file_name = 'particle_9999_vndata_diff_eta_-0.5_0.5.dat'
         else:
             file_name = f'particle_{particle_id}_vndata_diff_y_-0.5_0.5.dat'
-        file_name_ref1 = 'particle_9999_vndata_diff_eta_0.5_1.dat'
-        file_name_ref2 = 'particle_9999_vndata_diff_eta_-1_-0.5.dat'
+        file_name_ref1 = 'particle_9999_vndata_diff_eta_2.8_5.1.dat'
+        file_name_ref2 = 'particle_9999_vndata_diff_eta_-5.1_-2.8.dat'
 
         pT_array = []
         dN_array = []
@@ -1723,15 +1711,15 @@ for icen in range(len(centralityCutList) - 1):
 
                 if not FastFlag:
                     # calculate vn distribution for charged hadrons
-                    output_filename = path.join(
-                        avg_folder,
-                        "charged_hadron_vn_distribution_{}.dat".format(expKey)
-                    )
-                    calculate_vn_distribution(vn_array2, output_filename)
+                    #output_filename = path.join(
+                    #    avg_folder,
+                    #    "charged_hadron_vn_distribution_{}.dat".format(expKey)
+                    #)
+                    #calculate_vn_distribution(vn_array2, output_filename)
 
                     # calculate rn ratios
-                    rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
-                                                 avg_folder)
+                    #rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
+                    #                             avg_folder)
 
                     # calculate flow event-plane correlation
                     output_filename = path.join(
@@ -1808,7 +1796,10 @@ for icen in range(len(centralityCutList) - 1):
                                         eta_point, Qn_rap_array, -1.0, 1.0)
         elif RapidityTrigger == 1:
             vn_SP_eta, vn_SP_eta_err = calculate_vn_eta(
-                                        eta_point, Qn_rap_array, -3.9, -3.1)
+                                        eta_point, Qn_rap_array, -5.1, -2.8)
+        elif RapidityTrigger == 2:
+            vn_SP_eta, vn_SP_eta_err = calculate_vn_eta(
+                                        eta_point, Qn_rap_array, -4.9, -3.1)
         vn_SP_eta_mid, vn_SP_eta_mid_err = calculate_vn_eta(
                                         eta_point, Qn_rap_array, -0.5, 0.5)
 
