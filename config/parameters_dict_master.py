@@ -62,6 +62,8 @@ ipglasma_dict = {
     'setWSDeformParams': 0,
     'R_WS': 6.6,
     'a_WS': 0.52,
+    'dR_np': 0.,
+    'da_np': 0.,
     'beta2': 0.28,
     'beta3': 0.0,
     'beta4': 0.0,
@@ -551,6 +553,9 @@ hadronic_afterburner_toolkit_dict = {
     'vn_rapidity_dis_pT_max': 3.0,   # the maximum value of pT for vn rap. distr.
 
     'rapidityPTDistributionFlag': 0,  # output Qn vectors in (eta, pT)
+    'pidwithPseudoRapCuts': 0,        # Analyze pid particles Qn vectors with
+                                      # pseudo-rapidity cuts in additional to the
+                                      # default rapidity cuts
 
     'check_spatial_dis': 0,         # flag to check dN/dtau distribution
     'intrinsic_detas': 0.1,         # deta_s in the output samples

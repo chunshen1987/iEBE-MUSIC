@@ -11,7 +11,7 @@ rm -fr 3dMCGlauber_code/.git
 # download IPGlasma
 rm -fr ipglasma_code
 git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
-(cd ipglasma_code; git checkout 7195a564e131c3a19d6d1c174ce83aa0d92a2bff)
+(cd ipglasma_code; git checkout 6cab80d2ad30df2c724b991828202ecf2dffe6af)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
@@ -23,13 +23,13 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
-(cd MUSIC_code; git checkout df8010edcda41daa1679256be58869f42491b142)
+(cd MUSIC_code; git checkout 367578720c5f74adb809f30465475da3d352d0f0)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=3 https://github.com/chunshen1987/iSS -b dev iSS_code
-(cd iSS_code; git checkout 833be1ccc6c8cb02ee6e10f690612406df7fe43b)
+(cd iSS_code; git checkout 3006e5fe0c22c9cc94c6aeb0afa865ecc2563771)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper
@@ -47,6 +47,6 @@ rm -fr urqmd_code/.git
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout f78e71ee68a5cc12b7c1d856c34cc445410d64eb)
+(cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
 rm -fr hadronic_afterburner_toolkit_code/.git
 

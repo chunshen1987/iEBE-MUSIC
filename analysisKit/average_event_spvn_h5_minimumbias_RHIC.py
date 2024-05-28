@@ -37,6 +37,7 @@ kinematicCutsDict = {
         "STAR2" : {"pTmin": 0.20, "pTmax": 3.0},
 }
 
+weakFlag = True
 Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
                            60., 70., 80., 90., 100.]
 PHOBOS_cen_list = [0., 6., 15., 25., 35., 45., 55.]  # PHOBOS AuAu 200
@@ -59,6 +60,9 @@ FastFlag = True      # True: only analyze a subset of charged hadron obs.
 RapTrigLabel = "CL1"
 if RapidityTrigger == 1:
     RapTrigLabel = "BBC"
+weakFDStr = ""
+if weakFlag:
+    weakFDStr = "_weakFD"
 
 try:
     data_path = path.abspath(argv[1])
@@ -1561,9 +1565,10 @@ for icen in range(len(centralityCutList) - 1):
         # first particle yield dN/dy
         if particle_id == '9999':
             n_order = 10
-            file_name = 'particle_9999_vndata_eta_-0.5_0.5.dat'
+            file_name = f'particle_9999_vndata_eta_-0.5_0.5{weakFDStr}.dat'
         else:
-            file_name = 'particle_%s_vndata_y_-0.5_0.5.dat' % particle_id
+            file_name = (
+                f'particle_{particle_id}_vndata_y_-0.5_0.5{weakFDStr}.dat')
             n_order = 6
 
         dN_dy = zeros(len(selected_events_list))
@@ -1577,11 +1582,13 @@ for icen in range(len(centralityCutList) - 1):
 
         # then <pT>, vn, dN/(2pi dy pT dpT), vn{SP}(pT)
         if particle_id == '9999':
-            file_name = 'particle_9999_vndata_diff_eta_-0.5_0.5.dat'
+            file_name = (
+                f'particle_9999_vndata_diff_eta_-0.5_0.5{weakFDStr}.dat')
         else:
-            file_name = f'particle_{particle_id}_vndata_diff_y_-0.5_0.5.dat'
-        file_name_ref1 = 'particle_9999_vndata_diff_eta_0.5_1.dat'
-        file_name_ref2 = 'particle_9999_vndata_diff_eta_-1_-0.5.dat'
+            file_name = (
+                f'particle_{particle_id}_vndata_diff_y_-0.5_0.5{weakFDStr}.dat')
+        file_name_ref1 = f'particle_9999_vndata_diff_eta_0.5_1{weakFDStr}.dat'
+        file_name_ref2 = f'particle_9999_vndata_diff_eta_-1_-0.5{weakFDStr}.dat'
 
         pT_array = []
         dN_array = []
@@ -1723,15 +1730,15 @@ for icen in range(len(centralityCutList) - 1):
 
                 if not FastFlag:
                     # calculate vn distribution for charged hadrons
-                    output_filename = path.join(
-                        avg_folder,
-                        "charged_hadron_vn_distribution_{}.dat".format(expKey)
-                    )
-                    calculate_vn_distribution(vn_array2, output_filename)
+                    #output_filename = path.join(
+                    #    avg_folder,
+                    #    "charged_hadron_vn_distribution_{}.dat".format(expKey)
+                    #)
+                    #calculate_vn_distribution(vn_array2, output_filename)
 
                     # calculate rn ratios
-                    rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
-                                                 avg_folder)
+                    #rn_cms = calculate_rn_ratios(vn_cms_arrays_for_rn,
+                    #                             avg_folder)
 
                     # calculate flow event-plane correlation
                     output_filename = path.join(
@@ -1771,9 +1778,11 @@ for icen in range(len(centralityCutList) - 1):
 
         # then particle rapidity distribution
         if particle_id == '9999':
-            file_name = 'particle_%s_dNdeta_pT_0.2_3.dat' % particle_id
+            file_name = (
+                f'particle_{particle_id}_dNdeta_pT_0.2_3{weakFDStr}.dat')
         else:
-            file_name = 'particle_%s_dNdy_pT_0.2_3.dat' % particle_id
+            file_name = (
+                f'particle_{particle_id}_dNdy_pT_0.2_3{weakFDStr}.dat')
 
         eta_array = []
         dN_array = []
