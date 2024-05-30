@@ -9,6 +9,7 @@ import subprocess
 import argparse
 from math import ceil
 from glob import glob
+from utilities.Pick_EOS_From_File import fetch_an_EOS
 
 centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.30, 0.45, '10-20', 0.10), (0.45, 0.55, '20-30', 0.10),
@@ -582,7 +583,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, para_dict, afterburner_type):
+                           time_stamp, para_dict, afterburner_type,
+                           EOSType: int, EOSId: int):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -652,11 +654,19 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                     path.join(event_folder, 'MUSIC'))
     shutil.copyfile(path.join(param_folder, 'MUSIC/music_input_mode_2'),
                     path.join(event_folder, 'MUSIC/music_input_mode_2'))
-    for link_i in ['EOS', 'MUSIChydro']:
-        subprocess.call("ln -s {0:s} {1:s}".format(
-            path.abspath(path.join(code_path, 'MUSIC_code/{}'.format(link_i))),
-            path.join(event_folder, "MUSIC/{}".format(link_i))),
-                        shell=True)
+    targetFile = path.join(code_path, 'MUSIC_code/MUSIChydro')
+    desLoc = path.join(event_folder, "MUSIC/MUSIChydro")
+    subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
+    if EOSType != 42:
+        targetFile = path.join(code_path, 'MUSIC_code/EOS')
+        desLoc = path.join(event_folder, "MUSIC/EOS")
+        subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
+    else:
+        eosDatabase = path.join(package_root_path, 'EOS_database', 'EoS.pkl')
+        eosFileName = fetch_an_EOS(eosDatabase, EOSId)
+        mkdir(path.join(event_folder, "MUSIC/EOS"))
+        shutil.move(eosFileName,
+                    path.join(event_folder, "MUSIC/EOS/EoS_1DGen.bin"))
 
     if para_dict.control_dict['compute_photon_emission']:
         # photon
@@ -1005,6 +1015,11 @@ def main():
     if 'compute_photon_emission' not in parameter_dict.control_dict.keys():
         parameter_dict.control_dict['compute_photon_emission'] = False
 
+    EOSType = 9
+    EOSId = 0
+    if 'EOSType' in parameter_dict.control_dict.keys():
+        EOSType = parameter_dict.control_dict['EOSType']
+        EOSId = parameter_dict.control_dict['EOSId']
 
     cent_label = "XXX"
     cent_label_pre = cent_label
@@ -1048,7 +1063,7 @@ def main():
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
                                IPGlasma_time_stamp, parameter_dict,
-                               afterburner_type)
+                               afterburner_type, EOSType, EOSId)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()

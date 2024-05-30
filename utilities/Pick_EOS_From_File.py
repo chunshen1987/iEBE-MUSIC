@@ -1,10 +1,13 @@
 import sys
 import pickle
 
-# main function should accept a command line argument for the index of the EoS to be picked
-def fetch_an_EOS(database: str, id: int) -> None:
+def fetch_an_EOS(database: str, id: int) -> str:
+    """
+        This function fetch an EoS with `id` from the database file.
+        It return the eosFileName
+    """
     index = f"{id:04d}"
-    print(f"Pick_EOS_From_File: filename = {database}, index = {index}")
+    #print(f"Pick_EOS_From_File: filename = {database}, index = {index}")
 
     # load the EoS file
     with open(database, 'rb') as f:
@@ -18,9 +21,11 @@ def fetch_an_EOS(database: str, id: int) -> None:
         sys.exit(1)
 
     # write the EoS to a new binary file with columns e, P, T
-    with open(f"EoS_{index}.bin", 'wb') as f:
+    eosFileName = f"EoS_{index}.bin"
+    with open(eosFileName, 'wb') as f:
         f.write(data.tobytes())
 
+    return eosFileName
 
 if __name__ == "__main__":
     try:
