@@ -4,6 +4,7 @@
 
 ## citation
 
+```
 @article{Giacalone:2024ixe,
     author = "Giacalone, Giuliano and others",
     title = "{The unexpected uses of a bowling pin: anisotropic flow in fixed-target $^{208}$Pb+$^{20}$Ne collisions as a probe of quark-gluon plasma}",
@@ -13,6 +14,7 @@
     month = "5",
     year = "2024"
 }
+```
 
 ## Setting the parameters in the iEBE-MUSIC framework
 
@@ -28,8 +30,7 @@ For Pb+O collisions, one can set `Projectile` to "O".
 By changing the value of the parameter `lightNucleusOption`, we can choose
 nucleus configurations from different theories,
 
-lightNucleusOption = 2  ->  PGCM clustered
-lightNucleusOption = 3  ->  PGCM uniform
-lightNucleusOption = 4  ->  NLEFT positive weights
-lightNucleusOption = 5  ->  NLEFT negative weights
-
+- lightNucleusOption = 2  ->  PGCM clustered
+- lightNucleusOption = 3  ->  PGCM uniform
+- lightNucleusOption = 4  ->  NLEFT positive weights
+- lightNucleusOption = 5  ->  NLEFT negative weights
