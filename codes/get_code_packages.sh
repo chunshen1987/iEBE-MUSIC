@@ -23,13 +23,13 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout d9d5762e76e8fec9dc9faf82d309d8e0bb03f8c8)
+(cd MUSIC_code; git checkout d513ec4617634f61052ae3d743278fdf87b1d9d2)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=3 https://github.com/chunshen1987/iSS -b 4DEoS iSS_code
-(cd iSS_code; git checkout 88b9a2aa1c451a0f679e4506e0dbaada2f44d176)
+(cd iSS_code; git checkout 3b1f8b71200984afbd8b3e86c6754423caa45e41)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper

@@ -7,7 +7,7 @@ RUN yum -y upgrade
 RUN yum -y install epel-release centos-release-scl
 
 # osg repo
-RUN yum -y install http://repo.opensciencegrid.org/osg/3.5/osg-3.5-el7-release-latest.rpm
+#RUN yum -y install http://repo.opensciencegrid.org/osg/3.5/osg-3.5-el7-release-latest.rpm
 
 ## well rounded basic system to support a wide range of user jobs
 #RUN yum -y grouplist \
@@ -64,8 +64,8 @@ RUN yum -y install http://springdale.princeton.edu/data/springdale/7/x86_64/os/C
 RUN yum -y install http://springdale.princeton.edu/data/springdale/7/x86_64/os/Computational/gsl25-devel-2.5-3.sdl7.2.x86_64.rpm
 
 # osg
-RUN yum -y install osg-ca-certs osg-wn-client && \
-        rm -f /etc/grid-security/certificates/*.r0
+#RUN yum -y install osg-ca-certs osg-wn-client && \
+#        rm -f /etc/grid-security/certificates/*.r0
 
 # Install pre-reqs python packages
 RUN pip3 install --upgrade && \
