@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b eosGenerator MUSIC_code
-(cd MUSIC_code; git checkout 37cb4ab314c89a6299c852cae5c80d05b1b1b23b)
+(cd MUSIC_code; git checkout 7971ed85d866ae9757116e7ba05571c3b3193176)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -50,3 +50,5 @@ git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit
 (cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
+# download essential EOS files for hydro simulations
+(cd MUSIC_code/EOS; bash download_hotQCD.sh; bash download_Neos2D.sh bqs;)
