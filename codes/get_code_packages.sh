@@ -4,8 +4,8 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 0064ce53702d81a915599df80ce2605461fff7ab)
+git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b main 3dMCGlauber_code
+(cd 3dMCGlauber_code; git checkout 89efd9d917162e9095fab7c7d446befc3c0bf494)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -50,5 +50,7 @@ git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit
 (cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
+# download nucleus configurations for 3D-Glauber
+(cd 3dMCGlauber_code/tables; bash download_nucleusTables.sh;)
 # download essential EOS files for hydro simulations
 (cd MUSIC_code/EOS; bash download_hotQCD.sh; bash download_Neos2D.sh bqs;)
