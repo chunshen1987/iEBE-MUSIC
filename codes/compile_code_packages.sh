@@ -73,6 +73,9 @@ fi
 echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
+    cd EOS
+    ./download_EOSQ.sh
+    cd ../
     rm -fr build
     mkdir -p build
     cd build
