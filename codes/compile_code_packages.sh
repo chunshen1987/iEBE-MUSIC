@@ -74,7 +74,7 @@ echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
     cd EOS
-    ./download_EOSQ.sh
+    bash download_Neos2D.sh
     cd ../
     rm -fr build
     mkdir -p build
