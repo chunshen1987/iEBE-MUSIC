@@ -480,7 +480,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
-        f'{para_dict['kompost_filename']}.music_init_flowNonLinear_pimunuTransverse.txt'
+        "{}.music_init_flowNonLinear_pimunuTransverse.txt".format(
+            para_dict['kompost_filename'])
     ]
     hydro_info_filepattern = [
         "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
