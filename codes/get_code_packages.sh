@@ -17,7 +17,7 @@ rm -fr ipglasma_code/.git
 # download KoMPoST
 rm -fr kompost_code
 git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
-(cd kompost_code; git checkout 3a8f873bcf8e20ec8522cb851d20ae5e66610085)
+(cd kompost_code; git checkout ad5fe9d3b26434bb1d5c29820499ef26808b5a47)
 rm -fr kompost_code/.git
 
 # download MUSIC
