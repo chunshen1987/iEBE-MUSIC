@@ -30,5 +30,5 @@ if __name__ == "__main__":
     except IndexError:
         print_help()
         exit(1)
-    
+
     fecth_an_3DMCGlauber_event(database_filename, event_id)
