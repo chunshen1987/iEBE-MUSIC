@@ -241,7 +241,7 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13} {14:s}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13} {14:s} {15:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
            para_dict.control_dict["save_ipglasma_results"],
            para_dict.control_dict["save_kompost_results"],
@@ -250,7 +250,8 @@ python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {
            time_stamp,
            para_dict.control_dict["compute_polarization"],
            para_dict.control_dict["compute_photon_emission"],
-           enableCheckPoint, afterburner_type))
+           enableCheckPoint,afterburner_type,
+           para_dict.kompost_dict["KoMPoSTInputs"]["OutputFileTag"]))
     script.write("""
 
 status=$?
