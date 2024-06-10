@@ -4,8 +4,8 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 9af251c283e700a2abb9eb844a91da861136920f)
+git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b main 3dMCGlauber_code
+(cd 3dMCGlauber_code; git checkout ff4026a54d04aea0ac864d327f164106a3a67122)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -17,7 +17,7 @@ rm -fr ipglasma_code/.git
 # download KoMPoST
 rm -fr kompost_code
 git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
-(cd kompost_code; git checkout 3a8f873bcf8e20ec8522cb851d20ae5e66610085)
+(cd kompost_code; git checkout ad5fe9d3b26434bb1d5c29820499ef26808b5a47)
 rm -fr kompost_code/.git
 
 # download MUSIC
@@ -50,5 +50,7 @@ git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit
 (cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
+# download nucleus configurations for 3D-Glauber
+(cd 3dMCGlauber_code/tables; bash download_nucleusTables.sh;)
 # download essential EOS files for hydro simulations
 (cd MUSIC_code/EOS; bash download_hotQCD.sh; bash download_Neos2D.sh bqs;)
