@@ -240,18 +240,24 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     write_script_header(cluster_name, script, n_threads, event_id, walltime,
                         working_folder)
     script.write("\nseed_add=${1:-0}\n")
+
+    try:
+        kompostFileName = para_dict.kompost_dict["KoMPoSTInputs"]["OutputFileTag"]
+    except:
+        kompostFileName = "ekt"
+
     script.write("""
 python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13} {14:s} {15:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-           para_dict.control_dict["save_ipglasma_results"],
-           para_dict.control_dict["save_kompost_results"],
-           para_dict.control_dict["save_hydro_surfaces"],
-           para_dict.control_dict["save_UrQMD_files"],
-           time_stamp,
-           para_dict.control_dict["compute_polarization"],
-           para_dict.control_dict["compute_photon_emission"],
-           enableCheckPoint,afterburner_type,
-           para_dict.kompost_dict["KoMPoSTInputs"]["OutputFileTag"]))
+        para_dict.control_dict["save_ipglasma_results"],
+        para_dict.control_dict["save_kompost_results"],
+        para_dict.control_dict["save_hydro_surfaces"],
+        para_dict.control_dict["save_UrQMD_files"],
+        time_stamp,
+        para_dict.control_dict["compute_polarization"],
+        para_dict.control_dict["compute_photon_emission"],
+        enableCheckPoint,afterburner_type,
+        kompostFileName))
     script.write("""
 
 status=$?
