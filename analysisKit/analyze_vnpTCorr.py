@@ -149,7 +149,7 @@ def calculate_rhon(dataArr1, dataArr2, dataArr3,
         f = open(outputFileName, 'a')
     else:
         f = open(outputFileName, 'w')
-        f.write("# cen  Nch  rho_2  cov(Q2pT)  var(Q2)  var(PT)\n")
+        f.write("# cen  Nch  rho_2  cov(Q2^2 pT)  var(Q2^2)  var(PT)\n")
     f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
     for ires in rho2Results:
         f.write("  {:.5e}".format(ires))
@@ -161,7 +161,7 @@ def calculate_rhon(dataArr1, dataArr2, dataArr3,
         f = open(outputFileName, 'a')
     else:
         f = open(outputFileName, 'w')
-        f.write("# cen  Nch  rho_3  cov(Q3pT)  var(Q3)  var(PT)\n")
+        f.write("# cen  Nch  rho_3  cov(Q3^2 pT)  var(Q3^2)  var(PT)\n")
     f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
     for ires in rho3Results:
         f.write("  {:.5e}".format(ires))
@@ -173,7 +173,7 @@ def calculate_rhon(dataArr1, dataArr2, dataArr3,
         f = open(outputFileName, 'a')
     else:
         f = open(outputFileName, 'w')
-        f.write("# cen  Nch  rho_4  cov(Q4pT)  var(Q4)  var(PT)\n")
+        f.write("# cen  Nch  rho_4  cov(Q4^2 pT)  var(Q4^2)  var(PT)\n")
     f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
     for ires in rho4Results:
         f.write("  {:.5e}".format(ires))
