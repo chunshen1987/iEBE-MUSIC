@@ -100,6 +100,7 @@ ipglasma_dict = {
     'Target': "Au",
     'bmin': 0.,
     'bmax': 20.,
+    'rotateReactionPlane': 0,
     'lightNucleusOption': 1,
     'useFixedNpart': 0,
     'averageOverThisManyNuclei': 1,
