@@ -73,9 +73,6 @@ fi
 echo -e "${Green}compile MUSIC ... ${NC}"
 (
     cd MUSIC_code
-    cd EOS
-    bash download_Neos2D.sh
-    cd ../
     rm -fr build
     mkdir -p build
     cd build
@@ -91,6 +88,7 @@ mkdir -p MUSIC
 cp MUSIC_code/example_inputfiles/IPGlasma_2D/music_input_mode_2 MUSIC/
 cp MUSIC_code/utilities/sweeper.sh MUSIC/
 (cd MUSIC; mkdir -p initial)
+
 
 # compile photonEmission_hydroInterface
 echo -e "${Green}compile photonEmission_hydroInterface ... ${NC}"
