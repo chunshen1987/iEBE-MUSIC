@@ -17,9 +17,9 @@ control_dict = {
 # 3DMCGlauber model
 mcglauber_dict = {
     'database_name': "self",     # self: generate initial condition on the fly
-    'Projectile':  "p",         # projectile nucleus name
+    'Projectile':  "dipole",         # projectile nucleus name
     'Target'    :  "Pb",         # target nucleus name
-    'resetProjWS':  1,                                                          
+    'resetProjWS':  0,                                                          
     'resetTargWS':  1,                                                          
     'TargWS_R':  6.68,                                                          
     'TargWS_a':  0.528,                                                          
@@ -47,8 +47,16 @@ mcglauber_dict = {
     'lambdaBs': 1.0,             # fraction of single-to-double string junction stopping
     'lambdaQs': 1.0,             # fraction of single-to-double string junction stopping
     'baryonInStringProb': 0.1,
-
+    'batch_density_output': 0,
     'BG': 16.,
+    'BG_proj': 5.,
+    'BG_targ': 17.,
+    'use_roots_cut': 0,
+    'use_roots_distribution': 1,
+    'roots_low_cut': 2.,
+    'roots_up_cut': 700.,
+    'use_E_dependent_LB': 0,
+    'CB': 1.58,
     'shadowing_factor':  0.20,   # a shadowning factor for producing strings from multiple scatterings
     'rapidity_loss_method': 4,
     'remnant_energy_loss_fraction': 0.5,         # nucleon remnants energy loss fraction (fraction of string's y_loss) [0, 1]
@@ -67,7 +75,8 @@ mcglauber_dict = {
 
 # MUSIC
 music_dict = {
-    'Initial_profile': 131,   # type of initial condition 
+    'beastMode': 2,
+    'Initial_profile': 13,   # type of initial condition 
                              # 13: dynamical initialization (3dMCGlauber_dynamical)
                              #   -- 131: 3dMCGlauber with zero nucleus thickness
     'string_source_sigma_eta': 0.5,  # the smearning size of the hotspot in eta
@@ -138,17 +147,30 @@ iss_dict = {
     'number_of_particles_needed': 100000,      # number of hadrons to sample
     'local_charge_conservation': 0,     # flag to impose local charge conservation
     'global_momentum_conservation': 0,  # flag to impose GMC
+    'regulateEOS': 0,          # flag to regulate T and mu with pure HRG EOS
+    'maximum_sampling_events': 10000,
+
 }
 
-
-# hadronic afterburner toolkit
 hadronic_afterburner_toolkit_dict = {
-    'analyze_HBT': 0,                    # 0/1: flag to perform HBT analysis
+    'rap_shift': 0.465,                  # The rapidity shift
+    'rap_type_for_pid': 1,               # 0: for pseudo-rapidity; 1: for rapidity
+    'rap_min_for_pid': -1.0,             # minimum value of rapidity integration
+                                         # range for mid-rapidity observables
+    'rap_max_for_pid': 0.0,              # maximum value of rapidity integration
+    'output_y_pt_spectra': 1,
+    'y0': -0.7,
+    'y1': -0.5,
+    'y2': -0.3,
+    'y3': -0.1,
+    'y4':  0.1,
+    'y5':  0.3,
+    'y6':  0.5,
+    'y7':  0.7,
     'event_buffer_size': 500000,         # the number of events read in at once
-    'rapidity_shift':  0.465,            # 0.5*log(Z_P*A_T/(A_P*Z_T))
-    'compute_correlation': 0,            # flag to compute correlation function
-    'flag_charge_dependence': 0,         # flag to compute charge dependence correlation
+    'compute_correlation': 1,            # flag to compute correlation function
+    'flag_charge_dependence': 1,         # flag to compute charge dependence correlation
     'compute_corr_rap_dep': 0,           # flag to compute the rapidity dependent multi-particle correlation
     'resonance_weak_feed_down_flag': 0,  # include weak feed down contribution
-    'collect_neutral_particles': 1,      # Collect neutral particles for net-baryon number checks.
 }
+
