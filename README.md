@@ -3,7 +3,6 @@ This is a repository is an overarching numerical framework for event-by-event si
 
 If you have any questions, please email to the iEBE-MUSIC google groups, iebe-music@googlegroups.com
 
-
 ## Setup & Ingradients:
 All the code packages can be downloaded from online git repositories. Please use `codes/get_code_packages.sh` to download the code packages and `codes/compile_code_packages.sh` to compile all the packages before event-by-event simulations.
 
