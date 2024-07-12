@@ -100,12 +100,9 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                          + "{} cenMin={} cenMax={};)".format(seed_add+iev*ran,
                                                              cenMin, cenMin+1),
                          shell=True)
-                     
                 else:
                     call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
                          + "{};)".format(seed_add+iev*ran), shell=True)
-                call("mv 3dMCGlauber/rapidity_shift hadronic_afterburner_toolkit/rapidity_shift",
-                     shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
                 call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
@@ -124,12 +121,10 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                                     final_results_folder), shell=True)
             call("mv 3dMCGlauber/nB_etas_*.dat {}".format(
                                     final_results_folder), shell=True)
-            call("mv 3dMCGlauber/nQ_etas_*.dat {}".format(
-                                    final_results_folder), shell=True)
             call("mv 3dMCGlauber/ecc_ed*.dat {}".format(
                                     final_results_folder), shell=True)
             call("mv 3dMCGlauber/rapidity_shift hadronic_afterburner_toolkit/rapidity_shift",
-                                    shell=True)
+                     shell=True)
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, event_id)
@@ -484,11 +479,11 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         "participants_event_{}.dat".format(event_id),
                         "ed_etas_distribution_*.dat",
                         "nB_etas_distribution_*.dat",
-                        "nQ_etas_distribution_*.dat",
                         "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
-        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
+        "{}.music_init_flowNonLinear_pimunuTransverse.txt".format(
+            para_dict['kompost_filename'])
     ]
     hydro_info_filepattern = [
         "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
@@ -745,7 +740,7 @@ def main(para_dict_):
             call("ln -s {0:s} {1:s}".format(
                 path.join(path.abspath(final_results_folder),
                           kompost_folder_name,
-                          ("ekt_tIn01_tOut08"
+                          (para_dict_['kompost_filename']
                            + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
@@ -852,6 +847,11 @@ if __name__ == "__main__":
         print_usage()
         sys.exit(0)
 
+    try:
+        KOMPOST_FILENAME = str(sys.argv[17])
+    except IndexError:
+        KOMPOST_FILENAME = "ekt_tIn01_tOut08"
+
     known_initial_types = [
         "IPGlasma", "IPGlasma+KoMPoST",
         "3DMCGlauber_dynamical", "3DMCGlauber_participants",
@@ -881,6 +881,7 @@ if __name__ == "__main__":
         'time_stamp_str': TIME_STAMP,
         'check_point_flag': CHECK_POINT,
         'afterburner_type': AFTERBURNER_TYPE,
+        'kompost_filename': KOMPOST_FILENAME,
     }
 
     main(para_dict)
