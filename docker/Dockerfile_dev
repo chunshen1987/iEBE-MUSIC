@@ -27,7 +27,7 @@ RUN yum -y install \
 
 # Install pre-reqs python packages
 RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install numpy h5py scipy
+    python3 -m pip install "numpy<2.0" h5py scipy
 
 ENV HOME /opt/
 
