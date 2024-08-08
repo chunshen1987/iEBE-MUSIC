@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b greg_dev MUSIC_code
-(cd MUSIC_code; git checkout d513ec4617634f61052ae3d743278fdf87b1d9d2)
+(cd MUSIC_code; git checkout bb7a9a957978b576c77adbe1323d7193e574a49e)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -47,7 +47,7 @@ rm -fr urqmd_code/.git
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=3 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout f78e71ee68a5cc12b7c1d856c34cc445410d64eb)
+(cd hadronic_afterburner_toolkit_code; git checkout d07edc2741ebeabca45b7504d3ad02f067f4bc11)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
 # dowload 4D NEoS fomr bitbucket https://bitbucket.org/wayne_state_nuclear_theory/neos/src/main/EoS_UrQMD/
