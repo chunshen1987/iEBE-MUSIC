@@ -20,6 +20,8 @@ control_dict = {
     'save_UrQMD_files': False,        # flag to save UrQMD files
     'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
     'compute_polarization': False,       # flag to save spin polarization results
+    'EOSType': 0,
+    'EOSId': 0,
 }
 
 
