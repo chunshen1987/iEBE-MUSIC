@@ -47,7 +47,7 @@ rm -fr urqmd_code/.git
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
+(cd hadronic_afterburner_toolkit_code; git checkout a19f1a5699abd2d8c727e3fba4e492b99524a404)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
 # download nucleus configurations for 3D-Glauber
