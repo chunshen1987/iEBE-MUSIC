@@ -480,7 +480,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         "ecc_ed_*.dat",]
 
     pre_equilibrium_filelist = [
-        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
+        "{}.music_init_flowNonLinear_pimunuTransverse.txt".format(
+            para_dict['kompost_filename'])
     ]
     hydro_info_filepattern = [
         "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
@@ -579,7 +580,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 for iline, rawline in enumerate(parafile.readlines()):
                     paraline = rawline.strip('\n')
                     gtemp.attrs.create("{0}".format(iline),
-                                       np.string_(paraline))
+                                       np.bytes_(paraline))
             else:
                 dtemp = np.loadtxt(file_path, dtype="float32")
                 h5data = gtemp.create_dataset("{0}".format(file_name),
@@ -591,7 +592,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 header_text = str(ftemp.readline())
                 ftemp.close()
                 if header_text.startswith("#"):
-                    h5data.attrs.create("header", np.string_(header_text))
+                    h5data.attrs.create("header", np.bytes_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
         shutil.rmtree(spvnfolder, ignore_errors=True)
@@ -737,7 +738,7 @@ def main(para_dict_):
             call("ln -s {0:s} {1:s}".format(
                 path.join(path.abspath(final_results_folder),
                           kompost_folder_name,
-                          ("ekt_tIn01_tOut08"
+                          (para_dict_['kompost_filename']
                            + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
@@ -844,6 +845,11 @@ if __name__ == "__main__":
         print_usage()
         sys.exit(0)
 
+    try:
+        KOMPOST_FILENAME = str(sys.argv[17])
+    except IndexError:
+        KOMPOST_FILENAME = "ekt_tIn01_tOut08"
+
     known_initial_types = [
         "IPGlasma", "IPGlasma+KoMPoST",
         "3DMCGlauber_dynamical", "3DMCGlauber_participants",
@@ -873,6 +879,7 @@ if __name__ == "__main__":
         'time_stamp_str': TIME_STAMP,
         'check_point_flag': CHECK_POINT,
         'afterburner_type': AFTERBURNER_TYPE,
+        'kompost_filename': KOMPOST_FILENAME,
     }
 
     main(para_dict)

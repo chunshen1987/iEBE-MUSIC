@@ -100,6 +100,7 @@ ipglasma_dict = {
     'Target': "Au",
     'bmin': 0.,
     'bmax': 20.,
+    'rotateReactionPlane': 0,
     'lightNucleusOption': 1,
     'useFixedNpart': 0,
     'averageOverThisManyNuclei': 1,
@@ -243,6 +244,7 @@ music_dict = {
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
     's_factor': 0.190,      # normalization factor read in initial data file
+    'preEqVisFactor': 1.0,  # additional scale factor for initial viscous tensor
 
     'Initial_time_tau_0': 0.4,          # starting time of the hydrodynamic evolution (fm/c)
     'Delta_Tau': 0.005,                 # time step to use in the evolution [fm/c]
@@ -295,7 +297,7 @@ music_dict = {
     'output_evolution_every_N_y': 1,    # output evolution file every Ny steps
     'output_evolution_every_N_timesteps': 10,  # output evolution every Ntime steps
 
-    # parameters for freeze out and Cooper-Frye 
+    # parameters for freeze out and Cooper-Frye
     'Do_FreezeOut_Yes_1_No_0': 1,       # flag to find freeze-out surface
     'Do_FreezeOut_lowtemp': 1,          # flag to include cold corona
     'freeze_out_tau_start_max': 2,      # the maximum freeze-out starting time [fm/c]
@@ -305,13 +307,14 @@ music_dict = {
     'average_surface_over_this_many_time_steps': 10,   # the step skipped in the tau
     'freeze_Ncell_x_step': 1,
     'freeze_Ncell_eta_step': 1,
-    'freeze_eps_flag': 0,
+    'use_eps_for_freeze_out': 1,  # find freeze-out surface 
+                                  # 0: use temperature, 1: use energy density
     'N_freeze_out': 1,
     'eps_switch': 0.18,
     'eps_freeze_max': 0.18,
     'eps_freeze_min': 0.18,
-    'use_eps_for_freeze_out': 1,  # find freeze-out surface 
-                                  # 0: use temperature, 1: use energy density
+    'freeze_eps_flag': 0,           #0: use eps_freeze_max and eps_freeze_min
+                                    #1: read eps_freeze from an external file
 }
 
 
