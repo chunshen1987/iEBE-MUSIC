@@ -4,7 +4,8 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-git clone --depth=1 https://github.com/wenbin1501110084/3dMCGlauber 3dMCGlauber_code
+#git clone --depth=1 https://github.com/wenbin1501110084/3dMCGlauber 3dMCGlauber_code
+git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b UPC 3dMCGlauber_code
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -30,6 +31,8 @@ rm -fr kompost_code/.git
 rm -fr MUSIC_code
 git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
 (cd MUSIC_code; git checkout 062762b8a15b487259571f35517de9283af0a7ef)
+(cd MUSIC_code/EOS; bash download_Neos4D.sh)
+(cd MUSIC_code/EOS; bash download_Neos2D.sh)
 rm -fr MUSIC_code/.git
 
 
