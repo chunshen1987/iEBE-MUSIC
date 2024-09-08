@@ -105,17 +105,17 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                          + "{};)".format(seed_add+iev*ran), shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-                call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
-                                                specFilename), shell=True)
+                #call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                #                                specFilename), shell=True)
             else:
                 print("3D MC-Glauber event exists ...")
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
             shutil.copy(file_name, path.join(final_results_folder,
                                              "strings_{}.dat".format(event_id)))
-            shutil.copy(specFilename,
-                        path.join(final_results_folder,
-                                  "spectators_{}.dat".format(event_id)))
+            #shutil.copy(specFilename,
+            #            path.join(final_results_folder,
+            #                      "spectators_{}.dat".format(event_id)))
             filePatterns = ["ed_etas", "nB_etas", "ecc_ed"]
             call("mv 3dMCGlauber/ed_etas_*.dat {}".format(
                                     final_results_folder), shell=True)
@@ -885,3 +885,4 @@ if __name__ == "__main__":
     }
 
     main(para_dict)
+
