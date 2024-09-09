@@ -494,6 +494,7 @@ surfaceFile=`ls hydro_event | grep "surface"`
 for iev in {0..9}
 do
     cd iSS
+    export OMP_NUM_THREADS=1
     RANDOMSEED=`cat iSS_parameters.dat | grep "randomSeed" | cut -f 3 -d " "`
     if [ $RANDOMSEED != "-1" ]; then
         RANDOMSEED=$((RANDOMSEED + iev))
