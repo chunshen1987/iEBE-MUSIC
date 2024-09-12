@@ -89,7 +89,7 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         connect_ipglasma_event(res_path, initial_type, file_name)
         return status, file_name
     elif initial_type == "3DMCGlauber_dynamical":
-        if database == "self" or "fixCentrality":
+        if database == "self" or database == "fixCentrality":
             file_name = "strings_event_{}.dat".format(event_id)
             specFilename = "spectators_event_{}.dat".format(event_id)
             ran = np.random.default_rng().integers(1e8)
@@ -513,7 +513,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             curr_time, spvnfolder),
               flush=True)
 
-        if para_dict['initial_condition'] == "self" or "fixCentrality":
+        if (para_dict['initial_condition'] == "self"
+            or para_dict['initial_condition'] == "fixCentrality"):
             # save initial conditions
             if "IPGlasma" in para_dict['initial_type']:
                 initial_folder = path.join(
@@ -756,7 +757,8 @@ def main(para_dict_):
             continue
 
         if (initial_type == "3DMCGlauber_dynamical"
-                and (initial_condition == "self" or "fixCentrality")):
+                and (initial_condition == "self"
+                     or initial_condition == "fixCentrality")):
             # save the initial condition
             shutil.move("MUSIC/initial/strings.dat",
                         path.join(final_results_folder, hydro_folder_name,
