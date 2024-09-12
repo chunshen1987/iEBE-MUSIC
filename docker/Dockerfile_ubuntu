@@ -38,7 +38,7 @@ RUN cd ${HOME} \
 && ./get_code_packages.sh \
 && ./compile_code_packages.sh \
 && cd ../EOS_database \
-&& bash download_EOSdatabase1D.sh
+&& bash download_EOSdatabase1D.sh \
 && bash download_QGPViscositydatabaseD.sh
 
 ENV PYTHONIOENCODING utf-8
