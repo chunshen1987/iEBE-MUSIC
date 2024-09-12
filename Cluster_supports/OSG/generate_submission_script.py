@@ -3,7 +3,7 @@
 
 
 import sys
-from os import path
+from os import path, makedirs
 import random
 
 FILENAME = "singularity.submit"
@@ -57,9 +57,9 @@ transfer_input_files = {0}
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
 
-error = ../log/job.$(Cluster).$(Process).error
-output = ../log/job.$(Cluster).$(Process).output
-log = ../log/job.$(Cluster).$(Process).log
+error = log/job.$(Cluster).$(Process).error
+output = log/job.$(Cluster).$(Process).output
+log = log/job.$(Cluster).$(Process).log
 
 #+JobDurationCategory = "Long"
 max_idle = 1000
@@ -132,6 +132,9 @@ fi
 def main(para_dict_):
     write_submission_script(para_dict_)
     write_job_running_script(para_dict_)
+    logFolderName = "log"
+    if not path.exists(logFolderName):
+        makedirs(logFolderName)
 
 
 if __name__ == "__main__":

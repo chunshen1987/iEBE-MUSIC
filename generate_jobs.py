@@ -10,6 +10,7 @@ import argparse
 from math import ceil
 from glob import glob
 from utilities.Pick_EOS_From_File import fetch_an_EOS
+from utilities.Pick_viscosity_From_File import fetchShearViscosity1D, fetchBulkViscosity1D
 
 centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.30, 0.45, '10-20', 0.10), (0.45, 0.55, '20-30', 0.10),
@@ -675,6 +676,18 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         mkdir(path.join(event_folder, "MUSIC/EOS"))
         shutil.move(eosFileName,
                     path.join(event_folder, "MUSIC/EOS/EoS_1DGen.bin"))
+        shearFileName = fetchShearViscosity1D(
+            path.join(package_root_path, 'EOS_database', 'eta_s.pkl'),
+            EOSId
+        )
+        bulkFileName = fetchBulkViscosity1D(
+            path.join(package_root_path, 'EOS_database', 'zeta_s.pkl'),
+            EOSId
+        )
+        shutil.move(shearFileName,
+                    path.join(event_folder, "MUSIC/EOS/shear_1DGen.bin"))
+        shutil.move(bulkFileName,
+                    path.join(event_folder, "MUSIC/EOS/bulk_1DGen.bin"))
 
     if para_dict.control_dict['compute_photon_emission']:
         # photon

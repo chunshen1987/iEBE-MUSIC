@@ -11,7 +11,7 @@ rm -fr 3dMCGlauber_code/.git
 # download IPGlasma
 rm -fr ipglasma_code
 git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
-(cd ipglasma_code; git checkout 6cab80d2ad30df2c724b991828202ecf2dffe6af)
+(cd ipglasma_code; git checkout 3931f4dbbe86bd18604da3e575222a4a52dec7db)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b eosGenerator MUSIC_code
-(cd MUSIC_code; git checkout 7971ed85d866ae9757116e7ba05571c3b3193176)
+(cd MUSIC_code; git checkout c88e090cd7bcacefeb20461d2e84912088964375)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
@@ -47,7 +47,7 @@ rm -fr urqmd_code/.git
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
 git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout 4c976c272b53db80246b3f53725496c0037fafef)
+(cd hadronic_afterburner_toolkit_code; git checkout a19f1a5699abd2d8c727e3fba4e492b99524a404)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
 # download nucleus configurations for 3D-Glauber

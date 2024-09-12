@@ -581,7 +581,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 for iline, rawline in enumerate(parafile.readlines()):
                     paraline = rawline.strip('\n')
                     gtemp.attrs.create("{0}".format(iline),
-                                       np.string_(paraline))
+                                       np.bytes_(paraline))
             else:
                 dtemp = np.loadtxt(file_path, dtype="float32")
                 h5data = gtemp.create_dataset("{0}".format(file_name),
@@ -593,7 +593,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 header_text = str(ftemp.readline())
                 ftemp.close()
                 if header_text.startswith("#"):
-                    h5data.attrs.create("header", np.string_(header_text))
+                    h5data.attrs.create("header", np.bytes_(header_text))
         hf.close()
         shutil.move("{}.h5".format(results_name), final_results_folder)
         shutil.rmtree(spvnfolder, ignore_errors=True)
