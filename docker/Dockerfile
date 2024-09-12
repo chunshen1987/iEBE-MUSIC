@@ -38,7 +38,8 @@ RUN cd ${HOME} && \
     ./get_code_packages.sh && \
     ./compile_code_packages.sh && \
     cd ../EOS_database && \
-    bash download_EOSdatabase1D.sh
+    bash download_EOSdatabase1D.sh && \
+    bash download_QGPViscositydatabase1D.sh
 
 # Cleaning caches to reduce size of image
 RUN yum clean all
