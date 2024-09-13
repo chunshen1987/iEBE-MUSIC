@@ -10,7 +10,7 @@ import argparse
 from math import ceil
 from glob import glob
 from utilities.Pick_EOS_From_File import fetch_an_EOS
-from utilities.Pick_viscosity_From_File import fetchShearViscosity1D, fetchBulkViscosity1D
+from utilities.Pick_QGPviscosity_From_File import fetchShearViscosity1D, fetchBulkViscosity1D
 
 centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.30, 0.45, '10-20', 0.10), (0.45, 0.55, '20-30', 0.10),
@@ -297,7 +297,7 @@ export OMP_NUM_THREADS={0:d}
     script.write("""
 # IPGlasma evolution (run 1 event)
 ./ipglasma input 2>&1 {0}
-""").format(logfile)
+""".format(logfile))
 
     script.write("""
 for ifile in *.dat
@@ -343,7 +343,7 @@ export OMP_NUM_THREADS={0:d}
 ./KoMPoST.exe setup.ini 2>&1 {0}
 mv *.txt $results_folder
 )
-""").format(logfile)
+""".format(logfile))
 
     script.close()
 
@@ -377,12 +377,12 @@ export OMP_NUM_THREADS={0:d}
 ./MUSIChydro music_input_mode_2 2>&1 {0}
 ./sweeper.sh $results_folder
 )
-""").format(logfile)
+""".format(logfile))
 
     script.close()
 
 
-def generate_script_photon(folder_name, nthreads, logfile): :
+def generate_script_photon(folder_name, nthreads, logfile):
     """This function generates script for photon radiation"""
 
     working_folder = folder_name
@@ -403,7 +403,7 @@ export OMP_NUM_THREADS={0:d}
 # perform photon radiation
 ./hydro_photonEmission.e 2>&1 {0}
 )
-""").format(logfile)
+""".format(logfile))
 
     script.close()
 
@@ -434,8 +434,8 @@ mv ../hydro_event/surface.dat results/surface.dat
 mv ../hydro_event/music_input results/music_input
 mv ../hydro_event/spectators.dat results/spectators.dat
 
-""").format(nthreads))
-    script.write("./iSS.e {0} 2>&1 \n".format(logfile))
+""").format(nthreads)
+    script.write("./iSS.e 2>&1 {0}\n".format(logfile))
     script.write("""
 
 rm -fr ../hydro_event
@@ -519,8 +519,7 @@ done
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
         script.write(
-            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 2>&1 {0}\n"
-            .format(logfile))
+            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 2>&1 {0}\n".format(logfile))
         script.write("    else\n")
         script.write(
             "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 >> run.log\n"
