@@ -432,7 +432,7 @@ export OMP_NUM_THREADS={0:d}
     script.close()
 
 
-def generate_script_spinPol(folder_name, cluster_name):
+def generate_script_spinPol(folder_name, cluster_name, nthreads):
     """This function generates script for spin polarization"""
     working_folder = folder_name
 
@@ -453,6 +453,8 @@ cd UrQMDev_$SubEventId
 mkdir -p UrQMD_results
 rm -fr UrQMD_results/*
 
+export OMP_NUM_THREADS={0:d}
+
 cd iSS
 mkdir -p results
 rm -fr results/*
@@ -460,7 +462,7 @@ mv ../hydro_event/surface.dat results/surface.dat
 mv ../hydro_event/music_input results/music_input
 mv ../hydro_event/spectators.dat results/spectators.dat
 
-""")
+""").format(nthreads))
     script.write("./iSS.e {0}\n".format(logfile))
     script.write("""
 
@@ -495,6 +497,7 @@ rm -fr UrQMD_results/*
 surfaceFile=`ls hydro_event | grep "surface"`
 for iev in {0..9}
 do
+    export OMP_NUM_THREADS=1
     cd iSS
     RANDOMSEED=`cat iSS_parameters.dat | grep "randomSeed" | cut -f 3 -d " "`
     if [ $RANDOMSEED != "-1" ]; then
@@ -715,7 +718,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             HBT_flag = True
 
     if para_dict.control_dict['compute_polarization']:
-        generate_script_spinPol(event_folder, cluster_name)
+        generate_script_spinPol(event_folder, cluster_name, n_threads)
 
     generate_script_afterburner(event_folder, cluster_name, HBT_flag,
                                 afterburner_type)
