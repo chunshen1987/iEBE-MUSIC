@@ -22,6 +22,7 @@ control_dict = {
     'compute_polarization': False,       # flag to save spin polarization results
     'EOSType': 0,
     'EOSId': 0,
+    'debugFlag': False,
 }
 
 
