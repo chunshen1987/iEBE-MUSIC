@@ -169,7 +169,7 @@ then
 
 """.format(singularityRepoPath, executeScriptName, workFolderPath,
            parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
-           seed, bayesParamFile))
+           seed, bayesParamFile.split('/')[-1]))
     if clusterName == "anvil":
         script.write("""
 
