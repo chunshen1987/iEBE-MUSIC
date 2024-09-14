@@ -432,7 +432,7 @@ mkdir -p results
 rm -fr results/*
 mv ../hydro_event/surface.dat results/surface.dat
 mv ../hydro_event/music_input results/music_input
-mv ../hydro_event/spectators.dat results/spectators.dat
+mv ../hydro_event/spectators.dat results/spectators.dat 2>/dev/null
 
 """).format(nthreads)
     script.write("./iSS.e 2>&1 {0}\n".format(logfile))
@@ -475,7 +475,7 @@ do
     rm -fr results/*
     ln -s ../../hydro_event/${surfaceFile} results/surface.dat
     cp ../hydro_event/music_input results/music_input
-    cp ../hydro_event/spectators.dat results/spectators.dat 2>&1 > /dev/null
+    cp ../hydro_event/spectators.dat results/spectators.dat 2>/dev/null
     if [ $SubEventId = "0" ] && [ $iev -eq "0" ]; then
     """)
     script.write("    ./iSS.e randomSeed=$RANDOMSEED 2>&1 {0}".format(logfile))
@@ -815,7 +815,7 @@ def main():
     parser.add_argument('--node_type',
                         metavar='',
                         type=str,
-                        default='SKX',
+                        default='CPU',
                         help='Node type (work on stampede2, Anvil & nersc)')
     parser.add_argument('-n',
                         '--n_jobs',
