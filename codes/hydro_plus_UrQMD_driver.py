@@ -51,18 +51,16 @@ def mapEventIdToCentrality(event_id):
 
 
 def get_initial_condition(database, initial_type, iev, event_id, seed_add,
-                          final_results_folder, time_stamp_str="0.4"):
+                          final_results_folder):
     """This funciton get initial conditions"""
     status = True
     if "IPGlasma" in initial_type:
         ipglasma_local_folder = "ipglasma/ipglasma_results"
         res_path = path.join(path.abspath(final_results_folder),
                              "ipglasma_results_{}".format(event_id))
-        file_name = ("epsilon-u-Hydro-t{0:s}-{1}.dat".format(
-                                                time_stamp_str, event_id))
+        file_name = (f"epsilon-u-Hydro-TauHydro-{event_id}.dat")
         if "KoMPoST" in initial_type:
-            file_name = ("Tmunu-t{0:s}-{1}.dat".format(time_stamp_str,
-                                                       event_id))
+            file_name = (f"Tmunu-TauHydro-{event_id}.dat")
         if database == "self":
             # check existing events ...
             if not path.exists(path.join(res_path, file_name)):
@@ -78,10 +76,9 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         else:
             if "KoMPoST" in initial_type:
                 file_temp = fecth_an_IPGlasma_event_Tmunu(
-                                            database, time_stamp_str, event_id)
+                                            database, event_id)
             else:
-                file_temp = fecth_an_IPGlasma_event(database, time_stamp_str,
-                                                    event_id)
+                file_temp = fecth_an_IPGlasma_event(database, event_id)
             makedirs(ipglasma_local_folder, exist_ok=True)
             shutil.move(file_temp,
                         path.join(ipglasma_local_folder, file_name))
@@ -459,22 +456,20 @@ def check_an_event_is_good(event_folder):
 
 def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     """This function combines all the results into hdf5"""
-    results_name = "spvn_results_{}".format(event_id)
-    time_stamp = para_dict['time_stamp_str']
+    results_name = f"spvn_results_{event_id}"
     initial_state_filelist1 = [
-        'NcollList{}.dat'.format(event_id),
-        'NpartList{}.dat'.format(event_id),
-        'NpartdNdy-t0.6-{}.dat'.format(event_id),
-        'NgluonEstimators{}.dat'.format(event_id),
-        'usedParameters{}.dat'.format(event_id),
+        f'NcollList{event_id}.dat',
+        f'NpartList{event_id}.dat',
+        f'NpartdNdy-t0.6-{event_id}.dat',
+        f'NgluonEstimators{event_id}.dat',
+        f'usedParameters{event_id}.dat',
     ]
     initial_state_filelist2 = [
-        'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
-        'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
+        f'epsilon-u-Hydro-TauHydro-{event_id}.dat',
     ]
-    glauber_filelist = ["strings_{}.dat".format(event_id),
-                        "spectators_{}.dat".format(event_id),
-                        "participants_event_{}.dat".format(event_id),
+    glauber_filelist = [f"strings_{event_id}.dat",
+                        f"spectators_{event_id}.dat",
+                        f"participants_event_{event_id}.dat",
                         "ed_etas_distribution_*.dat",
                         "nB_etas_distribution_*.dat",
                         "ecc_ed_*.dat",]
@@ -497,14 +492,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "Smu_Thermal_*.dat", "Rspin_*.dat"
     ]
 
-    hydrofolder = path.join(final_results_folder,
-                            "hydro_results_{}".format(event_id))
+    hydrofolder = path.join(final_results_folder, f"hydro_results_{event_id}")
     spvnfolder = path.join(final_results_folder, results_name)
     photonFolder = path.join(final_results_folder,
-                             "photon_results_{}".format(event_id))
+                             f"photon_results_{event_id}")
 
-    spinfolder = path.join(final_results_folder,
-                           "spin_results_{}".format(event_id))
+    spinfolder = path.join(final_results_folder, f"spin_results_{event_id}")
 
     status = check_an_event_is_good(spvnfolder)
     if status:
@@ -518,8 +511,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             # save initial conditions
             if "IPGlasma" in para_dict['initial_type']:
                 initial_folder = path.join(
-                    final_results_folder,
-                    "ipglasma_results_{}".format(event_id))
+                    final_results_folder, f"ipglasma_results_{event_id}")
                 for inifilename in initial_state_filelist1:
                     inifile = path.join(initial_folder, inifilename)
                     if path.isfile(inifile):
@@ -541,7 +533,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
                     and para_dict['save_kompost']):
                 preeq_folder = path.join(final_results_folder,
-                                         "kompost_results_{}".format(event_id))
+                                         f"kompost_results_{event_id}")
                 for prefilename in pre_equilibrium_filelist:
                     prefile = path.join(preeq_folder, prefilename)
                     if path.isfile(prefile):
@@ -571,8 +563,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         shutil.move(ispinfile, spvnfolder)
 
 
-        hf = h5py.File("{0}.h5".format(results_name), "w")
-        gtemp = hf.create_group("{0}".format(results_name))
+        hf = h5py.File(f"{results_name}.h5", "w")
+        gtemp = hf.create_group(f"{results_name}")
         file_list = glob(path.join(spvnfolder, "*"))
         for file_path in file_list:
             file_name = file_path.split("/")[-1]
@@ -580,11 +572,10 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 parafile = open(file_path)
                 for iline, rawline in enumerate(parafile.readlines()):
                     paraline = rawline.strip('\n')
-                    gtemp.attrs.create("{0}".format(iline),
-                                       np.bytes_(paraline))
+                    gtemp.attrs.create(f"{iline}", np.bytes_(paraline))
             else:
                 dtemp = np.loadtxt(file_path, dtype="float32")
-                h5data = gtemp.create_dataset("{0}".format(file_name),
+                h5data = gtemp.create_dataset(f"{file_name}",
                                               data=dtemp,
                                               compression="gzip",
                                               compression_opts=9)
@@ -595,10 +586,10 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 if header_text.startswith("#"):
                     h5data.attrs.create("header", np.bytes_(header_text))
         hf.close()
-        shutil.move("{}.h5".format(results_name), final_results_folder)
+        shutil.move(f"{results_name}.h5", final_results_folder)
         shutil.rmtree(spvnfolder, ignore_errors=True)
     else:
-        print("{} is broken, skipped".format(spvnfolder), flush=True)
+        print(f"{spvnfolder} is broken, skipped", flush=True)
     return (status)
 
 
@@ -716,8 +707,7 @@ def main(para_dict_):
                                                   initial_type, iev,
                                                   idx0 + iev,
                                                   para_dict_['seed_add'],
-                                                  final_results_folder,
-                                                  para_dict_['time_stamp_str'])
+                                                  final_results_folder)
         if not initStauts:
             exitErrorTriggerInitial = True
             continue
@@ -838,11 +828,10 @@ if __name__ == "__main__":
         SAVE_HYDRO = (sys.argv[9].lower() == "true")
         SAVE_URQMD = (sys.argv[10].lower() == "true")
         SEED_ADD = int(sys.argv[11])
-        TIME_STAMP = str(sys.argv[12])
-        COMP_POLARIZATION = (sys.argv[13].lower() == "true")
-        COMP_PHOTONS = (sys.argv[14].lower() == "true")
-        CHECK_POINT = (sys.argv[15].lower() == "true")
-        AFTERBURNER_TYPE = str(sys.argv[16])
+        COMP_POLARIZATION = (sys.argv[12].lower() == "true")
+        COMP_PHOTONS = (sys.argv[13].lower() == "true")
+        CHECK_POINT = (sys.argv[14].lower() == "true")
+        AFTERBURNER_TYPE = str(sys.argv[15])
     except IndexError:
         print_usage()
         sys.exit(0)
@@ -878,7 +867,6 @@ if __name__ == "__main__":
         'compute_polarization': COMP_POLARIZATION,
         'compute_photons': COMP_PHOTONS,
         'seed_add': SEED_ADD,
-        'time_stamp_str': TIME_STAMP,
         'check_point_flag': CHECK_POINT,
         'afterburner_type': AFTERBURNER_TYPE,
         'kompost_filename': KOMPOST_FILENAME,

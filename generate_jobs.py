@@ -227,7 +227,7 @@ wait
 
 def generate_full_job_script(cluster_name, folder_name, database, initial_type,
                              n_hydro, ev0_id, n_urqmd, n_threads, para_dict,
-                             time_stamp, afterburner_type):
+                             afterburner_type):
     """This function generates full job script"""
     working_folder = folder_name
     event_id = working_folder.split('/')[-1]
@@ -249,13 +249,12 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
         kompostFileName = "ekt"
 
     script.write("""
-python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10:s} {11} {12} {13} {14:s} {15:s}
+python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10} {11} {12} {13:s} {14:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
         para_dict.control_dict["save_ipglasma_results"],
         para_dict.control_dict["save_kompost_results"],
         para_dict.control_dict["save_hydro_surfaces"],
         para_dict.control_dict["save_UrQMD_files"],
-        time_stamp,
         para_dict.control_dict["compute_polarization"],
         para_dict.control_dict["compute_photon_emission"],
         enableCheckPoint,afterburner_type,
@@ -557,7 +556,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           time_stamp, para_dict, afterburner_type,
+                           para_dict, afterburner_type,
                            EOSType: int, EOSId: int, debugFlag: bool):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
@@ -613,7 +612,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                              initial_condition_type,
                              n_hydro_per_job, event_id_offset,
                              n_urqmd_per_hydro, n_threads, para_dict,
-                             time_stamp, afterburner_type)
+                             afterburner_type)
 
     if initial_condition_type == "IPGlasma+KoMPoST":
         generate_script_kompost(event_folder, n_threads, logfile)
@@ -932,23 +931,18 @@ def main():
         exit(1)
 
     initial_condition_database = ""
-    IPGlasma_time_stamp = "0.4"
     if initial_condition_type == "IPGlasma":
         if parameter_dict.ipglasma_dict['type'] == "self":
             initial_condition_database = "self"
         else:
             initial_condition_database = (
                 parameter_dict.ipglasma_dict['database_name_pattern'])
-        IPGlasma_time_stamp = str(
-            parameter_dict.music_dict['Initial_time_tau_0'])
     elif initial_condition_type == "IPGlasma+KoMPoST":
         if parameter_dict.ipglasma_dict['type'] == "self":
             initial_condition_database = "self"
         else:
             initial_condition_database = (
                 parameter_dict.ipglasma_dict['database_name_pattern'])
-        IPGlasma_time_stamp = str(
-            parameter_dict.kompost_dict['KoMPoSTInputs']['tIn'])
     elif initial_condition_type == "3DMCGlauber_consttau":
         initial_condition_database = (
             parameter_dict.mcglauber_dict['database_name'])
@@ -1059,8 +1053,8 @@ def main():
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads,
-                               IPGlasma_time_stamp, parameter_dict,
-                               afterburner_type, EOSType, EOSId, debugFlag)
+                               parameter_dict, afterburner_type,
+                               EOSType, EOSId, debugFlag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
