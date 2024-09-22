@@ -28,7 +28,7 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
 RUN pip3 install --upgrade && \
     pip3 install numpy h5py scipy
 
-ENV HOME /home/
+ENV HOME /opt/
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} \
