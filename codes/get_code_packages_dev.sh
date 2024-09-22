@@ -4,8 +4,8 @@
 
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
-#git clone --depth=1 https://github.com/wenbin1501110084/3dMCGlauber 3dMCGlauber_code
-git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b UPC 3dMCGlauber_code
+git clone --depth=1 https://github.com/wenbin1501110084/3dMCGlauber -b polarized_d 3dMCGlauber_code
+#git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b UPC 3dMCGlauber_code
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
