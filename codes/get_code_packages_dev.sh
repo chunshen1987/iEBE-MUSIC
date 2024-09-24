@@ -11,7 +11,7 @@ rm -fr 3dMCGlauber_code/.git
 # download IPGlasma
 rm -fr ipglasma_code
 git clone --depth=1 https://github.com/chunshen1987/ipglasma -b UPC_Diff ipglasma_code
-(cd ipglasma_code; git checkout 7195a564e131c3a19d6d1c174ce83aa0d92a2bff)
+#(cd ipglasma_code; git checkout 7195a564e131c3a19d6d1c174ce83aa0d92a2bff)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
