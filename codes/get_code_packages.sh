@@ -10,8 +10,8 @@ rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
 rm -fr ipglasma_code
-git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
-(cd ipglasma_code; git checkout 3931f4dbbe86bd18604da3e575222a4a52dec7db)
+git clone --depth=1 https://github.com/chunshen1987/ipglasma -b ForwardLightConeSolution ipglasma_code
+(cd ipglasma_code; git checkout bd4fa1aed24785ff67552c118f43339bde439f5e)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
