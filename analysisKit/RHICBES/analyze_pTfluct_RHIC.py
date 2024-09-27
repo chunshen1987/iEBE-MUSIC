@@ -12,12 +12,13 @@ def help_message():
 
 
 centralityRange = 1.
-Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
-                           60., 70., 80., 90., 100.]
+Reg_centrality_cut_list = [
+    0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
+]
 centralityCutList = Reg_centrality_cut_list
 #centralityCutList = [0, 1, 2, 3, 4, 6, 8, 10, 15, 20, 30, 40, 50, 60,
 #                     70, 80, 90, 100]
-dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
 def computeJKMeanandErr(dataArr):
@@ -27,8 +28,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_pTfluct(dataArr1, dataArr2, dataArr3,
-                      outputFileHeader: str, cenLabel: str) -> None:
+def calculate_pTfluct(dataArr1, dataArr2, dataArr3, outputFileHeader: str,
+                      cenLabel: str) -> None:
     """
         this function calculates the moments of pT fluctuation
         mean:      <pT>,
@@ -61,12 +62,13 @@ def calculate_pTfluct(dataArr1, dataArr2, dataArr3,
     sknewPT_array = np.zeros(nev)
     kurtosisPT_array = np.zeros(nev)
     for iev in range(nev):
-        array_idx      = [True]*nev
+        array_idx = [True]*nev
         array_idx[iev] = False
-        array_idx      = np.array(array_idx)
+        array_idx = np.array(array_idx)
 
-        meanPT_array[iev] = ((np.mean(dataArr1[array_idx, 1])
-                              + np.mean(dataArr2[array_idx, 1]))/2.)
+        meanPT_array[iev] = (
+            (np.mean(dataArr1[array_idx, 1]) + np.mean(dataArr2[array_idx, 1]))
+            /2.)
         varPT = np.mean(var_dPT[array_idx])/np.mean(N2_weight[array_idx])
         varPT_array[iev] = varPT/meanPT_array[iev]**2.
         sknewPT_array[iev] = (np.mean(sknew_dPT[array_idx])
@@ -79,8 +81,10 @@ def calculate_pTfluct(dataArr1, dataArr2, dataArr3,
     sknewPTMean, sknewPTErr = computeJKMeanandErr(sknewPT_array)
     kurtosisPTMean, kurtosisPTErr = computeJKMeanandErr(kurtosisPT_array)
 
-    pTfluctResults = [meanPTMean, meanPTErr, varPTMean, varPTErr,
-                      sknewPTMean, sknewPTErr, kurtosisPTMean, kurtosisPTErr]
+    pTfluctResults = [
+        meanPTMean, meanPTErr, varPTMean, varPTErr, sknewPTMean, sknewPTErr,
+        kurtosisPTMean, kurtosisPTErr
+    ]
 
     dN_mean = np.real(np.mean(dataArr1[:, 0] + dataArr2[:, 0]))
     dN_err = np.std(dataArr1[:, 0] + dataArr2[:, 0])/np.sqrt(nev)
@@ -110,25 +114,21 @@ with open(database_file, "rb") as pf:
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
-dNdyList = - np.sort(-np.array(dNdyList))
+dNdyList = -np.sort(-np.array(dNdyList))
 print(f"Number of good events: {len(dNdyList)}")
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]:
+    if centralityCutList[icen + 1] < centralityCutList[icen]:
         continue
     selected_events_list = []
 
-    dN_dy_cut_high = dNdyList[
-        int(len(dNdyList)*centralityCutList[icen]/100.)
-    ]
-    dN_dy_cut_low = dNdyList[
-        min(len(dNdyList)-1,
-            int(len(dNdyList)*centralityCutList[icen+1]/100.))
-    ]
+    dN_dy_cut_high = dNdyList[int(len(dNdyList)*centralityCutList[icen]/100.)]
+    dN_dy_cut_low = dNdyList[min(
+        len(dNdyList) - 1, int(len(dNdyList)*centralityCutList[icen + 1]/100.))]
 
     if len(dNcutList) == len(centralityCutList):
         dN_dy_cut_high = dNcutList[icen]
-        dN_dy_cut_low = dNcutList[icen+1]
+        dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
@@ -139,11 +139,11 @@ for icen in range(len(centralityCutList) - 1):
     if nev <= 0:
         continue
 
-    cenLabel = (centralityCutList[icen] +
-                centralityCutList[icen+1])/2.*centralityRange
+    cenLabel = (centralityCutList[icen]
+                + centralityCutList[icen + 1])/2.*centralityRange
     print("analysis {}%-{}% nev = {}...".format(
-            centralityCutList[icen]*centralityRange,
-            centralityCutList[icen+1]*centralityRange, nev))
+        centralityCutList[icen]*centralityRange,
+        centralityCutList[icen + 1]*centralityRange, nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
     QnArr1 = []

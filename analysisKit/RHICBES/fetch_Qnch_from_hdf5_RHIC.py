@@ -7,20 +7,37 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "STAR_eta_-0p5_0p5": {"pTmin": 0.2, "pTmax": 2,
-                          "etamin": -0.5, "etamax": 0.5},
-    "STAR_eta_-1_-0p5": {"pTmin": 0.2, "pTmax": 2,
-                         "etamin": -1, "etamax": -0.5},
-    "STAR_eta_0p5_1": {"pTmin": 0.2, "pTmax": 2,
-                       "etamin": 0.5, "etamax": 1},
-    "STAR_eta_-1_1": {"pTmin": 0.2, "pTmax": 2,
-                      "etamin": -1, "etamax": 1},
+    "STAR_eta_-0p5_0p5": {
+        "pTmin": 0.2,
+        "pTmax": 2,
+        "etamin": -0.5,
+        "etamax": 0.5
+    },
+    "STAR_eta_-1_-0p5": {
+        "pTmin": 0.2,
+        "pTmax": 2,
+        "etamin": -1,
+        "etamax": -0.5
+    },
+    "STAR_eta_0p5_1": {
+        "pTmin": 0.2,
+        "pTmax": 2,
+        "etamin": 0.5,
+        "etamax": 1
+    },
+    "STAR_eta_-1_1": {
+        "pTmin": 0.2,
+        "pTmax": 2,
+        "etamin": -1,
+        "etamax": 1
+    },
 }
 
 pidList = [('pi+', '211'), ('pi-', '-211'), ('K+', '321'), ('K-', '-321'),
            ('p', '2212'), ('pbar', '-2212')]
 
 RHICetaRangeList = ['-0.5_0.5', '-1_-0.5', '-3.9_-3.1', '0.5_1', '3.1_3.9']
+
 
 def help_message():
     print("Usage: {0} database_file".format(sys.argv[0]))
@@ -38,24 +55,24 @@ def calcualte_inte_Vn_pT(pT_low, pT_high, data):
     dN_event = data[:, 1]
     totalN_event = data[:, -1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                 np.log(dN_event+1e-30)))
-    totalN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                     np.log(totalN_event+1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
+    totalN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(totalN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     totalN = np.sum(totalN_interp)*dpT/(pT_event[1] - pT_event[0])
     meanpT = (np.sum(dN_interp*pT_inte_array**2.)
-              / np.sum(dN_interp*pT_inte_array))
+              /np.sum(dN_interp*pT_inte_array))
     temp_vn_array = [N, meanpT]
-    for iorder in range(1, NORDER+1):
+    for iorder in range(1, NORDER + 1):
         vn_real_event = data[:, 2*iorder]
-        vn_imag_event = data[:, 2*iorder+1]
+        vn_imag_event = data[:, 2*iorder + 1]
         vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
         Vn_real_inte = (np.sum(vn_real_interp*dN_interp*pT_inte_array)
-                        / np.sum(dN_interp*pT_inte_array))
+                        /np.sum(dN_interp*pT_inte_array))
         Vn_imag_inte = (np.sum(vn_imag_interp*dN_interp*pT_inte_array)
-                        / np.sum(dN_interp*pT_inte_array))
+                        /np.sum(dN_interp*pT_inte_array))
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
     temp_vn_array.append(totalN)
     return temp_vn_array
@@ -73,19 +90,19 @@ def calcualte_inte_Vn_eta(etaMin, etaMax, data):
     ET_event = data[:, 2]
     totalN_event = data[:, -1]
     eta_event = data[:, 0]
-    dN_interp = np.exp(np.interp(eta_inte_array, eta_event,
-                                 np.log(dN_event+1e-30)))
-    totalN_interp = np.exp(np.interp(eta_inte_array, eta_event,
-                                     np.log(totalN_event+1e-30)))
-    ET_interp = np.exp(np.interp(eta_inte_array, eta_event,
-                                 np.log(ET_event + 1e-30)))
+    dN_interp = np.exp(
+        np.interp(eta_inte_array, eta_event, np.log(dN_event + 1e-30)))
+    totalN_interp = np.exp(
+        np.interp(eta_inte_array, eta_event, np.log(totalN_event + 1e-30)))
+    ET_interp = np.exp(
+        np.interp(eta_inte_array, eta_event, np.log(ET_event + 1e-30)))
     N = np.sum(dN_interp)*deta
     totalN = np.sum(totalN_interp)*deta/(eta_event[1] - eta_event[0])
     ET = np.sum(ET_interp)*deta
     temp_vn_array = [N, ET]
-    for iorder in range(1, NORDER+1):
-        vn_real_event = data[:, 2*iorder+1]
-        vn_imag_event = data[:, 2*iorder+2]
+    for iorder in range(1, NORDER + 1):
+        vn_real_event = data[:, 2*iorder + 1]
+        vn_imag_event = data[:, 2*iorder + 2]
         vn_real_interp = np.interp(eta_inte_array, eta_event, vn_real_event)
         vn_imag_interp = np.interp(eta_inte_array, eta_event, vn_imag_event)
         Vn_real_inte = np.sum(vn_real_interp*dN_interp)/np.sum(dN_interp)
@@ -101,7 +118,8 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
         given pT range (pTMin, pTMax) and eta range (etaMin, etaMax)
         for every event in the data
     """
-    npT = 20; nEta = 71
+    npT = 20
+    nEta = 71
     pTArr = np.linspace(0, 3.8, npT)
     dpT = pTArr[1] - pTArr[0]
     pTMinIdx = int((pTMin - 0.)/dpT)
@@ -118,9 +136,9 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
                      *dN_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
     totalN = N*Nevents
     temp_vn_array = [N, meanpT]
-    for iorder in range(1, NORDER+1):
-        Qn_real_event = data[:, 2*iorder+2].reshape(nEta, npT)
-        Qn_imag_event = data[:, 2*iorder+3].reshape(nEta, npT)
+    for iorder in range(1, NORDER + 1):
+        Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
+        Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
         Vn_real_inte = (
             np.sum(Qn_real_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
         Vn_imag_inte = (
@@ -140,11 +158,11 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                 np.log(dN_event+1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = (np.sum(dN_interp*pT_inte_array**2.)
-              / np.sum(dN_interp*pT_inte_array))
+              /np.sum(dN_interp*pT_inte_array))
     res_array = [N, meanpT]
     return res_array
 
@@ -183,10 +201,11 @@ for ievent, event_i in enumerate(eventList):
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         vnInte_data = np.nan_to_num(eventGroup.get(vnInte_filename))
         N_hadronic_events = vnInte_data[-1, 2]
-        Vn_vector = calcualte_inte_Vn_pTeta(
-                    pTetacut['pTmin'], pTetacut['pTmax'],
-                    pTetacut['etamin'], pTetacut['etamax'],
-                    vn_data, N_hadronic_events)
+        Vn_vector = calcualte_inte_Vn_pTeta(pTetacut['pTmin'],
+                                            pTetacut['pTmax'],
+                                            pTetacut['etamin'],
+                                            pTetacut['etamax'], vn_data,
+                                            N_hadronic_events)
         outdata[event_i][expName] = np.array(Vn_vector)
 
 print("nev = {}".format(len(eventList)))
