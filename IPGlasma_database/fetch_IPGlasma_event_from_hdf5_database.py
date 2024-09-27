@@ -12,7 +12,8 @@ def print_help():
     print("{0} database_filename event_id output_type".format(argv[0]))
 
 
-def fecth_an_IPGlasma_event_Tmunu(database_path, time_stamp, event_idx):
+def fecth_an_IPGlasma_event_Tmunu(database_path, event_idx):
+    time_stamp = "0.4"
     print(("fectching an IP-Glasma event Tmunu with "
            + "event id: {} at tau = {} fm from {}".format(event_idx,
                                                           time_stamp,
@@ -48,7 +49,8 @@ def fecth_an_IPGlasma_event_Tmunu(database_path, time_stamp, event_idx):
     return(file_name)
 
 
-def fecth_an_IPGlasma_event(database_path, time_stamp, event_idx):
+def fecth_an_IPGlasma_event(database_path, event_idx):
+    time_stamp = "0.4"
     print(("fectching an IP-Glasma event with "
            + "event id: {} at tau = {} fm from {}".format(event_idx,
                                                           time_stamp,

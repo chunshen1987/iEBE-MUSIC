@@ -160,7 +160,7 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-h5Stat=`ls *.h5`
+h5Stat=`ls *.h5 2>/dev/null`
 
 if [ -z "$h5Stat" ]
 then
@@ -169,7 +169,7 @@ then
 
 """.format(singularityRepoPath, executeScriptName, workFolderPath,
            parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
-           seed, bayesParamFile))
+           seed, bayesParamFile.split('/')[-1]))
     if clusterName == "anvil":
         script.write("""
 
