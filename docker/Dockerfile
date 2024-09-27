@@ -33,7 +33,7 @@ ENV HOME /opt/
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} && \
-    git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC -b EoSGenerator && \
+    git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC -b dev && \
     cd iEBE-MUSIC/codes && \
     ./get_code_packages.sh && \
     ./compile_code_packages.sh && \
