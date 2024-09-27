@@ -116,6 +116,7 @@ ipglasma_dict = {
     'dtau': 0.1,
     'LOutput': 30,
     'sizeOutput': 512,
+    'computeGluonMultiplicity': 0,
     'etaSizeOutput': 1,
     'detaOutput': 0,
     'writeOutputs': 1,
