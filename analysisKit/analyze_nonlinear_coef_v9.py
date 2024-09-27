@@ -10,10 +10,12 @@ def help_message():
     print("Usage: {0} database_file".format(sys.argv[0]))
     exit(0)
 
-Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
-                           60., 70., 80., 90., 100.]
+
+Reg_centrality_cut_list = [
+    0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
+]
 centralityCutList = Reg_centrality_cut_list
-dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
 def calculate_chi_422(vn_data_array1, vn_data_array2):
@@ -38,14 +40,13 @@ def calculate_chi_422(vn_data_array1, vn_data_array2):
 
     # four-particle correlation
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
-    Q2_N4 = (  np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
+    Q2_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
              - np.real(Q4_1*np.conj(Q2_2)*np.conj(Q2_2))
-             - np.real(Q2_1*Q2_1*np.conj(Q4_2))
-             + np.real(Q4_1*np.conj(Q4_2)))
+             - np.real(Q2_1*Q2_1*np.conj(Q4_2)) + np.real(Q4_1*np.conj(Q4_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
-    chi_422_num = (  Q4_1*np.conj(Q2_2)*np.conj(Q2_2) - Q4_1*np.conj(Q4_2)
+    chi_422_num = (Q4_1*np.conj(Q2_2)*np.conj(Q2_2) - Q4_1*np.conj(Q4_2)
                    + Q4_2*np.conj(Q2_1)*np.conj(Q2_1) - Q4_2*np.conj(Q4_1))
 
     num = np.real(np.mean(chi_422_num))/np.mean(N3_weight)
@@ -80,8 +81,7 @@ def calculate_chi_523(vn_data_array1, vn_data_array2):
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q2Q3_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q3_1*np.conj(Q3_2))
                - np.real(Q5_1*np.conj(Q2_2*Q3_2))
-               - np.real(Q2_1*Q3_1*np.conj(Q5_2))
-               + np.real(Q5_1*np.conj(Q5_2)))
+               - np.real(Q2_1*Q3_1*np.conj(Q5_2)) + np.real(Q5_1*np.conj(Q5_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
@@ -91,11 +91,11 @@ def calculate_chi_523(vn_data_array1, vn_data_array2):
     num = np.real(np.mean(chi_523_num))/np.mean(N3_weight)
     den = np.mean(Q2Q3_N4)/np.mean(N4_weight)
     chi_523_mean = num/den
-    return(chi_523_mean)
+    return (chi_523_mean)
 
 
-def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2,
-                                       V4L_1, V4L_2, V5L_1, V5L_2):
+def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2, V4L_1,
+                                       V4L_2, V5L_1, V5L_2):
     """
         This function computes the linear components
         for V6 = V6L + chi_6222 V2^3 + chi_633 V3^2 + chi_624 V2*V4L
@@ -120,13 +120,13 @@ def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2,
     chi_6222_num = V6_1*(np.conj(V2_2)**3) + V6_2*(np.conj(V2_1)**3)
     V2_6 = 2*np.real((V2_1*np.conj(V2_2))**3)
     V32_V23 = (V3_1**2)*(np.conj(V2_2)**3) + (V3_2**2)*(np.conj(V2_1)**3)
-    V2V4L_V23 = (  (V2_1*V4L_1)*(np.conj(V2_2)**3)
-                 + (V2_2*V4L_2)*(np.conj(V2_1)**3))
+    V2V4L_V23 = ((V2_1*V4L_1)*(np.conj(V2_2)**3) + (V2_2*V4L_2)*
+                 (np.conj(V2_1)**3))
 
     chi_633_num = V6_1*(np.conj(V3_2)**2) + V6_2*(np.conj(V3_1)**2)
     V3_4 = 2*np.real((V3_1*np.conj(V3_2))**2)
-    V2V4L_V32 = (  (V2_1*V4L_1)*(np.conj(V3_2)**2)
-                 + (V2_2*V4L_2)*(np.conj(V3_1)**2))
+    V2V4L_V32 = ((V2_1*V4L_1)*(np.conj(V3_2)**2) + (V2_2*V4L_2)*
+                 (np.conj(V3_1)**2))
 
     v624_num = V6_1*(np.conj(V2_2*V4L_2)) + V6_2*(np.conj(V2_1*V4L_1))
     V2V4L_2 = 2*np.real(V2_1*np.conj(V2_2)*V4L_1*np.conj(V4L_2))
@@ -148,26 +148,28 @@ def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2,
 
     array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.cfloat)
 
-    array_rhs = np.array([[den_JK11, den_JK12, den_JK13],
-                          [den_JK21, den_JK22, den_JK23],
-                          [den_JK31, den_JK32, den_JK33],
-                         ], dtype=np.cfloat)
+    array_rhs = np.array([
+        [den_JK11, den_JK12, den_JK13],
+        [den_JK21, den_JK22, den_JK23],
+        [den_JK31, den_JK32, den_JK33],
+    ],
+                         dtype=np.cfloat)
     chi_6 = np.linalg.solve(array_rhs, array_lhs)
     chi_6222_mean = chi_6[0]
     chi_633_mean = chi_6[1]
     chi_624_mean = chi_6[2]
 
-    V6L_1 = (V6_1 - chi_6222_mean*(V2_1**3) - chi_633_mean*(V3_1**2)
-             - chi_624_mean*(V2_1*V4L_1))
-    V6L_2 = (V6_2 - chi_6222_mean*(V2_2**3) - chi_633_mean*(V3_2**2)
-             - chi_624_mean*(V2_2*V4L_2))
+    V6L_1 = (V6_1 - chi_6222_mean*(V2_1**3) - chi_633_mean*
+             (V3_1**2) - chi_624_mean*(V2_1*V4L_1))
+    V6L_2 = (V6_2 - chi_6222_mean*(V2_2**3) - chi_633_mean*
+             (V3_2**2) - chi_624_mean*(V2_2*V4L_2))
 
     chi_7223_num = V7_1*np.conj((V2_2**2)*V3_2) + V7_2*np.conj((V2_1**2)*V3_1)
     V22V3_V22V3 = 2*np.real((V2_1**2)*V3_1*np.conj((V2_2**2)*V3_2))
-    V3V4_V22V3 = (V3_1*V4L_1*np.conj((V2_2**2)*V3_2)
-                  + V3_2*V4L_2*np.conj((V2_1**2)*V3_1))
-    V2V5_V22V3 = (V2_1*V5L_1*np.conj((V2_2**2)*V3_2)
-                  + V2_2*V5L_2*np.conj((V2_1**2)*V3_1))
+    V3V4_V22V3 = (V3_1*V4L_1*np.conj((V2_2**2)*V3_2) + V3_2*V4L_2*np.conj(
+        (V2_1**2)*V3_1))
+    V2V5_V22V3 = (V2_1*V5L_1*np.conj((V2_2**2)*V3_2) + V2_2*V5L_2*np.conj(
+        (V2_1**2)*V3_1))
 
     chi_734_num = V7_1*np.conj(V3_2*V4L_2) + V7_2*np.conj(V3_1*V4L_1)
     V3V4_V3V4 = 2*np.real(V3_1*V4L_1*np.conj(V3_2*V4L_2))
@@ -193,20 +195,22 @@ def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2,
 
     array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.cfloat)
 
-    array_rhs = np.array([[den_JK11, den_JK12, den_JK13],
-                          [den_JK21, den_JK22, den_JK23],
-                          [den_JK31, den_JK32, den_JK33],
-                         ], dtype=np.cfloat)
+    array_rhs = np.array([
+        [den_JK11, den_JK12, den_JK13],
+        [den_JK21, den_JK22, den_JK23],
+        [den_JK31, den_JK32, den_JK33],
+    ],
+                         dtype=np.cfloat)
     chi_7 = np.linalg.solve(array_rhs, array_lhs)
     chi_7223_mean = chi_7[0]
     chi_734_mean = chi_7[1]
     chi_725_mean = chi_7[2]
 
-    V7L_1 = (V7_1 - chi_7223_mean*(V2_1**2*V3_1) - chi_734_mean*(V3_1*V4L_1)
-             - chi_725_mean*(V2_1*V5L_1))
-    V7L_2 = (V7_2 - chi_7223_mean*(V2_2**2*V3_2) - chi_734_mean*(V3_2*V4L_2)
-             - chi_725_mean*(V2_2*V5L_2))
-    return(V6L_1, V6L_2, V7L_1, V7L_2)
+    V7L_1 = (V7_1 - chi_7223_mean*(V2_1**2*V3_1) - chi_734_mean*
+             (V3_1*V4L_1) - chi_725_mean*(V2_1*V5L_1))
+    V7L_2 = (V7_2 - chi_7223_mean*(V2_2**2*V3_2) - chi_734_mean*
+             (V3_2*V4L_2) - chi_725_mean*(V2_2*V5L_2))
+    return (V6L_1, V6L_2, V7L_1, V7L_2)
 
 
 def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
@@ -251,7 +255,7 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
     V5L_2 = V5_2 - chi_523*(V2_2*V3_2)
 
     V6L_1, V6L_2, V7L_1, V7L_2 = calculateNonLinearResponseV67_2sub(
-                vn_data_array1, vn_data_array2, V4L_1, V4L_2, V5L_1, V5L_2)
+        vn_data_array1, vn_data_array2, V4L_1, V4L_2, V5L_1, V5L_2)
 
     conjV333_1 = np.conj(V3_1**3)
     conjV333_2 = np.conj(V3_2**3)
@@ -386,32 +390,38 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
 
         if flag == 0:
             array_lhs = np.array([b1, b2, b3, b4, b5, b6, b7])
-            array_rhs = np.array([[A11, 0, 0, 0, 0, 0, 0],
-                                  [0, A22, 0, 0, 0, 0, 0],
-                                  [0, 0, A33, 0, 0, 0, 0],
-                                  [0, 0, 0, A44, 0, 0, 0],
-                                  [0, 0, 0, 0, A55, 0, 0],
-                                  [0, 0, 0, 0, 0, A66, 0],
-                                  [0, 0, 0, 0, 0, 0, A77],
-                                 ], dtype=np.cfloat)
+            array_rhs = np.array([
+                [A11, 0, 0, 0, 0, 0, 0],
+                [0, A22, 0, 0, 0, 0, 0],
+                [0, 0, A33, 0, 0, 0, 0],
+                [0, 0, 0, A44, 0, 0, 0],
+                [0, 0, 0, 0, A55, 0, 0],
+                [0, 0, 0, 0, 0, A66, 0],
+                [0, 0, 0, 0, 0, 0, A77],
+            ],
+                                 dtype=np.cfloat)
         elif flag == 1:
             array_lhs = np.array([b1, b2, b3, b4, b5, b6, b7])
-            array_rhs = np.array([[A11, A12, A13, A14, A15, A16, A17],
-                                  [A21, A22, A23, A24, A25, A26, A27],
-                                  [A31, A32, A33, A34, A35, A36, A37],
-                                  [A41, A42, A43, A44, A45, A46, A47],
-                                  [A51, A52, A53, A54, A55, A56, A57],
-                                  [A61, A62, A63, A64, A65, A66, A67],
-                                  [A71, A72, A73, A74, A75, A76, A77],
-                                 ], dtype=np.cfloat)
+            array_rhs = np.array([
+                [A11, A12, A13, A14, A15, A16, A17],
+                [A21, A22, A23, A24, A25, A26, A27],
+                [A31, A32, A33, A34, A35, A36, A37],
+                [A41, A42, A43, A44, A45, A46, A47],
+                [A51, A52, A53, A54, A55, A56, A57],
+                [A61, A62, A63, A64, A65, A66, A67],
+                [A71, A72, A73, A74, A75, A76, A77],
+            ],
+                                 dtype=np.cfloat)
         elif flag == 2:
             array_lhs = np.array([b1, b2, b3, b4, b5])
-            array_rhs = np.array([[A11, A12, A13, A14, A15],
-                                  [A21, A22, A23, A24, A25],
-                                  [A31, A32, A33, A34, A35],
-                                  [A41, A42, A43, A44, A45],
-                                  [A51, A52, A53, A54, A55],
-                                 ], dtype=np.cfloat)
+            array_rhs = np.array([
+                [A11, A12, A13, A14, A15],
+                [A21, A22, A23, A24, A25],
+                [A31, A32, A33, A34, A35],
+                [A41, A42, A43, A44, A45],
+                [A51, A52, A53, A54, A55],
+            ],
+                                 dtype=np.cfloat)
         chi_9 = np.linalg.solve(array_rhs, array_lhs)
         chi_9333_JK[iev] = chi_9[0]
         chi_92223_JK[iev] = chi_9[1]
@@ -424,84 +434,79 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
 
     # compute the real part of the response coefficients
     chi_9333_mean = np.mean(np.real(chi_9333_JK))
-    chi_9333_err = np.sqrt((nev - 1.)/nev
-                           *np.sum((np.real(chi_9333_JK) - chi_9333_mean)**2))
+    chi_9333_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_9333_JK) - chi_9333_mean)**2))
     chi_92223_mean = np.mean(np.real(chi_92223_JK))
-    chi_92223_err = np.sqrt((nev - 1.)/nev
-                           *np.sum((np.real(chi_92223_JK) - chi_92223_mean)**2.))
+    chi_92223_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_92223_JK) - chi_92223_mean)**2.))
     chi_9234_mean = np.mean(np.real(chi_9234_JK))
-    chi_9234_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.real(chi_9234_JK) - chi_9234_mean)**2.))
+    chi_9234_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_9234_JK) - chi_9234_mean)**2.))
     chi_9225_mean = np.mean(np.real(chi_9225_JK))
-    chi_9225_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.real(chi_9225_JK) - chi_9225_mean)**2.))
+    chi_9225_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_9225_JK) - chi_9225_mean)**2.))
     chi_945_mean = np.mean(np.real(chi_945_JK))
-    chi_945_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.real(chi_945_JK) - chi_945_mean)**2.))
+    chi_945_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_945_JK) - chi_945_mean)**2.))
     chi_936_mean = np.mean(np.real(chi_936_JK))
-    chi_936_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.real(chi_936_JK) - chi_936_mean)**2.))
+    chi_936_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_936_JK) - chi_936_mean)**2.))
     chi_927_mean = np.mean(np.real(chi_927_JK))
-    chi_927_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.real(chi_927_JK) - chi_927_mean)**2.))
+    chi_927_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_927_JK) - chi_927_mean)**2.))
 
-    results = [chi_9333_mean, chi_9333_err, chi_92223_mean, chi_92223_err,
-               chi_9234_mean, chi_9234_err, chi_9225_mean, chi_9225_err,
-               chi_945_mean, chi_945_err,
-               chi_936_mean, chi_936_err, chi_927_mean, chi_927_err]
+    results = [
+        chi_9333_mean, chi_9333_err, chi_92223_mean, chi_92223_err,
+        chi_9234_mean, chi_9234_err, chi_9225_mean, chi_9225_err, chi_945_mean,
+        chi_945_err, chi_936_mean, chi_936_err, chi_927_mean, chi_927_err
+    ]
 
     # compute sqrt<V9L^2>
-    V9L_1 = (V9_1 - chi_9333_mean*(V3_1**3.)
-             - chi_92223_mean*(V2_1**3*V3_1)
-             - chi_9234_mean*(V2_1*V3_1*V4L_1)
-             - chi_9225_mean*(V2_1*V2_1*V5L_1)
-             - chi_945_mean*(V4L_1*V5L_1)
-             - chi_936_mean*(V3_1*V6L_1)
-             - chi_927_mean*(V2_1*V7L_1))
-    V9L_2 = (V9_2 - chi_9333_mean*(V3_2**3.)
-             - chi_92223_mean*(V2_2**3*V3_2)
-             - chi_9234_mean*(V2_2*V3_2*V4L_2)
-             - chi_9225_mean*(V2_2*V2_2*V5L_2)
-             - chi_945_mean*(V4L_2*V5L_2)
-             - chi_936_mean*(V3_2*V6L_2)
-             - chi_927_mean*(V2_2*V7L_2))
+    V9L_1 = (V9_1 - chi_9333_mean*(V3_1**3.) - chi_92223_mean*
+             (V2_1**3*V3_1) - chi_9234_mean*(V2_1*V3_1*V4L_1) - chi_9225_mean*
+             (V2_1*V2_1*V5L_1) - chi_945_mean*(V4L_1*V5L_1) - chi_936_mean*
+             (V3_1*V6L_1) - chi_927_mean*(V2_1*V7L_1))
+    V9L_2 = (V9_2 - chi_9333_mean*(V3_2**3.) - chi_92223_mean*
+             (V2_2**3*V3_2) - chi_9234_mean*(V2_2*V3_2*V4L_2) - chi_9225_mean*
+             (V2_2*V2_2*V5L_2) - chi_945_mean*(V4L_2*V5L_2) - chi_936_mean*
+             (V3_2*V6L_2) - chi_927_mean*(V2_2*V7L_2))
     v9L_rms = np.nan_to_num(np.sqrt(np.mean(np.real(V9L_1*np.conj(V9L_2)))))
-    v9L_err = np.nan_to_num(np.std(np.real(V9L_1*np.conj(V9L_2)))/np.sqrt(nev)
-                            / (2*v9L_rms))
+    v9L_err = np.nan_to_num(
+        np.std(np.real(V9L_1*np.conj(V9L_2)))/np.sqrt(nev)/(2*v9L_rms))
 
     results += [v9L_rms, v9L_err]
 
     # compute the imaginary part of the response coefficients
     chi_9333_mean = np.mean(np.imag(chi_9333_JK))
-    chi_9333_err = np.sqrt((nev - 1.)/nev
-                           *np.sum((np.imag(chi_9333_JK) - chi_9333_mean)**2))
+    chi_9333_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_9333_JK) - chi_9333_mean)**2))
     chi_92223_mean = np.mean(np.imag(chi_92223_JK))
-    chi_92223_err = np.sqrt((nev - 1.)/nev
-                           *np.sum((np.imag(chi_92223_JK) - chi_92223_mean)**2.))
+    chi_92223_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_92223_JK) - chi_92223_mean)**2.))
     chi_9234_mean = np.mean(np.imag(chi_9234_JK))
-    chi_9234_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.imag(chi_9234_JK) - chi_9234_mean)**2.))
+    chi_9234_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_9234_JK) - chi_9234_mean)**2.))
     chi_9225_mean = np.mean(np.imag(chi_9225_JK))
-    chi_9225_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.imag(chi_9225_JK) - chi_9225_mean)**2.))
+    chi_9225_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_9225_JK) - chi_9225_mean)**2.))
     chi_945_mean = np.mean(np.imag(chi_945_JK))
-    chi_945_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.imag(chi_945_JK) - chi_945_mean)**2.))
+    chi_945_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_945_JK) - chi_945_mean)**2.))
     chi_936_mean = np.mean(np.imag(chi_936_JK))
-    chi_936_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.imag(chi_936_JK) - chi_936_mean)**2.))
+    chi_936_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_936_JK) - chi_936_mean)**2.))
     chi_927_mean = np.mean(np.imag(chi_927_JK))
-    chi_927_err = np.sqrt((nev - 1.)/nev
-                          *np.sum((np.imag(chi_927_JK) - chi_927_mean)**2.))
+    chi_927_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_927_JK) - chi_927_mean)**2.))
 
-    results += [chi_9333_mean, chi_9333_err, chi_92223_mean, chi_92223_err,
-                chi_9234_mean, chi_9234_err, chi_9225_mean, chi_9225_err,
-                chi_945_mean, chi_945_err,
-                chi_936_mean, chi_936_err, chi_927_mean, chi_927_err]
+    results += [
+        chi_9333_mean, chi_9333_err, chi_92223_mean, chi_92223_err,
+        chi_9234_mean, chi_9234_err, chi_9225_mean, chi_9225_err, chi_945_mean,
+        chi_945_err, chi_936_mean, chi_936_err, chi_927_mean, chi_927_err
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileNameV9):
         f = open(outputFileNameV9, 'a')
     else:
@@ -528,37 +533,35 @@ with open(database_file, "rb") as pf:
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
-dNdyList = - np.sort(-np.array(dNdyList))
+dNdyList = -np.sort(-np.array(dNdyList))
 print("Number of good events: {}".format(len(dNdyList)))
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]: continue
+    if centralityCutList[icen + 1] < centralityCutList[icen]:
+        continue
     selected_events_list = []
 
-    dN_dy_cut_high = dNdyList[
-        int(len(dNdyList)*centralityCutList[icen]/100.)
-    ]
-    dN_dy_cut_low  = dNdyList[
-        min(len(dNdyList)-1,
-            int(len(dNdyList)*centralityCutList[icen+1]/100.))
-    ]
+    dN_dy_cut_high = dNdyList[int(len(dNdyList)*centralityCutList[icen]/100.)]
+    dN_dy_cut_low = dNdyList[min(
+        len(dNdyList) - 1, int(len(dNdyList)*centralityCutList[icen + 1]/100.))]
 
     if len(dNcutList) == len(centralityCutList):
         dN_dy_cut_high = dNcutList[icen]
-        dN_dy_cut_low = dNcutList[icen+1]
+        dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
-            and data[event_name]['Nch'] <= dN_dy_cut_high):
+                and data[event_name]['Nch'] <= dN_dy_cut_high):
             selected_events_list.append(event_name)
 
     nev = len(selected_events_list)
-    if nev <= 0: continue
+    if nev <= 0:
+        continue
 
-    cenLabel = (centralityCutList[icen] +
-                centralityCutList[icen+1])/2.
-    print("analysis {}%-{}% nev = {}...".format(
-            centralityCutList[icen], centralityCutList[icen+1], nev))
+    cenLabel = (centralityCutList[icen] + centralityCutList[icen + 1])/2.
+    print("analysis {}%-{}% nev = {}...".format(centralityCutList[icen],
+                                                centralityCutList[icen + 1],
+                                                nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
     QnArr1 = []

@@ -1,6 +1,7 @@
 import sys
 import pickle
 
+
 def fetchShearViscosity1D(database: str, id: int) -> str:
     """
         This function fetches a eta/s(T) with `id` from the database file.

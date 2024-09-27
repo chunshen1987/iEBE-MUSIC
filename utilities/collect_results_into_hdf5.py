@@ -38,8 +38,8 @@ def check_an_event_is_good(event_folder):
     for ifile in required_files_list:
         filename = path.join(event_folder, ifile)
         if filename not in event_file_list:
-            print("event {} is bad, missing {} ...".format(event_folder,
-                                                           filename))
+            print("event {} is bad, missing {} ...".format(
+                event_folder, filename))
             return False
     return True
 
@@ -47,7 +47,7 @@ def check_an_event_is_good(event_folder):
 def zip_results_into_hdf5(results_folder):
     """This function combines all the results into hdf5"""
     final_results_folder = "/".join(
-                            path.abspath(results_folder).split("/")[:-1])
+        path.abspath(results_folder).split("/")[:-1])
     results_name = results_folder.split("/")[-1]
 
     spvnfolder = results_folder
@@ -62,8 +62,10 @@ def zip_results_into_hdf5(results_folder):
         for file_path in file_list:
             file_name = file_path.split("/")[-1]
             dtemp = np.loadtxt(file_path)
-            h5data = gtemp.create_dataset("{0}".format(file_name), data=dtemp,
-                                 compression="gzip", compression_opts=9)
+            h5data = gtemp.create_dataset("{0}".format(file_name),
+                                          data=dtemp,
+                                          compression="gzip",
+                                          compression_opts=9)
             ftemp = open(file_path, "r")
             header_text = str(ftemp.readline())
             ftemp.close()

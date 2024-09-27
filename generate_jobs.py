@@ -20,18 +20,18 @@ centrality_list = [(0.00, 0.15, '0-5', 0.05), (0.15, 0.30, '5-10', 0.05),
                    (0.95, 1.00, '90-100', 0.10)]
 
 known_initial_types = [
-    "IPGlasma", "IPGlasma+KoMPoST",
-    "3DMCGlauber_dynamical", "3DMCGlauber_participants",
-    "3DMCGlauber_consttau"
+    "IPGlasma", "IPGlasma+KoMPoST", "3DMCGlauber_dynamical",
+    "3DMCGlauber_participants", "3DMCGlauber_consttau"
 ]
 
 known_afterburner_types = [
-    "UrQMD", "decay",
+    "UrQMD",
+    "decay",
 ]
 
 support_cluster_list = [
-    'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill",
-    'stampede2', "anvil"
+    'nersc', 'wsugrid', "osg", "local", "guillimin", "mcgill", 'stampede2',
+    "anvil"
 ]
 
 
@@ -148,8 +148,8 @@ rm -fr `pwd`
     script.close()
 
 
-def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes,
-                                  nTaskPerNode, n_threads, walltime):
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
+                                  n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
@@ -244,21 +244,21 @@ def generate_full_job_script(cluster_name, folder_name, database, initial_type,
     script.write("\nseed_add=${1:-0}\n")
 
     try:
-        kompostFileName = para_dict.kompost_dict["KoMPoSTInputs"]["OutputFileTag"]
+        kompostFileName = para_dict.kompost_dict["KoMPoSTInputs"][
+            "OutputFileTag"]
     except:
         kompostFileName = "ekt"
 
     script.write("""
 python3 hydro_plus_UrQMD_driver.py {0:s} {1:s} {2:d} {3:d} {4:d} {5:d} {6} {7} {8} {9} $seed_add {10} {11} {12} {13:s} {14:s}
 """.format(initial_type, database, n_hydro, ev0_id, n_urqmd, n_threads,
-        para_dict.control_dict["save_ipglasma_results"],
-        para_dict.control_dict["save_kompost_results"],
-        para_dict.control_dict["save_hydro_surfaces"],
-        para_dict.control_dict["save_UrQMD_files"],
-        para_dict.control_dict["compute_polarization"],
-        para_dict.control_dict["compute_photon_emission"],
-        enableCheckPoint,afterburner_type,
-        kompostFileName))
+           para_dict.control_dict["save_ipglasma_results"],
+           para_dict.control_dict["save_kompost_results"],
+           para_dict.control_dict["save_hydro_surfaces"],
+           para_dict.control_dict["save_UrQMD_files"],
+           para_dict.control_dict["compute_polarization"],
+           para_dict.control_dict["compute_photon_emission"], enableCheckPoint,
+           afterburner_type, kompostFileName))
     script.write("""
 
 status=$?
@@ -519,7 +519,8 @@ done
 """)
         script.write('    if [ $SubEventId = "0" ]; then\n')
         script.write(
-            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 2>&1 {0}\n".format(logfile))
+            "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 2>&1 {0}\n"
+            .format(logfile))
         script.write("    else\n")
         script.write(
             "        ./hadronic_afterburner_tools.e analyze_flow=0 analyze_HBT=1 particle_monval=211 distinguish_isospin=1 event_buffer_size=500000 >> run.log\n"
@@ -544,7 +545,8 @@ def generate_script_analyze_spvn(folder_name, HBT_flag, logfile):
     cd hadronic_afterburner_toolkit
 """)
     script.write(
-        "   ./hadronic_afterburner_tools.e analyze_HBT=0 2>&1 {0}\n".format(logfile))
+        "   ./hadronic_afterburner_tools.e analyze_HBT=0 2>&1 {0}\n".format(
+            logfile))
     if HBT_flag:
         script.write(
             "    python3 ./average_event_HBT_correlation_function.py .. results\n"
@@ -557,8 +559,8 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           para_dict, afterburner_type,
-                           EOSType: int, EOSId: int, debugFlag: bool):
+                           para_dict, afterburner_type, EOSType: int,
+                           EOSId: int, debugFlag: bool):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -578,7 +580,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         logfile = " >> run.log"
 
     if (initial_condition_database == "self"
-        or initial_condition_type == "fixCentrality"):
+            or initial_condition_type == "fixCentrality"):
         if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
@@ -591,14 +593,16 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                     path.join(event_folder, "3dMCGlauber/{}".format(link_i))),
                                 shell=True)
         elif initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
-            generate_script_ipglasma(
-                    event_folder, n_threads, event_id, logfile)
+            generate_script_ipglasma(event_folder, n_threads, event_id, logfile)
             mkdir(path.join(event_folder, 'ipglasma'))
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
             link_list = [
-                'qs2Adj_vs_Tp_vs_Y_200.in', 'utilities', 'ipglasma',
-                'nucleusConfigurations', 'tables',
+                'qs2Adj_vs_Tp_vs_Y_200.in',
+                'utilities',
+                'ipglasma',
+                'nucleusConfigurations',
+                'tables',
             ]
             for link_i in link_list:
                 subprocess.call("ln -s {0:s} {1:s}".format(
@@ -609,8 +613,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                 shell=True)
 
     generate_full_job_script(cluster_name, event_folder,
-                             initial_condition_database,
-                             initial_condition_type,
+                             initial_condition_database, initial_condition_type,
                              n_hydro_per_job, event_id_offset,
                              n_urqmd_per_hydro, n_threads, para_dict,
                              afterburner_type)
@@ -648,13 +651,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         shutil.move(eosFileName,
                     path.join(event_folder, "MUSIC/EOS/EoS_1DGen.bin"))
         shearFileName = fetchShearViscosity1D(
-            path.join(package_root_path, 'EOS_database', 'eta_s.pkl'),
-            EOSId
-        )
+            path.join(package_root_path, 'EOS_database', 'eta_s.pkl'), EOSId)
         bulkFileName = fetchBulkViscosity1D(
-            path.join(package_root_path, 'EOS_database', 'zeta_s.pkl'),
-            EOSId
-        )
+            path.join(package_root_path, 'EOS_database', 'zeta_s.pkl'), EOSId)
         shutil.move(shearFileName,
                     path.join(event_folder, "MUSIC/EOS/shear_1DGen.bin"))
         shutil.move(bulkFileName,
@@ -664,14 +663,15 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         # photon
         generate_script_photon(event_folder, n_threads, logfile)
         mkdir(path.join(event_folder, 'photonEmission_hydroInterface'))
-        shutil.copyfile(path.join(param_folder, 'photonEmission_hydroInterface',
-                                  'parameters.dat'),
-                        path.join(event_folder, 'photonEmission_hydroInterface',
-                                  'parameters.dat'))
+        shutil.copyfile(
+            path.join(param_folder, 'photonEmission_hydroInterface',
+                      'parameters.dat'),
+            path.join(event_folder, 'photonEmission_hydroInterface',
+                      'parameters.dat'))
         for link_i in ['ph_rates', 'hydro_photonEmission.e']:
-            orgFilePath = path.abspath(path.join(code_path,
-                                       'photonEmission_hydroInterface_code',
-                                       '{}'.format(link_i)))
+            orgFilePath = path.abspath(
+                path.join(code_path, 'photonEmission_hydroInterface_code',
+                          '{}'.format(link_i)))
             trgFilePath = path.join(event_folder,
                                     "photonEmission_hydroInterface",
                                     "{}".format(link_i))
@@ -714,18 +714,18 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                        "calculate_polarization = 0", line)
                         f1.write(line2)
                 f1.close()
-                shutil.copyfile("temp.dat", path.join(sub_event_folder,
-                                                      iSSParamFile))
+                shutil.copyfile("temp.dat",
+                                path.join(sub_event_folder, iSSParamFile))
             if iev == n_urqmd_per_hydro:
                 f1 = open("temp.dat", "w")
                 with open(path.join(sub_event_folder, iSSParamFile)) as f:
                     for line in f:
-                        line2 = re.sub("MC_sampling = 4",
-                                       "MC_sampling = 0", line)
+                        line2 = re.sub("MC_sampling = 4", "MC_sampling = 0",
+                                       line)
                         f1.write(line2)
                 f1.close()
-                shutil.copyfile("temp.dat", path.join(sub_event_folder,
-                                                      iSSParamFile))
+                shutil.copyfile("temp.dat",
+                                path.join(sub_event_folder, iSSParamFile))
             remove("temp.dat")
 
         for link_i in ['iSS_tables', 'iSS.e']:
@@ -744,10 +744,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                 path.join(sub_event_folder, "urqmd/urqmd.e")),
                             shell=True)
         if HBT_flag:
-            shutil.copytree(path.join(code_path,
-                                      'hadronic_afterburner_toolkit'),
-                            path.join(sub_event_folder,
-                                      'hadronic_afterburner_toolkit'))
+            shutil.copytree(
+                path.join(code_path, 'hadronic_afterburner_toolkit'),
+                path.join(sub_event_folder, 'hadronic_afterburner_toolkit'))
             shutil.copyfile(
                 path.join(param_folder,
                           'hadronic_afterburner_toolkit/parameters.dat'),
@@ -1015,7 +1014,7 @@ def main():
     cent_label = "XXX"
     cent_label_pre = cent_label
     if (initial_condition_database == "self"
-        or initial_condition_database == "fixCentrality"):
+            or initial_condition_database == "fixCentrality"):
         print("\U0001F375  Generate initial condition on the fly ... ")
     else:
         initial_condition_database = path.abspath(initial_condition_database)
@@ -1053,9 +1052,8 @@ def main():
                                initial_condition_type, code_package_path,
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
-                               n_urqmd_per_hydro, n_threads,
-                               parameter_dict, afterburner_type,
-                               EOSType, EOSId, debugFlag)
+                               n_urqmd_per_hydro, n_threads, parameter_dict,
+                               afterburner_type, EOSType, EOSId, debugFlag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()
@@ -1108,8 +1106,8 @@ def main():
             n_nodes += 1
 
         generate_Stampede2_mpi_job_script(working_folder_name,
-                                          args.node_type.lower(),
-                                          n_nodes, n_jobs, n_threads, walltime)
+                                          args.node_type.lower(), n_nodes,
+                                          n_jobs, n_threads, walltime)
         script_path = path.join(code_package_path, "utilities")
         shutil.copy(path.join(script_path, 'collect_events.sh'),
                     working_folder_name)

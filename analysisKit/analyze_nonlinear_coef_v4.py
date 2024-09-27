@@ -11,10 +11,11 @@ def help_message():
     exit(0)
 
 
-Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
-                           60., 70., 80., 90., 100.]
+Reg_centrality_cut_list = [
+    0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
+]
 centralityCutList = Reg_centrality_cut_list
-dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
 def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
@@ -62,12 +63,10 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
         array_lhs = np.array([num_JK1, num_JK2], dtype=np.cfloat)
 
         if flag == 1:
-            array_rhs = np.array([[den_JK11, den_JK12],
-                                  [den_JK21, den_JK22]],
+            array_rhs = np.array([[den_JK11, den_JK12], [den_JK21, den_JK22]],
                                  dtype=np.cfloat)
         else:
-            array_rhs = np.array([[den_JK11,        0],
-                                  [0,        den_JK22]],
+            array_rhs = np.array([[den_JK11, 0], [0, den_JK22]],
                                  dtype=np.cfloat)
 
         chi_6 = np.linalg.solve(array_rhs, array_lhs)
@@ -76,11 +75,11 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
 
     # compute the real part of the response coefficients
     chi_422_mean = np.mean(np.real(chi_422_JK))
-    chi_422_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((np.real(chi_422_JK) - chi_422_mean)**2))
+    chi_422_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_422_JK) - chi_422_mean)**2))
     chi_413_mean = np.mean(np.real(chi_413_JK))
-    chi_413_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((np.real(chi_413_JK) - chi_413_mean)**2.))
+    chi_413_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.real(chi_413_JK) - chi_413_mean)**2.))
     results = [chi_422_mean, chi_422_err, chi_413_mean, chi_413_err]
 
     # compute sqrt<V4L^2>
@@ -92,16 +91,15 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
 
     # compute the imaginary part of the response coefficients
     chi_422_mean = np.mean(np.imag(chi_422_JK))
-    chi_422_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((np.imag(chi_422_JK) - chi_422_mean)**2))
+    chi_422_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_422_JK) - chi_422_mean)**2))
     chi_413_mean = np.mean(np.imag(chi_413_JK))
-    chi_413_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((np.imag(chi_413_JK) - chi_413_mean)**2.))
+    chi_413_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (np.imag(chi_413_JK) - chi_413_mean)**2.))
     results += [chi_422_mean, chi_422_err, chi_413_mean, chi_413_err]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileNameV4):
         f = open(outputFileNameV4, 'a')
     else:
@@ -126,25 +124,21 @@ with open(database_file, "rb") as pf:
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
-dNdyList = - np.sort(-np.array(dNdyList))
+dNdyList = -np.sort(-np.array(dNdyList))
 print("Number of good events: {}".format(len(dNdyList)))
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]:
+    if centralityCutList[icen + 1] < centralityCutList[icen]:
         continue
     selected_events_list = []
 
-    dN_dy_cut_high = dNdyList[
-        int(len(dNdyList)*centralityCutList[icen]/100.)
-    ]
-    dN_dy_cut_low = dNdyList[
-        min(len(dNdyList)-1,
-            int(len(dNdyList)*centralityCutList[icen+1]/100.))
-    ]
+    dN_dy_cut_high = dNdyList[int(len(dNdyList)*centralityCutList[icen]/100.)]
+    dN_dy_cut_low = dNdyList[min(
+        len(dNdyList) - 1, int(len(dNdyList)*centralityCutList[icen + 1]/100.))]
 
     if len(dNcutList) == len(centralityCutList):
         dN_dy_cut_high = dNcutList[icen]
-        dN_dy_cut_low = dNcutList[icen+1]
+        dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
@@ -155,10 +149,10 @@ for icen in range(len(centralityCutList) - 1):
     if nev <= 0:
         continue
 
-    cenLabel = (centralityCutList[icen] +
-                centralityCutList[icen+1])/2.
-    print("analysis {}%-{}% nev = {}...".format(
-            centralityCutList[icen], centralityCutList[icen+1], nev))
+    cenLabel = (centralityCutList[icen] + centralityCutList[icen + 1])/2.
+    print("analysis {}%-{}% nev = {}...".format(centralityCutList[icen],
+                                                centralityCutList[icen + 1],
+                                                nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
     QnArr1 = []

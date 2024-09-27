@@ -6,9 +6,24 @@ import numpy as np
 
 NORDER = 9
 kinematicCutsDict = {
-    "ALICE": {"pTmin": 0.2, "pTmax": 3.0, "etamin": -0.8, "etamax": 0.8},
-    "CMS": {"pTmin": 0.3, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
-    "ATLAS": {"pTmin": 0.5, "pTmax": 3.0, "etamin": -0.5, "etamax": 0.5},
+    "ALICE": {
+        "pTmin": 0.2,
+        "pTmax": 3.0,
+        "etamin": -0.8,
+        "etamax": 0.8
+    },
+    "CMS": {
+        "pTmin": 0.3,
+        "pTmax": 3.0,
+        "etamin": -0.5,
+        "etamax": 0.5
+    },
+    "ATLAS": {
+        "pTmin": 0.5,
+        "pTmax": 3.0,
+        "etamin": -0.5,
+        "etamax": 0.5
+    },
 }
 
 
@@ -27,23 +42,23 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                 np.log(dN_event+1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     temp_vn_array = [N, meanpT]
-    for iorder in range(1, NORDER+1):
+    for iorder in range(1, NORDER + 1):
         vn_real_event = data[:, 2*iorder]
-        vn_imag_event = data[:, 2*iorder+1]
+        vn_imag_event = data[:, 2*iorder + 1]
         vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
         Qn_real_inte = 2.*np.pi*np.sum(
-                    vn_real_interp*dN_interp*pT_inte_array)*dpT
+            vn_real_interp*dN_interp*pT_inte_array)*dpT
         Qn_imag_inte = 2.*np.pi*np.sum(
-                    vn_imag_interp*dN_interp*pT_inte_array)*dpT
+            vn_imag_interp*dN_interp*pT_inte_array)*dpT
         temp_vn_array.append(Qn_real_inte)
         temp_vn_array.append(Qn_imag_inte)
-    return(temp_vn_array)
+    return (temp_vn_array)
 
 
 def calcualte_yield_and_meanpT(pT_low, pT_high, data):
@@ -56,12 +71,12 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                 np.log(dN_event+1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     res_array = [N, meanpT]
-    return(res_array)
+    return (res_array)
 
 
 try:
@@ -75,7 +90,8 @@ eventList = list(h5_data.keys())
 outFileList = []
 for expName in kinematicCutsDict:
     outFile = open("Qn_vectors_{}.txt".format(expName), "w")
-    outFile.write("# Nch  <pT>(GeV)  Qn_real  Qn_imag (n=0,{})\n".format(NORDER))
+    outFile.write(
+        "# Nch  <pT>(GeV)  Qn_real  Qn_imag (n=0,{})\n".format(NORDER))
     outFileList.append(outFile)
 for ievent, event_i in enumerate(eventList):
     if ievent % 100 == 0:
@@ -89,7 +105,7 @@ for ievent, event_i in enumerate(eventList):
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         vn_filename = 'particle_9999_vndata_diff_eta_{}_{}.dat'.format(
-                                        pTetacut["etamin"], pTetacut["etamax"])
+            pTetacut["etamin"], pTetacut["etamax"])
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         Qn_vector += calcualte_inte_Qn(pTetacut["pTmin"], pTetacut["pTmax"],
                                        vn_data)

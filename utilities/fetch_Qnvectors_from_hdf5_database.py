@@ -22,19 +22,19 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event+1e-30)))
+    dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event + 1e-30)))
     N = 2.*pi*sum(dN_interp*pT_inte_array)*dpT
     temp_vn_array = [N + 1j*0.0]
     for iorder in range(1, n_order):
         vn_real_event = data[:, 2*iorder]
-        vn_imag_event = data[:, 2*iorder+1]
+        vn_imag_event = data[:, 2*iorder + 1]
         vn_real_interp = interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = interp(pT_inte_array, pT_event, vn_imag_event)
         Qn_real_inte = 2.*pi*sum(vn_real_interp*dN_interp*pT_inte_array)*dpT
         Qn_imag_inte = 2.*pi*sum(vn_imag_interp*dN_interp*pT_inte_array)*dpT
         Qn_inte = Qn_real_inte + 1j*Qn_imag_inte
         temp_vn_array.append(Qn_inte)
-    return(temp_vn_array)
+    return (temp_vn_array)
 
 
 def calcualte_yield_and_meanpT(pT_low, pT_high, data, pid):
@@ -47,11 +47,11 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data, pid):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event+1e-30)))
+    dN_interp = exp(interp(pT_inte_array, pT_event, log(dN_event + 1e-30)))
     N = 2.*pi*sum(dN_interp*pT_inte_array)*dpT
     meanpT = sum(dN_interp*pT_inte_array**2.)/sum(dN_interp*pT_inte_array)
     res_array = [pid, N, meanpT]
-    return(res_array)
+    return (res_array)
 
 
 try:
@@ -77,21 +77,28 @@ output = []
 for iorder in range(n_order):
     vn_real = real(Qn_vector[iorder]/Qn_vector[0])
     vn_imag = imag(Qn_vector[iorder]/Qn_vector[0])
-    temp = [iorder, real(Qn_vector[iorder]), imag(Qn_vector[iorder]),
-            vn_real, vn_imag, sqrt(vn_real**2. + vn_imag**2.),
-            arctan2(vn_imag, vn_real)/(float(iorder) + 1e-15)]
+    temp = [
+        iorder,
+        real(Qn_vector[iorder]),
+        imag(Qn_vector[iorder]), vn_real, vn_imag,
+        sqrt(vn_real**2. + vn_imag**2.),
+        arctan2(vn_imag, vn_real)/(float(iorder) + 1e-15)
+    ]
     output.append(temp)
-savetxt("Qn_vectors_{}.dat".format(event_id), output,
+savetxt("Qn_vectors_{}.dat".format(event_id),
+        output,
         fmt="%d  " + "%.4e  "*6,
         header="n  Qn_real  Qn_imag  vn_real  vn_imag  vn_mag  psi_n")
 
-particle_list = ['particle_9999_vndata_diff_eta_-0.5_0.5.dat',
-                 'particle_211_vndata_diff_y_-0.5_0.5.dat',
-                 'particle_-211_vndata_diff_y_-0.5_0.5.dat',
-                 'particle_321_vndata_diff_y_-0.5_0.5.dat',
-                 'particle_-321_vndata_diff_y_-0.5_0.5.dat',
-                 'particle_2212_vndata_diff_y_-0.5_0.5.dat',
-                 'particle_-2212_vndata_diff_y_-0.5_0.5.dat']
+particle_list = [
+    'particle_9999_vndata_diff_eta_-0.5_0.5.dat',
+    'particle_211_vndata_diff_y_-0.5_0.5.dat',
+    'particle_-211_vndata_diff_y_-0.5_0.5.dat',
+    'particle_321_vndata_diff_y_-0.5_0.5.dat',
+    'particle_-321_vndata_diff_y_-0.5_0.5.dat',
+    'particle_2212_vndata_diff_y_-0.5_0.5.dat',
+    'particle_-2212_vndata_diff_y_-0.5_0.5.dat'
+]
 pid_list = [9999, 211, -211, 321, -321, 2212, -2212]
 res_arr = []
 for ipart, filename in enumerate(particle_list):
@@ -101,8 +108,10 @@ for ipart, filename in enumerate(particle_list):
     # no pT cut on particle yield and mean-pT
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data, pid_list[ipart])
     res_arr.append(dN_vector)
-savetxt("particle_yield_and_meanpT_{}.dat".format(event_id), array(res_arr),
-        fmt="%d  " + "%.4e  "*2, header="pid  dN/dy  <pT> (GeV)")
+savetxt("particle_yield_and_meanpT_{}.dat".format(event_id),
+        array(res_arr),
+        fmt="%d  " + "%.4e  "*2,
+        header="pid  dN/dy  <pT> (GeV)")
 
 fileList = list(h5_group.keys())
 for fileName in fileList:

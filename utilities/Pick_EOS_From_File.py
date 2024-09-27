@@ -1,6 +1,7 @@
 import sys
 import pickle
 
+
 def fetch_an_EOS(database: str, id: int) -> str:
     """
         This function fetch an EoS with `id` from the database file.
@@ -26,6 +27,7 @@ def fetch_an_EOS(database: str, id: int) -> str:
         f.write(data.tobytes())
 
     return eosFileName
+
 
 if __name__ == "__main__":
     try:

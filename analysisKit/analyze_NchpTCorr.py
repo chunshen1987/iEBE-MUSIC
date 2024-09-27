@@ -13,7 +13,7 @@ def help_message():
 
 centralityRange = 1.
 centralityCutList = [0, 5]
-dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
 def computeJKMeanandErr(dataArr):
@@ -38,8 +38,8 @@ def calculate_NchpTCorr(NchArr, meanpTArr) -> None:
     NchErr = np.zeros(nBins)
     nevArr = []
     for ibin in range(nBins):
-        idx = ((normalizedNchArr >= NchBins[ibin])
-               & (normalizedNchArr < NchBins[ibin+1]))
+        idx = ((normalizedNchArr >= NchBins[ibin]) &
+               (normalizedNchArr < NchBins[ibin + 1]))
         nev = len(normalizedNchArr[idx])
         nevArr.append(nev)
         if nev > 1:
@@ -68,25 +68,21 @@ with open(database_file, "rb") as pf:
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
-dNdyList = - np.sort(-np.array(dNdyList))
+dNdyList = -np.sort(-np.array(dNdyList))
 print(f"Number of good events: {len(dNdyList)}")
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]:
+    if centralityCutList[icen + 1] < centralityCutList[icen]:
         continue
     selected_events_list = []
 
-    dN_dy_cut_high = dNdyList[
-        int(len(dNdyList)*centralityCutList[icen]/100.)
-    ]
-    dN_dy_cut_low = dNdyList[
-        min(len(dNdyList)-1,
-            int(len(dNdyList)*centralityCutList[icen+1]/100.))
-    ]
+    dN_dy_cut_high = dNdyList[int(len(dNdyList)*centralityCutList[icen]/100.)]
+    dN_dy_cut_low = dNdyList[min(
+        len(dNdyList) - 1, int(len(dNdyList)*centralityCutList[icen + 1]/100.))]
 
     if len(dNcutList) == len(centralityCutList):
         dN_dy_cut_high = dNcutList[icen]
-        dN_dy_cut_low = dNcutList[icen+1]
+        dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
@@ -97,11 +93,11 @@ for icen in range(len(centralityCutList) - 1):
     if nev <= 0:
         continue
 
-    cenLabel = (centralityCutList[icen] +
-                centralityCutList[icen+1])/2.*centralityRange
+    cenLabel = (centralityCutList[icen]
+                + centralityCutList[icen + 1])/2.*centralityRange
     print("analysis {}%-{}% nev = {}...".format(
-            centralityCutList[icen]*centralityRange,
-            centralityCutList[icen+1]*centralityRange, nev))
+        centralityCutList[icen]*centralityRange,
+        centralityCutList[icen + 1]*centralityRange, nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
     NchArr = []
