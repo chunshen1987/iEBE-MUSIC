@@ -117,6 +117,7 @@ iSS
 osc2u
 urqmd
 playground
+EOS_database/*.pkl
 
 # Sphinx
 docs/SphinxDoc/_build/
