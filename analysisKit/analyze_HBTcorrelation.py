@@ -186,11 +186,11 @@ for icen in range(len(centralityCutList) - 1):
             sigma_num = sigma_num/nev - num**2
             sigma_denorm = sigma_denorm/nev - denorm**2
 
-            correlation = num/(denorm + 1e-15)
-            correlation_err = (abs(correlation)
-                               *np.sqrt(sigma_num/(num + 1e-15)**2.
-                                        + sigma_denorm/(denorm + 1e-15)**2.)
-                               /np.sqrt(nev))
+            correlation = num/(denorm + EPS)
+            correlation_err = (
+                abs(correlation)
+                *np.sqrt(sigma_num/(num + EPS)**2. + sigma_denorm/
+                         (denorm + EPS)**2.)/np.sqrt(nev) + EPS)
             avgCorr[:, 0] = correlation
             avgCorr[:, 1] = correlation_err
 
