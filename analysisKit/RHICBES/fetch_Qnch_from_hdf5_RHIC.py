@@ -6,6 +6,12 @@ import pickle
 import numpy as np
 
 NORDER = 9
+
+weakFDFlag = True
+weakString = ""
+if weakFDFlag:
+    weakString = "_weakFD"
+
 kinematicCutsDict = {
     "STAR_eta_-0p5_0p5": {
         "pTmin": 0.2,
@@ -183,19 +189,19 @@ for ievent, event_i in enumerate(eventList):
             event_i, database_file))
     eventGroup = h5_data.get(event_i)
     outdata[event_i] = {}
-    vn_filename = "particle_9999_vndata_diff_eta_-0.5_0.5.dat"
+    vn_filename = f"particle_9999_vndata_diff_eta_-0.5_0.5{weakString}.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
     outdata[event_i]["Nch"] = dN_vector[0]
     outdata[event_i]["mean_pT_ch"] = dN_vector[1]
     fileList = list(eventGroup.keys())
     for pidName, pid in pidList:
-        vn_filename = "particle_{}_vndata_diff_y_-0.5_0.5.dat".format(pid)
+        vn_filename = f"particle_{pid}_vndata_diff_y_-0.5_0.5{weakString}.dat"
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
         outdata[event_i]["{}_dNdy_meanpT".format(pidName)] = dN_vector
-    vn_filename = 'particle_9999_pTeta_distribution.dat'
-    vnInte_filename = 'particle_9999_vndata_eta_-0.5_0.5.dat'
+    vn_filename = f'particle_9999_pTeta_distribution{weakString}.dat'
+    vnInte_filename = f'particle_9999_vndata_eta_-0.5_0.5{weakString}.dat'
     for exp_i, expName in enumerate(kinematicCutsDict):
         pTetacut = kinematicCutsDict[expName]
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
@@ -209,7 +215,7 @@ for ievent, event_i in enumerate(eventList):
         outdata[event_i][expName] = np.array(Vn_vector)
 
 print("nev = {}".format(len(eventList)))
-with open('QnVectors.pickle', 'wb') as pf:
+with open(f'QnVectors{weakString}.pickle', 'wb') as pf:
     pickle.dump(outdata, pf)
 
 h5_data.close()
