@@ -84,7 +84,7 @@ def calcualte_inte_Vn_pT(pT_low, pT_high, data):
     return temp_vn_array
 
 
-def calcualte_inte_Vn_eta(etaMin, etaMax, data):
+def calcualte_inte_Vn_eta(etaMin, etaMax, data, vnFlag=True):
     """
         this function calculates the eta-integrated vn in a
         given eta range (etaMin, etaMax) for every event in the data
@@ -106,15 +106,16 @@ def calcualte_inte_Vn_eta(etaMin, etaMax, data):
     totalN = np.sum(totalN_interp)*deta/(eta_event[1] - eta_event[0])
     ET = np.sum(ET_interp)*deta
     temp_vn_array = [N, ET]
-    for iorder in range(1, NORDER + 1):
-        vn_real_event = data[:, 2*iorder + 1]
-        vn_imag_event = data[:, 2*iorder + 2]
-        vn_real_interp = np.interp(eta_inte_array, eta_event, vn_real_event)
-        vn_imag_interp = np.interp(eta_inte_array, eta_event, vn_imag_event)
-        Vn_real_inte = np.sum(vn_real_interp*dN_interp)/np.sum(dN_interp)
-        Vn_imag_inte = np.sum(vn_imag_interp*dN_interp)/np.sum(dN_interp)
-        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
-    temp_vn_array.append(totalN)
+    if vnFlag:
+        for iorder in range(1, NORDER + 1):
+            vn_real_event = data[:, 2*iorder + 1]
+            vn_imag_event = data[:, 2*iorder + 2]
+            vn_real_interp = np.interp(eta_inte_array, eta_event, vn_real_event)
+            vn_imag_interp = np.interp(eta_inte_array, eta_event, vn_imag_event)
+            Vn_real_inte = np.sum(vn_real_interp*dN_interp)/np.sum(dN_interp)
+            Vn_imag_inte = np.sum(vn_imag_interp*dN_interp)/np.sum(dN_interp)
+            temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+        temp_vn_array.append(totalN)
     return temp_vn_array
 
 
@@ -194,6 +195,13 @@ for ievent, event_i in enumerate(eventList):
     dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
     outdata[event_i]["Nch"] = dN_vector[0]
     outdata[event_i]["mean_pT_ch"] = dN_vector[1]
+
+    # compute dET/deta
+    vn_filename = f"particle_99999_dNdeta_pT_0_4{weakString}.dat"
+    vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+    dN_vector = calcualte_inte_Vn_eta(-0.5, 0.5, vn_data, vnFlag=False)
+    outdata[event_i]["ET"] = dN_vector[1]
+
     fileList = list(eventGroup.keys())
     for pidName, pid in pidList:
         vn_filename = f"particle_{pid}_vndata_diff_y_-0.5_0.5{weakString}.dat"
