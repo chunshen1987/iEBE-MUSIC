@@ -5,12 +5,17 @@ import sys
 import pickle
 import numpy as np
 
+EPS = 1e-15
+
 NORDER = 9
 
 weakFDFlag = True
 weakString = ""
 if weakFDFlag:
     weakString = "_weakFD"
+
+pTdiffFlag = True
+etadiffFlag = True
 
 kinematicCutsDict = {
     "STAR_eta_-0p5_0p5": {
@@ -93,7 +98,7 @@ def calcualte_inte_Vn_eta(etaMin, etaMax, data, vnFlag=True):
     eta_inte_array = np.linspace(etaMin, etaMax, nEta)
     deta = eta_inte_array[1] - eta_inte_array[0]
     dN_event = data[:, 1]
-    ET_event = data[:, 2]
+    ET_event = data[:, -2]
     totalN_event = data[:, -1]
     eta_event = data[:, 0]
     dN_interp = np.exp(
@@ -151,6 +156,38 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
         Vn_imag_inte = (
             np.sum(Qn_imag_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+    temp_vn_array.append(totalN)
+    return temp_vn_array
+
+
+def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int):
+    """
+        this function calculates the pT-integrated vn(eta) in a
+        given pT range (pTMin, pTMax) for every event in the data
+    """
+    npT = 20
+    nEta = 71
+    pTArr = np.linspace(0, 3.8, npT)
+    dpT = pTArr[1] - pTArr[0]
+    pTMinIdx = int((pTMin - 0.)/dpT)
+    pTMaxIdx = min(npT, int((pTMax - 0.)/dpT) + 1)
+    etaArr = np.linspace(-7, 7, nEta)
+    deta = etaArr[1] - etaArr[0]
+
+    pT_event = data[:, 1].reshape(nEta, npT)
+    dN_event = data[:, 2].reshape(nEta, npT)
+    N = np.sum(dN_event[:, pTMinIdx:pTMaxIdx], axis=1) + EPS
+    meanpT = (np.sum(
+        pT_event[:, pTMinIdx:pTMaxIdx]*dN_event[:, pTMinIdx:pTMaxIdx], axis=1)
+              /N)
+    totalN = N*Nevents
+    temp_vn_array = [N, meanpT]  # dN/deta, <pT>(eta)
+    for iorder in range(1, NORDER + 1):
+        Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
+        Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
+        Vn_real_inte = (np.sum(Qn_real_event[:, pTMinIdx:pTMaxIdx], axis=1)/N)
+        Vn_imag_inte = (np.sum(Qn_imag_event[:, pTMinIdx:pTMaxIdx], axis=1)/N)
+        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)  # Vn(eta)
     temp_vn_array.append(totalN)
     return temp_vn_array
 
@@ -221,6 +258,39 @@ for ievent, event_i in enumerate(eventList):
                                             pTetacut['etamax'], vn_data,
                                             N_hadronic_events)
         outdata[event_i][expName] = np.array(Vn_vector)
+    if pTdiffFlag:
+        for pidName, pid in pidList:
+            if pid == "9999":
+                vn_filename = (
+                    f"particle_9999_vndata_diff_eta_-0.5_0.5{weakString}.dat")
+            else:
+                vn_filename = (
+                    f"particle_{pid}_vndata_diff_y_-0.5_0.5{weakString}.dat")
+            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+            # dN/(2pi pT dpT dy)
+            outdata[event_i]["{}_sp".format(pidName)] = vn_data[:, 1]
+            # v2(pT)
+            outdata[event_i]["{}_v2pT".format(pidName)] = (vn_data[:, 4]
+                                                           + 1j*vn_data[:, 5])
+            # v3(pT)
+            outdata[event_i]["{}_v3pT".format(pidName)] = (vn_data[:, 6]
+                                                           + 1j*vn_data[:, 7])
+            # v4(pT)
+            outdata[event_i]["{}_v4pT".format(pidName)] = (vn_data[:, 8]
+                                                           + 1j*vn_data[:, 9])
+    if etadiffFlag:
+        vn_filename = f'particle_9999_pTeta_distribution{weakString}.dat'
+        vnInte_filename = f'particle_9999_vndata_eta_-0.5_0.5{weakString}.dat'
+        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+        vnInte_data = np.nan_to_num(eventGroup.get(vnInte_filename))
+        N_hadronic_events = vnInte_data[-1, 2]
+        Vn_vector = calcualte_inte_Vneta_pTeta(0.2, 2.0, vn_data,
+                                               N_hadronic_events)
+        outdata[event_i]["chVneta_pT_0p2_2"] = np.array(Vn_vector)
+        vn_filename = f"particle_99999_dNdeta_pT_0_4{weakString}.dat"
+        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+        outdata[event_i]["dET/deta"] = vn_data[:, -2]
+        outdata[event_i]["etaArr"] = vn_data[:, 0]
 
 print("nev = {}".format(len(eventList)))
 with open(f'QnVectors{weakString}.pickle', 'wb') as pf:
