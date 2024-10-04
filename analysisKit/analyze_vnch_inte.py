@@ -841,6 +841,33 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2, outputFileName_vn4,
     return
 
 
+def calcualte_vn_2_no_rap_gap(vn_data_array, outputFileName, cenLabel):
+    """
+        this function computes vn{2} and its stat. err.
+    """
+    nev = len(vn_data_array[:, 0])
+    dN = np.real(vn_data_array[:, -1])
+    dN = dN.reshape(len(dN), 1)
+    Qn_array = dN*vn_data_array[:, 2:-1]
+
+    corr = (Qn_array*np.conj(Qn_array) - dN)/(dN*(dN - 1))
+    vn_2 = np.nan_to_num(np.sqrt(np.real(np.mean(corr, 0))))
+    vn_2_err = np.nan_to_num(np.std(np.real(corr), 0)/np.sqrt(nev)/2./vn_2)
+    dN_mean = np.real(np.mean(vn_data_array[:, 0]))/2.
+    dN_err = np.std(vn_data_array[:, 0])/(2.*np.sqrt(nev))
+    if path.isfile(outputFileName):
+        f = open(outputFileName, 'a')
+    else:
+        f = open(outputFileName, 'w')
+        f.write("# cen  Nch  vn{2}  vn{2}_err (n = 1-9)\n")
+    f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
+    for i in range(len(vn_2)):
+        f.write("  {:.5e}  {:.5e}".format(vn_2[i], vn_2_err[i]))
+    f.write("\n")
+    f.close()
+    return
+
+
 def calcualte_vn_2_with_gap(vn_data_array_sub1, vn_data_array_sub2,
                             outputFileName, cenLabel):
     """
@@ -923,7 +950,6 @@ for icen in range(len(centralityCutList) - 1):
     QnArr3 = []
     piddNArr = []
     pidmeanpTArr = []
-    Ngluons = []
     for event_name in selected_events_list:
         Ngluons.append(data[event_name]['NgluonEst'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
@@ -939,8 +965,6 @@ for icen in range(len(centralityCutList) - 1):
             meanpTtmp.append(tmp[1])
         piddNArr.append(dNtmp)
         pidmeanpTArr.append(meanpTtmp)
-    Ngluons = np.array(Ngluons)
-    print(f"Ngluons = {Ngluons.min():.2f} - {Ngluons.max():.2f}")
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)
@@ -954,10 +978,10 @@ for icen in range(len(centralityCutList) - 1):
                       cenLabel)
     calculate_pid_dN(piddNArr, "pid_dN.dat", cenLabel)
     calculate_pid_meanpT(pidmeanpTArr, "pid_meanpT.dat", cenLabel)
-    calculateNonLinearResponseV2_2sub(QnArr2, QnArr3, "nonLinearV2_2sub.dat",
-                                      cenLabel)
-    calculateNonLinearResponseV3_2sub(QnArr2, QnArr3, "nonLinearV3_2sub.dat",
-                                      cenLabel)
+    #calculateNonLinearResponseV2_2sub(QnArr2, QnArr3, "nonLinearV2_2sub.dat",
+    #                                  cenLabel)
+    #calculateNonLinearResponseV3_2sub(QnArr2, QnArr3, "nonLinearV3_2sub.dat",
+    #                                  cenLabel)
     calculateNonLinearResponseV4_2sub(QnArr2, QnArr3, "nonLinearV4_2sub.dat",
                                       cenLabel)
     calculateNonLinearResponseV5_2sub(QnArr2, QnArr3, "nonLinearV5_2sub.dat",
