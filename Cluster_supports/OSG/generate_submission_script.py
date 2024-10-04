@@ -68,7 +68,7 @@ max_idle = 1000
 periodic_remove = (ExitCode == 73)
 
 # auto release hold jobs if they are caused by data transfer issues on OSG
-periodic_release = (HoldReasonCode == 13 && (time() - EnteredCurrentStatus) > 1200 )
+periodic_release = ((HoldReasonCode == 13 || HoldReasonCode == 26) && (time() - EnteredCurrentStatus) > 1200 )
 
 checkpoint_exit_code = 85
 
