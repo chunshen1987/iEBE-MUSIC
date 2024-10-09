@@ -4,6 +4,7 @@ import h5py
 import sys
 import pickle
 import numpy as np
+from scipy.interpolate import RegularGridInterpolator
 
 EPS = 1e-15
 
@@ -19,29 +20,59 @@ pTdiffFlag = True
 etadiffFlag = True
 
 kinematicCutsDict = {
-    "STAR_eta_-0p5_0p5": {
+    "STAR_eta_-0p5_0p5_pT_0p2_4": {
+        "pTmin": 0.2,
+        "pTmax": 4,
+        "etamin": -0.5,
+        "etamax": 0.5
+    },
+    "STAR_eta_-1_-0p5_pT_0p2_4": {
+        "pTmin": 0.2,
+        "pTmax": 4,
+        "etamin": -1,
+        "etamax": -0.5
+    },
+    "STAR_eta_0p5_1_pT_0p2_4": {
+        "pTmin": 0.2,
+        "pTmax": 4,
+        "etamin": 0.5,
+        "etamax": 1
+    },
+    "STAR_eta_-1_1_pT_0p2_4": {
+        "pTmin": 0.2,
+        "pTmax": 4,
+        "etamin": -1,
+        "etamax": 1
+    },
+    "STAR_eta_-0p5_0p5_pT_0p2_2": {
         "pTmin": 0.2,
         "pTmax": 2,
         "etamin": -0.5,
         "etamax": 0.5
     },
-    "STAR_eta_-1_-0p5": {
+    "STAR_eta_-1_-0p5_pT_0p2_2": {
         "pTmin": 0.2,
         "pTmax": 2,
         "etamin": -1,
         "etamax": -0.5
     },
-    "STAR_eta_0p5_1": {
+    "STAR_eta_0p5_1_pT_0p2_2": {
         "pTmin": 0.2,
         "pTmax": 2,
         "etamin": 0.5,
         "etamax": 1
     },
-    "STAR_eta_-1_1": {
+    "STAR_eta_-0p5_0_pT_0p2_2": {
         "pTmin": 0.2,
         "pTmax": 2,
-        "etamin": -1,
-        "etamax": 1
+        "etamin": -0.5,
+        "etamax": 0
+    },
+    "STAR_eta_0_0p5_pT_0p2_2": {
+        "pTmin": 0.2,
+        "pTmax": 2,
+        "etamin": 0,
+        "etamax": 0.5
     },
 }
 
@@ -139,34 +170,43 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
     npT = 20
     nEta = 71
     pTArr = np.linspace(0, 3.8, npT)
-    dpT = pTArr[1] - pTArr[0]
-    pTMinIdx = int((pTMin - 0.)/dpT)
-    pTMaxIdx = min(npT, int((pTMax - 0.)/dpT) + 1)
     etaArr = np.linspace(-7, 7, nEta)
-    deta = etaArr[1] - etaArr[0]
-    etaMinIdx = max(0, int((etaMin - etaArr[0])/deta))
-    etaMaxIdx = min(nEta, int((etaMax - etaArr[0])/deta) + 1)
+
+    pTInterpArr = np.linspace(pTMin, pTMax, npT)
+    etaInterpArr = np.linspace(etaMin, etaMax, nEta)
+    dpT = (pTInterpArr[1] - pTInterpArr[0])/(pTArr[1] - pTArr[0])
+    deta = (etaInterpArr[1] - etaInterpArr[0])/(etaArr[1] - etaArr[0])
+    etaInterpMesh, pTInterpMesh = np.meshgrid(etaInterpArr, pTInterpArr,
+                                              indexing='ij')
 
     pT_event = data[:, 1].reshape(nEta, npT)
     dN_event = data[:, 2].reshape(nEta, npT)
-    N = np.sum(dN_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])
-    meanpT = (np.sum(pT_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx]
-                     *dN_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
-    totalN = N*Nevents
-    temp_vn_array = [N, meanpT]
+    dNinterp = RegularGridInterpolator((etaArr, pTArr), dN_event,
+                                       bounds_error=False, fill_value=0)
+    pTinterp = RegularGridInterpolator((etaArr, pTArr), pT_event,
+                                       bounds_error=False, fill_value=0)
+
+    N = np.sum(dNinterp((etaInterpMesh, pTInterpMesh))) + EPS
+    meanpT = (np.sum(pTinterp((etaInterpMesh, pTInterpMesh))
+                     *dNinterp((etaInterpMesh, pTInterpMesh)))/N)
+    totalN = N*Nevents*dpT*deta
+    temp_vn_array = [N*dpT*deta, meanpT]
     for iorder in range(1, NORDER + 1):
         Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
         Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
-        Vn_real_inte = (
-            np.sum(Qn_real_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
-        Vn_imag_inte = (
-            np.sum(Qn_imag_event[etaMinIdx:etaMaxIdx, pTMinIdx:pTMaxIdx])/N)
+        QnRealInterp  = RegularGridInterpolator(
+            (etaArr, pTArr), Qn_real_event, bounds_error=False, fill_value=0)
+        QnImagInterp  = RegularGridInterpolator(
+            (etaArr, pTArr), Qn_imag_event, bounds_error=False, fill_value=0)
+        Vn_real_inte = np.sum(QnRealInterp((etaInterpMesh, pTInterpMesh)))/N
+        Vn_imag_inte = np.sum(QnImagInterp((etaInterpMesh, pTInterpMesh)))/N
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
     temp_vn_array.append(totalN)
     return temp_vn_array
 
 
-def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int):
+def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int,
+                               weightType: int):
     """
         this function calculates the pT-integrated vn(eta) in a
         given pT range (pTMin, pTMax) for every event in the data
@@ -174,25 +214,45 @@ def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int):
     npT = 20
     nEta = 71
     pTArr = np.linspace(0, 3.8, npT)
-    dpT = pTArr[1] - pTArr[0]
-    pTMinIdx = int((pTMin - 0.)/dpT)
-    pTMaxIdx = min(npT, int((pTMax - 0.)/dpT) + 1)
     etaArr = np.linspace(-7, 7, nEta)
-    deta = etaArr[1] - etaArr[0]
+
+    pTInterpArr = np.linspace(pTMin, pTMax, npT)
+    dpT = (pTInterpArr[1] - pTInterpArr[0])/(pTArr[1] - pTArr[0])
+    etaInterpMesh, pTInterpMesh = np.meshgrid(etaArr, pTInterpArr,
+                                              indexing='ij')
 
     pT_event = data[:, 1].reshape(nEta, npT)
     dN_event = data[:, 2].reshape(nEta, npT)
-    N = np.sum(dN_event[:, pTMinIdx:pTMaxIdx], axis=1) + EPS
-    meanpT = (np.sum(
-        pT_event[:, pTMinIdx:pTMaxIdx]*dN_event[:, pTMinIdx:pTMaxIdx], axis=1)
+    dNinterp = RegularGridInterpolator((etaArr, pTArr), dN_event,
+                                       bounds_error=False, fill_value=0)
+    pTinterp = RegularGridInterpolator((etaArr, pTArr), pT_event,
+                                       bounds_error=False, fill_value=0)
+
+    N = np.sum(dNinterp((etaInterpMesh, pTInterpMesh)), axis=1) + EPS
+    meanpT = (np.sum(pTinterp((etaInterpMesh, pTInterpMesh))
+                     *dNinterp((etaInterpMesh, pTInterpMesh)), axis=1)
               /N)
-    totalN = N*Nevents
-    temp_vn_array = [N, meanpT]  # dN/deta, <pT>(eta)
+    totalN = N*Nevents*dpT
+    temp_vn_array = [N*dpT, meanpT]  # dN/deta, <pT>(eta)
     for iorder in range(1, NORDER + 1):
         Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
         Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
-        Vn_real_inte = (np.sum(Qn_real_event[:, pTMinIdx:pTMaxIdx], axis=1)/N)
-        Vn_imag_inte = (np.sum(Qn_imag_event[:, pTMinIdx:pTMaxIdx], axis=1)/N)
+        QnRealInterp  = RegularGridInterpolator(
+            (etaArr, pTArr), Qn_real_event, bounds_error=False, fill_value=0)
+        QnImagInterp  = RegularGridInterpolator(
+            (etaArr, pTArr), Qn_imag_event, bounds_error=False, fill_value=0)
+        if weightType == 1:
+            Vn_real_inte = (np.sum(
+                QnRealInterp((etaInterpMesh, pTInterpMesh))*pTInterpMesh,
+                axis=1)/N)
+            Vn_imag_inte = (np.sum(
+                QnImagInterp((etaInterpMesh, pTInterpMesh))*pTInterpMesh,
+                axis=1)/N)
+        else:
+            Vn_real_inte = (np.sum(QnRealInterp((etaInterpMesh, pTInterpMesh)),
+                                   axis=1)/N)
+            Vn_imag_inte = (np.sum(QnImagInterp((etaInterpMesh, pTInterpMesh)),
+                                   axis=1)/N)
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)  # Vn(eta)
     temp_vn_array.append(totalN)
     return temp_vn_array
@@ -301,9 +361,22 @@ for ievent, event_i in enumerate(eventList):
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
         vnInte_data = np.nan_to_num(eventGroup.get(vnInte_filename))
         N_hadronic_events = vnInte_data[-1, 2]
-        Vn_vector = calcualte_inte_Vneta_pTeta(0.2, 2.0, vn_data,
-                                               N_hadronic_events)
-        outdata[event_i]["chVneta_pT_0p2_2"] = np.array(Vn_vector)
+        # for longitudinal derrelation
+        Vn_vector = calcualte_inte_Vneta_pTeta(0.4, 4.0, vn_data,
+                                               N_hadronic_events, 0)
+        outdata[event_i]["chVneta_pT_0p4_4"] = np.array(Vn_vector)
+
+        # for vn(eta)
+        Vn_vector = calcualte_inte_Vneta_pTeta(0.15, 2.0, vn_data,
+                                               N_hadronic_events, 0)
+        outdata[event_i]["chVneta_pT_0p15_2"] = np.array(Vn_vector)
+        Vn_vector = calcualte_inte_Vneta_pTeta(0.15, 2.0, vn_data,
+                                               N_hadronic_events, 1)
+        outdata[event_i]["chVneta_pTw_pT_0p15_2"] = np.array(Vn_vector)
+
+        vn_filename = f"particle_9999_dNdeta_pT_0.2_3{weakString}.dat"
+        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+        outdata[event_i]["dNch/deta"] = vn_data[:, 1]
 
         vn_filename = f"particle_99999_dNdeta_pT_0_4{weakString}.dat"
         vn_data = np.nan_to_num(eventGroup.get(vn_filename))
