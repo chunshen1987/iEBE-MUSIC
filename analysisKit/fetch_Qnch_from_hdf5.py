@@ -169,7 +169,7 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
     """
     npT = 20
     nEta = 71
-    pTArr = np.linspace(0, 3.8, npT)
+    pTArr = np.linspace(0.1, 3.9, npT)
     etaArr = np.linspace(-7, 7, nEta)
 
     pTInterpArr = np.linspace(pTMin, pTMax, npT)
@@ -213,7 +213,7 @@ def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int,
     """
     npT = 20
     nEta = 71
-    pTArr = np.linspace(0, 3.8, npT)
+    pTArr = np.linspace(0.1, 3.9, npT)
     etaArr = np.linspace(-7, 7, nEta)
 
     pTInterpArr = np.linspace(pTMin, pTMax, npT)
@@ -343,17 +343,14 @@ for ievent, event_i in enumerate(eventList):
                 vn_filename = (
                     f"particle_{pid}_vndata_diff_y_-0.5_0.5{weakString}.dat")
             vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-            # dN/(2pi pT dpT dy)
-            outdata[event_i]["{}_sp".format(pidName)] = vn_data[:, 1]
-            # v2(pT)
-            outdata[event_i]["{}_v2pT".format(pidName)] = (vn_data[:, 4]
-                                                           + 1j*vn_data[:, 5])
-            # v3(pT)
-            outdata[event_i]["{}_v3pT".format(pidName)] = (vn_data[:, 6]
-                                                           + 1j*vn_data[:, 7])
-            # v4(pT)
-            outdata[event_i]["{}_v4pT".format(pidName)] = (vn_data[:, 8]
-                                                           + 1j*vn_data[:, 9])
+            if pid == "9999":
+                outdata[event_i]["pTArr"] = vn_data[:, 0]
+            pTdiffData = [vn_data[:, 1]]
+            for iOrder in range(1, 5):
+                pTdiffData.append(
+                    vn_data[:, 2*iOrder] + 1j*vn_data[:, 2*iOrder + 1])
+            outdata[event_i][f"{pidName}_pTArr"] = np.array(pTdiffData)
+
     if etadiffFlag:
         # eta-differential spectra and vn
         vn_filename = f'particle_9999_pTeta_distribution{weakString}.dat'
