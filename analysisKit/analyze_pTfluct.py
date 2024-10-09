@@ -28,8 +28,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_pTfluct(dataArr1, dataArr2, dataArr3, outputFileHeader: str,
-                      cenLabel: str) -> None:
+def calculate_pTfluct(dataArr1, dataArr2, dataArr3, dataArr4,
+                      outputFileHeader: str, cenLabel: str) -> None:
     """
         this function calculates the moments of pT fluctuation
         mean:      <pT>,
@@ -43,18 +43,20 @@ def calculate_pTfluct(dataArr1, dataArr2, dataArr3, outputFileHeader: str,
     dN1 = np.real(dataArr1[:, -1])
     dN2 = np.real(dataArr2[:, -1])
     dN3 = np.real(dataArr3[:, -1])
+    dN4 = np.real(dataArr4[:, -1])
 
     deltaPT_1 = dN1*np.real(dataArr1[:, 1] - np.mean(dataArr1[:, 1]))
     deltaPT_2 = dN2*np.real(dataArr2[:, 1] - np.mean(dataArr2[:, 1]))
     deltaPT_3 = dN3*np.real(dataArr3[:, 1] - np.mean(dataArr3[:, 1]))
+    deltaPT_4 = dN4*np.real(dataArr4[:, 1] - np.mean(dataArr4[:, 1]))
 
     N2_weight = dN1*dN2
-    N3_weight = dN1*dN2*dN3
-    N4_weight = dN1*dN1*dN2*dN2
+    N3_weight = dN1*dN2*(dN3 + dN4)
+    N4_weight = dN1*dN2*dN3*dN4
 
     var_dPT = deltaPT_1*deltaPT_2
-    sknew_dPT = deltaPT_1*deltaPT_2*deltaPT_3
-    kurtosis_dPT = deltaPT_1*deltaPT_2*deltaPT_1*deltaPT_2
+    sknew_dPT = deltaPT_1*deltaPT_2*(deltaPT_3 + deltaPT_4)
+    kurtosis_dPT = deltaPT_1*deltaPT_2*deltaPT_3*deltaPT_4
 
     # calcualte observables with Jackknife resampling method
     meanPT_array = np.zeros(nev)
@@ -69,12 +71,12 @@ def calculate_pTfluct(dataArr1, dataArr2, dataArr3, outputFileHeader: str,
         meanPT_array[iev] = (
             (np.mean(dataArr1[array_idx, 1]) + np.mean(dataArr2[array_idx, 1]))
             /2.)
-        varPT = np.mean(var_dPT[array_idx])/np.mean(N2_weight[array_idx])
+        varPT = np.mean(var_dPT[array_idx]/N2_weight[array_idx])
         varPT_array[iev] = varPT/meanPT_array[iev]**2.
-        sknewPT_array[iev] = (np.mean(sknew_dPT[array_idx])
-                              /np.mean(N3_weight[array_idx])/varPT**1.5)
-        kurtosisPT_array[iev] = (np.mean(kurtosis_dPT[array_idx])
-                                 /np.mean(N4_weight[array_idx])/varPT**2)
+        sknewPT_array[iev] = (
+            np.mean(sknew_dPT[array_idx]/N3_weight[array_idx])/varPT**1.5)
+        kurtosisPT_array[iev] = (
+            np.mean(kurtosis_dPT[array_idx]/N4_weight[array_idx])/varPT**2)
 
     meanPTMean, meanPTErr = computeJKMeanandErr(meanPT_array)
     varPTMean, varPTErr = computeJKMeanandErr(varPT_array)
@@ -149,11 +151,14 @@ for icen in range(len(centralityCutList) - 1):
     QnArr1 = []
     QnArr2 = []
     QnArr3 = []
+    QnArr4 = []
     for event_name in selected_events_list:
-        QnArr1.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
-        QnArr2.append(data[event_name]['ALICE_eta_0p4_0p8'])
-        QnArr3.append(data[event_name]['ALICE_eta_-0p4_0p4'])
+        QnArr1.append(data[event_name]['STAR_eta_0_0p5_pT_0p2_2'])
+        QnArr2.append(data[event_name]['STAR_eta_-0p5_0_pT_0p2_2'])
+        QnArr3.append(data[event_name]['STAR_eta_0p5_1_pT_0p2_2'])
+        QnArr4.append(data[event_name]['STAR_eta_-1_-0p5_pT_0p2_2'])
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)
-    calculate_pTfluct(QnArr1, QnArr2, QnArr3, "ALICE", cenLabel)
+    QnArr4 = np.array(QnArr4)
+    calculate_pTfluct(QnArr1, QnArr2, QnArr3, QnArr4, "STAR", cenLabel)
