@@ -176,28 +176,38 @@ def calcualte_inte_Vn_pTeta(pTMin, pTMax, etaMin, etaMax, data, Nevents):
     etaInterpArr = np.linspace(etaMin, etaMax, nEta)
     dpT = (pTInterpArr[1] - pTInterpArr[0])/(pTArr[1] - pTArr[0])
     deta = (etaInterpArr[1] - etaInterpArr[0])/(etaArr[1] - etaArr[0])
-    etaInterpMesh, pTInterpMesh = np.meshgrid(etaInterpArr, pTInterpArr,
+    etaInterpMesh, pTInterpMesh = np.meshgrid(etaInterpArr,
+                                              pTInterpArr,
                                               indexing='ij')
 
     pT_event = data[:, 1].reshape(nEta, npT)
     dN_event = data[:, 2].reshape(nEta, npT)
-    dNinterp = RegularGridInterpolator((etaArr, pTArr), dN_event,
-                                       bounds_error=False, fill_value=0)
-    pTinterp = RegularGridInterpolator((etaArr, pTArr), pT_event,
-                                       bounds_error=False, fill_value=0)
+    dNinterp = RegularGridInterpolator((etaArr, pTArr),
+                                       dN_event,
+                                       bounds_error=False,
+                                       fill_value=0)
+    pTinterp = RegularGridInterpolator((etaArr, pTArr),
+                                       pT_event,
+                                       bounds_error=False,
+                                       fill_value=0)
 
     N = np.sum(dNinterp((etaInterpMesh, pTInterpMesh))) + EPS
-    meanpT = (np.sum(pTinterp((etaInterpMesh, pTInterpMesh))
-                     *dNinterp((etaInterpMesh, pTInterpMesh)))/N)
+    meanpT = (np.sum(
+        pTinterp((etaInterpMesh, pTInterpMesh))*dNinterp(
+            (etaInterpMesh, pTInterpMesh)))/N)
     totalN = N*Nevents*dpT*deta
     temp_vn_array = [N*dpT*deta, meanpT]
     for iorder in range(1, NORDER + 1):
         Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
         Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
-        QnRealInterp  = RegularGridInterpolator(
-            (etaArr, pTArr), Qn_real_event, bounds_error=False, fill_value=0)
-        QnImagInterp  = RegularGridInterpolator(
-            (etaArr, pTArr), Qn_imag_event, bounds_error=False, fill_value=0)
+        QnRealInterp = RegularGridInterpolator((etaArr, pTArr),
+                                               Qn_real_event,
+                                               bounds_error=False,
+                                               fill_value=0)
+        QnImagInterp = RegularGridInterpolator((etaArr, pTArr),
+                                               Qn_imag_event,
+                                               bounds_error=False,
+                                               fill_value=0)
         Vn_real_inte = np.sum(QnRealInterp((etaInterpMesh, pTInterpMesh)))/N
         Vn_imag_inte = np.sum(QnImagInterp((etaInterpMesh, pTInterpMesh)))/N
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
@@ -218,41 +228,50 @@ def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data, Nevents: int,
 
     pTInterpArr = np.linspace(pTMin, pTMax, npT)
     dpT = (pTInterpArr[1] - pTInterpArr[0])/(pTArr[1] - pTArr[0])
-    etaInterpMesh, pTInterpMesh = np.meshgrid(etaArr, pTInterpArr,
+    etaInterpMesh, pTInterpMesh = np.meshgrid(etaArr,
+                                              pTInterpArr,
                                               indexing='ij')
 
     pT_event = data[:, 1].reshape(nEta, npT)
     dN_event = data[:, 2].reshape(nEta, npT)
-    dNinterp = RegularGridInterpolator((etaArr, pTArr), dN_event,
-                                       bounds_error=False, fill_value=0)
-    pTinterp = RegularGridInterpolator((etaArr, pTArr), pT_event,
-                                       bounds_error=False, fill_value=0)
+    dNinterp = RegularGridInterpolator((etaArr, pTArr),
+                                       dN_event,
+                                       bounds_error=False,
+                                       fill_value=0)
+    pTinterp = RegularGridInterpolator((etaArr, pTArr),
+                                       pT_event,
+                                       bounds_error=False,
+                                       fill_value=0)
 
     N = np.sum(dNinterp((etaInterpMesh, pTInterpMesh)), axis=1) + EPS
-    meanpT = (np.sum(pTinterp((etaInterpMesh, pTInterpMesh))
-                     *dNinterp((etaInterpMesh, pTInterpMesh)), axis=1)
-              /N)
+    meanpT = (np.sum(pTinterp((etaInterpMesh, pTInterpMesh))*dNinterp(
+        (etaInterpMesh, pTInterpMesh)),
+                     axis=1)/N)
     totalN = N*Nevents*dpT
     temp_vn_array = [N*dpT, meanpT]  # dN/deta, <pT>(eta)
     for iorder in range(1, NORDER + 1):
         Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
         Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
-        QnRealInterp  = RegularGridInterpolator(
-            (etaArr, pTArr), Qn_real_event, bounds_error=False, fill_value=0)
-        QnImagInterp  = RegularGridInterpolator(
-            (etaArr, pTArr), Qn_imag_event, bounds_error=False, fill_value=0)
+        QnRealInterp = RegularGridInterpolator((etaArr, pTArr),
+                                               Qn_real_event,
+                                               bounds_error=False,
+                                               fill_value=0)
+        QnImagInterp = RegularGridInterpolator((etaArr, pTArr),
+                                               Qn_imag_event,
+                                               bounds_error=False,
+                                               fill_value=0)
         if weightType == 1:
-            Vn_real_inte = (np.sum(
-                QnRealInterp((etaInterpMesh, pTInterpMesh))*pTInterpMesh,
-                axis=1)/N)
-            Vn_imag_inte = (np.sum(
-                QnImagInterp((etaInterpMesh, pTInterpMesh))*pTInterpMesh,
-                axis=1)/N)
+            Vn_real_inte = (np.sum(QnRealInterp(
+                (etaInterpMesh, pTInterpMesh))*pTInterpMesh,
+                                   axis=1)/N)
+            Vn_imag_inte = (np.sum(QnImagInterp(
+                (etaInterpMesh, pTInterpMesh))*pTInterpMesh,
+                                   axis=1)/N)
         else:
-            Vn_real_inte = (np.sum(QnRealInterp((etaInterpMesh, pTInterpMesh)),
-                                   axis=1)/N)
-            Vn_imag_inte = (np.sum(QnImagInterp((etaInterpMesh, pTInterpMesh)),
-                                   axis=1)/N)
+            Vn_real_inte = (
+                np.sum(QnRealInterp((etaInterpMesh, pTInterpMesh)), axis=1)/N)
+            Vn_imag_inte = (
+                np.sum(QnImagInterp((etaInterpMesh, pTInterpMesh)), axis=1)/N)
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)  # Vn(eta)
     temp_vn_array.append(totalN)
     return temp_vn_array
@@ -347,8 +366,8 @@ for ievent, event_i in enumerate(eventList):
                 outdata[event_i]["pTArr"] = vn_data[:, 0]
             pTdiffData = [vn_data[:, 1]]
             for iOrder in range(1, 5):
-                pTdiffData.append(
-                    vn_data[:, 2*iOrder] + 1j*vn_data[:, 2*iOrder + 1])
+                pTdiffData.append(vn_data[:, 2*iOrder]
+                                  + 1j*vn_data[:, 2*iOrder + 1])
             outdata[event_i][f"{pidName}_pTArr"] = np.array(pTdiffData)
 
     if etadiffFlag:

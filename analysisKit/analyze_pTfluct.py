@@ -73,8 +73,8 @@ def calculate_pTfluct(dataArr1, dataArr2, dataArr3, dataArr4,
             /2.)
         varPT = np.mean(var_dPT[array_idx]/N2_weight[array_idx])
         varPT_array[iev] = varPT/meanPT_array[iev]**2.
-        sknewPT_array[iev] = (
-            np.mean(sknew_dPT[array_idx]/N3_weight[array_idx])/varPT**1.5)
+        sknewPT_array[iev] = (np.mean(sknew_dPT[array_idx]/N3_weight[array_idx])
+                              /varPT**1.5)
         kurtosisPT_array[iev] = (
             np.mean(kurtosis_dPT[array_idx]/N4_weight[array_idx])/varPT**2)
 

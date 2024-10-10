@@ -50,9 +50,9 @@ def calculate_vneta(dataArr, dataRef, etaRef, nOrder,
     dNRef2 = []
     for iev in range(nev):
         Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               dataRef[iev, -1, :]*dataRef[iev, nOrder+1, :])
+                               dataRef[iev, -1, :]*dataRef[iev, nOrder + 1, :])
         Qn2_interp = np.interp(etaRef2Interp, etaArr,
-                               dataRef[iev, -1, :]*dataRef[iev, nOrder+1, :])
+                               dataRef[iev, -1, :]*dataRef[iev, nOrder + 1, :])
         Q01_interp = np.interp(etaRef1Interp, etaArr, dataRef[iev, -1, :])
         Q02_interp = np.interp(etaRef2Interp, etaArr, dataRef[iev, -1, :])
         QnRef1.append(np.sum(Qn1_interp))
@@ -65,7 +65,7 @@ def calculate_vneta(dataArr, dataRef, etaRef, nOrder,
     dNRef1 = np.array(dNRef1).reshape((nev, 1))
     dNRef2 = np.array(dNRef2).reshape((nev, 1))
 
-    Qneta = dataArr[:, nOrder+1, :]*dataArr[:, -1, :]
+    Qneta = dataArr[:, nOrder + 1, :]*dataArr[:, -1, :]
     dNeta = dataArr[:, -1, :]
 
     vnNum = np.zeros([nev, nEta])
@@ -96,11 +96,9 @@ def calculate_vneta(dataArr, dataRef, etaRef, nOrder,
         #)
 
         # STAR definition in https://arxiv.org/pdf/nucl-ex/0409033
-        vnEta_array[iev, :] = (
-            (np.mean(vnNum[array_idx, :], axis=0)
-                /np.mean(dNeta[array_idx, :], axis=0))
-            / (np.sqrt(np.mean(vnDen[array_idx]) + 1e-16))
-        )
+        vnEta_array[iev, :] = ((np.mean(vnNum[array_idx, :], axis=0)
+                                /np.mean(dNeta[array_idx, :], axis=0))/
+                               (np.sqrt(np.mean(vnDen[array_idx]) + 1e-16)))
 
     vnMean, vnErr = computeJKMeanandErr(vnEta_array)
 
@@ -110,8 +108,8 @@ def calculate_vneta(dataArr, dataRef, etaRef, nOrder,
         f = open(outputFileName, 'w')
         f.write("# eta  v_n(eta)  v_n(eta)_err\n")
     for ieta in range(nEta):
-        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(
-                    etaArr[ieta], vnMean[ieta], vnErr[ieta]))
+        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(etaArr[ieta], vnMean[ieta],
+                                                  vnErr[ieta]))
     f.close()
 
 

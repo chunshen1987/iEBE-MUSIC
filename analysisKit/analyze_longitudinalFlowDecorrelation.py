@@ -49,9 +49,9 @@ def calculate_rneta(dataArr, etaRef, nOrder, outputFileName: str) -> None:
     QnRef2 = []
     for iev in range(nev):
         Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               dataArr[iev, -1, :]*dataArr[iev, nOrder+1, :])
+                               dataArr[iev, -1, :]*dataArr[iev, nOrder + 1, :])
         Qn2_interp = np.interp(etaRef2Interp, etaArr,
-                               dataArr[iev, -1, :]*dataArr[iev, nOrder+1, :])
+                               dataArr[iev, -1, :]*dataArr[iev, nOrder + 1, :])
         Q01_interp = np.interp(etaRef1Interp, etaArr, dataArr[iev, -1, :])
         Q02_interp = np.interp(etaRef2Interp, etaArr, dataArr[iev, -1, :])
         QnRef1.append(np.sum(Qn1_interp))
@@ -60,7 +60,7 @@ def calculate_rneta(dataArr, etaRef, nOrder, outputFileName: str) -> None:
     QnRef1 = np.array(QnRef1).reshape((nev, 1))
     QnRef2 = np.array(QnRef2).reshape((nev, 1))
 
-    Qneta = dataArr[:, nOrder+1, :]*dataArr[:, -1, :]
+    Qneta = dataArr[:, nOrder + 1, :]*dataArr[:, -1, :]
     rnNum = np.real(Qneta[:, ::-1]*np.conj(QnRef1) + Qneta*np.conj(QnRef2))
     rnDen = np.real(Qneta*np.conj(QnRef1) + Qneta[:, ::-1]*np.conj(QnRef2))
 
@@ -72,7 +72,7 @@ def calculate_rneta(dataArr, etaRef, nOrder, outputFileName: str) -> None:
         array_idx = np.array(array_idx)
 
         rn_array[iev, :] = (np.mean(rnNum[array_idx, :], axis=0)
-                            / np.mean(rnDen[array_idx, :], axis=0))
+                            /np.mean(rnDen[array_idx, :], axis=0))
 
     rnMean, rnErr = computeJKMeanandErr(rn_array)
 
@@ -83,8 +83,9 @@ def calculate_rneta(dataArr, etaRef, nOrder, outputFileName: str) -> None:
         f.write("# eta  r_n(eta)  r_n(eta)_err\n")
     for ieta in range(nEta):
         if etaArr[ieta] >= 0.:
-            f.write("{:.3f}  {:.5e}  {:.5e}\n".format(
-                        etaArr[ieta], rnMean[ieta], rnErr[ieta]))
+            f.write("{:.3f}  {:.5e}  {:.5e}\n".format(etaArr[ieta],
+                                                      rnMean[ieta],
+                                                      rnErr[ieta]))
     f.close()
 
 

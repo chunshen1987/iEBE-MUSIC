@@ -45,9 +45,9 @@ def calculate_vnpT(pTArr, poiSpVn, dataRef, etaRef, nOrder,
     dNRef2 = []
     for iev in range(nev):
         Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               dataRef[iev, -1, :]*dataRef[iev, nOrder+1, :])
+                               dataRef[iev, -1, :]*dataRef[iev, nOrder + 1, :])
         Qn2_interp = np.interp(etaRef2Interp, etaArr,
-                               dataRef[iev, -1, :]*dataRef[iev, nOrder+1, :])
+                               dataRef[iev, -1, :]*dataRef[iev, nOrder + 1, :])
         Q01_interp = np.interp(etaRef1Interp, etaArr, dataRef[iev, -1, :])
         Q02_interp = np.interp(etaRef2Interp, etaArr, dataRef[iev, -1, :])
         QnRef1.append(np.sum(Qn1_interp))
@@ -76,12 +76,10 @@ def calculate_vnpT(pTArr, poiSpVn, dataRef, etaRef, nOrder,
         array_idx[iev] = False
         array_idx = np.array(array_idx)
 
-        vnpT_arr[iev, :] = (
-            np.mean(vnpTNum[array_idx, :], axis=0)
-                /np.mean(n2Num[array_idx, :], axis=0)
-            /(np.sqrt(np.mean(vnpTDen[array_idx], axis=0)
-                    /np.mean(n2Den[array_idx], axis=0)) + 1e-16)
-        )
+        vnpT_arr[iev, :] = (np.mean(vnpTNum[array_idx, :], axis=0)
+                            /np.mean(n2Num[array_idx, :], axis=0)/(np.sqrt(
+                                np.mean(vnpTDen[array_idx], axis=0)
+                                /np.mean(n2Den[array_idx], axis=0)) + 1e-16))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
     dNpT_mean = np.mean(dNpT/(pTArr + 1e-16), axis=0)

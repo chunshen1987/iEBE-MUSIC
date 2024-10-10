@@ -44,8 +44,8 @@ def calculate_dNdeta(etaArr, dNdetaArr, outputFileName: str) -> None:
         f = open(outputFileName, 'w')
         f.write("# eta  dN/deta  dN/deta_err\n")
     for ieta in range(len(etaMean)):
-        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(
-                    etaMean[ieta], dNMean[ieta], dNerr[ieta]))
+        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(etaMean[ieta], dNMean[ieta],
+                                                  dNerr[ieta]))
     f.close()
 
 
@@ -65,8 +65,8 @@ def calculate_dETdeta(etaArr, dETdetaArr, outputFileName: str) -> None:
         f = open(outputFileName, 'w')
         f.write("# eta  dET/deta  dET/deta_err\n")
     for ieta in range(len(etaMean)):
-        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(
-                    etaMean[ieta], dETMean[ieta], dETerr[ieta]))
+        f.write("{:.3f}  {:.5e}  {:.5e}\n".format(etaMean[ieta], dETMean[ieta],
+                                                  dETerr[ieta]))
     f.close()
 
 
