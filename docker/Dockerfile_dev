@@ -3,9 +3,9 @@ FROM opensciencegrid/software-base:23-el9-release
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
 # Set up CMake
-yum -y install epel-release
-yum -y install cmake3
-ln -s /usr/bin/cmake3 /usr/bin/cmake
+RUN yum -y install epel-release
+RUN yum -y install cmake3
+RUN ln -s /usr/bin/cmake3 /usr/bin/cmake
     
 RUN yum -y install \
         cmake \
