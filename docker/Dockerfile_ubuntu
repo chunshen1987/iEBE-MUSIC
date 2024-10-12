@@ -5,7 +5,7 @@ MAINTAINER Chun Shen <chunshen@wayne.edu>
 - name: Set up CMake
   uses: actions/setup-cmake@v2
   with:
-    cmake-version: '3.5.0'  # Specify the version you need
+    cmake-version: '3.21.0'  # Specify the version you need
     
 RUN apt-get update
 RUN apt-get install -y libgsl-dev
