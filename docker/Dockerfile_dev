@@ -2,10 +2,10 @@ FROM opensciencegrid/software-base:23-el9-release
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
-- name: Set up CMake
-  uses: actions/setup-cmake@v2
-  with:
-    cmake-version: '3.21.0'  # Specify the version you need
+# Set up CMake
+yum -y install epel-release
+yum -y install cmake3
+ln -s /usr/bin/cmake3 /usr/bin/cmake
     
 RUN yum -y install \
         cmake \
