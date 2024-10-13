@@ -3,7 +3,6 @@ FROM opensciencegrid/software-base:23-el9-release
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
 RUN yum -y install \
-        epel-release \
         cmake \
         cmake3 \
         git \
@@ -31,11 +30,6 @@ RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install "numpy<2.0" h5py scipy
 
 ENV HOME /opt/
-
-# Set environment variables for GSL
-ENV GSL_INCLUDE_DIR=/usr/include
-ENV GSL_LIBRARY=/usr/lib64/libgsl.so
-ENV GSL_CBLAS_LIBRARY=/usr/lib64/libgslcblas.software
 
 # download and compile the iEBE-MUSIC framework
 RUN cd ${HOME} && \

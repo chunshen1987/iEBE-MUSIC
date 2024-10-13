@@ -2,17 +2,10 @@ FROM ubuntu:bionic
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
-- name: Set up CMake
-  uses: actions/setup-cmake@v2
-  with:
-    cmake-version: '3.21.0'  # Specify the version you need
-    
-RUN apt-get update
-RUN apt-get install -y libgsl-dev
-
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     apt-get update && apt-get install -y --no-install-recommends \
         cmake \
+        curl \
         g++ \
         gcc \
         gfortran \
