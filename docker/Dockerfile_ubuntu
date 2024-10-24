@@ -1,4 +1,4 @@
-FROM ubuntu:bionic
+FROM ubuntu:22.04
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
@@ -26,8 +26,8 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pre-reqs python packages
-RUN pip3 install --upgrade && \
-    pip3 install numpy h5py scipy
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install numpy h5py scipy
 
 ENV HOME /opt/
 
