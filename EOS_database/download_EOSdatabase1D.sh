@@ -8,4 +8,7 @@
 #wget --no-check-certificate 'https://www.dropbox.com/scl/fi/pxm2fv24mzgirx3nevsud/EoS.pkl?rlkey=pbb5rzx2869z8hhxgblerpgh7&dl=0' -O EoS.pkl
 
 # v1.1
-wget --no-check-certificate 'https://www.dropbox.com/scl/fi/pxm2fv24mzgirx3nevsud/EoS.pkl?rlkey=pbb5rzx2869z8hhxgblerpgh7&dl=0' -O EoS.pkl
+#wget --no-check-certificate 'https://www.dropbox.com/scl/fi/pxm2fv24mzgirx3nevsud/EoS.pkl?rlkey=pbb5rzx2869z8hhxgblerpgh7&dl=0' -O EoS.pkl
+
+# v1.2
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/iyx1ad6bzupjtkspsjgfm/EoS.pkl?rlkey=871ywdocxhfdiwnhou6va2z9o&dl=0' -O EoS.pkl
