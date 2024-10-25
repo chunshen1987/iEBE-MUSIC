@@ -560,7 +560,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
                            para_dict, afterburner_type, EOSType: int,
-                           EOSId: int, debugFlag: bool):
+                           EOSId: int, EOSFileName: str, debugFlag: bool):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -645,7 +645,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         desLoc = path.join(event_folder, "MUSIC/EOS")
         subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
     else:
-        eosDatabase = path.join(package_root_path, 'EOS_database', 'EoS.pkl')
+        eosDatabase = path.join(package_root_path, 'EOS_database', EOSFileName)
         eosFileName = fetch_an_EOS(eosDatabase, EOSId)
         mkdir(path.join(event_folder, "MUSIC/EOS"))
         shutil.move(eosFileName,
@@ -1003,9 +1003,11 @@ def main():
 
     EOSType = 9
     EOSId = 0
+    EOSFileName = "EoS.pkl"
     if 'EOSType' in parameter_dict.control_dict.keys():
         EOSType = parameter_dict.control_dict['EOSType']
         EOSId = parameter_dict.control_dict['EOSId']
+        EOSFileName = parameter_dict.control_dict['EOSFileName']
 
     debugFlag = False
     if 'debugFlag' in parameter_dict.control_dict.keys():
@@ -1053,7 +1055,8 @@ def main():
                                code_path, working_folder_name, cluster_name,
                                iev, event_id_offset, n_hydro_rescaled,
                                n_urqmd_per_hydro, n_threads, parameter_dict,
-                               afterburner_type, EOSType, EOSId, debugFlag)
+                               afterburner_type, EOSType, EOSId, EOSFileName,
+                               debugFlag)
         event_id_offset += n_hydro_rescaled
     sys.stdout.write("\n")
     sys.stdout.flush()

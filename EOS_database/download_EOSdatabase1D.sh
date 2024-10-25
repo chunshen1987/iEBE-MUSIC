@@ -12,3 +12,4 @@
 
 # v1.2
 wget --no-check-certificate 'https://www.dropbox.com/scl/fi/iyx1ad6bzupjtkspsjgfm/EoS.pkl?rlkey=871ywdocxhfdiwnhou6va2z9o&dl=0' -O EoS.pkl
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/kpf1t103g774wfit0dde6/EoS_v0.pkl?rlkey=q85bn8l1sjffdz4m7fiohvc4c&dl=0' -O EoS_v0.pkl
