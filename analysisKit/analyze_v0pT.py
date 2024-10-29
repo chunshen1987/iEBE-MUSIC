@@ -114,16 +114,16 @@ for icen in range(len(centralityCutList) - 1):
         centralityCutList[icen + 1]*centralityRange, nev))
     print(f"dNdy: {dN_dy_cut_low:.2f} - {dN_dy_cut_high:.2f}")
 
-    pTArr = data[selected_events_list[0]]['pT']
+    pTArr = data[selected_events_list[0]]['pTArr']
     charged_Sp = []
     pion_Sp = []
     kaon_Sp = []
     proton_Sp = []
     for event_name in selected_events_list:
-        charged_Sp.append(data[event_name]['ch_sp'])
-        pion_Sp.append(data[event_name]['pi+_sp'] + data[event_name]['pi-_sp'])
-        kaon_Sp.append(data[event_name]['K+_sp'] + data[event_name]['K-_sp'])
-        proton_Sp.append(data[event_name]['p_sp'] + data[event_name]['pbar_sp'])
+        charged_Sp.append(data[event_name]['ch_pTArr'][0, :])
+        pion_Sp.append(data[event_name]['pi+_pTArr'][0, :] + data[event_name]['pi-_pTArr'][0, :])
+        kaon_Sp.append(data[event_name]['K+_pTArr'][0, :] + data[event_name]['K-_pTArr'][0, :])
+        proton_Sp.append(data[event_name]['p_pTArr'][0, :] + data[event_name]['pbar_pTArr'][0, :])
     charged_Sp = np.array(charged_Sp)
     pion_Sp = np.array(pion_Sp)
     kaon_Sp = np.array(kaon_Sp)
