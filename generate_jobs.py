@@ -7,6 +7,9 @@ from os import path, mkdir, remove
 import shutil
 import subprocess
 import argparse
+import pickle
+import random
+import time
 from math import ceil
 from glob import glob
 from utilities.Pick_EOS_From_File import fetch_an_EOS
@@ -972,6 +975,31 @@ def main():
         code_path = path.join(working_folder_name, "codes")
         shutil.copytree("{}/codes".format(code_package_path), code_path)
 
+    usePosteriorParameters = False
+    if 'usePosteriorParameters' in parameter_dict.control_dict.keys():
+        usePosteriorParameters = (
+            parameter_dict.control_dict['usePosteriorParameters'])
+    if usePosteriorParameters:
+        if 'PosteriorChainFile' in parameter_dict.control_dict.keys():
+            posteriorChainFile = (
+                parameter_dict.control_dict['PosteriorChainFile'])
+            with open(posteriorChainFile, "rb") as f:
+                paramChain = pickle.load(f)
+            nParamSets = paramChain['chain'].shape[0]
+            setId = parameter_dict.control_dict['PosteriorParamSet']
+            if setId == -1:
+                if seed == -1:
+                    random.seed(time.time())
+                else:
+                    random.seed(seed)
+                setId = random.randint(0, nParamSets - 1)
+            paramSet = paramChain['chain'][setId % nParamSets, :]
+            paramName = paramChain['parameterName']
+            paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
+            with open(paramFile, "w") as f:
+                for i in range(len(paramName)):
+                    f.write("{}  {}\n".format(paramName[i], paramSet[i]))
+
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
         subprocess.call("(cd {}/config; ".format(code_package_path)
@@ -979,6 +1007,13 @@ def main():
                         + "-path {} -par {} -b {} -seed {};)".format(
                             working_folder_name, path.abspath(args.par_dict),
                             args.bayes_file, seed),
+                        shell=True)
+    elif usePosteriorParameters:
+        subprocess.call("(cd {}/config; ".format(code_package_path)
+                        + "python3 parameters_dict_master.py "
+                        + "-path {} -par {} -b {} -seed {};)".format(
+                            working_folder_name, path.abspath(args.par_dict),
+                            paramFile, seed),
                         shell=True)
     else:
         subprocess.call(
@@ -1007,7 +1042,8 @@ def main():
     if 'EOSType' in parameter_dict.control_dict.keys():
         EOSType = parameter_dict.control_dict['EOSType']
         EOSId = parameter_dict.control_dict['EOSId']
-        EOSFileName = parameter_dict.control_dict['EOSFileName']
+        if 'EOSFileName' in parameter_dict.control_dict.keys():
+            EOSFileName = parameter_dict.control_dict['EOSFileName']
 
     debugFlag = False
     if 'debugFlag' in parameter_dict.control_dict.keys():

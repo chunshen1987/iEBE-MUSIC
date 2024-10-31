@@ -747,27 +747,21 @@ def update_parameters_bayesian(bayes_file):
         key, val = line.split()
         if key in control_dict.keys():
             control_dict[key] = int(val)
-            continue
 
         if key in ipglasma_dict.keys():
             ipglasma_dict[key] = float(val)
-            continue
 
         if key in mcglauber_dict.keys():
             mcglauber_dict[key] = float(val)
-            continue
 
         if key in music_dict.keys():
             music_dict[key] = float(val)
-            continue
 
         if key in iss_dict.keys():
             iss_dict[key] = float(val)
-            continue
 
         if key in hadronic_afterburner_toolkit_dict.keys():
             hadronic_afterburner_toolkit_dict[key] = float(val)
-            continue
 
 
 def output_parameters_to_files(workfolder="."):
