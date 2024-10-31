@@ -580,7 +580,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         logfile = " >> run.log"
 
     if (initial_condition_database == "self"
-            or initial_condition_type == "fixCentrality"):
+            or initial_condition_database == "fixCentrality"):
         if "3DMCGlauber" in initial_condition_type:
             mkdir(path.join(event_folder, '3dMCGlauber'))
             shutil.copyfile(path.join(param_folder, '3dMCGlauber/input'),
