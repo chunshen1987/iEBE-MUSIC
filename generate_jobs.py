@@ -993,7 +993,7 @@ def main():
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
             subprocess.call(
                 "(cd {}/{}; python3 parameterGenerator.py {} {})".format(
-                    working_folder_name, posteriorChainFilePath, setId,
+                    code_package_path, posteriorChainFilePath, setId,
                     paramFile),
                 shell=True)
 
