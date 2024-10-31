@@ -13,7 +13,7 @@ control_dict = {
     'save_UrQMD_files': False,      # flag to save UrQMD files
     'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
     'usePosteriorParameters': False,
-    'PosteriorChainFile': "config/arXiv_2408.00537/posteriorChain.pkl",
+    'PosteriorChainFilePath': "config/arXiv_2408.00537",
     'PosteriorParamSet': 0,
 }
 

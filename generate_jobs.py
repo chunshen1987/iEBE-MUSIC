@@ -980,25 +980,20 @@ def main():
         usePosteriorParameters = (
             parameter_dict.control_dict['usePosteriorParameters'])
     if usePosteriorParameters:
-        if 'PosteriorChainFile' in parameter_dict.control_dict.keys():
-            posteriorChainFile = (
-                parameter_dict.control_dict['PosteriorChainFile'])
-            with open(posteriorChainFile, "rb") as f:
-                paramChain = pickle.load(f)
-            nParamSets = paramChain['chain'].shape[0]
+        if 'PosteriorChainFilePath' in parameter_dict.control_dict.keys():
+            posteriorChainFilePath = (
+                parameter_dict.control_dict['PosteriorChainFilePath'])
             setId = parameter_dict.control_dict['PosteriorParamSet']
             if setId == -1:
                 if seed == -1:
                     random.seed(time.time())
                 else:
                     random.seed(seed)
-                setId = random.randint(0, nParamSets - 1)
-            paramSet = paramChain['chain'][setId % nParamSets, :]
-            paramName = paramChain['parameterName']
+                setId = random.randint(0, 1000000)
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
-            with open(paramFile, "w") as f:
-                for i in range(len(paramName)):
-                    f.write("{}  {}\n".format(paramName[i], paramSet[i]))
+            subprocess.call(
+                "(cd {}; python3 parameterGenerator.py {} {})".format(
+                    posteriorChainFilePath, setId, paramFile), shell=True)
 
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
