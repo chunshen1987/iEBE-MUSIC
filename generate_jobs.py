@@ -992,8 +992,9 @@ def main():
                 setId = random.randint(0, 1000000)
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
             subprocess.call(
-                "(cd {}; python3 parameterGenerator.py {} {})".format(
-                    posteriorChainFilePath, setId, paramFile),
+                "(cd {}/{}; python3 parameterGenerator.py {} {})".format(
+                    working_folder_name, posteriorChainFilePath, setId,
+                    paramFile),
                 shell=True)
 
     if args.bayes_file != "":
