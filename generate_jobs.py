@@ -993,7 +993,8 @@ def main():
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
             subprocess.call(
                 "(cd {}; python3 parameterGenerator.py {} {})".format(
-                    posteriorChainFilePath, setId, paramFile), shell=True)
+                    posteriorChainFilePath, setId, paramFile),
+                shell=True)
 
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
