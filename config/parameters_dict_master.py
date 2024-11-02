@@ -566,6 +566,7 @@ hadronic_afterburner_toolkit_dict = {
     'net_particle_flag': 0,  # flag to collect net particle yield distribution
     # Parameters for single particle spectra and vn
     'rapidity_shift': 0.,
+    'readRapidityShiftFromFile': 0,
     'order_max':
         10,  # the maximum harmonic order (= order_max - 1 ) of anisotropic flow
     # for charged hadron; order_max = 6 for identified particles
@@ -590,6 +591,7 @@ hadronic_afterburner_toolkit_dict = {
         0.20,  # the minimum value of pT for vn rap. distr.
     'vn_rapidity_dis_pT_max': 3.0,  # the maximum value of pT for vn rap. distr.
     'rapidityPTDistributionFlag': 0,  # output Qn vectors in (eta, pT)
+    'pidwithRapidityPTDistribution': 0,
     'pidwithPseudoRapCuts': 0,  # Analyze pid particles Qn vectors with
     # pseudo-rapidity cuts in additional to the
     # default rapidity cuts
