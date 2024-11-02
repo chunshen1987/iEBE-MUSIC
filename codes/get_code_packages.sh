@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber -b UPCmerge 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 2c6ded7d04336d81cc46bf188be31aba507004c8)
+(cd 3dMCGlauber_code; git checkout 22955a36969429e99a85957eb6b3c231870a2015)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
