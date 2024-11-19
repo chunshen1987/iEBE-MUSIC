@@ -39,7 +39,9 @@ RUN cd ${HOME} && \
     ./compile_code_packages.sh && \
     cd ../EOS_database && \
     bash download_EOSdatabase1D.sh && \
-    bash download_QGPViscositydatabase1D.sh
+    bash download_QGPViscositydatabase1D.sh && \
+    cd ../config/BESPost && \
+    bash download_posteriorChain.sh
 
 # Cleaning caches to reduce size of image
 RUN yum clean all
