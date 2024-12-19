@@ -32,7 +32,7 @@ def check_an_event_is_good(h5_event):
     for ifile in required_files_list:
         if ifile not in event_file_list:
             print("event {} is bad, missing {} ...".format(
-                                                        h5_event.name, ifile))
+                h5_event.name, ifile))
             return False
     return True
 

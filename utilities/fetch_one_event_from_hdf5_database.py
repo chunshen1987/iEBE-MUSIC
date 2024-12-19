@@ -29,5 +29,7 @@ for file_i in list(h5_group.keys()):
     vn_data = h5_group.get(file_i)
     vn_data = nan_to_num(vn_data)
 
-    savetxt("{}/{}".format(group_name, file_i), vn_data,
-            fmt="%.6e", delimiter="  ")
+    savetxt("{}/{}".format(group_name, file_i),
+            vn_data,
+            fmt="%.6e",
+            delimiter="  ")
