@@ -34,37 +34,22 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
     return (filelist[iev])
 
 
-def mapEventIdToCentrality(event_id):
-    """This function maps the event_id to centrality bin for 3D-Glauber model
-       It makes sure the centrality are evenly distributed over different
-       simulation jobs when nev > 1
-    """
-    event_id = event_id % 100
-    b = event_id % 10
-    a = int((event_id - b)/10)
-    centrality = 0
-    if (b % 2) == 0:
-        centrality = b/2*10 + a
-    else:
-        centrality = (9 - (b - 1)/2)*10 + a
-    return (centrality)
-
-
-def get_initial_condition(database, initial_type, iev, event_id, seed_add,
-                          final_results_folder):
+def get_initial_condition(database, initial_type, iev, seed_add,
+                          final_results_folder, time_stamp_str="0.4"):
     """This funciton get initial conditions"""
     status = True
     if "IPGlasma" in initial_type:
         ipglasma_local_folder = "ipglasma/ipglasma_results"
         res_path = path.join(path.abspath(final_results_folder),
-                             "ipglasma_results_{}".format(event_id))
-        file_name = (f"epsilon-u-Hydro-TauHydro-{event_id}.dat")
+                             "ipglasma_results_{}".format(iev))
+        file_name = ("epsilon-u-Hydro-t{0:s}-{1}.dat".format(
+                                                time_stamp_str, iev))
         if "KoMPoST" in initial_type:
-            file_name = (f"Tmunu-TauHydro-{event_id}.dat")
+            file_name = ("Tmunu-t{0:s}-{1}.dat".format(time_stamp_str, iev))
         if database == "self":
             # check existing events ...
             if not path.exists(path.join(res_path, file_name)):
-                run_ipglasma(event_id)
+                run_ipglasma(iev)
                 collect_ipglasma_event(res_path)
                 if not path.exists(path.join(res_path, file_name)):
                     # IPGlasma event failed
@@ -75,92 +60,68 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                 print("No need to rerun ...")
         else:
             if "KoMPoST" in initial_type:
-                file_temp = fecth_an_IPGlasma_event_Tmunu(database, event_id)
+                file_temp = fecth_an_IPGlasma_event_Tmunu(
+                                            database, time_stamp_str, iev)
             else:
-                file_temp = fecth_an_IPGlasma_event(database, event_id)
+                file_temp = fecth_an_IPGlasma_event(database, time_stamp_str,
+                                                    iev)
             makedirs(ipglasma_local_folder, exist_ok=True)
-            shutil.move(file_temp, path.join(ipglasma_local_folder, file_name))
+            shutil.move(file_temp,
+                        path.join(ipglasma_local_folder, file_name))
             collect_ipglasma_event(res_path)
         connect_ipglasma_event(res_path, initial_type, file_name)
         return status, file_name
     elif initial_type == "3DMCGlauber_dynamical":
-        if database == "self" or database == "fixCentrality":
-            file_name = "strings_event_{}.dat".format(event_id)
-            specFilename = "spectators_event_{}.dat".format(event_id)
+        if database == "self":
+            file_name = "strings_event_{}.dat".format(iev)
+            specFilename = "spectators_event_{}.dat".format(iev)
             ran = np.random.default_rng().integers(1e8)
             if not path.exists(file_name):
-                if database == "self":
-                    cenMin = mapEventIdToCentrality(event_id)
-                    call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                         + "{} cenMin={} cenMax={};)".format(
-                             seed_add + iev*ran, cenMin, cenMin + 1),
-                         shell=True)
-                else:
-                    call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                         + "{};)".format(seed_add + iev*ran),
-                         shell=True)
+                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
+                                                        seed_add + iev*ran),
+                     shell=True)
+                call("mv 3dMCGlauber/rapidity_shift hadronic_afterburner_toolkit/rapidity_shift",
+                     shell=True)
                 call("mv 3dMCGlauber/strings_event_0.dat {}".format(file_name),
                      shell=True)
-                call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
-                    specFilename),
-                     shell=True)
+                #call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                #                                specFilename), shell=True)
             else:
                 print("3D MC-Glauber event exists ...")
                 print("No need to rerun ...")
             shutil.copy(file_name, "MUSIC/initial/strings.dat")
-            shutil.copy(
-                file_name,
-                path.join(final_results_folder,
-                          "strings_{}.dat".format(event_id)))
-            shutil.copy(
-                specFilename,
-                path.join(final_results_folder,
-                          "spectators_{}.dat".format(event_id)))
-            filePatterns = ["ed_etas", "nB_etas", "ecc_ed"]
-            call("mv 3dMCGlauber/rapidity_shift.dat hadronic_afterburner_toolkit/",
-                 shell=True)
-            call("mv 3dMCGlauber/ed_etas_*.dat {}".format(final_results_folder),
-                 shell=True)
-            call("mv 3dMCGlauber/nB_etas_*.dat {}".format(final_results_folder),
-                 shell=True)
-            call("mv 3dMCGlauber/ecc_ed*.dat {}".format(final_results_folder),
-                 shell=True)
+            shutil.copy(file_name, path.join(final_results_folder,
+                                             "strings_{}.dat".format(iev)))
+            #shutil.copy(specFilename,
+            #            path.join(final_results_folder,
+            #                      "spectators_{}.dat".format(iev)))
             return status, file_name
         else:
-            file_name = fecth_an_3DMCGlauber_event(database, event_id)
+            file_name = fecth_an_3DMCGlauber_event(database, iev)
             return status, file_name
     elif initial_type == "3DMCGlauber_participants":
-        file_name = "participants_event_{}.dat".format(event_id)
-        specFilename = "spectators_event_{}.dat".format(event_id)
+        file_name = "participants_event_{}.dat".format(iev)
+        specFilename = "spectators_event_{}.dat".format(iev)
         ran = np.random.default_rng().integers(1e8)
         if not path.exists(file_name):
-            if database == "self":
-                cenMin = mapEventIdToCentrality(event_id)
-                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                     + "{} cenMin={} cenMax={};)".format(
-                         seed_add + iev*ran, cenMin, cenMin + 1),
-                     shell=True)
-            else:
-                call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input "
-                     + "{};)".format(seed_add + iev*ran),
-                     shell=True)
+            call("(cd 3dMCGlauber; ./3dMCGlb.e 1 input {};)".format(
+                                                    seed_add + iev*ran),
+                 shell=True)
             call("mv 3dMCGlauber/participants_event_0.dat {}".format(file_name),
                  shell=True)
-            call(
-                "mv 3dMCGlauber/spectators_event_0.dat {}".format(specFilename),
-                shell=True)
+            call("mv 3dMCGlauber/spectators_event_0.dat {}".format(
+                                            specFilename), shell=True)
         else:
             print("3D MC-Glauber event exists ...")
             print("No need to rerun ...")
         shutil.copy(file_name, "MUSIC/initial/participants_event.dat")
         shutil.copy(file_name, path.join(final_results_folder, file_name))
-        shutil.copy(
-            specFilename,
-            path.join(final_results_folder,
-                      "spectators_{}.dat".format(event_id)))
+        shutil.copy(specFilename,
+                    path.join(final_results_folder,
+                              "spectators_{}.dat".format(iev)))
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
-        file_name = fecth_an_3DMCGlauber_smooth_event(database, event_id)
+        file_name = fecth_an_3DMCGlauber_smooth_event(database, iev)
         return status, file_name
     else:
         print("\U0001F6AB  "
@@ -169,10 +130,10 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         sys.exit(1)
 
 
-def run_ipglasma(event_id):
+def run_ipglasma(iev):
     """This functions run IPGlasma"""
     print("\U0001F3B6  Run IPGlasma ... ")
-    call("bash ./run_ipglasma.sh {}".format(event_id), shell=True)
+    call("bash ./run_ipglasma.sh {}".format(iev), shell=True)
 
 
 def collect_ipglasma_event(final_results_folder):
@@ -226,7 +187,7 @@ def run_hydro_event(final_results_folder, event_id):
 
         if not hydro_success:
             print("{} Hydrodynamic run failed, rerun ... ".format(logo),
-                  flush=True)
+                 flush=True)
             shutil.rmtree(results_folder)
 
     if not hydro_success:
@@ -282,7 +243,8 @@ def run_kompost(final_results_folder, event_id):
 def prepare_evolution_files_for_photon(final_results_folder, hydro_folder_name):
     """This function prepares hydro evolution file for photon radiation"""
     evoFileName = "evolution_all_xyeta.dat"
-    evo_file = path.join(final_results_folder, hydro_folder_name, evoFileName)
+    evo_file = path.join(final_results_folder, hydro_folder_name,
+                         evoFileName)
     photonFolderPath = path.join('photonEmission_hydroInterface', 'results')
     if path.exists(photonFolderPath):
         shutil.rmtree(photonFolderPath)
@@ -290,9 +252,9 @@ def prepare_evolution_files_for_photon(final_results_folder, hydro_folder_name):
     call("ln -s {0:s} {1:s}".format(path.abspath(evo_file),
                                     path.join(photonFolderPath, evoFileName)),
          shell=True)
-    shutil.copy(
-        path.join(final_results_folder, hydro_folder_name, "music_input"),
-        photonFolderPath)
+    shutil.copy(path.join(final_results_folder, hydro_folder_name,
+                          "music_input"),
+                photonFolderPath)
 
 
 def run_photon(final_results_folder, event_id):
@@ -304,7 +266,8 @@ def run_photon(final_results_folder, event_id):
 
     if path.exists(results_folder):
         # check whether photon has already run or not
-        print("{} photon results {} exist ...".format(logo, photon_folder_name),
+        print("{} photon results {} exist ...".format(logo,
+                                                      photon_folder_name),
               flush=True)
         photon_success = True
         if photon_success:
@@ -322,7 +285,8 @@ def run_photon(final_results_folder, event_id):
         photon_success = True
         if photon_success:
             # collect results
-            shutil.move("photonEmission_hydroInterface/results", results_folder)
+            shutil.move("photonEmission_hydroInterface/results",
+                        results_folder)
 
     return (photon_success, photon_folder_name)
 
@@ -380,11 +344,12 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
             spin_folder_name = "spin_results_{}".format(event_id)
             spin_folder = path.join(final_results_folder, spin_folder_name)
             if path.exists(spin_folder):
-                print("{} spin results {} exist ... ".format(logo, spin_folder),
+                print("{} spin results {} exist ... ".format(logo,
+                                                             spin_folder),
                       flush=True)
             else:
-                print("{}  [{}] Running spin calculations ... ".format(
-                    logo, curr_time),
+                print("{}  [{}] Running spin calculations ... ".format(logo,
+                                                                   curr_time),
                       flush=True)
                 call("bash ./run_spinPol.sh {}".format(n_urqmd), shell=True)
                 shutil.move("UrQMDev_{}/iSS/results".format(n_urqmd),
@@ -393,7 +358,8 @@ def run_urqmd_shell(n_urqmd, final_results_folder, event_id, para_dict,
                     checkPoint(startTime, checkPointFileName,
                                final_results_folder)
 
-        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time), flush=True)
+        print("{}  [{}] Running UrQMD ... ".format(logo, curr_time),
+              flush=True)
         with Pool(processes=n_urqmd) as pool1:
             pool1.map(run_urqmd_event, range(n_urqmd))
 
@@ -427,24 +393,38 @@ def run_spvn_analysis(urqmd_file_path, n_threads, final_results_folder,
          shell=True)
     # finally collect results
     curr_time = time.asctime()
-    print(f"\U0001F3CD  [{curr_time}] Running spvn analysis ... ", flush=True)
+    print("\U0001F3CD  [{}] Running spvn analysis ... ".format(curr_time),
+          flush=True)
 
     call("bash ./run_analysis_spvn.sh", shell=True)
 
     curr_time = time.asctime()
-    print(f"\U0001F3CD  [{curr_time}] Finished spvn analysis ... ", flush=True)
+    print("\U0001F3CD  [{}] Finished spvn analysis ... ".format(curr_time),
+          flush=True)
 
-    call(f"rm {spvn_folder}/particle_list.bin", shell=True)
+    call("rm {}/particle_list.bin".format(spvn_folder), shell=True)
     shutil.move(spvn_folder, final_results_folder)
 
 
 def check_an_event_is_good(event_folder):
     """This function checks the given event contains all required files"""
     required_files_list = [
-        'particle_9999_vndata_eta_-0.5_0.5.dat',
-        'particle_211_vndata_diff_y_-0.5_0.5.dat',
-        'particle_321_vndata_diff_y_-0.5_0.5.dat',
-        'particle_2212_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_9999_vndata_eta_-0.5_0.5.dat',
+        #'particle_9999_vndata_diff_eta_0.5_2.5.dat',
+        'particle_9999_vndata_eta_-2.5_2.5.dat',
+        #'particle_211_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_321_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_2212_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-211_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-321_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-2212_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_3122_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_3312_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_3334_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-3122_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-3312_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_-3334_vndata_diff_y_-0.5_0.5.dat',
+        #'particle_333_vndata_diff_y_-0.5_0.5.dat',
     ]
     event_file_list = glob(path.join(event_folder, "*"))
     for ifile in required_files_list:
@@ -459,40 +439,33 @@ def check_an_event_is_good(event_folder):
 
 def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     """This function combines all the results into hdf5"""
-    results_name = f"spvn_results_{event_id}"
+    results_name = "spvn_results_{}".format(event_id)
+    time_stamp = para_dict['time_stamp_str']
     initial_state_filelist1 = [
-        f'NcollList{event_id}.dat',
-        f'NpartList{event_id}.dat',
-        f'NpartdNdy-t0.6-{event_id}.dat',
-        f'NgluonEstimators{event_id}.dat',
-        f'usedParameters{event_id}.dat',
+        'NcollList{}.dat'.format(event_id),
+        'NpartList{}.dat'.format(event_id),
+        'NpartdNdy-t0.6-{}.dat'.format(event_id),
+        'NgluonEstimators{}.dat'.format(event_id),
+        'usedParameters{}.dat'.format(event_id),
     ]
     initial_state_filelist2 = [
-        f'epsilon-u-Hydro-TauHydro-{event_id}.dat',
+        'epsilon-u-Hydro-t0.1-{}.dat'.format(event_id),
+        'epsilon-u-Hydro-t{0}-{1}.dat'.format(time_stamp, event_id),
     ]
-    glauber_filelist = [
-        f"strings_{event_id}.dat",
-        f"spectators_{event_id}.dat",
-        f"participants_event_{event_id}.dat",
-        "ed_etas_distribution_*.dat",
-        "nB_etas_distribution_*.dat",
-        "ecc_ed_*.dat",
-    ]
+    glauber_filelist = ["strings_{}.dat".format(event_id)]#,
+    #                    "spectators_{}.dat".format(event_id),
+    #                    "participants_event_{}.dat".format(event_id)]
 
     pre_equilibrium_filelist = [
-        "{}.music_init_flowNonLinear_pimunuTransverse.txt".format(
-            para_dict['kompost_filename'])
+        'ekt_tIn01_tOut08.music_init_flowNonLinear_pimunuTransverse.txt'
     ]
     hydro_info_filepattern = [
-        "eccentricities_evo_*.dat",
-        "momentum_anisotropy_*.dat",
+        "eccentricities_evo_*.dat", "momentum_anisotropy_*.dat",
         "meanpT_estimators_*.dat",
         "inverse_Reynolds_number_eta_*.dat",
         "averaged_phase_diagram_trajectory_eta_*.dat",
-        "global_conservation_laws.dat",
-        "global_angular_momentum_*.dat",
-        "vorticity_evo_*.dat",
-        "FO_nBvseta.dat",
+        "global_conservation_laws.dat", "global_angular_momentum_*.dat",
+        "vorticity_evo_*.dat"
     ]
     photon_filepattern = ['*_Spvn*.dat']
     spin_filepattern = [
@@ -500,11 +473,14 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
         "Smu_Thermal_*.dat", "Rspin_*.dat"
     ]
 
-    hydrofolder = path.join(final_results_folder, f"hydro_results_{event_id}")
+    hydrofolder = path.join(final_results_folder,
+                            "hydro_results_{}".format(event_id))
     spvnfolder = path.join(final_results_folder, results_name)
-    photonFolder = path.join(final_results_folder, f"photon_results_{event_id}")
+    photonFolder = path.join(final_results_folder,
+                             "photon_results_{}".format(event_id))
 
-    spinfolder = path.join(final_results_folder, f"spin_results_{event_id}")
+    spinfolder = path.join(final_results_folder,
+                           "spin_results_{}".format(event_id))
 
     status = check_an_event_is_good(spvnfolder)
     if status:
@@ -513,12 +489,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
             curr_time, spvnfolder),
               flush=True)
 
-        if (para_dict['initial_condition'] == "self"
-                or para_dict['initial_condition'] == "fixCentrality"):
+        if para_dict['initial_condition'] == "self":
             # save initial conditions
             if "IPGlasma" in para_dict['initial_type']:
-                initial_folder = path.join(final_results_folder,
-                                           f"ipglasma_results_{event_id}")
+                initial_folder = path.join(
+                    final_results_folder,
+                    "ipglasma_results_{}".format(event_id))
                 for inifilename in initial_state_filelist1:
                     inifile = path.join(initial_folder, inifilename)
                     if path.isfile(inifile):
@@ -529,18 +505,16 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                         if path.isfile(inifile):
                             shutil.move(inifile, spvnfolder)
             if "3DMCGlauber" in para_dict['initial_type']:
-                for iniFilenamePattern in glauber_filelist:
-                    iniFileList = glob(
-                        path.join(final_results_folder, iniFilenamePattern))
-                    for iniFile in iniFileList:
-                        if path.isfile(iniFile):
-                            shutil.move(iniFile, spvnfolder)
+                for iniFilename in glauber_filelist:
+                    iniFile = path.join(final_results_folder, iniFilename)
+                    if path.isfile(iniFile):
+                        shutil.move(iniFile, spvnfolder)
 
             # save pre-equilibrium results
             if (para_dict['initial_type'] == "IPGlasma+KoMPoST"
                     and para_dict['save_kompost']):
                 preeq_folder = path.join(final_results_folder,
-                                         f"kompost_results_{event_id}")
+                                         "kompost_results_{}".format(event_id))
                 for prefilename in pre_equilibrium_filelist:
                     prefile = path.join(preeq_folder, prefilename)
                     if path.isfile(prefile):
@@ -569,8 +543,9 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                     if path.isfile(ispinfile):
                         shutil.move(ispinfile, spvnfolder)
 
-        hf = h5py.File(f"{results_name}.h5", "w")
-        gtemp = hf.create_group(f"{results_name}")
+
+        hf = h5py.File("{0}.h5".format(results_name), "w")
+        gtemp = hf.create_group("{0}".format(results_name))
         file_list = glob(path.join(spvnfolder, "*"))
         for file_path in file_list:
             file_name = file_path.split("/")[-1]
@@ -578,10 +553,11 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 parafile = open(file_path)
                 for iline, rawline in enumerate(parafile.readlines()):
                     paraline = rawline.strip('\n')
-                    gtemp.attrs.create(f"{iline}", np.bytes_(paraline))
+                    gtemp.attrs.create("{0}".format(iline),
+                                       np.string_(paraline))
             else:
                 dtemp = np.loadtxt(file_path, dtype="float32")
-                h5data = gtemp.create_dataset(f"{file_name}",
+                h5data = gtemp.create_dataset("{0}".format(file_name),
                                               data=dtemp,
                                               compression="gzip",
                                               compression_opts=9)
@@ -590,12 +566,12 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 header_text = str(ftemp.readline())
                 ftemp.close()
                 if header_text.startswith("#"):
-                    h5data.attrs.create("header", np.bytes_(header_text))
+                    h5data.attrs.create("header", np.string_(header_text))
         hf.close()
-        shutil.move(f"{results_name}.h5", final_results_folder)
+        shutil.move("{}.h5".format(results_name), final_results_folder)
         shutil.rmtree(spvnfolder, ignore_errors=True)
     else:
-        print(f"{spvnfolder} is broken, skipped", flush=True)
+        print("{} is broken, skipped".format(spvnfolder), flush=True)
     return (status)
 
 
@@ -631,7 +607,7 @@ def remove_unwanted_outputs(final_results_folder, event_id, para_dict):
 
     if para_dict["compute_photons"]:
         photonfolder = path.join(final_results_folder,
-                                 "photon_results_{}".format(event_id))
+                                "photon_results_{}".format(event_id))
         shutil.rmtree(photonfolder, ignore_errors=True)
 
 
@@ -663,14 +639,13 @@ def main(para_dict_):
     nev = para_dict_['n_hydro']
     exitErrorTrigger = False
     exitErrorTriggerInitial = False
-    for iev in range(nev):
+    for iev in range(idx0, idx0 + nev):
         curr_time = time.asctime()
 
-        event_id = str(iev + idx0)
-        if (para_dict_['initial_condition'] != "self"
-                and para_dict_['initial_condition'] != "fixCentrality"):
+        event_id = str(iev)
+        if para_dict_['initial_condition'] != "self":
             initial_database_name = (
-                initial_condition.split("/")[-1].split(".h5")[0])
+                    initial_condition.split("/")[-1].split(".h5")[0])
             event_id = initial_database_name + "_" + event_id
 
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
@@ -693,7 +668,6 @@ def main(para_dict_):
             status = False
             if path.exists(results_file):
                 status = True
-            else:
                 spvnfolder = path.join(final_results_folder,
                                        "spvn_results_{}".format(event_id))
                 if path.exists(spvnfolder):
@@ -710,9 +684,10 @@ def main(para_dict_):
               flush=True)
 
         initStauts, ifile = get_initial_condition(initial_condition,
-                                                  initial_type, iev, idx0 + iev,
+                                                  initial_type, iev,
                                                   para_dict_['seed_add'],
-                                                  final_results_folder)
+                                                  final_results_folder,
+                                                  para_dict_['time_stamp_str'])
         if not initStauts:
             exitErrorTriggerInitial = True
             continue
@@ -734,7 +709,7 @@ def main(para_dict_):
             call("ln -s {0:s} {1:s}".format(
                 path.join(path.abspath(final_results_folder),
                           kompost_folder_name,
-                          (para_dict_['kompost_filename']
+                          ("ekt_tIn01_tOut08"
                            + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
@@ -752,13 +727,11 @@ def main(para_dict_):
             continue
 
         if (initial_type == "3DMCGlauber_dynamical"
-                and (initial_condition == "self"
-                     or initial_condition == "fixCentrality")):
+                and initial_condition == "self"):
             # save the initial condition
-            shutil.move(
-                "MUSIC/initial/strings.dat",
-                path.join(final_results_folder, hydro_folder_name,
-                          "strings_{}.dat".format(event_id)))
+            shutil.move("MUSIC/initial/strings.dat",
+                        path.join(final_results_folder, hydro_folder_name,
+                                  "strings_{}.dat".format(event_id)))
 
         if para_dict_["check_point_flag"]:
             checkPoint(startTime, CHECKPOINT_FILENAME, final_results_folder)
@@ -768,31 +741,34 @@ def main(para_dict_):
             prepare_evolution_files_for_photon(final_results_folder,
                                                hydro_folder_name)
             photon_success, photon_folder_name = run_photon(
-                final_results_folder, event_id)
+                                final_results_folder, event_id)
             if not photon_success:
                 exitErrorTrigger = True
                 continue
             if not para_dict["save_hydro"]:
-                evoFileName = path.join(final_results_folder, hydro_folder_name,
+                evoFileName = path.join(final_results_folder,
+                                        hydro_folder_name,
                                         "evolution_all_xyeta.dat")
                 shutil.rmtree(evoFileName, ignore_errors=True)
             if para_dict_["check_point_flag"]:
-                checkPoint(startTime, CHECKPOINT_FILENAME, final_results_folder)
+                checkPoint(startTime, CHECKPOINT_FILENAME,
+                           final_results_folder)
 
         nUrQMDFolder = n_urqmd
         if para_dict_["compute_polarization"]:
             nUrQMDFolder += 1
         # if hydro finishes properly, we continue to do hadronic transport
-        status_success = prepare_surface_files_for_urqmd(
-            final_results_folder, hydro_folder_name, nUrQMDFolder)
+        status_success = prepare_surface_files_for_urqmd(final_results_folder,
+                                                         hydro_folder_name,
+                                                         nUrQMDFolder)
         if not status_success:
             exitErrorTrigger = True
             continue
 
         # then run UrQMD events in parallel
         urqmd_success, urqmd_file_path = run_urqmd_shell(
-            n_urqmd, final_results_folder, event_id, para_dict_, startTime,
-            CHECKPOINT_FILENAME)
+            n_urqmd, final_results_folder, event_id, para_dict_,
+            startTime, CHECKPOINT_FILENAME)
         if not urqmd_success:
             print("\U000026D4  {} did not finsh properly, skipped.".format(
                 urqmd_file_path),
@@ -831,24 +807,17 @@ if __name__ == "__main__":
         SAVE_HYDRO = (sys.argv[9].lower() == "true")
         SAVE_URQMD = (sys.argv[10].lower() == "true")
         SEED_ADD = int(sys.argv[11])
-        COMP_POLARIZATION = (sys.argv[12].lower() == "true")
-        COMP_PHOTONS = (sys.argv[13].lower() == "true")
-        CHECK_POINT = (sys.argv[14].lower() == "true")
-        AFTERBURNER_TYPE = str(sys.argv[15])
+        TIME_STAMP = str(sys.argv[12])
+        COMP_POLARIZATION = (sys.argv[13].lower() == "true")
+        COMP_PHOTONS = (sys.argv[14].lower() == "true")
+        CHECK_POINT = (sys.argv[15].lower() == "true")
     except IndexError:
         print_usage()
         sys.exit(0)
 
-    try:
-        KOMPOST_FILENAME = str(sys.argv[17])
-    except IndexError:
-        KOMPOST_FILENAME = "ekt_tIn01_tOut08"
-
     known_initial_types = [
-        "IPGlasma",
-        "IPGlasma+KoMPoST",
-        "3DMCGlauber_dynamical",
-        "3DMCGlauber_participants",
+        "IPGlasma", "IPGlasma+KoMPoST",
+        "3DMCGlauber_dynamical", "3DMCGlauber_participants",
         "3DMCGlauber_consttau",
     ]
     if INITIAL_CONDITION_TYPE not in known_initial_types:
@@ -872,9 +841,9 @@ if __name__ == "__main__":
         'compute_polarization': COMP_POLARIZATION,
         'compute_photons': COMP_PHOTONS,
         'seed_add': SEED_ADD,
+        'time_stamp_str': TIME_STAMP,
         'check_point_flag': CHECK_POINT,
-        'afterburner_type': AFTERBURNER_TYPE,
-        'kompost_filename': KOMPOST_FILENAME,
     }
 
     main(para_dict)
+
