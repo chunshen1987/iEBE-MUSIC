@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
-parafile=$1
-processId=$2
-nHydroEvents=$3
-nUrQMD=$4
-nthreads=$5
-seed=$6
-bayesFile=$7
+workFolder=$1
+parafile=$2
+processId=$3
+nHydroEvents=$4
+nUrQMD=$5
+nthreads=$6
+seed=$7
+bayesFile=$8
 
 
 # Run the singularity container
@@ -21,13 +22,13 @@ printf "Job running as user: `/usr/bin/id`\n"
 
 if [ -z ${bayesFile} ]
 then
-    /home/iEBE-MUSIC/generate_jobs.py -w playground -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} --nocopy --continueFlag
+    /opt/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} --nocopy --continueFlag
 else
-    /home/iEBE-MUSIC/generate_jobs.py -w playground -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
+    /opt/iEBE-MUSIC/generate_jobs.py -w ${workFolder} -c wsugrid -par ${parafile} -id ${processId} -n_hydro ${nHydroEvents} -n_th ${nthreads} -n_urqmd ${nUrQMD} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
 fi
 
 
-cd playground/event_0
+cd ${workFolder}/event_0
 bash submit_job.script
 status=$?
 if [ $status -ne 0 ]; then

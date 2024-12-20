@@ -3,7 +3,7 @@
 
 
 import sys
-from os import path
+from os import path, makedirs
 import random
 
 FILENAME = "singularity.submit"
@@ -57,15 +57,18 @@ transfer_input_files = {0}
     script.write("""
 transfer_output_files = playground/event_0/EVENT_RESULTS_$(Process)/spvn_results_$(Process).h5
 
-error = ../log/job.$(Cluster).$(Process).error
-output = ../log/job.$(Cluster).$(Process).output
-log = ../log/job.$(Cluster).$(Process).log
+error = log/job.$(Cluster).$(Process).error
+output = log/job.$(Cluster).$(Process).output
+log = log/job.$(Cluster).$(Process).log
 
 #+JobDurationCategory = "Long"
 max_idle = 1000
 
 # remove the failed jobs
 periodic_remove = (ExitCode == 73)
+
+# auto release hold jobs if they are caused by data transfer issues on OSG
+periodic_release = ((HoldReasonCode == 13 || HoldReasonCode == 26) && (time() - EnteredCurrentStatus) > 1200 )
 
 checkpoint_exit_code = 85
 
@@ -107,11 +110,11 @@ printf "Job running as user: `/usr/bin/id`\\n"
     if para_dict_["bayesFlag"]:
         script.write("""bayesFile=$6
 
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
+/opt/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} -b ${bayesFile} --nocopy --continueFlag
 """)
     else:
         script.write("""
-/home/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --nocopy --continueFlag
+/opt/iEBE-MUSIC/generate_jobs.py -w playground -c OSG -par ${parafile} -id ${processId} -n_th ${nthreads} -n_urqmd ${nthreads} -n_hydro ${nHydroEvents} -seed ${seed} --nocopy --continueFlag
 """)
 
     script.write("""
@@ -129,6 +132,9 @@ fi
 def main(para_dict_):
     write_submission_script(para_dict_)
     write_job_running_script(para_dict_)
+    logFolderName = "log"
+    if not path.exists(logFolderName):
+        makedirs(logFolderName)
 
 
 if __name__ == "__main__":
