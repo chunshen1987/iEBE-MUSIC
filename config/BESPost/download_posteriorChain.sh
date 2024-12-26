@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-wget --no-check-certificate 'https://www.dropbox.com/scl/fi/3xl7zykt4vhsqipb97ycj/posteriorChain.pkl?rlkey=ecapnv9l1sgtdu3phhia0c9g1&dl=0' -O posteriorChain.pkl
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/4so8e9jxb9wnuddrb84df/posteriorChain.pkl?rlkey=h2i9jpg3u56f3zaz9v0uud1o3&dl=0' -O posteriorChain.pkl
