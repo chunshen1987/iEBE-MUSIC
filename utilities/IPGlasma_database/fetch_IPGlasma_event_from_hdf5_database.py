@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 """
-     This script fectches individual IP-Glasma event from the hdf5 database.
+     This script fetches individual IP-Glasma event from the hdf5 database.
      It outputs the input file for MUSIC fluid dynamic simulation.
 """
 
@@ -13,9 +13,9 @@ def print_help():
     print("{0} database_filename event_id output_type".format(argv[0]))
 
 
-def fecth_an_IPGlasma_event_Tmunu(database_path, event_idx):
+def fetch_an_IPGlasma_event_Tmunu(database_path, event_idx):
     time_stamp = "0.4"
-    print(("fectching an IP-Glasma event Tmunu with "
+    print(("fetching an IP-Glasma event Tmunu with "
            + "event id: {} at tau = {} fm from {}".format(
                event_idx, time_stamp, database_path)))
     hf = h5py.File(database_path, "r")
@@ -50,9 +50,9 @@ def fecth_an_IPGlasma_event_Tmunu(database_path, event_idx):
     return (file_name)
 
 
-def fecth_an_IPGlasma_event(database_path, event_idx):
+def fetch_an_IPGlasma_event(database_path, event_idx):
     time_stamp = "0.4"
-    print(("fectching an IP-Glasma event with "
+    print(("fetching an IP-Glasma event with "
            + "event id: {} at tau = {} fm from {}".format(
                event_idx, time_stamp, database_path)))
     hf = h5py.File(database_path, "r")
@@ -100,7 +100,7 @@ if __name__ == "__main__":
 
     time_stamp_str = "0.4"
     if type_flag == 0:
-        fecth_an_IPGlasma_event(database_filename, time_stamp_str, event_id)
+        fetch_an_IPGlasma_event(database_filename, time_stamp_str, event_id)
     elif type_flag == 1:
-        fecth_an_IPGlasma_event_Tmunu(database_filename, time_stamp_str,
+        fetch_an_IPGlasma_event_Tmunu(database_filename, time_stamp_str,
                                       event_id)

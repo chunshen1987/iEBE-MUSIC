@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 """
-     This script fectches individual IP-Glasma event from the hdf5 database.
+     This script fetches individual IP-Glasma event from the hdf5 database.
      It outputs the input file for MUSIC fluid dynamic simulation.
 """
 
@@ -13,8 +13,8 @@ def print_help():
     print("{0} database_filename event_id".format(argv[0]))
 
 
-def fecth_an_IPGlasma_event(database_path, time_stamp, event_idx):
-    print(("fectching an IP-Glasma event with "
+def fetch_an_IPGlasma_event(database_path, time_stamp, event_idx):
+    print(("fetching an IP-Glasma event with "
            + "event id: {} at tau = {} fm from {}".format(
                event_idx, time_stamp, database_path)))
     hf = h5py.File(database_path, "r")
@@ -36,4 +36,4 @@ if __name__ == "__main__":
         exit(1)
 
     time_stamp_str = "0.4"
-    fecth_an_IPGlasma_event(database_filename, time_stamp_str, event_id)
+    fetch_an_IPGlasma_event(database_filename, time_stamp_str, event_id)

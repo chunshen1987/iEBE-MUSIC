@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 """
-     This script fectches individual 3D MC-Glauber event from the hdf5 database.
+     This script fetches individual 3D MC-Glauber event from the hdf5 database.
      It outputs the input file for MUSIC fluid dynamic simulation.
 """
 
@@ -13,8 +13,8 @@ def print_help():
     print("{0} database_filename event_id".format(argv[0]))
 
 
-def fecth_an_3DMCGlauber_event(database_path, event_idx):
-    print(("fectching an 3DMCGlauber event with "
+def fetch_an_3DMCGlauber_event(database_path, event_idx):
+    print(("fetching an 3DMCGlauber event with "
            + "event id: {} from {}".format(event_idx, database_path)))
     hf = h5py.File(database_path, "r")
     file_name = "strings_event_{0:d}.dat".format(event_idx)
@@ -33,4 +33,4 @@ if __name__ == "__main__":
         print_help()
         exit(1)
 
-    fecth_an_3DMCGlauber_event(database_filename, event_id)
+    fetch_an_3DMCGlauber_event(database_filename, event_id)

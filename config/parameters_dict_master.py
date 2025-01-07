@@ -25,6 +25,8 @@ control_dict = {
     'EOSType': 0,
     'EOSId': 0,
     'EOSFileName': "EoS.pkl",
+    'entropy_matching': False,  # flag to perform entropy matching for IPGlasma
+                                # or IPGlasma+KoMPoST initial conditions
     'debugFlag': False,
 }
 
@@ -209,6 +211,7 @@ kompost_dict = {
     'KoMPoSTParameters': {
         'EtaOverS': 0.12,  # specific shear viscosity
         'EtaOverSTemperatureScale': 0.1,
+        'NuEffective': 16.0, # effective number of degrees of freedom
         'EVOLUTION_MODE':
             1,  # 0 for free-streaming, 1: for "KoMPoST" EKT evolution
         'ENERGY_PERTURBATIONS': 1,
@@ -227,6 +230,11 @@ kompost_dict = {
     },
 }
 
+# Entropy matching
+entropy_matching_dict = {
+    'nu_eff': 16.0  # effective number of degrees of freedom
+}
+
 # MUSIC
 music_dict = {
     'echo_level': 1,  # control the mount of message output to screen
@@ -237,6 +245,7 @@ music_dict = {
     #   -- 91: e and u^\mu,
     #   -- 92: e only,
     #   -- 93: e, u^\mu, and pi^\munu
+    #   -- 94: e, u^\mu, pi^\munu, and Pi (for s matching)
     # 11: 3dMCGlauber initial condition at a constant tau surface
     #     based on the nuclear thickness funciton TA and TB
     #   -- 111: second parameterization of eta profile

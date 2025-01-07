@@ -12,8 +12,8 @@ import shutil
 import re
 import h5py
 import numpy as np
-from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
-from fetch_3DMCGlauber_event_from_hdf5_database import fecth_an_3DMCGlauber_event
+from fetch_IPGlasma_event_from_hdf5_database import fetch_an_IPGlasma_event, fetch_an_IPGlasma_event_Tmunu
+from fetch_3DMCGlauber_event_from_hdf5_database import fetch_an_3DMCGlauber_event
 
 
 def print_usage():
@@ -26,7 +26,7 @@ def print_usage():
           + "compute_photons_flag enableCheckPoint")
 
 
-def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
+def fetch_an_3DMCGlauber_smooth_event(database_path, iev):
     """This function returns the filename of an initial condition in the
        database_path folder
     """
@@ -52,7 +52,7 @@ def mapEventIdToCentrality(event_id):
 
 def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                           final_results_folder):
-    """This funciton get initial conditions"""
+    """This function get initial conditions"""
     status = True
     if "IPGlasma" in initial_type:
         ipglasma_local_folder = "ipglasma/ipglasma_results"
@@ -75,9 +75,9 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                 print("No need to rerun ...")
         else:
             if "KoMPoST" in initial_type:
-                file_temp = fecth_an_IPGlasma_event_Tmunu(database, event_id)
+                file_temp = fetch_an_IPGlasma_event_Tmunu(database, event_id)
             else:
-                file_temp = fecth_an_IPGlasma_event(database, event_id)
+                file_temp = fetch_an_IPGlasma_event(database, event_id)
             makedirs(ipglasma_local_folder, exist_ok=True)
             shutil.move(file_temp, path.join(ipglasma_local_folder, file_name))
             collect_ipglasma_event(res_path)
@@ -125,7 +125,7 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                  shell=True)
             return status, file_name
         else:
-            file_name = fecth_an_3DMCGlauber_event(database, event_id)
+            file_name = fetch_an_3DMCGlauber_event(database, event_id)
             return status, file_name
     elif initial_type == "3DMCGlauber_participants":
         file_name = "participants_event_{}.dat".format(event_id)
@@ -158,7 +158,7 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                       "spectators_{}.dat".format(event_id)))
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
-        file_name = fecth_an_3DMCGlauber_smooth_event(database, event_id)
+        file_name = fetch_an_3DMCGlauber_smooth_event(database, event_id)
         return status, file_name
     else:
         print("\U0001F6AB  "
@@ -736,6 +736,8 @@ def main(para_dict_):
                            + ".music_init_flowNonLinear_pimunuTransverse.txt")),
                 hydro_initial_file),
                  shell=True)
+            
+        if para_dict_["check_point_flag"]:
 
         # first run hydro
         hydro_success, hydro_folder_name = run_hydro_event(
