@@ -18,6 +18,7 @@ if weakFDFlag:
 initialFlag = False
 pTdiffFlag = True
 etadiffFlag = True
+photonFlag = True
 
 kinematicCutsDict = {
     "STAR_eta_-0p5_0p5_pT_0p2_4": {
@@ -79,6 +80,11 @@ kinematicCutsDict = {
 pidList = [('ch', '9999'), ('pi+', '211'), ('pi-', '-211'), ('K+', '321'),
            ('K-', '-321'), ('p', '2212'), ('pbar', '-2212')]
 
+photonList = ['QGP_2to2_total', 'QGP_AMYcollinear',
+              'HG_2to2_meson_total', 'HG_omega',
+              'HG_rho_spectralfun', 'HG_pipi_bremsstrahlung',
+             ]
+
 LHCetaRangeList = [
     '-0.4_0.4', '-0.5_0.5', '-0.8_-0.4', '-2.4_-0.5', '-2.5_-0.5', '-3.7_-1.7',
     '-4.9_-3.1', '-5.1_-2.8', '0.4_0.8', '0.5_2.4', '0.5_2.5', '1.7_3.7',
@@ -90,6 +96,26 @@ RHICetaRangeList = ['-0.5_0.5', '-1_-0.5', '-3.9_-3.1', '0.5_1', '3.1_3.9']
 def help_message():
     print("Usage: {0} database_file".format(sys.argv[0]))
     exit(0)
+
+
+def get3DGlauberData(h5Event):
+    """
+        this function gets the 3D Glauber data from the hdf5 event
+    """
+    data = []
+    for fileName in h5Event.keys():
+        if "strings_" in fileName:
+            data = h5Event.get(fileName).attrs.get("header")
+            break
+    data = data.decode("utf-8").split(" ")
+    b = float(data[3])
+    Npart = int(data[7])
+    Ncoll = int(data[10])
+    Nstrings = int(data[13])
+    Etot = float(data[16])
+    Pztot = float(data[20])
+    randomSeed = int(data[24])
+    return [b, Npart, Ncoll, Nstrings, Etot, Pztot, randomSeed]
 
 
 def calcualte_inte_Vn_pT(pT_low, pT_high, data):
@@ -369,6 +395,27 @@ for ievent, event_i in enumerate(eventList):
                 pTdiffData.append(vn_data[:, 2*iOrder]
                                   + 1j*vn_data[:, 2*iOrder + 1])
             outdata[event_i][f"{pidName}_pTArr"] = np.array(pTdiffData)
+
+    if photonFlag:
+        eventData = get3DGlauberData(eventGroup)
+        outdata[event_i]["Ncoll"] = eventData[2]
+        outdata[event_i]["Npart"] = eventData[1]
+        outdata[event_i]["b"] = eventData[0]
+
+        photonFullres = []
+        for ichannel, channelName in enumerate(photonList):
+            vn_filename = f"{channelName}_Spvn_tot_ypTdiff.dat"
+            vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+            if ichannel == 0:
+                photonFullres = vn_data
+                photonFullres[:, 3:] = (vn_data[:, 3:]
+                                        * vn_data[:, 2].reshape(-1, 1))
+            else:
+                photonFullres[:, 2] += vn_data[:, 2]
+                photonFullres[:, 3:] += (vn_data[:, 3:]
+                                         * vn_data[:, 2].reshape(-1, 1))
+        photonFullres[:, 3:] /= photonFullres[:, 2].reshape(-1, 1)
+        outdata[event_i]["photon_ypTdiff"] = photonFullres
 
     if etadiffFlag:
         # eta-differential spectra and vn
