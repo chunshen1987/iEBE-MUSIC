@@ -415,7 +415,9 @@ for ievent, event_i in enumerate(eventList):
                 photonFullres[:, 3:] += (vn_data[:, 3:]
                                          * vn_data[:, 2].reshape(-1, 1))
         photonFullres[:, 3:] /= photonFullres[:, 2].reshape(-1, 1)
-        outdata[event_i]["photon_ypTdiff"] = photonFullres
+        outdata[event_i]["photon_ypTdiff"] = photonFullres[:, 2:]
+        outdata[event_i]["photon_pTArr"] = np.unique(photonFullres[:, 1])
+        outdata[event_i]["photon_yArr"] = np.unique(photonFullres[:, 0])
 
     if etadiffFlag:
         # eta-differential spectra and vn
