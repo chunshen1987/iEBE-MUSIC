@@ -992,9 +992,9 @@ def main():
                 setId = random.randint(0, 1000000)
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
             subprocess.call(
-                "(cd {}/{}; python3 parameterGenerator.py {} {})".format(
+                "(cd {}/{}; python3 parameterGenerator.py {} {} {})".format(
                     code_package_path, posteriorChainFilePath, setId,
-                    paramFile),
+                    paramFile, parameter_dict.mcglauber_dict['roots']),
                 shell=True)
 
     if args.bayes_file != "":
