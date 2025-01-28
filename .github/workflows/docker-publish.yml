@@ -7,7 +7,7 @@ name: CI to Docker Hub
 
 on:
   push:
-    branches: [ main, dev, EoSGenerator ]
+    branches: [ main, dev ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
   pull_request:
