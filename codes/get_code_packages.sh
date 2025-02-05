@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=3 https://github.com/chunshen1987/3dMCGlauber -b electriCharge 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout ed18f599bbfba89cde2e13ee31c7804317460757)
+(cd 3dMCGlauber_code; git checkout 6aec7ce70ab4c93b36e91b027578453542335548)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -29,7 +29,7 @@ rm -fr MUSIC_code/.git
 # download iSS particle sampler
 rm -fr iSS_code
 git clone --depth=3 https://github.com/chunshen1987/iSS -b 4DEoS iSS_code
-(cd iSS_code; git checkout 3b1f8b71200984afbd8b3e86c6754423caa45e41)
+(cd iSS_code; git checkout 65d33ce260424ad819efda735decb3ff92c6878e)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper
