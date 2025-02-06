@@ -125,6 +125,16 @@ ipglasma_dict = {
     'readInitialWilsonLines': 0,
     'writeInitialWilsonLines': 0,
     'writeOutputsToHDF5': 0
+    'useJIMWLK': 0,
+    'mu0_jimwlk': 0.28,
+    'simpleLangevin': 1,
+    'alphas_jimwlk': 0,
+    'jimwlk_ic_x': 0.01,
+    'x_projectile_jimwlk': 0.001,
+    'x_target_jimwlk': 0.001,
+    'Ds_jimwlk': 0.005,
+    'Lambda_QCD_jimwlk': 0.040,
+    'm_jimwlk': 0.4,
 }
 
 # 3DMCGlauber model
