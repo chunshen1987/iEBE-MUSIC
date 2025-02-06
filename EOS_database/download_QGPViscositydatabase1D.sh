@@ -14,4 +14,5 @@
 
 # v1.3
 wget --no-check-certificate 'https://www.dropbox.com/scl/fi/x3glrdayd4jqds9t0q1qr/eta_s.pkl?rlkey=sxvq9uga8b0gtj4rla56bkrwb&dl=0' -O eta_s.pkl
+#wget --no-check-certificate 'https://www.dropbox.com/scl/fi/enlum5m55f2m9djuj0ppj/zeta_s.pkl?rlkey=6nmdczzrnp23iylefeud9p7rt&dl=0' -O zeta_s.pkl
 wget --no-check-certificate 'https://www.dropbox.com/scl/fi/enlum5m55f2m9djuj0ppj/zeta_s.pkl?rlkey=6nmdczzrnp23iylefeud9p7rt&dl=0' -O zeta_s.pkl
