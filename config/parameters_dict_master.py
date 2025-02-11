@@ -378,6 +378,10 @@ photon_dict = {
     'photon_phi_q_f': 6.2831853,  # the largest angle of photon momentum
     'photon_y_i': 0.0,  # the smallest photon rapidity
     'photon_y_f': 0.0,  # the largest photon rapidity
+    'nMInv': 11,        # number of points for dilepton invariant mass
+    'dilepton_mass_i': 1.0,         # the smallest dilepton mass (GeV)
+    'dilepton_mass_f': 3.0,         # the largest dilepton mass (GeV)
+    'alpha_s': 0.2,         # value of alpha_s used in the NLO QGP dilepton rate
     'norder': 10,  # calculate photon vn to norder
     'turn_on_muB': 1,  # flag to include muB dependence in photon rates
     'T_dec': 0.105,  # freeze out temperature (GeV)
