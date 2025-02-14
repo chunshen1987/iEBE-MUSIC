@@ -135,6 +135,8 @@ ipglasma_dict = {
     'Ds_jimwlk': 0.005,
     'Lambda_QCD_jimwlk': 0.040,
     'm_jimwlk': 0.4,
+    'saveSnapshots': 0,
+    'xSnapshotList': [5e-3,2e-3,0.0001,0.00005,0.00001]
 }
 
 # 3DMCGlauber model
@@ -800,9 +802,14 @@ def output_parameters_to_files(workfolder="."):
             elif itype == 3:
                 if key_name in ("type", "database_name_pattern"):
                     continue
-                f.write("{parameter_name}  {parameter_value}\n".format(
-                    parameter_name=key_name,
-                    parameter_value=parameters_dict[key_name]))
+                if isinstance(parameters_dict[key_name], list):
+                    varStr = ",".join(
+                            [str(var) for var in parameters_dict[key_name]])
+                    f.write(f"{key_name}  {varStr}\n")
+                else:
+                    f.write("{parameter_name}  {parameter_value}\n".format(
+                        parameter_name=key_name,
+                        parameter_value=parameters_dict[key_name]))
             elif itype == 4:
                 f.write("[{}]\n".format(key_name))
                 for subkey_name in parameters_dict[key_name]:
