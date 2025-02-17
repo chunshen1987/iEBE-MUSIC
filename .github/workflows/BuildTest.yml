@@ -25,7 +25,7 @@ jobs:
       - name: Install dependent libraries
         run: |
            sudo apt-get update
-           sudo apt-get install libfftw3-dev hdf5-tools libhdf5-dev
+           sudo apt-get install libfftw3-dev hdf5-tools libhdf5-dev libgsl-dev
       - name: Build the iEBE-MUSIC framework
         run: |
           cd codes/
