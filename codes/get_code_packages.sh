@@ -52,3 +52,7 @@ rm -fr hadronic_afterburner_toolkit_code/.git
 
 # dowload 4D NEoS fomr bitbucket https://bitbucket.org/wayne_state_nuclear_theory/neos/src/main/EoS_UrQMD/
 (cd MUSIC_code/EOS; bash download_Neos4D.sh pdg;)
+
+# download 4D tables in iSS
+(cd iSS_code/iSS_tables/EOS_tabels; bash download_HRG4D.sh;)
+(cd iSS_code/iSS_tables/deltaf_tables/urqmd; bash download_NEoS4D_deltafCoeffs.sh;)
