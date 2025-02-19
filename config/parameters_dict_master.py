@@ -391,11 +391,12 @@ iss_dict = {
     'turn_on_rhob': 0,          # read in net baryon chemical potential
     'turn_on_diff': 0,          # read in baryon diffusion current
 
+    'regulateEOS': 1            # flag to regulate T and mu with pure HRG EOS
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
     'include_deltaf_diffusion': 0,  # include delta f contribution from diffusion
 
-    'bulk_deltaf_kind': 1,     # 0: 14-momentum approximation, 1: relaxation time approximation
+    'bulk_deltaf_kind': 20,     # 0: 14-momentum approximation, 1: relaxation time approximation
     'restrict_deltaf': 0,      # flag to apply restriction on the size of delta f
     'deltaf_max_ratio': 1.0,   # the maximum allowed size of delta f w.r.t f0
     'quantum_statistics': 1,   # include quantum statistics (1: yes, 0: no)
@@ -438,6 +439,7 @@ iss_dict = {
     'output_samples_into_files': 0,  # output particle samples into individual files
     'store_samples_in_memory': 1,    # flag to store particle samples in memory
     'use_OSCAR_format': 1,           # output results in OSCAR format
+    'use_OSCAR2013': 0,              # output results in OSCAR 2013 format (need use_OSCAR_format == 1)
     'use_gzip_format': 0,  # output results in gzip format (only works with
                            # store_samples_in_memory = 1)
     'use_binary_format': 0,
