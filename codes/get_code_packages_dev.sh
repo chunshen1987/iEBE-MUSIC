@@ -10,7 +10,7 @@ rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
 rm -fr ipglasma_code
-git clone --depth=1 https://github.com/wenbin1501110084/ipglasma -b stringy_proton ipglasma_code
+git clone --depth=1 https://github.com/chunshen1987/ipglasma -b ipglasma_jimwlk ipglasma_code
 #(cd ipglasma_code; git checkout 819e672bb710f6bbc0fd751e6710a841d1fe7d27)
 rm -fr ipglasma_code/.git
 
@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
-(cd MUSIC_code; git checkout b191bf895bcabfdf810636de7f54f8f38c69f2ba)
+(cd MUSIC_code; git checkout 3cdd9d1c6ab31d9a1893c5845662cdafe0281e0b)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
