@@ -436,7 +436,7 @@ mv ../hydro_event/surface.dat results/surface.dat
 mv ../hydro_event/music_input results/music_input
 mv ../hydro_event/spectators.dat results/spectators.dat 2>/dev/null
 
-""").format(nthreads)
+""".format(nthreads))
     script.write("./iSS.e 2>&1 {0}\n".format(logfile))
     script.write("""
 
