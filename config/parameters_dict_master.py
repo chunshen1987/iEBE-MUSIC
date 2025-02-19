@@ -391,7 +391,7 @@ iss_dict = {
     'turn_on_rhob': 0,          # read in net baryon chemical potential
     'turn_on_diff': 0,          # read in baryon diffusion current
 
-    'regulateEOS': 1            # flag to regulate T and mu with pure HRG EOS
+    'regulateEOS': 1,            # flag to regulate T and mu with pure HRG EOS
     'include_deltaf_shear': 1,      # include delta f contribution from shear
     'include_deltaf_bulk': 1,       # include delta f contribution from bulk
     'include_deltaf_diffusion': 0,  # include delta f contribution from diffusion
