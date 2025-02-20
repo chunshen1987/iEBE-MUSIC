@@ -951,7 +951,6 @@ for icen in range(len(centralityCutList) - 1):
     piddNArr = []
     pidmeanpTArr = []
     for event_name in selected_events_list:
-        Ngluons.append(data[event_name]['NgluonEst'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
         QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
         QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
