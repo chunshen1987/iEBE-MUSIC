@@ -46,7 +46,7 @@ rm -fr urqmd_code/.git
 
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
-git clone --depth=3 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b rapQn hadronic_afterburner_toolkit_code
+git clone --depth=3 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b main hadronic_afterburner_toolkit_code
 (cd hadronic_afterburner_toolkit_code; git checkout 1045565e1213bff1c28017c74d69a77ff8b5299e)
 rm -fr hadronic_afterburner_toolkit_code/.git
 
