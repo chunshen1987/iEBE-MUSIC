@@ -15,6 +15,8 @@ control_dict = {
     'usePosteriorParameters': False,
     'PosteriorChainFilePath': "config/BESPost",
     'PosteriorParamSet': 0,
+    'PosteriorParamSetFlag': 0,     # 0: choose from sorted chain
+                                    # 1: choose from parameter clusters
 }
 
 

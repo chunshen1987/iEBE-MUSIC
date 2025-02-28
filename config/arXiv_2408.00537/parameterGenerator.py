@@ -18,15 +18,22 @@ parameterName = [
 ]
 
 setId = int(sys.argv[1])
-paramFile = str(sys.argv[2])
+setFlag = int(sys.argv[2])
+paramFile = str(sys.argv[3])
 
 with open("posteriorChain.pkl", 'rb') as f:
     data = pickle.load(f)
-nParamSets = data['chain'].shape[0]
-setId = setId % nParamSets
-print(f"Using parameter set: {setId}")
 
-paramSet = data['chain'][setId, :]
+setName = 'chain'
+if setFlag == 1:
+    setName = 'paramClusters'
+nParamSets = data[setName].shape[0]
+setId = setId % nParamSets
+paramSet = data[setName][setId, :]
+print(f"Using parameter set: {setId} from {setName}")
+paramDict = {}
+for i, param_i in enumerate(parameterName):
+    paramDict[param_i] = paramSet[i]
 
 paramSet[13] = paramSet[13]/paramSet[12]
 paramSet[14] = paramSet[14]/paramSet[12]

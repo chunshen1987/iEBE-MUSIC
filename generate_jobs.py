@@ -984,6 +984,7 @@ def main():
             posteriorChainFilePath = (
                 parameter_dict.control_dict['PosteriorChainFilePath'])
             setId = parameter_dict.control_dict['PosteriorParamSet']
+            setFlag = parameter_dict.control_dict['PosteriorParamSetFlag']
             if setId == -1:
                 if seed == -1:
                     random.seed(time.time())
@@ -992,8 +993,8 @@ def main():
                 setId = random.randint(0, 1000000)
             paramFile = path.join(working_folder_name, "iEBE_parameters.txt")
             subprocess.call(
-                "(cd {}/{}; python3 parameterGenerator.py {} {} {})".format(
-                    code_package_path, posteriorChainFilePath, setId,
+                "(cd {}/{}; python3 parameterGenerator.py {} {} {} {})".format(
+                    code_package_path, posteriorChainFilePath, setId, setFlag,
                     paramFile, parameter_dict.mcglauber_dict['roots']),
                 shell=True)
 

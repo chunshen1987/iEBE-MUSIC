@@ -15,6 +15,8 @@ control_dict = {
     'usePosteriorParameters': False,
     'PosteriorChainFilePath': "config/arXiv_2408.00537",
     'PosteriorParamSet': 0,
+    'PosteriorParamSetFlag': 0,     # 0: choose from sorted chain
+                                    # 1: choose from parameter clusters
 }
 
 

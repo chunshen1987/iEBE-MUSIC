@@ -41,6 +41,8 @@ RUN cd ${HOME} && \
     bash download_EOSdatabase1D.sh && \
     bash download_QGPViscositydatabase1D.sh && \
     cd ../config/BESPost && \
+    bash download_posteriorChain.sh \
+    cd ../config/arXiv_2408.00537 && \
     bash download_posteriorChain.sh
 
 # Cleaning caches to reduce size of image
