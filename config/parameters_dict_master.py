@@ -398,6 +398,7 @@ photon_dict = {
     'nMInv': 11,        # number of points for dilepton invariant mass
     'dilepton_mass_i': 1.0,         # the smallest dilepton mass (GeV)
     'dilepton_mass_f': 3.0,         # the largest dilepton mass (GeV)
+    'dileptonType': 0,              # 0: electrons, 1: muons
     'alpha_s': 0.2,         # value of alpha_s used in the NLO QGP dilepton rate
     'norder': 10,  # calculate photon vn to norder
     'turn_on_muB': 1,  # flag to include muB dependence in photon rates
