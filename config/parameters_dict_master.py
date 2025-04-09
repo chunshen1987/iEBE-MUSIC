@@ -312,6 +312,7 @@ music_dict = {
     # transport coefficients
     'quest_revert_strength': 10.0,  # the strength of the viscous regulation
     'FlagResumTransportCoeff': 0,   # switch to use resummed transport coeff.
+    'FlagResetCausality': 0,
     'resumTransCoeffAlpha': 1.5,    # resummed transport coeff. control parameter
     'Viscosity_Flag_Yes_1_No_0': 1,  # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,  # include shear viscous effect
