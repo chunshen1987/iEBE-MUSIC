@@ -44,11 +44,11 @@ ipglasma_dict = {
     # all parameters below are for (type == self)
     'mode': 1,  # run mode
     'readMultFromFile': 0,
-    'size': 720,  # number of grid points of IP-Glasma computation
-    'L': 30.,  # grid size in the transverse plane
-    'Nc': 3,  # number of color
-    'm': 0.2,  # infrared cut-off mass (GeV)
-    'rmax': 10.,
+    'size': 800,  # number of grid points of IP-Glasma computation
+    'L': 40.,     # grid size in the transverse plane
+    'Nc': 3,      # number of color
+    'm': 0.2,     # infrared cut-off mass (GeV)
+    'rmax': 100.,
     'UVdamp': 0.,
     'Jacobianm': 0.35,
     'g': 1.,  # strong coupling constant

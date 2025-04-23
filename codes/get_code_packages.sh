@@ -11,7 +11,7 @@ rm -fr 3dMCGlauber_code/.git
 # download IPGlasma
 rm -fr ipglasma_code
 git clone --depth=1 https://github.com/chunshen1987/ipglasma -b ipglasma_jimwlk ipglasma_code
-(cd ipglasma_code; git checkout d1b46fa98d4e39a288bfde887b9d196d648cfc60)
+(cd ipglasma_code; git checkout d530962528457faee20b3347ff557ebe4dd6336c)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
@@ -52,5 +52,7 @@ rm -fr hadronic_afterburner_toolkit_code/.git
 
 # download nucleus configurations for 3D-Glauber
 (cd 3dMCGlauber_code/tables; bash download_nucleusTables.sh;)
+# download nucleus configurations for IP-Glasma
+(cd ipglasma_code/nucleusConfigurations; bash download_nucleusTables.sh;)
 # download essential EOS files for hydro simulations
 (cd MUSIC_code/EOS; bash download_hotQCD.sh; bash download_Neos2D.sh bqs;)
