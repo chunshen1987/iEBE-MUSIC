@@ -419,6 +419,13 @@ for ievent, event_i in enumerate(eventList):
         outdata[event_i]["photon_pTArr"] = np.unique(photonFullres[:, 1])
         outdata[event_i]["photon_yArr"] = np.unique(photonFullres[:, 0])
 
+        dileptonFileName = "Dilepton_QGPNLO_Spvn_eq_MInv.dat"
+        outdata[event_i]["dilepton_MInv"] = (
+                np.nan_to_num(eventGroup.get(dileptonFileName)))
+        dileptonFileName = "Dilepton_QGPNLO_Spvn_eq_MInvpTdiff.dat"
+        outdata[event_i]["dilepton_MInvpTdiff"] = (
+                np.nan_to_num(eventGroup.get(dileptonFileName)))
+
     if etadiffFlag:
         # eta-differential spectra and vn
         vn_filename = f'particle_9999_pTeta_distribution{weakString}.dat'
