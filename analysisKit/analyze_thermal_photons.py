@@ -34,7 +34,7 @@ def calculate_photon_dNdy(yArr, pTArr, data_ypTdiff,
     """
     dpT = pTArr[1] - pTArr[0]
     nev = data_ypTdiff.shape[0]
-    dNdy = np.sum(data_ypTdiff*pTArr, axis=2)*2*np.pi*dpT
+    dNdy = np.sum(data_ypTdiff, axis=2)*dpT
     dNdy_mean = np.mean(dNdy, axis=0)
     dNdy_err = np.std(dNdy, axis=0)/np.sqrt(nev)
     results = np.array([yArr, dNdy_mean, dNdy_err])
@@ -51,10 +51,10 @@ def calculate_photon_pTSpectra(yArr, pTArr, data_ypTdiff,
         this function calculate the photon pT spectra
     """
     nev = data_ypTdiff.shape[0]
-    idx = np.abs(yArr) < 0.5
+    idx = np.abs(yArr) < 0.1
     dy = yArr[1] - yArr[0]
     Yinterval = len(yArr[idx])*dy
-    dNd2pT = np.sum(data_ypTdiff[:, idx, :], axis=1)*dy/Yinterval
+    dNd2pT = np.sum(data_ypTdiff[:, idx, :], axis=1)*dy/Yinterval/pTArr/(2*np.pi)
     dNd2pT_mean = np.mean(dNd2pT, axis=0)
     dNd2pT_err = np.std(dNd2pT, axis=0)/np.sqrt(nev)
     results = np.array([pTArr, dNd2pT_mean, dNd2pT_err])
@@ -62,7 +62,7 @@ def calculate_photon_pTSpectra(yArr, pTArr, data_ypTdiff,
                results.transpose(),
                fmt="%.4e",
                delimiter="  ",
-               header="pT(GeV)  dN/d2pT  dN/d2pT_err")
+               header="pT(GeV)  dN/(2pi dy pT dpT)  dN/(2pi dy pT dpT)_err")
 
 
 def calculate_photon_vnpT(yArr, pTArr, photon_dN, photon_v2, rapInterval,
@@ -103,6 +103,7 @@ def calculate_photon_vnpT(yArr, pTArr, photon_dN, photon_v2, rapInterval,
     dy = yArr[1] - yArr[0]
     dNd2pT = np.sum(photon_dN[:, idx, :], axis=1)
     QnpT = np.sum(photon_v2[:, idx, :]*photon_dN[:, idx, :], axis=1)
+    Yinterval = len(yArr[idx])*dy
 
     vnpTNum = np.real(QnpT*np.conj(QnRef1 + QnRef2))
     n2Num = dNd2pT*(dNRef1 + dNRef2) + 1e-16
@@ -121,15 +122,16 @@ def calculate_photon_vnpT(yArr, pTArr, photon_dN, photon_v2, rapInterval,
                                 /np.mean(n2Den[array_idx], axis=0)) + 1e-16))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
-    dNpT_mean = np.mean(dNd2pT, axis=0)*dy
-    dNpT_err = np.std(dNd2pT, axis=0)*dy/np.sqrt(nev)
+    dNd2pT = dNd2pT*dy/Yinterval/(2*np.pi)/pTArr
+    dNpT_mean = np.mean(dNd2pT, axis=0)
+    dNpT_err = np.std(dNd2pT, axis=0)/np.sqrt(nev)
 
     results = np.array([pTArr, dNpT_mean, dNpT_err, vnpT_mean, vnpT_err])
     np.savetxt(outputFileName,
                results.transpose(),
                fmt="%.4e",
                delimiter="  ",
-               header="pT (GeV)  dN/d2pT  dN/d2pT_err  vn(pT)  vn(pT)_err")
+               header="pT (GeV)  dN/(2pi dy pT dpT)  dN/(2pi dy pT dpT)_err  vn(pT)  vn(pT)_err")
 
 
 try:
@@ -201,12 +203,13 @@ for icen in range(len(centralityCutList) - 1):
         f.write("# centrality  Ncoll  Ncoll_err\n")
     else:
         f = open("Ncoll.dat", 'a')
-    f.write(f"{cenBinMid} {np.mean(Ncoll):.3e} {np.std(Ncoll)/np.sqrt(nev):.3e}\n")
+    f.write(
+        f"{cenBinMid} {np.mean(Ncoll):.3e} {np.std(Ncoll)/np.sqrt(nev):.3e}\n")
 
     calculate_photon_dNdy(yArr, pTArr, photon_dN_ypTDiff,
-                          f"photon_dNdy_C{cenLabel}.dat")
+                          f"thermalphoton_dNdy_C{cenLabel}.dat")
     calculate_photon_pTSpectra(yArr, pTArr, photon_dN_ypTDiff,
-                               f"photon_pTSpectra_C{cenLabel}.dat")
+                               f"thermalphoton_pTSpectra_C{cenLabel}.dat")
     calculate_photon_vnpT(yArr, pTArr, photon_dN_ypTDiff, photon_v2_ypTDiff,
                           [-0.5, 0.5], QnArrEta, [0.5, 1.], 2,
-                          f"photon_v2pT_C{cenLabel}.dat")
+                          f"thermalphoton_v2pT_C{cenLabel}.dat")
