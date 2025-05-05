@@ -45,7 +45,7 @@ ipglasma_dict = {
     'mode': 1,  # run mode
     'readMultFromFile': 0,
     'size': 800,  # number of grid points of IP-Glasma computation
-    'L': 40.,     # grid size in the transverse plane
+    'L': 30.,     # grid size in the transverse plane
     'Nc': 3,      # number of color
     'm': 0.2,     # infrared cut-off mass (GeV)
     'rmax': 100.,
@@ -76,7 +76,7 @@ ipglasma_dict = {
     'a_WS': 0.52,
     'dR_np': 0.,
     'da_np': 0.,
-    'beta2': 0.28,
+    'beta2': 0.0,
     'beta3': 0.0,
     'beta4': 0.0,
     'gamma': 0.0,
