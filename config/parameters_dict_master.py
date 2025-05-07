@@ -124,6 +124,7 @@ ipglasma_dict = {
     'writeEvolution': 0,
     'readInitialWilsonLines': 0,
     'writeInitialWilsonLines': 0,
+    'useJIMWLK': 0,
     'writeOutputsToHDF5': 0
 }
 
