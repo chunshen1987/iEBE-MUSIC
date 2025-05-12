@@ -13,7 +13,7 @@ control_dict = {
     'save_UrQMD_files': False,      # flag to save UrQMD files
     'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
     'usePosteriorParameters': False,
-    'PosteriorChainFilePath': "config/BESPost",
+    'PosteriorChainFilePath': "config/BESPost2",
     'PosteriorParamSet': 0,
     'PosteriorParamSetFlag': 0,     # 0: choose from sorted chain
                                     # 1: choose from parameter clusters
