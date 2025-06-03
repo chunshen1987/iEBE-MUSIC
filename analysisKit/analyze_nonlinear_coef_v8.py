@@ -141,14 +141,14 @@ def calculateNonLinearResponseV6_2sub(vn_data_array1, vn_data_array2, V4L_1,
     den_JK32 = np.conj(den_JK23)
     den_JK33 = np.mean(V2V4L_2)
 
-    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.cfloat)
+    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.complex128)
 
     array_rhs = np.array([
         [den_JK11, den_JK12, den_JK13],
         [den_JK21, den_JK22, den_JK23],
         [den_JK31, den_JK32, den_JK33],
     ],
-                         dtype=np.cfloat)
+                         dtype=np.complex128)
     chi_6 = np.linalg.solve(array_rhs, array_lhs)
     chi_6222_mean = chi_6[0]
     chi_633_mean = chi_6[1]
@@ -315,7 +315,7 @@ def calculateNonLinearResponseV8_2sub(vn_data_array1, vn_data_array2,
                 [0, 0, 0, 0, A55, 0],
                 [0, 0, 0, 0, 0, A66],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         elif flag == 1:
             array_lhs = np.array([b1, b2, b3, b4, b5, b6])
             array_rhs = np.array([
@@ -326,7 +326,7 @@ def calculateNonLinearResponseV8_2sub(vn_data_array1, vn_data_array2,
                 [A51, A52, A53, A54, A55, A56],
                 [A61, A62, A63, A64, A65, A66],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         elif flag == 2:
             array_lhs = np.array([b1, b2, b3])
             array_rhs = np.array([
@@ -334,7 +334,7 @@ def calculateNonLinearResponseV8_2sub(vn_data_array1, vn_data_array2,
                 [A21, A22, A23],
                 [A31, A32, A33],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         chi_8 = np.linalg.solve(array_rhs, array_lhs)
 
         chi_82222_JK[iev] = chi_8[0]
@@ -476,8 +476,8 @@ for icen in range(len(centralityCutList) - 1):
     QnArr3 = []
     for event_name in selected_events_list:
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
-        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
-        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
+        QnArr2.append(data[event_name]['ALICE_eta_-3p2_-0p4'])
+        QnArr3.append(data[event_name]['ALICE_eta_0p4_3p2'])
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)

@@ -146,14 +146,14 @@ def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2, V4L_1,
     den_JK32 = np.conj(den_JK23)
     den_JK33 = np.mean(V2V4L_2)
 
-    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.cfloat)
+    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.complex128)
 
     array_rhs = np.array([
         [den_JK11, den_JK12, den_JK13],
         [den_JK21, den_JK22, den_JK23],
         [den_JK31, den_JK32, den_JK33],
     ],
-                         dtype=np.cfloat)
+                         dtype=np.complex128)
     chi_6 = np.linalg.solve(array_rhs, array_lhs)
     chi_6222_mean = chi_6[0]
     chi_633_mean = chi_6[1]
@@ -193,14 +193,14 @@ def calculateNonLinearResponseV67_2sub(vn_data_array1, vn_data_array2, V4L_1,
     den_JK32 = np.conj(den_JK23)
     den_JK33 = np.mean(V2V5_V2V5)
 
-    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.cfloat)
+    array_lhs = np.array([num_JK1, num_JK2, num_JK3], dtype=np.complex128)
 
     array_rhs = np.array([
         [den_JK11, den_JK12, den_JK13],
         [den_JK21, den_JK22, den_JK23],
         [den_JK31, den_JK32, den_JK33],
     ],
-                         dtype=np.cfloat)
+                         dtype=np.complex128)
     chi_7 = np.linalg.solve(array_rhs, array_lhs)
     chi_7223_mean = chi_7[0]
     chi_734_mean = chi_7[1]
@@ -399,7 +399,7 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
                 [0, 0, 0, 0, 0, A66, 0],
                 [0, 0, 0, 0, 0, 0, A77],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         elif flag == 1:
             array_lhs = np.array([b1, b2, b3, b4, b5, b6, b7])
             array_rhs = np.array([
@@ -411,7 +411,7 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
                 [A61, A62, A63, A64, A65, A66, A67],
                 [A71, A72, A73, A74, A75, A76, A77],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         elif flag == 2:
             array_lhs = np.array([b1, b2, b3, b4, b5])
             array_rhs = np.array([
@@ -421,7 +421,7 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
                 [A41, A42, A43, A44, A45],
                 [A51, A52, A53, A54, A55],
             ],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         chi_9 = np.linalg.solve(array_rhs, array_lhs)
         chi_9333_JK[iev] = chi_9[0]
         chi_92223_JK[iev] = chi_9[1]
@@ -462,6 +462,13 @@ def calculateNonLinearResponseV9_2sub(vn_data_array1, vn_data_array2,
     ]
 
     # compute sqrt<V9L^2>
+    chi_9333_mean = np.mean(chi_9333_JK)
+    chi_92223_mean = np.mean(chi_92223_JK)
+    chi_9234_mean = np.mean(chi_9234_JK)
+    chi_9225_mean = np.mean(chi_9225_JK)
+    chi_945_mean = np.mean(chi_945_JK)
+    chi_936_mean = np.mean(chi_936_JK)
+    chi_927_mean = np.mean(chi_927_JK)
     V9L_1 = (V9_1 - chi_9333_mean*(V3_1**3.) - chi_92223_mean*
              (V2_1**3*V3_1) - chi_9234_mean*(V2_1*V3_1*V4L_1) - chi_9225_mean*
              (V2_1*V2_1*V5L_1) - chi_945_mean*(V4L_1*V5L_1) - chi_936_mean*
@@ -572,8 +579,8 @@ for icen in range(len(centralityCutList) - 1):
         #QnArr2.append(data[event_name]['STAR_eta_-1_-0p5'])
         #QnArr3.append(data[event_name]['STAR_eta_0p5_1'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
-        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
-        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
+        QnArr2.append(data[event_name]['ALICE_eta_-3p2_-0p4'])
+        QnArr3.append(data[event_name]['ALICE_eta_0p4_3p2'])
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)

@@ -97,14 +97,14 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
         den_JK21 = np.conj(den_JK12)
         den_JK22 = np.mean(V1V4_V1V4[array_idx])
 
-        array_lhs = np.array([num_JK1, num_JK2], dtype=np.cfloat)
+        array_lhs = np.array([num_JK1, num_JK2], dtype=np.complex128)
 
         if flag == 1:
             array_rhs = np.array([[den_JK11, den_JK12], [den_JK21, den_JK22]],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
         else:
             array_rhs = np.array([[den_JK11, 0], [0, den_JK22]],
-                                 dtype=np.cfloat)
+                                 dtype=np.complex128)
 
         chi_5 = np.linalg.solve(array_rhs, array_lhs)
         chi_523_JK[iev] = chi_5[0]
@@ -200,8 +200,8 @@ for icen in range(len(centralityCutList) - 1):
         #QnArr2.append(data[event_name]['STAR_eta_-1_-0p5'])
         #QnArr3.append(data[event_name]['STAR_eta_0p5_1'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
-        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
-        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
+        QnArr2.append(data[event_name]['ALICE_eta_-3p2_-0p4'])
+        QnArr3.append(data[event_name]['ALICE_eta_0p4_3p2'])
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)
