@@ -7,12 +7,17 @@
 ```
 @article{Giacalone:2024ixe,
     author = "Giacalone, Giuliano and others",
-    title = "{The unexpected uses of a bowling pin: anisotropic flow in fixed-target $^{208}$Pb+$^{20}$Ne collisions as a probe of quark-gluon plasma}",
+    title = "{Anisotropic Flow in Fixed-Target Pb208+Ne20 Collisions as a Probe of Quark-Gluon Plasma}",
     eprint = "2405.20210",
     archivePrefix = "arXiv",
     primaryClass = "nucl-th",
-    month = "5",
-    year = "2024"
+    reportNumber = "CERN-TH-2024-074",
+    doi = "10.1103/PhysRevLett.134.082301",
+    journal = "Phys. Rev. Lett.",
+    volume = "134",
+    number = "8",
+    pages = "082301",
+    year = "2025"
 }
 ```
 
