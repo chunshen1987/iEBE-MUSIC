@@ -17,6 +17,22 @@ in the paper, arXiv:2502.05138
     month = "2",
     year = "2025"
 }
+
+@dataset{mantysaari_2025_15693131,
+  author       = {Mäntysaari, Heikki and
+                  Schenke, Bjoern and
+                  Shen, Chun and
+                  Zhao(赵文彬), Wenbin},
+  title        = {Data repository for "Collision energy dependence
+                   in heavy ion collisions from nonlinear QCD
+                   evolution"
+                  },
+  month        = jun,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.15693131},
+  url          = {https://doi.org/10.5281/zenodo.15693131},
+}
 ```
 
 ## Setting the parameters in the iEBE-MUSIC framework
