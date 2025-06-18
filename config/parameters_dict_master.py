@@ -91,7 +91,8 @@ ipglasma_dict = {
     'protonAnisotropy': 0,
     'roots': 200.,
     'usePseudoRapidity': 0,
-    'Rapidity': 0.,
+    'RapidityA': 0.,
+    'RapidityB': 0.,
     'useFluctuatingx': 1,
     'xFromThisFactorTimesQs': 1,
     'useNucleus': 1,
@@ -700,6 +701,11 @@ def update_parameters_dict(par_dict_path, ran_seed):
         else:
             ipglasma_dict['seed'] = ran_seed
             ipglasma_dict['useTimeForSeed'] = 0
+
+        if 'Rapidity' in ipglasma_dict:
+            # for backward compatibility
+            ipglasma_dict['RapidityA'] = ipglasma_dict['Rapidity']
+            ipglasma_dict['RapidityB'] = ipglasma_dict['Rapidity']
 
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 9
