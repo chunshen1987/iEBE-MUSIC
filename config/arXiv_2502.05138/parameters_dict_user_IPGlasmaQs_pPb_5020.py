@@ -49,7 +49,7 @@ ipglasma_dict = {
     'UVdamp': 0.0,
     'smearingWidth': 0.7,
     'QsmuRatio': 0.643,
-    'useFluctuatingx': 1,
+    'useFluctuatingx': 0,
     'RapidityA': 3.881797942790138,     # x = 0.0002061372954
     'RapidityB': 4.811797942790138,     # x = 0.00008133223474
     'useJIMWLK': 0,
