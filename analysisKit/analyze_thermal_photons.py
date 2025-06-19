@@ -54,7 +54,8 @@ def calculate_photon_pTSpectra(yArr, pTArr, data_ypTdiff,
     idx = np.abs(yArr) < 0.1
     dy = yArr[1] - yArr[0]
     Yinterval = len(yArr[idx])*dy
-    dNd2pT = np.sum(data_ypTdiff[:, idx, :], axis=1)*dy/Yinterval/pTArr/(2*np.pi)
+    dNd2pT = np.sum(data_ypTdiff[:, idx, :],
+                    axis=1)*dy/Yinterval/pTArr/(2*np.pi)
     dNd2pT_mean = np.mean(dNd2pT, axis=0)
     dNd2pT_err = np.std(dNd2pT, axis=0)/np.sqrt(nev)
     results = np.array([pTArr, dNd2pT_mean, dNd2pT_err])
@@ -66,8 +67,7 @@ def calculate_photon_pTSpectra(yArr, pTArr, data_ypTdiff,
 
 
 def calculate_photon_vnpT(yArr, pTArr, photon_dN, photon_v2, rapInterval,
-                          dataRef, etaRef, nOrder,
-                          outputFileName: str) -> None:
+                          dataRef, etaRef, nOrder, outputFileName: str) -> None:
     """
         this function compute the v_n(p_T) according to the scalar product
         method
@@ -127,11 +127,14 @@ def calculate_photon_vnpT(yArr, pTArr, photon_dN, photon_v2, rapInterval,
     dNpT_err = np.std(dNd2pT, axis=0)/np.sqrt(nev)
 
     results = np.array([pTArr, dNpT_mean, dNpT_err, vnpT_mean, vnpT_err])
-    np.savetxt(outputFileName,
-               results.transpose(),
-               fmt="%.4e",
-               delimiter="  ",
-               header="pT (GeV)  dN/(2pi dy pT dpT)  dN/(2pi dy pT dpT)_err  vn(pT)  vn(pT)_err")
+    np.savetxt(
+        outputFileName,
+        results.transpose(),
+        fmt="%.4e",
+        delimiter="  ",
+        header=
+        "pT (GeV)  dN/(2pi dy pT dpT)  dN/(2pi dy pT dpT)_err  vn(pT)  vn(pT)_err"
+    )
 
 
 try:
@@ -186,7 +189,8 @@ for icen in range(len(centralityCutList) - 1):
     Ncoll = []
     pTArr = data[selected_events_list[0]]['photon_pTArr']
     yArr = data[selected_events_list[0]]['photon_yArr']
-    npT = len(pTArr); ny = len(yArr)
+    npT = len(pTArr)
+    ny = len(yArr)
     for event_name in selected_events_list:
         Ncoll.append(data[event_name]['Ncoll'])
         photon_dN_ypTDiff.append(data[event_name]['photon_ypTdiff'][:, 0])

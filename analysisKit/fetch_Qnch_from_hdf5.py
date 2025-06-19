@@ -80,10 +80,14 @@ kinematicCutsDict = {
 pidList = [('ch', '9999'), ('pi+', '211'), ('pi-', '-211'), ('K+', '321'),
            ('K-', '-321'), ('p', '2212'), ('pbar', '-2212')]
 
-photonList = ['QGP_2to2_total', 'QGP_AMYcollinear',
-              'HG_2to2_meson_total', 'HG_omega',
-              'HG_rho_spectralfun', 'HG_pipi_bremsstrahlung',
-             ]
+photonList = [
+    'QGP_2to2_total',
+    'QGP_AMYcollinear',
+    'HG_2to2_meson_total',
+    'HG_omega',
+    'HG_rho_spectralfun',
+    'HG_pipi_bremsstrahlung',
+]
 
 LHCetaRangeList = [
     '-0.4_0.4', '-0.5_0.5', '-0.8_-0.4', '-2.4_-0.5', '-2.5_-0.5', '-3.7_-1.7',
@@ -409,22 +413,22 @@ for ievent, event_i in enumerate(eventList):
             if ichannel == 0:
                 photonFullres = vn_data
                 photonFullres[:, 3:] = (vn_data[:, 3:]
-                                        * vn_data[:, 2].reshape(-1, 1))
+                                        *vn_data[:, 2].reshape(-1, 1))
             else:
                 photonFullres[:, 2] += vn_data[:, 2]
                 photonFullres[:, 3:] += (vn_data[:, 3:]
-                                         * vn_data[:, 2].reshape(-1, 1))
+                                         *vn_data[:, 2].reshape(-1, 1))
         photonFullres[:, 3:] /= photonFullres[:, 2].reshape(-1, 1)
         outdata[event_i]["photon_ypTdiff"] = photonFullres[:, 2:]
         outdata[event_i]["photon_pTArr"] = np.unique(photonFullres[:, 1])
         outdata[event_i]["photon_yArr"] = np.unique(photonFullres[:, 0])
 
         dileptonFileName = "Dilepton_QGPNLO_Spvn_eq_MInv.dat"
-        outdata[event_i]["dilepton_MInv"] = (
-                np.nan_to_num(eventGroup.get(dileptonFileName)))
+        outdata[event_i]["dilepton_MInv"] = (np.nan_to_num(
+            eventGroup.get(dileptonFileName)))
         dileptonFileName = "Dilepton_QGPNLO_Spvn_eq_MInvpTdiff.dat"
-        outdata[event_i]["dilepton_MInvpTdiff"] = (
-                np.nan_to_num(eventGroup.get(dileptonFileName)))
+        outdata[event_i]["dilepton_MInvpTdiff"] = (np.nan_to_num(
+            eventGroup.get(dileptonFileName)))
 
     if etadiffFlag:
         # eta-differential spectra and vn

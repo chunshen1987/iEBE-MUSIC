@@ -28,9 +28,9 @@ control_dict = {
     'debugFlag': False,
     'usePosteriorParameters': False,
     'PosteriorChainFilePath': "config/arXiv_2408.00537",
-    'PosteriorParamSet': 0,         # -1: choose randoomly
-    'PosteriorParamSetFlag': 0,     # 0: choose from sorted chain
-                                    # 1: choose from parameter clusters
+    'PosteriorParamSet': 0,  # -1: choose randoomly
+    'PosteriorParamSetFlag': 0,  # 0: choose from sorted chain
+    # 1: choose from parameter clusters
 }
 
 # IPGlasma
@@ -45,9 +45,9 @@ ipglasma_dict = {
     'mode': 1,  # run mode
     'readMultFromFile': 0,
     'size': 800,  # number of grid points of IP-Glasma computation
-    'L': 30.,     # grid size in the transverse plane
-    'Nc': 3,      # number of color
-    'm': 0.2,     # infrared cut-off mass (GeV)
+    'L': 30.,  # grid size in the transverse plane
+    'Nc': 3,  # number of color
+    'm': 0.2,  # infrared cut-off mass (GeV)
     'rmax': 100.,
     'UVdamp': 0.,
     'Jacobianm': 0.35,
@@ -143,7 +143,7 @@ ipglasma_dict = {
     'Lambda_QCD_jimwlk': 0.040,
     'm_jimwlk': 0.4,
     'saveSnapshots': 0,
-    'xSnapshotList': [5e-3,2e-3,0.0001,0.00005,0.00001]
+    'xSnapshotList': [5e-3, 2e-3, 0.0001, 0.00005, 0.00001]
 }
 
 # 3DMCGlauber model
@@ -312,9 +312,9 @@ music_dict = {
     # 17: BEST lattice EoS at finite mu_B
     # transport coefficients
     'quest_revert_strength': 10.0,  # the strength of the viscous regulation
-    'FlagResumTransportCoeff': 0,   # switch to use resummed transport coeff.
+    'FlagResumTransportCoeff': 0,  # switch to use resummed transport coeff.
     'FlagResetCausality': 0,
-    'resumTransCoeffAlpha': 1.5,    # resummed transport coeff. control parameter
+    'resumTransCoeffAlpha': 1.5,  # resummed transport coeff. control parameter
     'Viscosity_Flag_Yes_1_No_0': 1,  # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,  # include shear viscous effect
     'Shear_to_S_ratio': 0.12,  # value of \eta/s
@@ -398,13 +398,13 @@ photon_dict = {
     'photon_phi_q_f': 6.2831853,  # the largest angle of photon momentum
     'photon_y_i': 0.0,  # the smallest photon rapidity
     'photon_y_f': 0.0,  # the largest photon rapidity
-    'nMInv': 11,        # number of points for dilepton invariant mass
-    'dilepton_mass_i': 1.0,         # the smallest dilepton mass (GeV)
-    'dilepton_mass_f': 3.0,         # the largest dilepton mass (GeV)
-    'dilepton_y_i': -0.5,           # the dilepton rapidity integration limit
-    'dilepton_y_f': 0.5,            # the dilepton rapidity integration limit
-    'dileptonType': 0,              # 0: electrons, 1: muons
-    'alpha_s': 0.2,         # value of alpha_s used in the NLO QGP dilepton rate
+    'nMInv': 11,  # number of points for dilepton invariant mass
+    'dilepton_mass_i': 1.0,  # the smallest dilepton mass (GeV)
+    'dilepton_mass_f': 3.0,  # the largest dilepton mass (GeV)
+    'dilepton_y_i': -0.5,  # the dilepton rapidity integration limit
+    'dilepton_y_f': 0.5,  # the dilepton rapidity integration limit
+    'dileptonType': 0,  # 0: electrons, 1: muons
+    'alpha_s': 0.2,  # value of alpha_s used in the NLO QGP dilepton rate
     'norder': 10,  # calculate photon vn to norder
     'turn_on_muB': 1,  # flag to include muB dependence in photon rates
     'T_dec': 0.105,  # freeze out temperature (GeV)
@@ -824,7 +824,7 @@ def output_parameters_to_files(workfolder="."):
                     continue
                 if isinstance(parameters_dict[key_name], list):
                     varStr = ",".join(
-                            [str(var) for var in parameters_dict[key_name]])
+                        [str(var) for var in parameters_dict[key_name]])
                     f.write(f"{key_name}  {varStr}\n")
                 else:
                     f.write("{parameter_name}  {parameter_value}\n".format(
