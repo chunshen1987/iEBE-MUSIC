@@ -75,8 +75,8 @@ for icen in range(len(centrality_cut_list) - 1):
     dN_dy_cut_high = (dN_dy_mb[int(
         len(dN_dy_mb)*centrality_cut_list[icen]/100.)])
     dN_dy_cut_low = dN_dy_mb[min(
-        len(dN_dy_mb) - 1,
-        int(len(dN_dy_mb)*centrality_cut_list[icen + 1]/100.))]
+        [len(dN_dy_mb) - 1,
+         int(len(dN_dy_mb)*centrality_cut_list[icen + 1]/100.)])]
 
     selected_events_list = []
     for ifolder, event_name in enumerate(event_list):
