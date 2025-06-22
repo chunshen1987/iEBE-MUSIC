@@ -275,6 +275,12 @@ def main():
                         type=int,
                         default='-1',
                         help='Random Seed (-1: according to system time)')
+    parser.add_argument('-id',
+                        '--job_process_id',
+                        metavar='',
+                        type=int,
+                        default='0',
+                        help='Job process id number')
     args = parser.parse_args()
 
     if len(sys.argv) < 2:
@@ -299,6 +305,7 @@ def main():
         singularityRepoPath = path.abspath(args.singularity)
         executeScript = args.executeScript
         parameterFile = args.par_dict
+        job_id0 = args.job_process_id
     except:
         parser.print_help()
         exit(0)
@@ -331,10 +338,11 @@ def main():
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
+        event_id0 = job_id0 + i_job*n_hydro_per_job
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
                                parameterFile, args.bayes_file,
-                               i_job*n_hydro_per_job, n_hydro_per_job, nUrQMD,
+                               event_id0, n_hydro_per_job, nUrQMD,
                                n_threads, seed, wallTime)
     sys.stdout.write("\n")
     sys.stdout.flush()
