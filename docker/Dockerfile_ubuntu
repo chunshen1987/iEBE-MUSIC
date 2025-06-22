@@ -1,10 +1,12 @@
-FROM ubuntu:bionic
+FROM ubuntu:22.04
 
 MAINTAINER Chun Shen <chunshen@wayne.edu>
 
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     apt-get update && apt-get install -y --no-install-recommends \
         cmake \
+        cmake-data \
+        curl \
         g++ \
         gcc \
         gfortran \
@@ -13,8 +15,10 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
         libfftw3-dev \
         libgsl-dev \
         libhdf5-dev \
+        libeigen3-dev \
         libz-dev \
         make \
+        pkg-config \
         python3 \
         python3-pip \
         time \
@@ -25,8 +29,8 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pre-reqs python packages
-RUN pip3 install --upgrade && \
-    pip3 install numpy h5py scipy
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install numpy h5py scipy
 
 ENV HOME /opt/
 
@@ -35,7 +39,16 @@ RUN cd ${HOME} \
 && git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC -b main \
 && cd iEBE-MUSIC/codes \
 && ./get_code_packages.sh \
-&& ./compile_code_packages.sh
+&& ./compile_code_packages.sh \
+&& cd ../EOS_database \
+&& bash download_EOSdatabase1D.sh \
+&& bash download_QGPViscositydatabase1D.sh \
+&& cd ../config/BESPost \
+&& bash download_posteriorChain.sh \
+&& cd ../BESPost2 \
+&& bash download_posteriorChain.sh \
+&& cd ../arXiv_2408.00537 \
+&& bash download_posteriorChain.sh
 
 ENV PYTHONIOENCODING utf-8
 

@@ -40,9 +40,10 @@ def fetch_IPGlasma_events(datafile, outputfile, nev):
         out_group = out_data.create_group("event-{0}".format(iev))
         outfile_name = "epsilon-u-Hydro-t0.4-{}.dat".format(iev)
         dset = out_group.create_dataset("{0}".format(outfile_name),
-                                        data = temp_data,
-                                        compression="gzip", compression_opts=9)
-        data_header = temp_data.attrs["header"].decode('UTF-8').replace('#','')
+                                        data=temp_data,
+                                        compression="gzip",
+                                        compression_opts=9)
+        data_header = temp_data.attrs["header"].decode('UTF-8').replace('#', '')
         dset.attrs.create("header", np.string_(data_header))
         dset.attrs.create("x_size", temp_data.attrs['x_size'])
         dset.attrs.create("y_size", temp_data.attrs['y_size'])
@@ -53,7 +54,6 @@ def fetch_IPGlasma_events(datafile, outputfile, nev):
 
     in_data.close()
     out_data.close()
-
 
 
 if __name__ == "__main__":

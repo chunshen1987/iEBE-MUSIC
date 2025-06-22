@@ -10,8 +10,10 @@ from glob import glob
 
 import numpy as np
 
+
 def print_help():
     print("{0} results_folder".format(sys.argv[0]))
+
 
 try:
     results_folder = str(sys.argv[1])
@@ -28,8 +30,10 @@ hf = h5py.File("{0}.h5".format(results_name), "w")
 
 # save events summary
 event_summary = np.loadtxt(path.join(results_path, "events_summary.dat"))
-dset          = hf.create_dataset("events_summary.dat", data = event_summary,
-                                  compression="gzip", compression_opts=9)
+dset = hf.create_dataset("events_summary.dat",
+                         data=event_summary,
+                         compression="gzip",
+                         compression_opts=9)
 # save input file
 inputfile = np.genfromtxt(path.join(results_path, "input"), dtype='str')
 for para_name, para_val in inputfile:
@@ -38,12 +42,14 @@ for para_name, para_val in inputfile:
 event_list = glob(path.join(results_path, "string*"))
 nev = len(event_list)
 for ievent, event_path in enumerate(event_list):
-    print("processing {0:d}/{1:d} {2} ... ".format(ievent+1, nev,
+    print("processing {0:d}/{1:d} {2} ... ".format(ievent + 1, nev,
                                                    results_path))
     file_name = event_path.split("/")[-1]
-    dtemp     = np.loadtxt(event_path)
-    dset      = hf.create_dataset("{0}".format(file_name), data = dtemp,
-                                  compression="gzip", compression_opts=9)
+    dtemp = np.loadtxt(event_path)
+    dset = hf.create_dataset("{0}".format(file_name),
+                             data=dtemp,
+                             compression="gzip",
+                             compression_opts=9)
     f = open(event_path)
     header = f.readline().strip('\n')
     dset.attrs.create("header", np.string_(header))

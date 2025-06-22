@@ -23,7 +23,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
         script.write("""#!/usr/bin/env bash
 #SBATCH --job-name event_{0}
 #SBATCH -q primary
-#SBATCH --exclude=asx[1-20],wsu[1-117]
+#SBATCH --exclude=asx[1-20]
 #SBATCH -N 1
 #SBATCH -n {1}
 #SBATCH --mem={2:.0f}G
@@ -99,8 +99,8 @@ rm -fr `pwd`
     script.close()
 
 
-def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes,
-                                  nTaskPerNode, n_threads, walltime):
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
+                                  n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
@@ -160,7 +160,7 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
     script.write("""
-h5Stat=`ls *.h5`
+h5Stat=`ls *.h5 2>/dev/null`
 
 if [ -z "$h5Stat" ]
 then
@@ -168,8 +168,8 @@ then
     singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
 
 """.format(singularityRepoPath, executeScriptName, workFolderPath,
-           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
-           seed, bayesParamFile))
+           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads, seed,
+           bayesParamFile.split('/')[-1]))
     if clusterName == "anvil":
         script.write("""
 
@@ -188,7 +188,6 @@ fi
     shutil.copy(parameterFile, eventFolder)
     if bayesParamFile != "":
         shutil.copy(bayesParamFile, eventFolder)
-
 
 
 def create_a_working_folder(workfolder_path):
@@ -276,6 +275,12 @@ def main():
                         type=int,
                         default='-1',
                         help='Random Seed (-1: according to system time)')
+    parser.add_argument('-id',
+                        '--job_process_id',
+                        metavar='',
+                        type=int,
+                        default='0',
+                        help='Job process id number')
     args = parser.parse_args()
 
     if len(sys.argv) < 2:
@@ -300,6 +305,7 @@ def main():
         singularityRepoPath = path.abspath(args.singularity)
         executeScript = args.executeScript
         parameterFile = args.par_dict
+        job_id0 = args.job_process_id
     except:
         parser.print_help()
         exit(0)
@@ -332,12 +338,12 @@ def main():
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
+        event_id0 = job_id0 + i_job*n_hydro_per_job
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
                                parameterFile, args.bayes_file,
-                               i_job*n_hydro_per_job,
-                               n_hydro_per_job, nUrQMD, n_threads, seed,
-                               wallTime)
+                               event_id0, n_hydro_per_job, nUrQMD,
+                               n_threads, seed, wallTime)
     sys.stdout.write("\n")
     sys.stdout.flush()
 
@@ -369,8 +375,8 @@ def main():
             n_nodes += 1
 
         generate_Stampede2_mpi_job_script(working_folder_name,
-                                          args.node_type.lower(),
-                                          n_nodes, n_jobs, n_threads, wallTime)
+                                          args.node_type.lower(), n_nodes,
+                                          n_jobs, n_threads, wallTime)
         shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),

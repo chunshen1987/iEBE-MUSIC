@@ -13,12 +13,13 @@ def help_message():
 
 centralityRange = 1.
 pidList = ['pi+', 'pi-', 'K+', 'K-', 'p', 'pbar']
-Reg_centrality_cut_list = [0., 5., 10., 20., 30., 40., 50.,
-                           60., 70., 80., 90., 100.]
+Reg_centrality_cut_list = [
+    0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
+]
 centralityCutList = Reg_centrality_cut_list
 # centralityCutList = [0, 1, 2, 3, 4, 6, 8, 10, 15, 20, 30, 40, 50, 60,
 #                      70, 80, 90, 100]
-dNcutList = []    # pre-defined Nch cut if simulation is not minimum bias
+dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
 def calculate_pid_dN(dN_data_array, outputFilename, cenLabel):
@@ -99,12 +100,10 @@ def calculateSymmetricCumulant2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q2Q3_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q3_1*np.conj(Q3_2))
                - np.real(Q5_1*np.conj(Q2_2)*np.conj(Q3_2))
-               - np.real(Q2_1*Q3_1*np.conj(Q5_2))
-               + np.real(Q5_1*np.conj(Q5_2)))
+               - np.real(Q2_1*Q3_1*np.conj(Q5_2)) + np.real(Q5_1*np.conj(Q5_2)))
     Q2Q4_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q4_1*np.conj(Q4_2))
                - np.real(Q6_1*np.conj(Q2_2)*np.conj(Q4_2))
-               - np.real(Q2_1*Q4_1*np.conj(Q6_2))
-               + np.real(Q6_1*np.conj(Q6_2)))
+               - np.real(Q2_1*Q4_1*np.conj(Q6_2)) + np.real(Q6_1*np.conj(Q6_2)))
 
     # calcualte observables with Jackknife resampling method
     SC32_array = np.zeros(nev)
@@ -117,17 +116,17 @@ def calculateSymmetricCumulant2sub(vn_data_array1, vn_data_array2,
         array_idx = np.array(array_idx)
 
         # SC(3,2)
-        v2v3 = ((np.mean(Q3_N2[array_idx])*np.mean(Q2_N2[array_idx]))
-                / (np.mean(N2_weight[array_idx])**2.))
-        SC32_array[iev] = (np.mean(Q2Q3_N4[array_idx])
-                           / np.mean(N4_weight[array_idx]) - v2v3)
+        v2v3 = ((np.mean(Q3_N2[array_idx])*np.mean(Q2_N2[array_idx]))/
+                (np.mean(N2_weight[array_idx])**2.))
+        SC32_array[iev] = (
+            np.mean(Q2Q3_N4[array_idx])/np.mean(N4_weight[array_idx]) - v2v3)
         NSC32_array[iev] = SC32_array[iev]/v2v3
 
         # SC(4,2)
-        v2v4 = ((np.mean(Q4_N2[array_idx])*np.mean(Q2_N2[array_idx]))
-                / (np.mean(N2_weight[array_idx])**2.))
-        SC42_array[iev] = (np.mean(Q2Q4_N4[array_idx])
-                           / np.mean(N4_weight[array_idx]) - v2v4)
+        v2v4 = ((np.mean(Q4_N2[array_idx])*np.mean(Q2_N2[array_idx]))/
+                (np.mean(N2_weight[array_idx])**2.))
+        SC42_array[iev] = (
+            np.mean(Q2Q4_N4[array_idx])/np.mean(N4_weight[array_idx]) - v2v4)
         NSC42_array[iev] = SC42_array[iev]/v2v4
 
     SC32_mean = np.mean(SC32_array)
@@ -140,11 +139,12 @@ def calculateSymmetricCumulant2sub(vn_data_array1, vn_data_array2,
     NSC42_mean = np.mean(NSC42_array)
     NSC42_err = np.sqrt((nev - 1.)/nev*np.sum((NSC42_array - NSC42_mean)**2.))
 
-    results = [SC32_mean, SC32_err, NSC32_mean, NSC32_err,
-               SC42_mean, SC42_err, NSC42_mean, NSC42_err]
+    results = [
+        SC32_mean, SC32_err, NSC32_mean, NSC32_err, SC42_mean, SC42_err,
+        NSC42_mean, NSC42_err
+    ]
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -189,8 +189,7 @@ def calculateNonLinearResponseV2_2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q1_N4 = (np.real(Q1_1*np.conj(Q1_2)*Q1_1*np.conj(Q1_2))
              - np.real(Q2_1*np.conj(Q1_2)*np.conj(Q1_2))
-             - np.real(Q1_1*Q1_1*np.conj(Q2_2))
-             + np.real(Q2_1*np.conj(Q2_2)))
+             - np.real(Q1_1*Q1_1*np.conj(Q2_2)) + np.real(Q2_1*np.conj(Q2_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
@@ -207,12 +206,12 @@ def calculateNonLinearResponseV2_2sub(vn_data_array1, vn_data_array2,
         array_idx = np.array(array_idx)
 
         num_JK = (np.real(np.mean(chi_211_num[array_idx]))
-                  / np.mean(N3_weight[array_idx]))
+                  /np.mean(N3_weight[array_idx]))
         den_JK = (np.real(np.mean(Q1_N4[array_idx]))
-                  / np.mean(N4_weight[array_idx]))
+                  /np.mean(N4_weight[array_idx]))
 
-        v2_Psi2 = np.nan_to_num(np.sqrt(np.mean(Q2_N2[array_idx])
-                                        / np.mean(N2_weight[array_idx])))
+        v2_Psi2 = np.nan_to_num(
+            np.sqrt(np.mean(Q2_N2[array_idx])/np.mean(N2_weight[array_idx])))
 
         chi_211_JK[iev] = num_JK/den_JK
         v211_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
@@ -220,20 +219,21 @@ def calculateNonLinearResponseV2_2sub(vn_data_array1, vn_data_array2,
         v2L_JK[iev] = np.nan_to_num(np.sqrt(v2_Psi2**2 - v211_JK[iev]**2.))
 
     chi_211_mean = np.mean(chi_211_JK)
-    chi_211_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((chi_211_JK - chi_211_mean)**2.))
+    chi_211_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (chi_211_JK - chi_211_mean)**2.))
     v211_mean = np.mean(v211_JK)
     v211_err = np.sqrt((nev - 1.)/nev*np.sum((v211_JK - v211_mean)**2.))
     rho211_mean = np.mean(rho211_JK)
     rho211_err = np.sqrt((nev - 1.)/nev*np.sum((rho211_JK - rho211_mean)**2.))
     v2L_mean = np.mean(v2L_JK)
     v2L_err = np.sqrt((nev - 1.)/nev*np.sum((v2L_JK - v2L_mean)**2.))
-    results = [v2L_mean, v2L_err, v211_mean, v211_err, rho211_mean, rho211_err,
-               chi_211_mean, chi_211_err]
+    results = [
+        v2L_mean, v2L_err, v211_mean, v211_err, rho211_mean, rho211_err,
+        chi_211_mean, chi_211_err
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -280,8 +280,7 @@ def calculateNonLinearResponseV3_2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q1Q2_N4 = (np.real(Q1_1*np.conj(Q1_2)*Q2_1*np.conj(Q2_2))
                - np.real(Q3_1*np.conj(Q1_2)*np.conj(Q2_2))
-               - np.real(Q1_1*Q2_1*np.conj(Q3_2))
-               + np.real(Q3_1*np.conj(Q3_2)))
+               - np.real(Q1_1*Q2_1*np.conj(Q3_2)) + np.real(Q3_1*np.conj(Q3_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
@@ -298,12 +297,12 @@ def calculateNonLinearResponseV3_2sub(vn_data_array1, vn_data_array2,
         array_idx = np.array(array_idx)
 
         num_JK = (np.real(np.mean(chi_312_num[array_idx]))
-                  / np.mean(N3_weight[array_idx]))
+                  /np.mean(N3_weight[array_idx]))
         den_JK = (np.real(np.mean(Q1Q2_N4[array_idx]))
-                  / np.mean(N4_weight[array_idx]))
+                  /np.mean(N4_weight[array_idx]))
 
-        v3_Psi3 = np.nan_to_num(np.sqrt(np.mean(Q3_N2[array_idx])
-                                        / np.mean(N2_weight[array_idx])))
+        v3_Psi3 = np.nan_to_num(
+            np.sqrt(np.mean(Q3_N2[array_idx])/np.mean(N2_weight[array_idx])))
 
         chi_312_JK[iev] = num_JK/den_JK
         v312_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
@@ -311,20 +310,21 @@ def calculateNonLinearResponseV3_2sub(vn_data_array1, vn_data_array2,
         v3L_JK[iev] = np.nan_to_num(np.sqrt(v3_Psi3**2 - v312_JK[iev]**2.))
 
     chi_312_mean = np.mean(chi_312_JK)
-    chi_312_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((chi_312_JK - chi_312_mean)**2.))
+    chi_312_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (chi_312_JK - chi_312_mean)**2.))
     v312_mean = np.mean(v312_JK)
     v312_err = np.sqrt((nev - 1.)/nev*np.sum((v312_JK - v312_mean)**2.))
     rho312_mean = np.mean(rho312_JK)
     rho312_err = np.sqrt((nev - 1.)/nev*np.sum((rho312_JK - rho312_mean)**2.))
     v3L_mean = np.mean(v3L_JK)
     v3L_err = np.sqrt((nev - 1.)/nev*np.sum((v3L_JK - v3L_mean)**2.))
-    results = [v3L_mean, v3L_err, v312_mean, v312_err, rho312_mean, rho312_err,
-               chi_312_mean, chi_312_err]
+    results = [
+        v3L_mean, v3L_err, v312_mean, v312_err, rho312_mean, rho312_err,
+        chi_312_mean, chi_312_err
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -368,8 +368,7 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q2_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
              - np.real(Q4_1*np.conj(Q2_2)*np.conj(Q2_2))
-             - np.real(Q2_1*Q2_1*np.conj(Q4_2))
-             + np.real(Q4_1*np.conj(Q4_2)))
+             - np.real(Q2_1*Q2_1*np.conj(Q4_2)) + np.real(Q4_1*np.conj(Q4_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
@@ -386,12 +385,12 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
         array_idx = np.array(array_idx)
 
         num_JK = (np.real(np.mean(chi_422_num[array_idx]))
-                  / np.mean(N3_weight[array_idx]))
+                  /np.mean(N3_weight[array_idx]))
         den_JK = (np.real(np.mean(Q2_N4[array_idx]))
-                  / np.mean(N4_weight[array_idx]))
+                  /np.mean(N4_weight[array_idx]))
 
-        v4_Psi4 = np.nan_to_num(np.sqrt(np.mean(Q4_N2[array_idx])
-                                        / np.mean(N2_weight[array_idx])))
+        v4_Psi4 = np.nan_to_num(
+            np.sqrt(np.mean(Q4_N2[array_idx])/np.mean(N2_weight[array_idx])))
 
         chi_422_JK[iev] = num_JK/den_JK
         v422_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
@@ -399,20 +398,21 @@ def calculateNonLinearResponseV4_2sub(vn_data_array1, vn_data_array2,
         v4L_JK[iev] = np.nan_to_num(np.sqrt(v4_Psi4**2 - v422_JK[iev]**2.))
 
     chi_422_mean = np.mean(chi_422_JK)
-    chi_422_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((chi_422_JK - chi_422_mean)**2.))
+    chi_422_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (chi_422_JK - chi_422_mean)**2.))
     v422_mean = np.mean(v422_JK)
     v422_err = np.sqrt((nev - 1.)/nev*np.sum((v422_JK - v422_mean)**2.))
     rho422_mean = np.mean(rho422_JK)
     rho422_err = np.sqrt((nev - 1.)/nev*np.sum((rho422_JK - rho422_mean)**2.))
     v4L_mean = np.mean(v4L_JK)
     v4L_err = np.sqrt((nev - 1.)/nev*np.sum((v4L_JK - v4L_mean)**2.))
-    results = [v4L_mean, v4L_err, v422_mean, v422_err, rho422_mean, rho422_err,
-               chi_422_mean, chi_422_err]
+    results = [
+        v4L_mean, v4L_err, v422_mean, v422_err, rho422_mean, rho422_err,
+        chi_422_mean, chi_422_err
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -458,8 +458,7 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q2Q3_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q3_1*np.conj(Q3_2))
                - np.real(Q5_1*np.conj(Q2_2)*np.conj(Q3_2))
-               - np.real(Q2_1*Q3_1*np.conj(Q5_2))
-               + np.real(Q5_1*np.conj(Q5_2)))
+               - np.real(Q2_1*Q3_1*np.conj(Q5_2)) + np.real(Q5_1*np.conj(Q5_2)))
 
     # three-particle correlation
     N3_weight = dN1*dN2*(dN2 - 1) + dN1*(dN1 - 1)*dN2
@@ -476,12 +475,12 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
         array_idx = np.array(array_idx)
 
         num_JK = (np.real(np.mean(chi_523_num[array_idx]))
-                  / np.mean(N3_weight[array_idx]))
+                  /np.mean(N3_weight[array_idx]))
         den_JK = (np.real(np.mean(Q2Q3_N4[array_idx]))
-                  / np.mean(N4_weight[array_idx]))
+                  /np.mean(N4_weight[array_idx]))
 
-        v5_Psi5 = np.nan_to_num(np.sqrt(np.mean(Q5_N2[array_idx])
-                                        / np.mean(N2_weight[array_idx])))
+        v5_Psi5 = np.nan_to_num(
+            np.sqrt(np.mean(Q5_N2[array_idx])/np.mean(N2_weight[array_idx])))
 
         chi_523_JK[iev] = num_JK/den_JK
         v523_JK[iev] = np.nan_to_num(num_JK/np.sqrt(den_JK))
@@ -489,20 +488,21 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
         v5L_JK[iev] = np.nan_to_num(np.sqrt(v5_Psi5**2 - v523_JK[iev]**2.))
 
     chi_523_mean = np.mean(chi_523_JK)
-    chi_523_err = np.sqrt((nev - 1.)/nev
-                          * np.sum((chi_523_JK - chi_523_mean)**2.))
+    chi_523_err = np.sqrt((nev - 1.)/nev*np.sum(
+        (chi_523_JK - chi_523_mean)**2.))
     v523_mean = np.mean(v523_JK)
     v523_err = np.sqrt((nev - 1.)/nev*np.sum((v523_JK - v523_mean)**2.))
     rho523_mean = np.mean(rho523_JK)
     rho523_err = np.sqrt((nev - 1.)/nev*np.sum((rho523_JK - rho523_mean)**2.))
     v5L_mean = np.mean(v5L_JK)
     v5L_err = np.sqrt((nev - 1.)/nev*np.sum((v5L_JK - v5L_mean)**2.))
-    results = [v5L_mean, v5L_err, v523_mean, v523_err, rho523_mean, rho523_err,
-               chi_523_mean, chi_523_err]
+    results = [
+        v5L_mean, v5L_err, v523_mean, v523_err, rho523_mean, rho523_err,
+        chi_523_mean, chi_523_err
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -515,8 +515,8 @@ def calculateNonLinearResponseV5_2sub(vn_data_array1, vn_data_array2,
     f.close()
 
 
-def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
-                      outputFileName42, outputFileName64, cenLabel):
+def calculate_vn4_vn6(vn_data_array, outputFileName_vn4, outputFileName42,
+                      outputFileName64, cenLabel):
     """
         this funciton computes the 4 particle cumulant vn{4}
             vn{4} = (2 <v_n*conj(v_n)>**2 - <(v_n*conj(v_n))**2.>)**(1/4)
@@ -554,24 +554,21 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
 
     # four-particle correlation
     N4_weight = dN*(dN - 1.)*(dN - 2.)*(dN - 3.)
-    Q2_4 = ((np.abs(Q2)**4.) - 2.*np.real(Q4*np.conj(Q2)*np.conj(Q2))
-            - 4.*(dN - 2.)*(np.abs(Q2)**2.) + np.abs(Q4)**2.
-            + 2*dN*(dN - 3.))
-    Q3_4 = ((np.abs(Q3)**4.) - 2.*np.real(Q6*np.conj(Q3)*np.conj(Q3))
-            - 4.*(dN - 2.)*(np.abs(Q3)**2.) + np.abs(Q6)**2.
-            + 2*dN*(dN - 3.))
+    Q2_4 = ((np.abs(Q2)**4.) - 2.*np.real(Q4*np.conj(Q2)*np.conj(Q2)) - 4.*
+            (dN - 2.)*(np.abs(Q2)**2.) + np.abs(Q4)**2. + 2*dN*(dN - 3.))
+    Q3_4 = ((np.abs(Q3)**4.) - 2.*np.real(Q6*np.conj(Q3)*np.conj(Q3)) - 4.*
+            (dN - 2.)*(np.abs(Q3)**2.) + np.abs(Q6)**2. + 2*dN*(dN - 3.))
 
     # six-particle correlation
     N6_weight = dN*(dN - 1.)*(dN - 2.)*(dN - 3.)*(dN - 4.)*(dN - 5.)
     Q2_6 = (np.abs(Q2)**6. + 9*(np.abs(Q4)**2.)*(np.abs(Q2)**2.)
             - 6.*np.real(Q4*Q2*np.conj(Q2)*np.conj(Q2)*np.conj(Q2))
             + 4.*np.real(Q6*np.conj(Q2)*np.conj(Q2)*np.conj(Q2))
-            - 12.*np.real(Q6*np.conj(Q4)*np.conj(Q2))
-            + 18.*(dN - 4.)*np.real(Q4*np.conj(Q2)*np.conj(Q2))
-            + 4.*(np.abs(Q6)**2.)
-            - 9.*(dN - 4.)*((np.abs(Q2)**4.) + (np.abs(Q4)**2.))
-            + 18.*(dN - 5.)*(dN - 2.)*(np.abs(Q2)**2.)
-            - 6.*dN*(dN - 4.)*(dN - 5.))
+            - 12.*np.real(Q6*np.conj(Q4)*np.conj(Q2)) + 18.*
+            (dN - 4.)*np.real(Q4*np.conj(Q2)*np.conj(Q2)) + 4.*
+            (np.abs(Q6)**2.) - 9.*(dN - 4.)*((np.abs(Q2)**4.) +
+                                             (np.abs(Q4)**2.)) + 18.*(dN - 5.)*
+            (dN - 2.)*(np.abs(Q2)**2.) - 6.*dN*(dN - 4.)*(dN - 5.))
 
     # calcualte observables with Jackknife resampling method
     C2_4_array = np.zeros(nev)
@@ -599,13 +596,12 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
             v2_2 = np.sqrt(C_2_2)
             r2_array[iev] = v2_4/v2_2
             F2_array[iev] = np.nan_to_num(
-                    np.sqrt((v2_2**2. - v2_4**2.)
-                            / (v2_2**2. + v2_4**2. + 1e-15)))
+                np.sqrt((v2_2**2. - v2_4**2.)/(v2_2**2. + v2_4**2. + 1e-15)))
             if C_2_6 > 0.:
                 v2_6 = (C_2_6/4.)**(1./6.)
                 r26_array[iev] = v2_6/v2_4
-                gamma1_array[iev] = (-6.*np.sqrt(2)*(v2_4**2.)*(v2_4 - v2_6)
-                                     / (v2_2**2. - v2_4**2.)**(1.5))
+                gamma1_array[iev] = (-6.*np.sqrt(2)*(v2_4**2.)*(v2_4 - v2_6)/
+                                     (v2_2**2. - v2_4**2.)**(1.5))
 
         C_3_2 = np.mean(Q3_N2[array_idx])/np.mean(N2_weight[array_idx])
         C34_tmp = np.mean(Q3_4[array_idx])/np.mean(N4_weight[array_idx])
@@ -615,8 +611,8 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
             v3_4 = (-C_3_4)**0.25
             v3_2 = np.sqrt(C_3_2)
             r3_array[iev] = v3_4/v3_2
-            F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)
-                                    / (v3_2**2. + v3_4**2. + 1e-15))
+            F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)/
+                                    (v3_2**2. + v3_4**2. + 1e-15))
 
     dN_mean = np.real(np.mean(vn_data_array[:, 0]))
     dN_err = np.std(vn_data_array[:, 0])/np.sqrt(nev)
@@ -636,8 +632,16 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     if C3_4_mean < 0:
         v3_4 = (-C3_4_mean)**0.25
         v3_4_err = 0.25*((-C3_4_mean)**(-0.75))*C3_4_err
-    results = [v2_4, v2_4_err, C2_4_mean, C2_4_err,
-               v3_4, v3_4_err, C3_4_mean, C3_4_err,]
+    results = [
+        v2_4,
+        v2_4_err,
+        C2_4_mean,
+        C2_4_err,
+        v3_4,
+        v3_4_err,
+        C3_4_mean,
+        C3_4_err,
+    ]
     if path.isfile(outputFileName_vn4):
         f = open(outputFileName_vn4, 'a')
     else:
@@ -659,8 +663,9 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     F2_err = np.sqrt((nev - 1.)/nev*np.sum((F2_array - F2_mean)**2.))
     F3_mean = np.mean(F3_array)
     F3_err = np.sqrt((nev - 1.)/nev*np.sum((F3_array - F3_mean)**2.))
-    results = [r2_mean, r2_err, F2_mean, F2_err,
-               r3_mean, r3_err, F3_mean, F3_err]
+    results = [
+        r2_mean, r2_err, F2_mean, F2_err, r3_mean, r3_err, F3_mean, F3_err
+    ]
     if path.isfile(outputFileName42):
         f = open(outputFileName42, 'a')
     else:
@@ -676,8 +681,8 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     r26_mean = np.mean(r26_array)
     r26_err = np.sqrt((nev - 1.)/nev*np.sum((r26_array - r26_mean)**2.))
     gamma1_mean = np.nan_to_num(np.mean(gamma1_array))
-    gamma1_err = np.nan_to_num(np.sqrt((nev - 1.)/nev*np.sum(
-                                        (gamma1_array - gamma1_mean)**2.)))
+    gamma1_err = np.nan_to_num(
+        np.sqrt((nev - 1.)/nev*np.sum((gamma1_array - gamma1_mean)**2.)))
     if path.isfile(outputFileName64):
         f = open(outputFileName64, 'a')
     else:
@@ -690,8 +695,8 @@ def calculate_vn4_vn6(vn_data_array, outputFileName_vn4,
     return
 
 
-def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
-                       outputFileName_vn4, outputFileName42, cenLabel):
+def calculate_vn4_2sub(vn_data_array1, vn_data_array2, outputFileName_vn4,
+                       outputFileName42, cenLabel):
     """
         this funciton computes the 4 particle cumulant vn{4}
             vn{4} = (2 <v_n*conj(v_n)>**2 - <(v_n*conj(v_n))**2.>)**(1/4)
@@ -727,13 +732,11 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
     N4_weight = dN1*(dN1 - 1)*dN2*(dN2 - 1)
     Q2_N4 = (np.real(Q2_1*np.conj(Q2_2)*Q2_1*np.conj(Q2_2))
              - np.real(Q4_1*np.conj(Q2_2)*np.conj(Q2_2))
-             - np.real(Q2_1*Q2_1*np.conj(Q4_2))
-             + np.real(Q4_1*np.conj(Q4_2)))
+             - np.real(Q2_1*Q2_1*np.conj(Q4_2)) + np.real(Q4_1*np.conj(Q4_2)))
 
     Q3_N4 = (np.real(Q3_1*np.conj(Q3_2)*Q3_1*np.conj(Q3_2))
              - np.real(Q6_1*np.conj(Q3_2)*np.conj(Q3_2))
-             - np.real(Q3_1*Q3_1*np.conj(Q6_2))
-             + np.real(Q6_1*np.conj(Q6_2)))
+             - np.real(Q3_1*Q3_1*np.conj(Q6_2)) + np.real(Q6_1*np.conj(Q6_2)))
 
     # calcualte observables with Jackknife resampling method
     C2_4_array = np.zeros(nev)
@@ -756,8 +759,8 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
             v2_4 = (-C_2_4)**0.25
             v2_2 = np.sqrt(C_2_2)
             r2_array[iev] = v2_4/v2_2
-            F2_array[iev] = np.sqrt((v2_2**2. - v2_4**2.)
-                                    / (v2_2**2. + v2_4**2. + 1e-15))
+            F2_array[iev] = np.sqrt((v2_2**2. - v2_4**2.)/
+                                    (v2_2**2. + v2_4**2. + 1e-15))
 
         C_3_2 = np.mean(Q3_N2[array_idx])/np.mean(N2_weight[array_idx])
         C34_tmp = np.mean(Q3_N4[array_idx])/np.mean(N4_weight[array_idx])
@@ -767,8 +770,8 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
             v3_4 = (-C_3_4)**0.25
             v3_2 = np.sqrt(C_3_2)
             r3_array[iev] = v3_4/v3_2
-            F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)
-                                    / (v3_2**2. + v3_4**2. + 1e-15))
+            F3_array[iev] = np.sqrt((v3_2**2. - v3_4**2.)/
+                                    (v3_2**2. + v3_4**2. + 1e-15))
 
     C2_4_mean = np.mean(C2_4_array)
     C2_4_err = np.sqrt((nev - 1.)/nev*np.sum((C2_4_array - C2_4_mean)**2.))
@@ -786,12 +789,19 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
     if C3_4_mean < 0:
         v3_4 = (-C3_4_mean)**0.25
         v3_4_err = 0.25*((-C3_4_mean)**(-0.75))*C3_4_err
-    results = [v2_4, v2_4_err, C2_4_mean, C2_4_err,
-               v3_4, v3_4_err, C3_4_mean, C3_4_err,]
+    results = [
+        v2_4,
+        v2_4_err,
+        C2_4_mean,
+        C2_4_err,
+        v3_4,
+        v3_4_err,
+        C3_4_mean,
+        C3_4_err,
+    ]
 
     dN_mean = np.real(np.mean(vn_data_array1[:, 0] + vn_data_array2[:, 0]))
-    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])
-              / np.sqrt(nev))
+    dN_err = (np.std(vn_data_array1[:, 0] + vn_data_array2[:, 0])/np.sqrt(nev))
     if path.isfile(outputFileName_vn4):
         f = open(outputFileName_vn4, 'a')
     else:
@@ -814,8 +824,9 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
     F3_mean = np.mean(F3_array)
     F3_err = np.sqrt((nev - 1.)/nev*np.sum((F3_array - F3_mean)**2.))
 
-    results = [r2_mean, r2_err, F2_mean, F2_err,
-               r3_mean, r3_err, F3_mean, F3_err]
+    results = [
+        r2_mean, r2_err, F2_mean, F2_err, r3_mean, r3_err, F3_mean, F3_err
+    ]
     if path.isfile(outputFileName42):
         f = open(outputFileName42, 'a')
     else:
@@ -825,6 +836,33 @@ def calculate_vn4_2sub(vn_data_array1, vn_data_array2,
     f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
     for ires in results:
         f.write("  {:.5e}".format(ires))
+    f.write("\n")
+    f.close()
+    return
+
+
+def calcualte_vn_2_no_rap_gap(vn_data_array, outputFileName, cenLabel):
+    """
+        this function computes vn{2} and its stat. err.
+    """
+    nev = len(vn_data_array[:, 0])
+    dN = np.real(vn_data_array[:, -1])
+    dN = dN.reshape(len(dN), 1)
+    Qn_array = dN*vn_data_array[:, 2:-1]
+
+    corr = (Qn_array*np.conj(Qn_array) - dN)/(dN*(dN - 1))
+    vn_2 = np.nan_to_num(np.sqrt(np.real(np.mean(corr, 0))))
+    vn_2_err = np.nan_to_num(np.std(np.real(corr), 0)/np.sqrt(nev)/2./vn_2)
+    dN_mean = np.real(np.mean(vn_data_array[:, 0]))/2.
+    dN_err = np.std(vn_data_array[:, 0])/(2.*np.sqrt(nev))
+    if path.isfile(outputFileName):
+        f = open(outputFileName, 'a')
+    else:
+        f = open(outputFileName, 'w')
+        f.write("# cen  Nch  vn{2}  vn{2}_err (n = 1-9)\n")
+    f.write("{:.3f}  {:.5e}  {:.5e}".format(cenLabel, dN_mean, dN_err))
+    for i in range(len(vn_2)):
+        f.write("  {:.5e}  {:.5e}".format(vn_2[i], vn_2_err[i]))
     f.write("\n")
     f.close()
     return
@@ -847,10 +885,10 @@ def calcualte_vn_2_with_gap(vn_data_array_sub1, vn_data_array_sub2,
     corr = (Qn_array1*np.conj(Qn_array2))/(dN1*dN2)
     vn_2 = np.nan_to_num(np.sqrt(np.real(np.mean(corr, 0))))
     vn_2_err = np.nan_to_num(np.std(np.real(corr), 0)/np.sqrt(nev)/2./vn_2)
-    dN_mean = np.real(np.mean(vn_data_array_sub1[:, 0]
-                              + vn_data_array_sub2[:, 0]))
+    dN_mean = np.real(
+        np.mean(vn_data_array_sub1[:, 0] + vn_data_array_sub2[:, 0]))
     dN_err = (np.std(vn_data_array_sub1[:, 0] + vn_data_array_sub2[:, 0])
-              / np.sqrt(nev))
+              /np.sqrt(nev))
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
@@ -875,25 +913,21 @@ with open(database_file, "rb") as pf:
 dNdyList = []
 for event_name in data.keys():
     dNdyList.append(data[event_name]['Nch'])
-dNdyList = - np.sort(-np.array(dNdyList))
+dNdyList = -np.sort(-np.array(dNdyList))
 print(f"Number of good events: {len(dNdyList)}")
 
 for icen in range(len(centralityCutList) - 1):
-    if centralityCutList[icen+1] < centralityCutList[icen]:
+    if centralityCutList[icen + 1] < centralityCutList[icen]:
         continue
     selected_events_list = []
 
-    dN_dy_cut_high = dNdyList[
-        int(len(dNdyList)*centralityCutList[icen]/100.)
-    ]
-    dN_dy_cut_low = dNdyList[
-        min(len(dNdyList)-1,
-            int(len(dNdyList)*centralityCutList[icen+1]/100.))
-    ]
+    dN_dy_cut_high = dNdyList[int(len(dNdyList)*centralityCutList[icen]/100.)]
+    dN_dy_cut_low = dNdyList[min(
+        len(dNdyList) - 1, int(len(dNdyList)*centralityCutList[icen + 1]/100.))]
 
     if len(dNcutList) == len(centralityCutList):
         dN_dy_cut_high = dNcutList[icen]
-        dN_dy_cut_low = dNcutList[icen+1]
+        dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
         if (data[event_name]['Nch'] > dN_dy_cut_low
@@ -904,11 +938,11 @@ for icen in range(len(centralityCutList) - 1):
     if nev <= 0:
         continue
 
-    cenLabel = (centralityCutList[icen] +
-                centralityCutList[icen+1])/2.*centralityRange
+    cenLabel = (centralityCutList[icen]
+                + centralityCutList[icen + 1])/2.*centralityRange
     print("analysis {}%-{}% nev = {}...".format(
-            centralityCutList[icen]*centralityRange,
-            centralityCutList[icen+1]*centralityRange, nev))
+        centralityCutList[icen]*centralityRange,
+        centralityCutList[icen + 1]*centralityRange, nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
     QnArr1 = []
@@ -916,9 +950,7 @@ for icen in range(len(centralityCutList) - 1):
     QnArr3 = []
     piddNArr = []
     pidmeanpTArr = []
-    Ngluons = []
     for event_name in selected_events_list:
-        Ngluons.append(data[event_name]['NgluonEst'])
         QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
         QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
         QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
@@ -932,8 +964,6 @@ for icen in range(len(centralityCutList) - 1):
             meanpTtmp.append(tmp[1])
         piddNArr.append(dNtmp)
         pidmeanpTArr.append(meanpTtmp)
-    Ngluons = np.array(Ngluons)
-    print(f"Ngluons = {Ngluons.min():.2f} - {Ngluons.max():.2f}")
     QnArr1 = np.array(QnArr1)
     QnArr2 = np.array(QnArr2)
     QnArr3 = np.array(QnArr3)
@@ -941,19 +971,19 @@ for icen in range(len(centralityCutList) - 1):
     pidmeanpTArr = np.array(pidmeanpTArr)
 
     calcualte_vn_2_with_gap(QnArr2, QnArr3, "vn2_sub.dat", cenLabel)
-    calculate_vn4_2sub(QnArr2, QnArr3, "vn4_2sub.dat",
-                       "vn4_2sub_over_vn2.dat", cenLabel)
-    calculate_vn4_vn6(QnArr1, "vn4.dat", "vn4_over_vn2.dat",
-                      "vn6_over_vn4.dat", cenLabel)
+    calculate_vn4_2sub(QnArr2, QnArr3, "vn4_2sub.dat", "vn4_2sub_over_vn2.dat",
+                       cenLabel)
+    calculate_vn4_vn6(QnArr1, "vn4.dat", "vn4_over_vn2.dat", "vn6_over_vn4.dat",
+                      cenLabel)
     calculate_pid_dN(piddNArr, "pid_dN.dat", cenLabel)
     calculate_pid_meanpT(pidmeanpTArr, "pid_meanpT.dat", cenLabel)
-    calculateNonLinearResponseV2_2sub(QnArr2, QnArr3,
-                                      "nonLinearV2_2sub.dat", cenLabel)
-    calculateNonLinearResponseV3_2sub(QnArr2, QnArr3,
-                                      "nonLinearV3_2sub.dat", cenLabel)
-    calculateNonLinearResponseV4_2sub(QnArr2, QnArr3,
-                                      "nonLinearV4_2sub.dat", cenLabel)
-    calculateNonLinearResponseV5_2sub(QnArr2, QnArr3,
-                                      "nonLinearV5_2sub.dat", cenLabel)
+    #calculateNonLinearResponseV2_2sub(QnArr2, QnArr3, "nonLinearV2_2sub.dat",
+    #                                  cenLabel)
+    #calculateNonLinearResponseV3_2sub(QnArr2, QnArr3, "nonLinearV3_2sub.dat",
+    #                                  cenLabel)
+    calculateNonLinearResponseV4_2sub(QnArr2, QnArr3, "nonLinearV4_2sub.dat",
+                                      cenLabel)
+    calculateNonLinearResponseV5_2sub(QnArr2, QnArr3, "nonLinearV5_2sub.dat",
+                                      cenLabel)
     calculateSymmetricCumulant2sub(QnArr2, QnArr3,
                                    "symmetricCumulants_2sub.dat", cenLabel)

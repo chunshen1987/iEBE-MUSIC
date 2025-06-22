@@ -5,37 +5,37 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 9af251c283e700a2abb9eb844a91da861136920f)
+(cd 3dMCGlauber_code; git checkout c5fb78113bc23cde601f854e0e92676672124dd9)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
 rm -fr ipglasma_code
-git clone --depth=1 https://github.com/chunshen1987/ipglasma ipglasma_code
-(cd ipglasma_code; git checkout 7195a564e131c3a19d6d1c174ce83aa0d92a2bff)
+git clone --depth=1 https://github.com/chunshen1987/ipglasma -b ipglasma_jimwlk ipglasma_code
+(cd ipglasma_code; git checkout 7cd9f37a38181fec85b71399ac7b46f233200a97)
 rm -fr ipglasma_code/.git
 
 # download KoMPoST
 rm -fr kompost_code
 git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
-(cd kompost_code; git checkout 3a8f873bcf8e20ec8522cb851d20ae5e66610085)
+(cd kompost_code; git checkout ad5fe9d3b26434bb1d5c29820499ef26808b5a47)
 rm -fr kompost_code/.git
 
 # download MUSIC
 rm -fr MUSIC_code
-git clone --depth=1 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
-(cd MUSIC_code; git checkout 062762b8a15b487259571f35517de9283af0a7ef)
+git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b chun_dev MUSIC_code
+(cd MUSIC_code; git checkout e25e49363e92c269f61fe7b8ab4bf5368bcc6d23)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
 rm -fr iSS_code
-git clone --depth=1 https://github.com/chunshen1987/iSS -b dev iSS_code
-(cd iSS_code; git checkout 3b151fdd03f5cd0f41c19b11af68e379c4c5f571)
+git clone --depth=3 https://github.com/chunshen1987/iSS -b dev iSS_code
+(cd iSS_code; git checkout b612a8e425d3e1dfc2d2b71cd208df6810c783be)
 rm -fr iSS_code/.git
 
 # download photonEmission wrapper
 rm -fr photonEmission_hydroInterface_code
 git clone --depth=1 https://github.com/chunshen1987/photonEmission_hydroInterface photonEmission_hydroInterface_code
-(cd photonEmission_hydroInterface_code; git checkout 282397c2ca423886d806c755f120ea7b16572e03)
+(cd photonEmission_hydroInterface_code; git checkout b80fb78c154cc9131162c8205615faffc86d6a49)
 rm -fr photonEmission_hydroInterface_code/.git
 
 # download UrQMD afterburner
@@ -46,7 +46,13 @@ rm -fr urqmd_code/.git
 
 # download hadronic afterner
 rm -fr hadronic_afterburner_toolkit_code
-git clone https://github.com/chunshen1987/hadronic_afterburner_toolkit hadronic_afterburner_toolkit_code
-(cd hadronic_afterburner_toolkit_code; git checkout f78e71ee68a5cc12b7c1d856c34cc445410d64eb)
+git clone --depth=5 https://github.com/chunshen1987/hadronic_afterburner_toolkit -b main hadronic_afterburner_toolkit_code
+(cd hadronic_afterburner_toolkit_code; git checkout e0cb8e5869bc6a8855f904d46d4c9e33a61db93a )
 rm -fr hadronic_afterburner_toolkit_code/.git
 
+# download nucleus configurations for 3D-Glauber
+(cd 3dMCGlauber_code/tables; bash download_nucleusTables.sh;)
+# download nucleus configurations for IP-Glasma
+(cd ipglasma_code/nucleusConfigurations; bash download_nucleusTables.sh;)
+# download essential EOS files for hydro simulations
+(cd MUSIC_code/EOS; bash download_hotQCD.sh; bash download_Neos2D.sh bqs;)

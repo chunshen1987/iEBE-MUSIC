@@ -30,8 +30,11 @@ def dump_results_from_hdf5(resultsFile):
             headerText = ""
             if "header" in attrsList:
                 headerText = str(hf[group_i][file_i].attrs.get("header"))
-            np.savetxt(path.join(resFolder, file_i), data, fmt="%.6e",
-                       delimiter="  ", header=headerText)
+            np.savetxt(path.join(resFolder, file_i),
+                       data,
+                       fmt="%.6e",
+                       delimiter="  ",
+                       header=headerText)
         hf.close()
 
 
