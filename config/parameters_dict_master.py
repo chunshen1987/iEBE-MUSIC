@@ -340,7 +340,7 @@ music_dict = {
     'output_movie_flag': 0,
     'output_evolution_T_cut': 0.145,
     'output_evolution_e_cut': 0.15,
-    'output_evolution_ideal_only': 0,       # only ideal part of the evolution
+    'output_evolution_ideal_only': 0,  # only ideal part of the evolution
     'outputBinaryEvolution': 1,  # output evolution file in binary format
     'output_evolution_every_N_eta': 1,  # output evolution file every Neta steps
     'output_evolution_every_N_x': 1,  # output evolution file every Nx steps

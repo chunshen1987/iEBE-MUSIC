@@ -22,7 +22,8 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     temp_vn_array = [N + 1j*0.0]
     for iorder in range(1, n_order):
@@ -30,8 +31,10 @@ def calcualte_inte_Qn(pT_low, pT_high, data):
         vn_imag_event = data[:, 2*iorder + 1]
         vn_real_interp = np.interp(pT_inte_array, pT_event, vn_real_event)
         vn_imag_interp = np.interp(pT_inte_array, pT_event, vn_imag_event)
-        Qn_real_inte = 2.*np.pi*np.sum(vn_real_interp*dN_interp*pT_inte_array)*dpT
-        Qn_imag_inte = 2.*np.pi*np.sum(vn_imag_interp*dN_interp*pT_inte_array)*dpT
+        Qn_real_inte = 2.*np.pi*np.sum(
+            vn_real_interp*dN_interp*pT_inte_array)*dpT
+        Qn_imag_inte = 2.*np.pi*np.sum(
+            vn_imag_interp*dN_interp*pT_inte_array)*dpT
         Qn_inte = Qn_real_inte + 1j*Qn_imag_inte
         temp_vn_array.append(Qn_inte)
     return (temp_vn_array)
@@ -47,7 +50,8 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data, pid):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     res_array = [pid, N, meanpT]
@@ -117,5 +121,5 @@ for fileName in fileList:
         data = np.nan_to_num(h5_group.get(fileName))
         np.savetxt(fileName, data, fmt="%.2f", header="x(fm)  y(fm)")
     if "binaryCollisions" in fileName:
-        data = np.nan_to_num(h5_group.get(fileName))[:, 1:3]
+        data = np.nan_to_num(h5_group.get(fileName)).reshape(-1, 4)[:, 1:3]
         np.savetxt("NcollList.dat", data, fmt="%.2f", header="x(fm)  y(fm)")
