@@ -364,12 +364,17 @@ for ievent, event_i in enumerate(eventList):
         print("fetching event: {0} from the database {1} ...".format(
             event_i, database_file))
     eventGroup = h5_data.get(event_i)
-    outdata[event_i] = {}
     vn_filename = f"particle_9999_vndata_diff_eta_-0.5_0.5{weakString}.dat"
     vn_data = np.nan_to_num(eventGroup.get(vn_filename))
-    dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
-    outdata[event_i]["Nch"] = dN_vector[0]
-    outdata[event_i]["mean_pT_ch"] = dN_vector[1]
+    if vn_data.ndim == 2:
+        outdata[event_i] = {}
+        dN_vector = calcualte_yield_and_meanpT(0.0, 3.0, vn_data)
+        outdata[event_i]["Nch"] = dN_vector[0]
+        outdata[event_i]["mean_pT_ch"] = dN_vector[1]
+    else:
+        print(f"skip {event_i} ...")
+        print("vn_data shape: ", vn_data.shape)
+        continue
 
     # compute dET/deta
     vn_filename = f"particle_99999_dNdeta_pT_0_4{weakString}.dat"
