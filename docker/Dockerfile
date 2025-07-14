@@ -41,7 +41,7 @@ RUN cd ${HOME} && \
     bash download_EOSdatabase1D.sh && \
     bash download_QGPViscositydatabase1D.sh && \
     cd ../config/arXiv_BayesianBES && \
-    bash download_posteriorChains.sh \
+    bash download_posteriorChains.sh && \
     cd ../arXiv_2408.00537 && \
     bash download_posteriorChain.sh
 
