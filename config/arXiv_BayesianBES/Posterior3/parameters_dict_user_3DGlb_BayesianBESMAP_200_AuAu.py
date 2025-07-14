@@ -12,10 +12,10 @@ control_dict = {
     'save_hydro_surfaces': False,   # flag to save hydro surfaces
     'save_UrQMD_files': False,      # flag to save UrQMD files
     'compute_photon_emission': False,   # flag to compute EM radiation from hydrodynamic medium
-    'usePosteriorParameters': False,
-    'PosteriorChainFilePath': "config/BESPost",
+    'usePosteriorParameters': True,
+    'PosteriorChainFilePath': "config/arXiv_BayesianBES/Posterior3",
     'PosteriorParamSet': 0,
-    'PosteriorParamSetFlag': 0,     # 0: choose from sorted chain
+    'PosteriorParamSetFlag': 1,     # 0: choose from sorted chain
                                     # 1: choose from parameter clusters
 }
 

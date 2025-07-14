@@ -40,10 +40,8 @@ RUN cd ${HOME} && \
     cd ../EOS_database && \
     bash download_EOSdatabase1D.sh && \
     bash download_QGPViscositydatabase1D.sh && \
-    cd ../config/BESPost && \
-    bash download_posteriorChain.sh \
-    cd ../config/BESPost2 && \
-    bash download_posteriorChain.sh \
+    cd ../config/arXiv_BayesianBES && \
+    bash download_posteriorChains.sh \
     cd ../arXiv_2408.00537 && \
     bash download_posteriorChain.sh
 
