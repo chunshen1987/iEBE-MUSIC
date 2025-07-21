@@ -14,7 +14,7 @@ rm -fr ipglasma_code
 git clone --depth=1 https://github.com/wenbin1501110084/ipglasma -b stingy_proton_jimwlk ipglasma_code
 #(cd ipglasma_code; git checkout 819e672bb710f6bbc0fd751e6710a841d1fe7d27)
 rm -fr ipglasma_code/.git
- 
+
 # download KoMPoST
 rm -fr kompost_code
 git clone --depth=1 https://github.com/chunshen1987/KoMPoST kompost_code
