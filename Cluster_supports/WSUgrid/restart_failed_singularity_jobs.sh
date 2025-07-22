@@ -20,7 +20,7 @@ fi
 cd $runFolder
 for iev in `ls | grep "event"`
 do
-    if grep -q -E "FATAL|bash: error" ${iev}/job.err; then
+    if grep -q -E "FATAL|bash: error|slurmstepd: error|unavailable" ${iev}/job.err; then
         jobId=`cat ${iev}/job_id`
         jobStatus=`squeue --job ${jobId} 2>&1`
         if [[ "$jobStatus" == *"error"* ]]; then
