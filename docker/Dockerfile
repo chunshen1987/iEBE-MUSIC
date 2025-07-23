@@ -10,7 +10,7 @@ RUN yum -y install \
         gcc \
         gcc-c++ \
         gcc-gfortran \
-        gsl-devel \
+        gsl-devel-2.7-1.el8 \
         fftw \
         fftw-devel \
         hdf5-devel \
