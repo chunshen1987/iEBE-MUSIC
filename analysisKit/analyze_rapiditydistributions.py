@@ -80,7 +80,8 @@ with open(database_file, "rb") as pf:
 
 dNdyList = []
 for event_name in data.keys():
-    dNdyList.append(data[event_name]['Nch'])
+    Nch = data[event_name]['Nch']
+    dNdyList.append(Nch)
 dNdyList = -np.sort(-np.array(dNdyList))
 print(f"Number of good events: {len(dNdyList)}")
 
@@ -98,8 +99,8 @@ for icen in range(len(centralityCutList) - 1):
         dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
-        if (data[event_name]['Nch'] > dN_dy_cut_low
-                and data[event_name]['Nch'] <= dN_dy_cut_high):
+        Nch = data[event_name]['Nch']
+        if Nch > dN_dy_cut_low and Nch <= dN_dy_cut_high:
             selected_events_list.append(event_name)
 
     nev = len(selected_events_list)

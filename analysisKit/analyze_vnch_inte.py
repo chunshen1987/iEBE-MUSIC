@@ -912,7 +912,8 @@ with open(database_file, "rb") as pf:
 
 dNdyList = []
 for event_name in data.keys():
-    dNdyList.append(data[event_name]['Nch'])
+    Nch = data[event_name]['Nch']
+    dNdyList.append(Nch)
 dNdyList = -np.sort(-np.array(dNdyList))
 print(f"Number of good events: {len(dNdyList)}")
 
@@ -930,8 +931,8 @@ for icen in range(len(centralityCutList) - 1):
         dN_dy_cut_low = dNcutList[icen + 1]
 
     for event_name in data.keys():
-        if (data[event_name]['Nch'] > dN_dy_cut_low
-                and data[event_name]['Nch'] <= dN_dy_cut_high):
+        Nch = data[event_name]['Nch']
+        if Nch > dN_dy_cut_low and Nch <= dN_dy_cut_high:
             selected_events_list.append(event_name)
 
     nev = len(selected_events_list)
@@ -951,9 +952,9 @@ for icen in range(len(centralityCutList) - 1):
     piddNArr = []
     pidmeanpTArr = []
     for event_name in selected_events_list:
-        QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4'])
-        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4'])
-        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8'])
+        QnArr1.append(data[event_name]['ALICE_eta_-0p4_0p4_pT_0p2_3'])
+        QnArr2.append(data[event_name]['ALICE_eta_-0p8_-0p4_pT_0p2_3'])
+        QnArr3.append(data[event_name]['ALICE_eta_0p4_0p8_pT_0p2_3'])
         dNtmp = []
         meanpTtmp = []
         dNtmp.append(data[event_name]['Nch'])
