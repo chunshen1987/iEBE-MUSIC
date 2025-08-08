@@ -22,6 +22,20 @@ Paper:
 
 Datasets:
 ```
+@dataset{chiu_2025_16780467,
+  author       = {Chiu, Cheng and
+                  Silveira Denicol, Gabriel and
+                  Luzum, Matthew and
+                  Shen, Chun},
+  title        = {Data Repository for "A Resummed Hydrodynamic
+                   Description of Relativistic Heavy-ion Collisions"
+                  },
+  month        = aug,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.16780467},
+  url          = {https://doi.org/10.5281/zenodo.16780467},
+}
 ```
 
 ## Setting the parameters in the iEBE-MUSIC framework
