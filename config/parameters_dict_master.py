@@ -154,8 +154,8 @@ mcglauber_dict = {
     'nucleon_configuration_from_file': 0,
     'light_nucleus_option':
         0,  # light nucleus configurations from different nuclear structure theory
-    'ProjPolarizationFlag': 0,      # 1: polarized, 0: unpolarized
-    'TargPolarizationFlag': 0,      # 1: polarized, 0: unpolarized
+    'ProjPolarizationFlag': 0,      # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'TargPolarizationFlag': 0,      # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
     'Proj_polJz': 0,                # polarized Jz for projectile
     'Targ_polJz': 0,                # polarized Jz for target
     'resetProjWS': 0,               # 1: reset W_S for projectile
