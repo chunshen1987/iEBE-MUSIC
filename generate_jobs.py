@@ -954,10 +954,6 @@ def main():
         nev = max(1, len(filelist))
         print("there are {} events found under the folder {}".format(
             nev, initial_condition_database))
-        n_jobs = min(nev, n_jobs)
-        n_hydro_per_job = int(ceil(nev/n_jobs))
-        print("n_jobs = {}, n_hydro_per_job = {}".format(
-            n_jobs, n_hydro_per_job))
     else:
         initial_condition_database = (
             parameter_dict.mcglauber_dict['database_name'])
