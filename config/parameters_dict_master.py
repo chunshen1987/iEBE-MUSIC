@@ -265,7 +265,9 @@ music_dict = {
     #   -- 93: e, u^\mu, and pi^\munu
     # 11: 3dMCGlauber initial condition at a constant tau surface
     #     based on the nuclear thickness funciton TA and TB
-    #   -- 111: second parameterization of eta profile
+    #   -- 111: 3dMCGlauber smooth initial condition (arXiv:2003.05852)
+    #   -- 112: generalization of arXiv:2003.05852 with yLfrac (arXiv:2106.08125)
+    #   -- 113: event-by-event TA TB version of 112 (arXiv:2203.15718)
     # 13: dynamical initialization (3dMCGlauber_dynamical)
     #   -- 131: 3dMCGlauber with zero nucleus thickness
 
