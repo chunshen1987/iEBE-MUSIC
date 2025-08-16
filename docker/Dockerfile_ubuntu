@@ -43,6 +43,8 @@ RUN cd ${HOME} \
 && cd ../EOS_database \
 && bash download_EOSdatabase1D.sh \
 && bash download_QGPViscositydatabase1D.sh \
+&& cd ../initialcondition_database \
+&& bash download_smoothTATB.sh \
 && cd ../config/arXiv_2507.11394 \
 && bash download_posteriorChains.sh \
 && cd ../arXiv_2408.00537 \
