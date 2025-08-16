@@ -178,6 +178,7 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
         file_name = fecth_an_3DMCGlauber_smooth_event(database, event_id)
+        printf(f"Using initial file: {file_name}")
         return status, file_name
     else:
         print("\U0001F6AB  "
