@@ -165,6 +165,7 @@ mcglauber_dict = {
     'Q2': 1.,  # the scale when evaluating the pdf
     'b_min': 0.,  # minimum impact parameter (fm)
     'b_max': 20.,  # maximum impact parameter (fm)
+    'randomRPflag': 0,  # 1: randomize reaction plane rangle
     'cenMin': 0,  # centrality cut lower bound (%)
     'cenMax': 100,  # centrality cut upper bound (%)
     'seed': -1,  # random seed (-1: system)
