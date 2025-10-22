@@ -12,7 +12,8 @@ import argparse
 from math import ceil
 from glob import glob
 
-support_cluster_list = ["wsugrid", "osg", "local", "stampede2", "anvil"]
+support_cluster_list = ["wsugrid", "osg", "local", "stampede2", "anvil",
+                        "csd3"]
 
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
@@ -44,6 +45,10 @@ source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
         script.write("""#!/usr/bin/env bash
 
 module purge
+""")
+    elif cluster == "csd3":
+        script.write("""#!/usr/bin/env bash
+
 """)
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -137,6 +142,37 @@ cp -r temp/* $PROJECT/RESULTS/
 rm -fr `pwd`
 
 """.format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
+    script.close()
+
+
+def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTaskPerNode,
+                                   n_threads, walltime):
+    """This function generates job script for Anvil"""
+    working_folder = folder_name
+
+    mem = 3420
+    if queueName not in ["cclake", "cclake-himem"]:
+        queueName = "cclake"
+        mem = 6840
+
+    script = open(path.join(working_folder, "submit_jobArr.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH --job-name iEBEMUSIC
+#SBATCH -A iris-ip012-CPU
+#SBATCH --output=job_%A_%a
+#SBATCH -e job.e%j
+#SBATCH -p {0:s}
+#SBATCH --nodes={1:d}
+#SBATCH --ntasks={2:d}
+#SBATCH --cpus-per-task={4:d}
+#SBATCH --time={3:s}
+#SBATCH --mem={5:d}mb
+#SBATCH --array=0-{2:d}
+
+cd event-$SLURM_ARRAY_TASK_ID
+bash submit_job.script
+
+""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads, mem))
     script.close()
 
 
@@ -400,6 +436,13 @@ def main():
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
                     working_folder_name)
+
+    if cluster_name == "csd3":
+        generate_csd3_job_array_script(working_folder_name,
+                                       args.node_type.lower(),
+                                       n_nodes, nTaskPerNode,
+                                       n_threads, wallTime)
+
 
 
 if __name__ == "__main__":
