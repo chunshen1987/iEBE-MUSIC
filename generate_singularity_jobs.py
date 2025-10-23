@@ -145,22 +145,28 @@ rm -fr `pwd`
     script.close()
 
 
-def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTaskPerNode,
+def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTasks,
                                    n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
-    mem = 3420
-    if queueName not in ["cclake", "cclake-himem"]:
+    if queueName not in ["icelake", "icelake-himem", "cclake", "cclake-himem"]:
         queueName = "cclake"
+
+    mem = 3420
+    if queueName == "icelake":
+        mem = 3380
+    elif queueName == 'icelake-himem':
+        mem = 6760
+    elif queueName == 'cclake-himem':
         mem = 6840
 
     script = open(path.join(working_folder, "submit_jobArr.script"), "w")
     script.write("""#!/bin/bash -l
 #SBATCH --job-name iEBEMUSIC
 #SBATCH -A iris-ip012-CPU
-#SBATCH --output=job_%A_%a
-#SBATCH -e job.e%j
+#SBATCH --output=job_%A_%a.output
+#SBATCH --error=job_%A_%a.error
 #SBATCH -p {0:s}
 #SBATCH --nodes={1:d}
 #SBATCH --ntasks={2:d}
@@ -169,10 +175,14 @@ def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTaskPerNode
 #SBATCH --mem={5:d}mb
 #SBATCH --array=0-{2:d}
 
-cd event-$SLURM_ARRAY_TASK_ID
+. /etc/profile.d/modules.sh                # Leave this line (enables the module command)
+source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/iEBE-MUSIC/Cluster_supports/CSD3/bashrc
+source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/venv/bin/activate
+
+cd event_$SLURM_ARRAY_TASK_ID
 bash submit_job.script
 
-""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads, mem))
+""".format(queueName, n_nodes, nTasks, walltime, n_threads, mem))
     script.close()
 
 
@@ -438,9 +448,11 @@ def main():
                     working_folder_name)
 
     if cluster_name == "csd3":
+        nThreadsPerNode = 56
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
         generate_csd3_job_array_script(working_folder_name,
                                        args.node_type.lower(),
-                                       n_nodes, nTaskPerNode,
+                                       n_nodes, n_jobs,
                                        n_threads, wallTime)
 
 
