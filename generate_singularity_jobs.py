@@ -145,9 +145,9 @@ rm -fr `pwd`
     script.close()
 
 
-def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTasks,
-                                   n_threads, walltime):
-    """This function generates job script for Anvil"""
+def generate_csd3_job_array_script(folder_name, queueName, n_jobs, n_threads,
+                                   walltime):
+    """This function generates job script for csd3"""
     working_folder = folder_name
 
     if queueName not in ["icelake", "icelake-himem", "cclake", "cclake-himem"]:
@@ -168,12 +168,12 @@ def generate_csd3_job_array_script(folder_name, queueName, n_nodes, nTasks,
 #SBATCH --output=job_%A_%a.output
 #SBATCH --error=job_%A_%a.error
 #SBATCH -p {0:s}
-#SBATCH --nodes={1:d}
-#SBATCH --ntasks={2:d}
-#SBATCH --cpus-per-task={4:d}
-#SBATCH --time={3:s}
-#SBATCH --mem={5:d}mb
-#SBATCH --array=0-{2:d}
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --time={1:s}
+#SBATCH --cpus-per-task={2:d}
+#SBATCH --mem={3:d}mb
+#SBATCH --array=0-{4:d}
 
 . /etc/profile.d/modules.sh                # Leave this line (enables the module command)
 source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/iEBE-MUSIC/Cluster_supports/CSD3/bashrc
@@ -182,7 +182,7 @@ source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/venv/bin/activate
 cd event_$SLURM_ARRAY_TASK_ID
 bash submit_job.script
 
-""".format(queueName, n_nodes, nTasks, walltime, n_threads, mem))
+""".format(queueName, walltime, n_threads, mem, n_jobs-1))
     script.close()
 
 
@@ -448,12 +448,9 @@ def main():
                     working_folder_name)
 
     if cluster_name == "csd3":
-        nThreadsPerNode = 56
-        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
         generate_csd3_job_array_script(working_folder_name,
                                        args.node_type.lower(),
-                                       n_nodes, n_jobs,
-                                       n_threads, wallTime)
+                                       n_jobs, n_threads, wallTime)
 
 
 
