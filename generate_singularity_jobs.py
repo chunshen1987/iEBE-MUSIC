@@ -199,6 +199,8 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     workFolderPath = "playground_{0}_{1}".format(workingFolderName, eventId)
     if clusterName == "stampede2":
         workFolderPath = "/tmp/" + workFolderPath
+    if clusterName == "csd3":
+        workFolderPath = "/local/" + workFolderPath
     workFolderName = workFolderPath.split('/')[-1]
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
