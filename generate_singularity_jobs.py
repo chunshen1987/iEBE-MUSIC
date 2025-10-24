@@ -274,7 +274,7 @@ def main():
                         metavar='',
                         type=str,
                         default='SKX',
-                        help='node type (work on stampede2 and Anvil)')
+                        help='node type (work on stampede2, Anvil, and CSD3)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
