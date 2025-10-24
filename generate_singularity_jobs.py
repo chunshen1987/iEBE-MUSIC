@@ -161,6 +161,8 @@ def generate_csd3_job_array_script(folder_name, queueName, n_jobs, n_threads,
     elif queueName == 'cclake-himem':
         mem = 6840
 
+    mem *= n_threads
+
     script = open(path.join(working_folder, "submit_jobArr.script"), "w")
     script.write("""#!/bin/bash -l
 #SBATCH --job-name iEBEMUSIC
