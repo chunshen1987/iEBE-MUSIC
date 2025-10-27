@@ -350,7 +350,7 @@ mv *.txt $results_folder
     script.close()
 
 
-def generate_script_hydro(folder_name, nthreads):
+def generate_script_hydro(folder_name, nthreads, debugFlag):
     """This function generates script for hydro simulation"""
     working_folder = folder_name
 
@@ -374,7 +374,15 @@ rm -fr $results_folder
 export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
-    script.write("""
+    if debugFlag:
+        script.write("""
+# hydro evolution
+./MUSIChydro music_input_mode_2 2>&1 | tee run.log
+./sweeper.sh $results_folder
+)
+""")
+    else:
+        script.write("""
 # hydro evolution
 ./MUSIChydro music_input_mode_2 > run.log  2>run.err
 ./sweeper.sh $results_folder
@@ -634,7 +642,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                             shell=True)
 
     # MUSIC
-    generate_script_hydro(event_folder, n_threads)
+    generate_script_hydro(event_folder, n_threads, debugFlag)
 
     shutil.copytree(path.join(code_path, 'MUSIC'),
                     path.join(event_folder, 'MUSIC'))
