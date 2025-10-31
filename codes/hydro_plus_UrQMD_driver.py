@@ -687,12 +687,6 @@ def main(para_dict_):
         curr_time = time.asctime()
 
         event_id = str(iev + idx0)
-        if (para_dict_['initial_condition'] != "self"
-                and para_dict_['initial_condition'] != "fixCentrality"):
-            initial_database_name = (
-                initial_condition.split("/")[-1].split(".h5")[0])
-            event_id = initial_database_name + "_" + event_id
-
         final_results_folder = "EVENT_RESULTS_{}".format(event_id)
 
         # setup OSG checkpoint file
