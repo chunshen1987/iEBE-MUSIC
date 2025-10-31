@@ -499,11 +499,13 @@ do
     if afterburner_type == "UrQMD":
         script.write("""
     cd ../osc2u
-    ./osc2u.e < ../iSS/OSCAR.DAT > {0}
+    ./osc2u.e < ../iSS/OSCAR.DAT {0}
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    ./runqmd.sh > {0}
+    ./runqmd.sh {0}
+""".format(logfile))
+        script.write("""
     mv particle_list.dat ../UrQMD_results/particle_list_${iev}.dat
     rm -fr OSCAR.input
     cd ..
@@ -512,7 +514,7 @@ do
     cat UrQMD_results/particle_list_${iev}.bin >> UrQMD_results/particle_list.bin
     rm -fr UrQMD_results/particle_list_${iev}.bin
 done
-""".format(logfile))
+""")
     elif afterburner_type == "decay":
         script.write("""
     cat particle_samples.bin >> ../UrQMD_results/particle_list.bin
