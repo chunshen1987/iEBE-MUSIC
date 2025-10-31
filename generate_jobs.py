@@ -587,7 +587,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         event_folder)
 
     logfile = ""
-    if cluster_name != "osg" or not debugFlag:
+    if not debugFlag:
         logfile = " >> run.log"
 
     if (initial_condition_database == "self"
