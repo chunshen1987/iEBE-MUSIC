@@ -499,12 +499,12 @@ do
     if afterburner_type == "UrQMD":
         script.write("""
     cd ../osc2u
-    ./osc2u.e < ../iSS/OSCAR.DAT {0}
+    ./osc2u.e < ../iSS/OSCAR.DAT > run.log
     mv fort.14 ../urqmd/OSCAR.input
     rm -fr ../iSS/OSCAR.DAT
     cd ../urqmd
-    ./runqmd.sh {0}
-""".format(logfile))
+    ./runqmd.sh > run.log
+""")
         script.write("""
     mv particle_list.dat ../UrQMD_results/particle_list_${iev}.dat
     rm -fr OSCAR.input
