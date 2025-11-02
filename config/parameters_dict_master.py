@@ -796,24 +796,35 @@ def update_parameters_dict(par_dict_path, ran_seed):
 def update_parameters_bayesian(bayes_file):
     parfile = open(bayes_file, "r")
     for line in parfile:
+        paramApplied = False
         key, val = line.split()
         if key in control_dict.keys():
             control_dict[key] = int(val)
+            paramApplied = True
 
         if key in ipglasma_dict.keys():
             ipglasma_dict[key] = float(val)
+            paramApplied = True
 
         if key in mcglauber_dict.keys():
             mcglauber_dict[key] = float(val)
+            paramApplied = True
 
         if key in music_dict.keys():
             music_dict[key] = float(val)
+            paramApplied = True
 
         if key in iss_dict.keys():
             iss_dict[key] = float(val)
+            paramApplied = True
 
         if key in hadronic_afterburner_toolkit_dict.keys():
             hadronic_afterburner_toolkit_dict[key] = float(val)
+            paramApplied = True
+
+        if not paramApplied:
+            print(f"Parameter {key} is not set! Please check your input file")
+
 
 
 def output_parameters_to_files(workfolder="."):
