@@ -41,7 +41,7 @@ rm -fr photonEmission_hydroInterface_code/.git
 # download UrQMD afterburner
 rm -fr urqmd_code
 git clone --depth=1 https://Chunshen1987@bitbucket.org/Chunshen1987/urqmd_afterburner.git urqmd_code
-(cd urqmd_code; git checkout 704c886)
+(cd urqmd_code; git checkout 09eeac28b5861d68d166c1f89b2e97e0a0ebfe8f)
 rm -fr urqmd_code/.git
 
 # download hadronic afterner
