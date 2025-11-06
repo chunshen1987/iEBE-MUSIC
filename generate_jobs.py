@@ -653,14 +653,12 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
     targetFile = path.join(code_path, 'MUSIC_code/MUSIChydro')
     desLoc = path.join(event_folder, "MUSIC/MUSIChydro")
     subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
-    if EOSType != 42:
-        targetFile = path.join(code_path, 'MUSIC_code/EOS')
-        desLoc = path.join(event_folder, "MUSIC/EOS")
-        subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
-    else:
+    targetFile = path.join(code_path, 'MUSIC_code/EOS')
+    desLoc = path.join(event_folder, "MUSIC/EOS")
+    subprocess.call(f"ln -s {targetFile} {desLoc}", shell=True)
+    if EOSType == 42:
         eosDatabase = path.join(package_root_path, 'EOS_database', EOSFileName)
         eosFileName = fetch_an_EOS(eosDatabase, EOSId)
-        mkdir(path.join(event_folder, "MUSIC/EOS"))
         shutil.move(eosFileName,
                     path.join(event_folder, "MUSIC/EOS/EoS_1DGen.bin"))
         shearFileName = fetchShearViscosity1D(
