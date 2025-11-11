@@ -2,8 +2,7 @@
 
 ## eprint: [link](https://arxiv.org/abs/2511.03588)
 
-This folder contains parameter files to compute observables in Pb+d^↑
-collisions as proposed in the paper, arXiv:2511.03588.
+This folder contains parameter files to compute the particle production and flow observables as shown in the paper, arXiv:2511.03588.
 
 ## citation
 
