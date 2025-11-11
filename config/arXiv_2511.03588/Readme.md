@@ -19,6 +19,23 @@ Paper:
     year = "2025"
 }
 ```
+Data Repository:
+```
+@dataset{mantysaari_2025_17583744,
+  author       = {Mäntysaari, Heikki and
+                  Schenke, Bjoern and
+                  Shen, Chun and
+                  Zhao(赵文彬), Wenbin},
+  title        = {Data repository for "Impact of QCD Energy
+                   Evolution on Observables in Heavy-Ion Collisions''
+                  },
+  month        = nov,
+  year         = 2025,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.17583744},
+  url          = {https://doi.org/10.5281/zenodo.17583744},
+}
+```
 
 
 ## Setting the parameters in the iEBE-MUSIC framework
