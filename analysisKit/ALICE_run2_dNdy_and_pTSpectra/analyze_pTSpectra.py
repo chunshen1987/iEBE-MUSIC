@@ -28,7 +28,7 @@ def calculate_pTSpectra(pTArr, poiSP, outputFileName: str) -> None:
     nev, npt = poiSP.shape
     pTSp_mean = np.mean(poiSP, axis=0)
     pTSp_err = np.sqrt(pTSp_mean)/np.sqrt(nev)
-    results = np.array([pTArr, pTSp_mean, pTSp_err]).transpose()
+    results = np.real(np.array([pTArr, pTSp_mean, pTSp_err]).transpose())
     np.savetxt(outputFileName,
                results,
                fmt="%.4e",
