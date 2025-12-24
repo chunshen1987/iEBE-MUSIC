@@ -1,4 +1,4 @@
-# System size and energy dependence of the mean transverse momentum fluctuations at the LHC 
+# Centrality dependence of the pseudorapidity density distribution for charged particles in Pb–Pb collisions at √sNN = 5.02TeV
 
 [paper](https://arxiv.org/pdf/1612.08966)
 

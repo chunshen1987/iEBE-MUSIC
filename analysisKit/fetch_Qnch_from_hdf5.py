@@ -80,10 +80,22 @@ kinematicCutsDict_ALICE = {
         "etamin": -0.5,
         "etamax": 0.5
     },
-    "ALICE_eta_-0p8_0p8_pT_0p2_3": {
+    "ALICE_eta_-0p8_0p8_pT_0p2_4": {
         "pTmin": 0.2,
-        "pTmax": 3,
+        "pTmax": 4,
         "etamin": -0.8,
+        "etamax": 0.8
+    },
+    "ALICE_eta_-0p8_0_pT_0p15_2": {
+        "pTmin": 0.15,
+        "pTmax": 2,
+        "etamin": -0.8,
+        "etamax": 0
+    },
+    "ALICE_eta_0_0p8_pT_0p15_2": {
+        "pTmin": 0.15,
+        "pTmax": 2,
+        "etamin": 0,
         "etamax": 0.8
     },
     "ALICE_eta_-0p4_0p4_pT_0p2_3": {
@@ -92,16 +104,16 @@ kinematicCutsDict_ALICE = {
         "etamin": -0.4,
         "etamax": 0.4
     },
-    "ALICE_eta_-0p8_-0p4_pT_0p2_3": {
+    "ALICE_eta_-0p8_-0p5_pT_0p2_4": {
         "pTmin": 0.2,
-        "pTmax": 3,
+        "pTmax": 4,
         "etamin": -0.8,
-        "etamax": -0.4
+        "etamax": -0.5
     },
-    "ALICE_eta_0p4_0p8_pT_0p2_3": {
+    "ALICE_eta_0p5_0p8_pT_0p2_4": {
         "pTmin": 0.2,
-        "pTmax": 3,
-        "etamin": 0.4,
+        "pTmax": 4,
+        "etamin": 0.5,
         "etamax": 0.8
     },
 }
