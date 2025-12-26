@@ -1,0 +1,78 @@
+#: table_doi: 10.17182/hepdata.146722.v1/t9
+#: name: Table 9
+#: description: $r_{2,2}$ versus $\eta$ for $x^{\pm}$ in $\mathrm{Pb}-\mathrm{Pb}$ at $\sqrt{s_{\mathrm{NN}}}=5.023\,\mathrm{Te\!V}$ 
+#: data_file: tab9.yaml
+#: keyword reactions: PB PB --> CHARGED
+#: keyword observables: R_2_2 | R_2_2 | R_2_2 | R_2_2 | R_2_2 | R_2_2 | R_2_2
+#: keyword cmenergies: 5023
+#: keyword phrases: Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Multi-particle correlation | Pseudorapidity separation | Decorrelation of event plane angle | Pseudorapidity Dependence
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,0 TO 5
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.009,0.003,-0.003
+0.36,0.24,0.48,0.991,0.009,-0.009
+0.6,0.48,0.72,0.98,0.01,-0.01
+0.84,0.72,0.96,0.942,0.006,-0.006
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,5 TO 10
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.006,0.003,-0.003
+0.36,0.24,0.48,0.994,0.004,-0.004
+0.6,0.48,0.72,0.99,0.003,-0.003
+0.84,0.72,0.96,0.986,0.005,-0.005
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,10 TO 20
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.0016,0.0007,-0.0007
+0.36,0.24,0.48,0.996,0.002,-0.002
+0.6,0.48,0.72,0.994,0.001,-0.001
+0.84,0.72,0.96,0.984,0.002,-0.002
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,20 TO 30
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.005,0.001,-0.001
+0.36,0.24,0.48,0.993,0.002,-0.002
+0.6,0.48,0.72,0.994,0.001,-0.001
+0.84,0.72,0.96,0.991,0.002,-0.002
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,30 TO 40
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.003,0.001,-0.001
+0.36,0.24,0.48,0.996,0.002,-0.002
+0.6,0.48,0.72,0.992,0.001,-0.001
+0.84,0.72,0.96,0.986,0.002,-0.002
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,40 TO 50
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.005,0.002,-0.002
+0.36,0.24,0.48,0.9953,0.0007,-0.0007
+0.6,0.48,0.72,0.987,0.002,-0.002
+0.84,0.72,0.96,0.983,0.002,-0.002
+
+#: PARTICLE,,,CHARGED
+#: HARMONIC,,,2
+#: ETARAP REF,,,2.8 TO 3.1999999999999997
+#: CENTRALITY [PCT],,,50 TO 60
+ETARAP,ETARAP LOW,ETARAP HIGH,R_2_2,stat +,stat -
+0.11999999999999966,-2.22e-16,0.23999999999999955,1.001,0.003,-0.003
+0.36,0.24,0.48,0.992,0.003,-0.003
+0.6,0.48,0.72,0.988,0.004,-0.004
+0.84,0.72,0.96,0.979,0.002,-0.002
+

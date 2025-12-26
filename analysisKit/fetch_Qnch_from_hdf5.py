@@ -560,13 +560,18 @@ for ievent, event_i in enumerate(eventList):
                                                    outdata['global']["pTArr"],
                                                    N_hadronic_events, 0)
             outdata[event_i]["chVneta_pT_0p2_2"] = np.array(Vn_vector)
-
-        # for vn(eta)
-        Vn_vector = calcualte_inte_Vneta_pTeta(0.2, 3.0, vn_data,
-                                               outdata['global']["etaArr"],
-                                               outdata['global']["pTArr"],
-                                               N_hadronic_events, 0)
-        outdata[event_i]["chVneta_pT_0p2_3"] = np.array(Vn_vector)
+        elif expFlag == "ALCIE":
+            # for vn(eta)
+            Vn_vector = calcualte_inte_Vneta_pTeta(0.2, 3.0, vn_data,
+                                                   outdata['global']["etaArr"],
+                                                   outdata['global']["pTArr"],
+                                                   N_hadronic_events, 0)
+            outdata[event_i]["chVneta_pT_0p2_3"] = np.array(Vn_vector)
+            Vn_vector = calcualte_inte_Vneta_pTeta(0, 4.0, vn_data,
+                                                   outdata['global']["etaArr"],
+                                                   outdata['global']["pTArr"],
+                                                   N_hadronic_events, 0)
+            outdata[event_i]["chVneta_pT_0_4"] = np.array(Vn_vector)
 
 print("nev = {}".format(len(eventList)))
 with open(f'QnVectors{weakString}.pickle', 'wb') as pf:
