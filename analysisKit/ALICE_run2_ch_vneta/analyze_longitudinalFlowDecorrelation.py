@@ -15,7 +15,7 @@ centralityRange = 1.
 Reg_centrality_cut_list = [
     0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
 ]
-centralityCutList = [0., 10., 40., 80]
+centralityCutList = Reg_centrality_cut_list
 #centralityCutList = [0, 1, 2, 3, 4, 6, 8, 10, 15, 20, 30, 40, 50, 60,
 #                     70, 80, 90, 100]
 dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias

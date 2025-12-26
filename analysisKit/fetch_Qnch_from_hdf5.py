@@ -560,7 +560,7 @@ for ievent, event_i in enumerate(eventList):
                                                    outdata['global']["pTArr"],
                                                    N_hadronic_events, 0)
             outdata[event_i]["chVneta_pT_0p2_2"] = np.array(Vn_vector)
-        elif expFlag == "ALCIE":
+        elif expFlag == "ALICE":
             # for vn(eta)
             Vn_vector = calcualte_inte_Vneta_pTeta(0.2, 3.0, vn_data,
                                                    outdata['global']["etaArr"],
