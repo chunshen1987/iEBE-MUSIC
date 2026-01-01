@@ -68,6 +68,12 @@ kinematicCutsDict_ALICE = {
         "etamin": 2.8,
         "etamax": 5.1
     },
+    "ALICE_V0A_eta_-5p1_-2p8_pT_0_4": {
+        "pTmin": 0,
+        "pTmax": 4,
+        "etamin": -5.1,
+        "etamax": -2.8
+    },
     "ALICE_V0C_eta_-3p7_-1p7_pT_0_4": {
         "pTmin": 0,
         "pTmax": 4,
