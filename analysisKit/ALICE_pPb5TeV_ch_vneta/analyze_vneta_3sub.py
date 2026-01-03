@@ -85,21 +85,21 @@ def calculate_vneta_3sub(etaArr, dataArr, dataRef,
 
     vnNum = np.zeros([nev, nEta])
     n2Num = np.zeros([nev, nEta])
-    poiIdx = np.abs(etaArr) < 1.5)
+    poiIdx = np.abs(etaArr) < 1.5
     vnNum[:, poiIdx] = np.real(
         Qneta[:, poiIdx]*np.conj(QnRef3)*Qneta[:, poiIdx]*np.conj(QnRef4))
     n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef3 + dNeta[:, poiIdx]*dNRef4) + 1e-16)
+        np.real(dNeta[:, poiIdx]*dNRef3 * dNeta[:, poiIdx]*dNRef4) + 1e-16)
     poiIdx = etaArr < -1.5
     vnNum[:, poiIdx] = np.real(
         Qneta[:, poiIdx]*np.conj(QnRef2)*Qneta[:, poiIdx]*np.conj(QnRef4))
     n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef2 + dNeta[:, poiIdx]*dNRef4) + 1e-16)
+        np.real(dNeta[:, poiIdx]*dNRef2 * dNeta[:, poiIdx]*dNRef4) + 1e-16)
     poiIdx = etaArr > 1.5
     vnNum[:, poiIdx] = np.real(
         Qneta[:, poiIdx]*np.conj(QnRef1)*Qneta[:, poiIdx]*np.conj(QnRef3))
     n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef1 + dNeta[:, poiIdx]*dNRef3) + 1e-16)
+        np.real(dNeta[:, poiIdx]*dNRef1 * dNeta[:, poiIdx]*dNRef3) + 1e-16)
 
     vnDenMid = np.real(QnRef3*np.conj(QnRef4))
     n2DenMid = np.real(dNRef3*dNRef4) + 1e-16
@@ -116,28 +116,28 @@ def calculate_vneta_3sub(etaArr, dataArr, dataRef,
         array_idx = np.array(array_idx)
 
         # average weighted by number of particle pairs
-        poiIdx = np.abs(etaArr) < 1.5)
-        vnEta_array[iev, poiIdx] = (
-            (np.mean(vnNum[array_idx, poiIdx], axis=0)
-             / np.mean(n2Num[array_idx, poiIdx], axis=0))
-            / (np.sqrt(np.mean(vnDenMid[array_idx])
-                       / np.mean(n2DenMid[array_idx])))
+        poiIdx = np.abs(etaArr) < 1.5
+        vnEta_array[iev, poiIdx] = np.sqrt(
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
+            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
+            / (np.mean(vnDenMid[array_idx])
+               / np.mean(n2DenMid[array_idx]))
         )
         poiIdx = etaArr < -1.5
-        vnEta_array[iev, poiIdx] = (
-            (np.mean(vnNum[array_idx, poiIdx], axis=0)
-             / np.mean(n2Num[array_idx, poiIdx], axis=0))
-            / (np.sqrt(np.mean(vnDenBack[array_idx])
-                       / np.mean(n2DenBack[array_idx])))
+        vnEta_array[iev, poiIdx] = np.sqrt(
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
+            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
+            / (np.mean(vnDenBack[array_idx])
+               / np.mean(n2DenBack[array_idx]))
         )
         poiIdx = etaArr > 1.5
-        vnEta_array[iev, poiIdx] = (
-            (np.mean(vnNum[array_idx, poiIdx], axis=0)
-             / np.mean(n2Num[array_idx, poiIdx], axis=0))
-            / (np.sqrt(np.mean(vnDenFoward[array_idx])
-                       / np.mean(n2DenFoward[array_idx])))
+        vnEta_array[iev, poiIdx] = np.sqrt(
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
+            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
+            / (np.mean(vnDenFoward[array_idx])
+               / np.mean(n2DenFoward[array_idx]))
         )
-
+    vnEta_array = np.nan_to_num(vnEta_array)
     vnMean, vnErr = computeJKMeanandErr(vnEta_array)
 
     if path.isfile(outputFileName):
