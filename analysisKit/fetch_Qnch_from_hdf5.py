@@ -124,6 +124,13 @@ kinematicCutsDict_ALICE = {
     },
 }
 
+
+ALICE_rnpT_kinematicCutsDict = {
+    "pTarray": [0.2, 0.5, 1, 1.5, 2, 2.5, 3],
+    "eta_trig": [-0.8, -0.6],
+    "eta_asso": [0.6, 0.8],
+}
+
 kinematicCutsDict = kinematicCutsDict_ALICE
 if expFlag == "ALICE":
     kinematicCutsDict = kinematicCutsDict_ALICE
@@ -257,10 +264,23 @@ def calcualte_inte_Vn_pTeta(pTMin: float, pTMax: float, etaMin: float,
     nEta = len(etabin); dEta = etabin[1] - etabin[0]
     weights = np.zeros([nEta, npT])
 
+    # offset the kinematic cuts from the bin edges
+    pTMin *= 0.999
+    pTMax *= 1.001
+    etaMin -= 0.001
+    etaMax += 0.001
+
     pTIdx0 = np.where(pTbin > pTMin)[0][0]
     pTIdx1 = np.where(pTbin < pTMax)[0][-1]
     etaIdx0 = np.where(etabin > etaMin)[0][0]
     etaIdx1 = np.where(etabin < etaMax)[0][-1]
+    if pTIdx0 > pTIdx1:
+        print(f"The pT interval has problems: {pTMin}, {pTMax}")
+        exit(1)
+    if etaIdx0 > etaIdx1:
+        print(f"The eta interval has problems: {etaMin}, {etaMax}")
+        exit(1)
+
     weights[etaIdx0:etaIdx1+1, pTIdx0:pTIdx1+1] = 1.
 
     pTminFrac = (pTbin[pTIdx0] - pTMin) / dpT
@@ -324,8 +344,15 @@ def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data: np.ndarray,
     nEta = len(etabin); dEta = etabin[1] - etabin[0]
     weights = np.zeros([nEta, npT])
 
+    # offset the kinematic cuts from the bin edges
+    pTMin *= 0.999
+    pTMax *= 1.001
+
     pTIdx0 = np.where(pTbin > pTMin)[0][0]
     pTIdx1 = np.where(pTbin < pTMax)[0][-1]
+    if pTIdx0 > pTIdx1:
+        print(f"The pT interval has problems: {pTMin}, {pTMax}")
+        exit(1)
     weights[:, pTIdx0:pTIdx1+1] = 1.
 
     pTminFrac = (pTbin[pTIdx0] - pTMin) / dpT
@@ -364,6 +391,61 @@ def calcualte_inte_Vneta_pTeta(pTMin: float, pTMax: float, data: np.ndarray,
         temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)    # Vn(eta)
     temp_vn_array.append(ET/dEta)            # dET/deta
     temp_vn_array.append(totalN)             # totalN
+    return temp_vn_array
+
+
+def calcualte_inte_VnpT_pTeta(etaMin: float, etaMax: float, data: np.ndarray,
+                              etabin: np.ndarray, pTbin: np.ndarray,
+                              Nevents: int, vnOrder:int):
+    """
+        this function calculates the eta-integrated vn(pT) in a
+        given eta range (etaMin, etaMax) for every event in the data
+    """
+    npT = len(pTbin); dpT = pTbin[1] - pTbin[0]
+    weights = np.zeros([nEta, npT])
+
+    # offset the kinematic cuts from the bin edges
+    etaMin -= 0.001
+    etaMax += 0.001
+
+    etaIdx0 = np.where(etabin >= etaMin)[0][0]
+    etaIdx1 = np.where(etabin <= etaMax)[0][-1]
+    if etaIdx0 > etaIdx1:
+        print(f"The eta interval has problems: {etaMin}, {etaMax}")
+        exit(1)
+    weights[etaIdx0:etaIdx1+1, :] = 1.
+
+    etaminFrac = (etabin[etaIdx0] - etaMin) / dEta
+    etamaxFrac = (etaMax - etabin[etaIdx1]) / dEta
+    if etaminFrac <= 0.5:
+        weights[etaIdx0, :] *= (0.5 + etaminFrac)
+    elif etaminFrac < 1.0 and etaIdx0 > 0:
+        weights[etaIdx0 - 1, :] = etaminFrac - 0.5
+
+    if etamaxFrac <= 0.5:
+        weights[etaIdx1, :] *= (0.5 + etamaxFrac)
+    elif etamaxFrac < 1.0 and etaIdx1 < nEta - 1:
+        weights[etaIdx1 + 1, :] = etamaxFrac - 0.5
+
+    pT_event = data[:, 1].reshape(nEta, npT)
+    dN_event = data[:, 2].reshape(nEta, npT)
+    ET_event = data[:, 3].reshape(nEta, npT)
+
+    N = np.sum(dN_event * weights, axis=0) + EPS
+    ET = np.sum(ET_event * weights, axis=0) + EPS
+    meanpT = np.sum(pT_event * weights * dN_event, axis=0) / N
+    totalN = N*Nevents
+
+    etaD = etaMax - etaMin
+    temp_vn_array = [N / etaD / dpT, meanpT]    # dN/deta/dpT, <pT>(pT)
+    for iorder in range(1, vnOrder + 1):
+        Qn_real_event = data[:, 2*iorder + 2].reshape(nEta, npT)
+        Qn_imag_event = data[:, 2*iorder + 3].reshape(nEta, npT)
+        Vn_real_inte = np.sum(Qn_real_event * weights, axis=0) / N
+        Vn_imag_inte = np.sum(Qn_imag_event * weights, axis=0) / N
+        temp_vn_array.append(Vn_real_inte + 1j*Vn_imag_inte)
+    #temp_vn_array.append(ET / etaD / dpT)        # dET/deta/dpT
+    temp_vn_array.append(totalN)
     return temp_vn_array
 
 
@@ -481,7 +563,7 @@ for ievent, event_i in enumerate(eventList):
         outdata[event_i][expName] = np.array(Vn_vector)
 
     if pTdiffFlag:
-        # pT-differential spectra and vn
+        # pT-differential spectra and vn at mid-rapidity
         for pidName, pid in pidList:
             if pid == "9999":
                 vn_filename = (
@@ -495,6 +577,48 @@ for ievent, event_i in enumerate(eventList):
                 pTdiffData.append(vn_data[:, 2*iOrder]
                                   + 1j*vn_data[:, 2*iOrder + 1])
             outdata[event_i][f"{pidName}_pTArr"] = np.array(pTdiffData)
+
+        vn_filename = f'particle_9999_pTeta_distribution{weakString}.dat'
+        vn_data = np.nan_to_num(eventGroup.get(vn_filename))
+        # pT-differential spectra and vn at special rapidity intevals
+        Vn_vector1 = calcualte_inte_VnpT_pTeta(0.6, 0.8, vn_data,
+                                               outdata['global']["etaArr"],
+                                               outdata['global']["pTArr"],
+                                               N_hadronic_events, 4)
+        outdata[event_i]["chVnpT_eta_0p6_0p8"] = np.array(Vn_vector1)
+        Vn_vector2 = calcualte_inte_VnpT_pTeta(-0.8, -0.6, vn_data,
+                                               outdata['global']["etaArr"],
+                                               outdata['global']["pTArr"],
+                                               N_hadronic_events, 4)
+        outdata[event_i]["chVnpT_eta_-0p8_-0p6"] = np.array(Vn_vector2)
+
+        # vn array for flow decorrelation r_n(pTa, pTb)
+        pTarray = ALICE_rnpT_kinematicCutsDict['pTarray']
+        etaTrig = ALICE_rnpT_kinematicCutsDict['eta_trig']
+        etaAsso = ALICE_rnpT_kinematicCutsDict['eta_asso']
+        vnpTTrig = []
+        vnpTAsso = []
+        for ipT in range(len(pTarray) - 1):
+            Vn_vector = calcualte_inte_Vn_pTeta(pTarray[ipT],
+                                                pTarray[ipT + 1],
+                                                etaTrig[0], etaTrig[1],
+                                                vn_data,
+                                                outdata["global"]['etaArr'],
+                                                outdata["global"]['pTArr'],
+                                                N_hadronic_events, 4)
+            vnpTTrig.append(Vn_vector)
+            vn_vector = calcualte_inte_Vn_pTeta(pTarray[ipT],
+                                                pTarray[ipT + 1],
+                                                etaAsso[0], etaAsso[1],
+                                                vn_data,
+                                                outdata["global"]['etaArr'],
+                                                outdata["global"]['pTArr'],
+                                                N_hadronic_events, 4)
+            vnpTAsso.append(Vn_vector)
+        outdata[event_i]["rn_ch_vnpT_trig"] = np.array(vnpTTrig)
+        outdata[event_i]["rn_ch_vnpT_asso"] = np.array(vnpTAsso)
+        outdata["global"]["rn_pTArr"] = pTarray
+
 
     if photonFlag:
         eventData = get3DGlauberData(eventGroup)

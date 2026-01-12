@@ -15,8 +15,7 @@ centralityRange = 1.
 Reg_centrality_cut_list = [
     0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
 ]
-centralityCutList = Reg_centrality_cut_list
-centralityCutList = [0, 20, 40, 60]
+centralityCutList = [0., 20., 40., 60]
 #centralityCutList = [0, 1, 2, 3, 4, 6, 8, 10, 15, 20, 30, 40, 50, 60,
 #                     70, 80, 90, 100]
 dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
@@ -29,64 +28,59 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_rneta(etaArr, dataArr, etaRef, nOrder: int,
-                    outputFileName: str) -> None:
+def calculate_rnpT(pTArr, dataTrig, dataAsso,
+                   nOrder: int, outputFileName: str) -> None:
     """
-        this function calculates the longitudinal decorrelation
-        r_n =  (<Q_n(-eta) Q_n(etaRef)> + < Q_n(eta) Q_n(-etaRef)>)
-              /(<Q_n(-eta) Q_n(-etaRef)> + < Q_n(eta) Q_n(etaRef)>)
+        this function calculates the flow pT decorrelation
+        r_n(pTa, pTb) = <Qn(pTa)Qn(pTb)^*>/sqrt(<|Qn(pTa)|^2><|Qn(pTb|^2>)
 
-        dataArr = [Nch, <pT>, Vn, totalN]
+        dataTrig.shape = (nev, npTbins, len(vnVectors))
+        vnVectors = [Nch, <pT>, Vn, ET, totalN]
     """
-    nev, nQn, nEta = dataArr.shape
-    nQn = nQn - 3
-    dN = np.real(dataArr[:, -1])
-
-    etaRefMin = etaRef[0]
-    etaRefMax = etaRef[1]
-    etaRef1Interp = np.linspace(etaRefMin, etaRefMax, 16)
-    etaRef2Interp = np.linspace(-etaRefMax, -etaRefMin, 16)
-    QnRef1 = []
-    QnRef2 = []
-    for iev in range(nev):
-        Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               dataArr[iev, -1, :]*dataArr[iev, nOrder + 1, :])
-        Qn2_interp = np.interp(etaRef2Interp, etaArr,
-                               dataArr[iev, -1, :]*dataArr[iev, nOrder + 1, :])
-        Q01_interp = np.interp(etaRef1Interp, etaArr, dataArr[iev, -1, :])
-        Q02_interp = np.interp(etaRef2Interp, etaArr, dataArr[iev, -1, :])
-        QnRef1.append(np.sum(Qn1_interp))
-        QnRef2.append(np.sum(Qn2_interp))
-
-    QnRef1 = np.array(QnRef1).reshape((nev, 1))
-    QnRef2 = np.array(QnRef2).reshape((nev, 1))
-
-    Qneta = dataArr[:, nOrder + 1, :]*dataArr[:, -1, :]
-    rnNum = np.real(Qneta[:, ::-1]*np.conj(QnRef1) + Qneta*np.conj(QnRef2))
-    rnDen = np.real(Qneta*np.conj(QnRef1) + Qneta[:, ::-1]*np.conj(QnRef2))
+    nev, npTbins, nQn = dataTrig.shape
+    QnTrigArr = dataTrig[:, :, nOrder + 1]*dataTrig[:, :, -1]
+    QnAssoArr = dataAsso[:, :, nOrder + 1]*dataAsso[:, :, -1]
 
     # calcualte observables with Jackknife resampling method
-    rn_array = np.zeros([nev, nEta])
+    rnpT_array = np.zeros([nev, int(npTbins*(npTbins - 1)/2)])
     for iev in range(nev):
         array_idx = [True]*nev
         array_idx[iev] = False
         array_idx = np.array(array_idx)
 
-        rn_array[iev, :] = (np.mean(rnNum[array_idx, :], axis=0)
-                            /np.mean(rnDen[array_idx, :], axis=0))
+        pTidx = 0
+        for ipT in range(npTbins - 1):
+            for jpT in range(0, ipT + 1):
+                if jpT == ipT:
+                    rnpT_array[iev, pTidx] = 1.
+                else:
+                    rnpT_array[iev, pTidx] = (
+                        np.real(np.mean(
+                            QnTrigArr[array_idx, ipT]
+                            *np.conj(QnAssoArr[array_idx, jpT]), axis=0))
+                        / np.sqrt(
+                            np.mean(np.abs(QnTrigArr[array_idx, ipT])**2,
+                                    axis=0)
+                            *np.mean(np.abs(QnAssoArr[array_idx, jpT])**2,
+                                     axis=0))
+                    )
+                pTidx += 1
 
-    rnMean, rnErr = computeJKMeanandErr(rn_array)
+    rnMean, rnErr = computeJKMeanandErr(rnpT_array)
 
     if path.isfile(outputFileName):
         f = open(outputFileName, 'a')
     else:
         f = open(outputFileName, 'w')
-        f.write("# eta  r_n(eta)  r_n(eta)_err\n")
-    for ieta in range(nEta):
-        if etaArr[ieta] >= 0.:
-            f.write("{:.3f}  {:.5e}  {:.5e}\n".format(etaArr[ieta],
-                                                      rnMean[ieta],
-                                                      rnErr[ieta]))
+        f.write("# pT^trig (GeV)  pT^asso (GeV)  r_n  r_n_err\n")
+    pTidx = 0
+    for ipT in range(npTbins - 1):
+        pTtrigMid = (pTArr[ipT] + pTArr[ipT + 1]) / 2.
+        for jpT in range(0, ipT + 1):
+            pTassoMid = (pTArr[jpT] + pTArr[jpT + 1]) / 2.
+            f.write("{:.3f}  {:.3f}  {:.5e}  {:.5e}\n".format(
+                pTtrigMid, pTassoMid, rnMean[pTidx], rnErr[pTidx]))
+            pTidx += 1
     f.close()
 
 
@@ -138,18 +132,17 @@ for icen in range(len(centralityCutList) - 1):
         centralityCutList[icen + 1]*centralityRange, nev))
     print("dNdy: {0:.2f} - {1:.2f}".format(dN_dy_cut_low, dN_dy_cut_high))
 
-    etaArr = data['global']['etaArr']
-    QnArr = []
+    rn_pTArr = data["global"]["rn_pTArr"]
+    QnArrTrig = []
+    QnArrAsso = []
     for event_name in selected_events_list:
-        QnArr.append(data[event_name]['chVneta_pT_0_4'])
+        QnArrTrig.append(data[event_name]['rn_ch_vnpT_trig'])
+        QnArrAsso.append(data[event_name]['rn_ch_vnpT_asso'])
 
-    QnArr = np.array(QnArr)
+    QnArrTrig = np.array(QnArrTrig)
+    QnArrAsso = np.array(QnArrAsso)
 
-    calculate_rneta(etaArr, QnArr, [3.5, 4.9], 2,
-                    f"ALICE_r2eta_Ref_3p5_4p9_C{cenLabel}.txt")
-    calculate_rneta(etaArr, QnArr, [3.5, 4.9], 3,
-                    f"ALICE_r3eta_Ref_3p5_4p9_C{cenLabel}.txt")
-    calculate_rneta(etaArr, QnArr, [2.1, 3.3], 2,
-                    f"ALICE_r2eta_Ref_2p1_3p3_C{cenLabel}.txt")
-    calculate_rneta(etaArr, QnArr, [2.1, 3.3], 3,
-                    f"ALICE_r3eta_Ref_2p1_3p3_C{cenLabel}.txt")
+    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso,
+                   2, f"ALICE_r2pT_C{cenLabel}.txt")
+    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso,
+                   3, f"ALICE_r3pT_C{cenLabel}.txt")
