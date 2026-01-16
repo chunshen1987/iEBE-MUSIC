@@ -170,14 +170,6 @@ pTDataSysErr.append(pTdata[:dNcenCut, 3])
 pTDataCovList.append(computeCovarianceMatrix(pTdata[:dNcenCut, 2],
                                              pTdata[:dNcenCut, 3]))
 
-# anti-proton <pT>
-# use the proton measurements because it is average over p and pbar
-pTDataArr.append(pTdata[:dNcenCut, 1])
-pTDataStatErr.append(pTdata[:dNcenCut, 2])
-pTDataSysErr.append(pTdata[:dNcenCut, 3])
-pTDataCovList.append(computeCovarianceMatrix(pTdata[:dNcenCut, 2],
-                                             pTdata[:dNcenCut, 3]))
-
 pTDataArr = np.array(pTDataArr).reshape(-1)
 pTDataStatErr = np.array(pTDataStatErr).reshape(-1)
 pTDataSysErr = np.array(pTDataSysErr).reshape(-1)
