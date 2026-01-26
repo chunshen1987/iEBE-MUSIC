@@ -331,6 +331,8 @@ music_dict = {
     'FlagResumTransportCoeff': 0,  # switch to use resummed transport coeff.
     'FlagResetCausality': 0,
     'resumTransCoeffAlpha': 1.5,  # resummed transport coeff. control parameter
+    'turn_on_bulk_chem': 0,         # flag to include chemical equilibration as an effective bulk viscosity
+    'chem_rate_C': 1,               # coefficient for chemical equilibration rate R = CT
     'Viscosity_Flag_Yes_1_No_0': 1,  # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,  # include shear viscous effect
     'Shear_to_S_ratio': 0.12,  # value of \eta/s
