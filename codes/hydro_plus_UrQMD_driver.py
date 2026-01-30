@@ -32,7 +32,10 @@ def fecth_an_3DMCGlauber_smooth_event(database_path, iev):
     """
     filelist = glob(path.join(database_path, 'nuclear_thickness_TA_*.dat'))
     filelist = sorted(filelist)
-    return (filelist[iev])
+    if iev < len(filelist):
+        return True, filelist[iev]
+    else:
+        return False, ""
 
 
 def mapEventIdToCentrality(event_id):
@@ -178,8 +181,12 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                       f"binaryCollisions_event_{event_id}.dat"))
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
-        file_name = fecth_an_3DMCGlauber_smooth_event(database, event_id)
-        print(f"Using initial file: {file_name}")
+        status, file_name = fecth_an_3DMCGlauber_smooth_event(database,
+                                                              event_id)
+        if status:
+            print(f"Using initial file: {file_name}")
+        else:
+            print(f"initial file not found: {file_name}")
         return status, file_name
     else:
         print("\U0001F6AB  "
