@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
     This script contains all the default parameters in the iEBE-MUSIC package.
 """
@@ -290,7 +291,7 @@ music_dict = {
     'eta_rhob_0': 1.5,  # peak position of the net baryon density
     'eta_rhob_width_1': 0.2,  # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,  # Gaussian width for |eta| < |eta_0|
-    'omega_rhob':, 0.,        # participant fraction in the net baryon density
+    'omega_rhob': 0.,         # participant fraction in the net baryon density
 
     # parameters for Initial_profile == 13 or 131
     'string_source_sigma_x': 0.5,  # the transverse size of the hotspot [fm]
