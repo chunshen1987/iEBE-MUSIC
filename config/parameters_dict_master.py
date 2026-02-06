@@ -182,16 +182,26 @@ mcglauber_dict = {
     'outputInitialEst': 1,  # flag to output initial state var vs. eta_s
     'cache_tables': 1,  # 1: use pre-generated tables for valence quark x
     # 0: re-generate tables for valence quark x
-    'baryon_junctions': 0,  # 0: baryon number assumed to be at string end
-    # 1: baryon number transported assuming baryon
-    # junctions (at smaller x)
-    # see arXiv:nucl-th/9602027
-    'lambdaB': 0.2,  # parameter the controls the strength of
-    # the baryon junction stopping
-    'lambdaBs': 1.0,  # Fraction of single-to-double string stopping
-    'baryonInStringProb':
-        1.0,  # the relative probility to put a baryon charge in the string
+
+    'ISBaryonInStringJunction': 0,  # 1: initial state baryon in the string junction
+                                    # 0: initial state baryon in valence quark hotspots
+
+    'FSBaryonFluctStringBreaking': 0,  # 0: baryon charge follow initial state
+                                       # 1: baryon charge fluctuates in the string breaking
+    'lambdaB': 1.0,    # parameter the controls the strength of the baryon string breaking
+    'lambdaBs': 1.0,   # Fraction of single-to-double string stopping
+    # the relative probility to put a baryon charge in the string
     # rather than at the wounded nucleon remnant
+    'FSbaryonInStringProb': 0.2,
+
+    'FSElectricQFluctStringBreaking': 0,  # 0: electric charge follow initial state
+                                          # 1: electric charge fluctuates in the string breaking
+    'lambdaQ': 1.0,    # parameter the controls the strength of the electric Q fluctuation at string breaking
+    'lambdaQs': 1.0,   # Fraction of single-to-double string stopping
+    # the relative probility to put an electric charge in the string
+    # rather than at the wounded nucleon remnant
+    'FSelectricChargeInStringProb': 0.2,
+
     'BG': 4.,  # Gaussian width for sampling the valence quark positions
     'shadowing_factor':
         1.0,  # a shadowning factor for producing strings from multiple scatterings

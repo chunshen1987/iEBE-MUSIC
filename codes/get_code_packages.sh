@@ -5,7 +5,7 @@
 # download 3DMCGlauber
 rm -fr 3dMCGlauber_code
 git clone --depth=5 https://github.com/chunshen1987/3dMCGlauber 3dMCGlauber_code
-(cd 3dMCGlauber_code; git checkout 736219f2af89efd2dec020ada90bb88b9e23187f)
+(cd 3dMCGlauber_code; git checkout b6059e234c420d7169d59bc0578d03c4e6804c39)
 rm -fr 3dMCGlauber_code/.git
 
 # download IPGlasma
@@ -23,7 +23,7 @@ rm -fr kompost_code/.git
 # download MUSIC
 rm -fr MUSIC_code
 git clone --depth=3 https://github.com/MUSIC-fluid/MUSIC -b main MUSIC_code
-(cd MUSIC_code; git checkout aee6bd03378fef72b070fb3707036012737e797c)
+(cd MUSIC_code; git checkout 1528c765b32bf2f0ccedfa60f694b6e353c0121e)
 rm -fr MUSIC_code/.git
 
 # download iSS particle sampler
