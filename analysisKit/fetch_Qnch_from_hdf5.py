@@ -402,6 +402,7 @@ def calcualte_inte_VnpT_pTeta(etaMin: float, etaMax: float, data: np.ndarray,
         given eta range (etaMin, etaMax) for every event in the data
     """
     npT = len(pTbin); dpT = pTbin[1] - pTbin[0]
+    nEta = len(etabin); dEta = etabin[1] - etabin[0]
     weights = np.zeros([nEta, npT])
 
     # offset the kinematic cuts from the bin edges
