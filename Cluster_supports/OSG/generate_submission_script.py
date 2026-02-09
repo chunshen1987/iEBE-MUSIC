@@ -4,6 +4,7 @@
 
 import sys
 from os import path, makedirs
+import argparse
 import random
 
 FILENAME = "singularity.submit"
@@ -12,11 +13,11 @@ def print_usage():
     """This function prints out help messages"""
     print("Usage: {} ".format(sys.argv[0].split("/")[-1])
           + "Njobs Nevents_per_job N_threads SingularityImage ParameterFile "
-          + "jobId [bayesFile]")
+          + "jobId [bayes_file]")
 
 
 def write_submission_script(para_dict_):
-    jobName = "iEBEMUSIC_{}".format(para_dict_["job_id"])
+    jobName = "iEBEMUSIC_{}".format(para_dict_["job_name"])
     random_seed = random.SystemRandom().randint(0, 10000000)
     imagePathHeader = "osdf://"
     script = open(FILENAME, "w")
@@ -24,8 +25,8 @@ def write_submission_script(para_dict_):
         script.write("""universe = vanilla
 executable = run_singularity.sh
 arguments = {0} $(Process) {1} {2} {3} {4}
-""".format(para_dict_["paraFile"], para_dict_["n_events_per_job"],
-           para_dict_["n_threads"], random_seed, para_dict_["bayesFile"]))
+""".format(para_dict_["param_file"], para_dict_["n_events_per_job"],
+           para_dict_["n_threads"], random_seed, para_dict_["bayes_file"]))
     else:
         script.write("""universe = vanilla
 executable = run_singularity.sh
@@ -40,16 +41,16 @@ WhenToTransferOutput = ON_EXIT
 
 +SingularityImage = "{1}"
 Requirements = SINGULARITY_CAN_USE_SIF && StringListIMember("stash", HasFileTransferPluginMethods)
-""".format(jobName, imagePathHeader + para_dict_["image_with_path"]))
+""".format(jobName, imagePathHeader + para_dict_["singularity_image_path"]))
 
     if para_dict_['bayesFlag']:
         script.write("""
 transfer_input_files = {0}, {1}
-""".format(para_dict_['paraFile'], para_dict_['bayesFile']))
+""".format(para_dict_['param_file'], para_dict_['bayes_file']))
     else:
         script.write("""
 transfer_input_files = {0}
-""".format(para_dict_['paraFile']))
+""".format(para_dict_['param_file']))
 
     script.write(
             "transfer_checkpoint_files = playground/event_0/EVENT_RESULTS_$(Process).tar.gz\n")
@@ -78,11 +79,12 @@ on_exit_hold = (ExitBySignal == True) || (ExitCode != 0 && ExitCode != 73)
 # The below are good base requirements for first testing jobs on OSG,
 # if you don't have a good idea of memory and disk usage.
 request_cpus = {0:d}
-request_memory = 2 GB
+request_memory = {1:d} GB
 request_disk = 2 GB
 
 # Queue one job with the above specifications.
-queue {1:d}""".format(para_dict_["n_threads"], para_dict_["n_jobs"]))
+queue {2:d}""".format(para_dict_["n_threads"], para_dict_["memory_per_job"],
+                      para_dict_["n_jobs"]))
     script.close()
 
 
@@ -138,34 +140,67 @@ def main(para_dict_):
 
 
 if __name__ == "__main__":
-    bayesFlag = False
-    bayesFile = ""
-    try:
-        N_JOBS = int(sys.argv[1])
-        N_EVENTS_PER_JOBS = int(sys.argv[2])
-        N_THREADS = int(sys.argv[3])
-        SINGULARITY_IMAGE_PATH = sys.argv[4]
-        SINGULARITY_IMAGE = SINGULARITY_IMAGE_PATH.split("/")[-1]
-        PARAMFILE = sys.argv[5]
-        JOBID = sys.argv[6]
-        if len(sys.argv) == 8:
-            bayesFile = sys.argv[7]
-            bayesFlag = True
-    except (IndexError, ValueError) as e:
-        print_usage()
+    parser = argparse.ArgumentParser(
+        description='Welcome to OSG script for the iEBE-MUSIC framework',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('-n',
+                        '--n_jobs',
+                        metavar='',
+                        type=int,
+                        default=1,
+                        help='number of jobs')
+    parser.add_argument('-nev',
+                        '--n_events_per_job',
+                        metavar='',
+                        type=int,
+                        default=1,
+                        help='number of events per job')
+    parser.add_argument('-nth',
+                        '--n_threads',
+                        metavar='',
+                        type=int,
+                        default=1,
+                        help='number of threads used for each job')
+    parser.add_argument('-singularity',
+                        '--singularity_image_path',
+                        metavar='',
+                        type=str,
+                        default="",
+                        help='singularity image path')
+    parser.add_argument('-param',
+                        '--param_file',
+                        metavar='',
+                        type=str,
+                        default="",
+                        help='parameter file')
+    parser.add_argument('-jobid',
+                        '--job_name',
+                        metavar='',
+                        type=str,
+                        default="test",
+                        help='job name')
+    parser.add_argument('-bayes',
+                        '--bayes_file',
+                        metavar='',
+                        type=str,
+                        default="",
+                        help='bayes file')
+    parser.add_argument('-mem',
+                        '--memory_per_job',
+                        metavar='',
+                        type=int,
+                        default="2",
+                        help='memory per job (GB)')
+
+    if len(sys.argv) < 2:
+        parser.print_help()
         exit(0)
 
-    para_dict = {
-        'n_jobs': N_JOBS,
-        'n_events_per_job': N_EVENTS_PER_JOBS,
-        'n_threads': N_THREADS,
-        'image_name': SINGULARITY_IMAGE,
-        'image_with_path': SINGULARITY_IMAGE_PATH,
-        'paraFile': PARAMFILE,
-        'job_id': JOBID,
-        'bayesFlag': bayesFlag,
-        'bayesFile': bayesFile,
-    }
+    para_dict = vars(parser.parse_args())
+
+    para_dict["bayesFlag"] = False
+    if para_dict["bayes_file"] != "":
+        para_dict["bayesFlag"] = True
 
     main(para_dict)
-
