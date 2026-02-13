@@ -31,7 +31,7 @@ arguments = {0} $(Process) {1} {2} {3} {4}
         script.write("""universe = vanilla
 executable = run_singularity.sh
 arguments = {0} $(Process) {1} {2} {3}
-""".format(para_dict_["paraFile"], para_dict_["n_events_per_job"],
+""".format(para_dict_["param_file"], para_dict_["n_events_per_job"],
            para_dict_["n_threads"], random_seed))
     script.write("""
 JobBatchName = {0}
