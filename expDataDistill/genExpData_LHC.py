@@ -89,10 +89,11 @@ exp_path = path.abspath('../analysisKit/ALICE_run2_dNdy_and_pTSpectra')
 # dNch/deta
 dNdata = np.loadtxt(path.join(exp_path, "dNch_deta_ALICE.dat"))
 dNDataArr.append(dNdata[:dNcenCut, 1])
-dNDataStatErr.append(statFrac*dNdata[:dNcenCut, 2])
-dNDataSysErr.append((1. - statFrac)*dNdata[:dNcenCut, 2])
+dNDataStatErr.append(np.sqrt(statFrac)*dNdata[:dNcenCut, 2])
+dNDataSysErr.append((np.sqrt(1. - statFrac)*dNdata[:dNcenCut, 2])
 dNDataCovList.append(computeCovarianceMatrix(
-    statFrac*dNdata[:dNcenCut, 2], (1. - statFrac)*dNdata[:dNcenCut, 2]))
+        np.sqrt(statFrac)*dNdata[:dNcenCut, 2],
+        np.sqrt(1. - statFrac)*dNdata[:dNcenCut, 2]))
 
 # dN/dy (pi^+ + pi^-)/2
 dNdata = np.loadtxt(path.join(exp_path, "PbPb5020_ALICE_pion_dNdy.dat"))
@@ -141,10 +142,11 @@ pTDataCovList = []
 # charged hadron <pT>
 pTdata = np.loadtxt(path.join(exp_path, "PbPb_ch_meanpT.dat"))
 pTDataArr.append(pTdata[:dNcenCut, 3])
-pTDataStatErr.append(statFrac*pTdata[:dNcenCut, 4])
-pTDataSysErr.append((1. - statFrac)*pTdata[:dNcenCut, 4])
+pTDataStatErr.append(np.sqrt(statFrac)*pTdata[:dNcenCut, 4])
+pTDataSysErr.append(np.sqrt(1. - statFrac)*pTdata[:dNcenCut, 4])
 pTDataCovList.append(computeCovarianceMatrix(
-    statFrac*pTdata[:dNcenCut, 4], (1. - statFrac)*pTdata[:dNcenCut, 4]))
+            np.sqrt(statFrac)*pTdata[:dNcenCut, 4],
+            np.sqrt(1. - statFrac)*pTdata[:dNcenCut, 4]))
 
 # pion <pT>
 pTdata = np.loadtxt(path.join(exp_path, "PbPb_5020_meanpT_pion.txt"))
