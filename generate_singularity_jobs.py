@@ -13,7 +13,7 @@ from math import ceil
 from glob import glob
 
 support_cluster_list = ["wsugrid", "osg", "local", "stampede2", "anvil",
-                        "csd3"]
+                        "csd3", "nersc"]
 
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
@@ -47,6 +47,10 @@ source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
 module purge
 """)
     elif cluster == "csd3":
+        script.write("""#!/usr/bin/env bash
+
+""")
+    elif cluster == "nersc":
         script.write("""#!/usr/bin/env bash
 
 """)
@@ -185,6 +189,46 @@ cd event_$SLURM_ARRAY_TASK_ID
 bash submit_job.script
 
 """.format(queueName, walltime, n_threads, mem, n_jobs-1))
+    script.close()
+
+
+def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
+                                  n_threads, walltime):
+    """This function generates job script for NERSC"""
+    working_folder = folder_name
+
+    if queueName not in ["regular", "shared"]:
+        queueName = "regular"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH --image=docker:chunshen1987/iebe-music:ubuntu-dev
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH -qos={0:s}
+#SBATCH -C cpu
+#SBATCH --nodes={1:d}
+#SBATCH --ntasks-per-node={2:d}
+#SBATCH --cpus-per-task={4:d}
+#SBATCH --time={3:s}
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
+
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $PROJECT
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $SCRATCH/RESULTS
+cp -r temp/* $SCRATCH/RESULTS/
+rm -fr `pwd`
+
+""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
     script.close()
 
 
@@ -444,6 +488,25 @@ def main():
             n_nodes += 1
 
         generate_Anvil_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(), n_nodes,
+                                      nTaskPerNode, n_threads, wallTime)
+        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
+
+    if cluster_name == "nersc":
+        nThreadsPerNode = 128
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/NERSC/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        nTaskPerNode = int(nThreadsPerNode/n_threads)
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_nersc_mpi_job_script(working_folder_name,
                                       args.node_type.lower(), n_nodes,
                                       nTaskPerNode, n_threads, wallTime)
         shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
