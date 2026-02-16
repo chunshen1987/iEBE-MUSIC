@@ -217,7 +217,7 @@ export OMP_PROC_BIND=true
 export OMP_PLACES=threads
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-mpirun -np $SLURM_NTASKS python3 job_MPI_wrapper.py
+srun -n $SLURM_NTASKS python3 job_MPI_wrapper.py
 
 # after all runs finish, collect results into one hdf5 file
 # and transfer it to $PROJECT
@@ -496,7 +496,7 @@ def main():
                     working_folder_name)
 
     if cluster_name == "nersc":
-        nThreadsPerNode = 128
+        nThreadsPerNode = 256
         shutil.copy(
             path.join(code_package_path,
                       'Cluster_supports/NERSC/job_MPI_wrapper.py'),
