@@ -206,7 +206,7 @@ def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
 #SBATCH -J iEBEMUSIC
 #SBATCH -o job.o%j
 #SBATCH -e job.e%j
-#SBATCH -qos={0:s}
+#SBATCH --qos={0:s}
 #SBATCH -C cpu
 #SBATCH --nodes={1:d}
 #SBATCH --ntasks-per-node={2:d}
