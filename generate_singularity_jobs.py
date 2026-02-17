@@ -192,8 +192,9 @@ bash submit_job.script
     script.close()
 
 
-def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
-                                  n_threads, walltime):
+def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes,
+                                  nTasks, n_threads, walltime,
+                                  singularityImage):
     """This function generates job script for NERSC"""
     working_folder = folder_name
 
@@ -202,16 +203,16 @@ def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
 
     script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
     script.write("""#!/bin/bash -l
-#SBATCH --image=docker:chunshen1987/iebe-music:ubuntu-dev
+#SBATCH --image=docker:{0:s}
 #SBATCH -J iEBEMUSIC
 #SBATCH -o job.o%j
 #SBATCH -e job.e%j
-#SBATCH --qos={0:s}
+#SBATCH --qos={1:s}
 #SBATCH -C cpu
-#SBATCH --nodes={1:d}
-#SBATCH --ntasks-per-node={2:d}
-#SBATCH --cpus-per-task={4:d}
-#SBATCH --time={3:s}
+#SBATCH --nodes={2:d}
+#SBATCH --ntasks={3:d}
+#SBATCH --cpus-per-task={5:d}
+#SBATCH --time={4:s}
 
 export OMP_PROC_BIND=true
 export OMP_PLACES=threads
@@ -228,7 +229,7 @@ mkdir -p $SCRATCH/RESULTS
 cp -r temp/* $SCRATCH/RESULTS/
 rm -fr `pwd`
 
-""".format(queueName, n_nodes, nTaskPerNode, walltime, n_threads))
+""".format(singularityImage, queueName, n_nodes, nTasks, walltime, n_threads))
     script.close()
 
 
@@ -253,7 +254,20 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     script = open(path.join(eventFolder, "submit_job.script"), "w")
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
-    script.write("""
+    if clusterName == "nersc":
+        script.write("""
+h5Stat=`ls *.h5 2>/dev/null`
+
+if [ -z "$h5Stat" ]
+then
+
+    shifter ./{0} {1} {2} {3} {4} {5} {6} {7} {8}
+
+""".format(executeScriptName, workFolderPath,
+           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads, seed,
+           bayesParamFile.split('/')[-1]))
+    else:
+        script.write("""
 h5Stat=`ls *.h5 2>/dev/null`
 
 if [ -z "$h5Stat" ]
@@ -502,13 +516,13 @@ def main():
                       'Cluster_supports/NERSC/job_MPI_wrapper.py'),
             working_folder_name)
         n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
-        nTaskPerNode = int(nThreadsPerNode/n_threads)
         if n_nodes*nThreadsPerNode < n_jobs*n_threads:
             n_nodes += 1
 
         generate_nersc_mpi_job_script(working_folder_name,
                                       args.node_type.lower(), n_nodes,
-                                      nTaskPerNode, n_threads, wallTime)
+                                      n_jobs, n_threads, wallTime,
+                                      args.singularity)
         shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
