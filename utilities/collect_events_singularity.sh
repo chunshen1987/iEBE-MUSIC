@@ -36,7 +36,7 @@ hydro_folder_name="hydro_results_"
 UrQMD_file_name="particle_list_"
 spvn_folder_name="spvn_results_"
 
-for ijob in `ls --color=none $fromFolder | grep "event" `;
+for ijob in `ls --color=none $fromFolder | grep "event_" `;
 do
     eventsPath=${fromFolder}/${ijob}
     evId=`echo $ijob | cut -f 2 -d _`
