@@ -297,6 +297,7 @@ music_dict = {
         5.4,  # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
     'Eta_fall_off': 0.3,  # Gaussian width fall off for entropy density
     'eta_m': 5.0,             # parameter for tilded longitudinal profile
+    'yL_frac': 0.0,           # shifted source model only yL = yL_frac*y_CM
     'tilted_fraction': 0.,    # fraction of tilted vs. shifted longitudinal profiles
     'eta_rhob_0': 1.5,  # peak position of the net baryon density
     'eta_rhob_width_1': 0.2,  # Gaussian width for |eta| > |eta_0|
