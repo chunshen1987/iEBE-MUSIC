@@ -90,7 +90,7 @@ exp_path = path.abspath('../analysisKit/ALICE_run2_dNdy_and_pTSpectra')
 dNdata = np.loadtxt(path.join(exp_path, "dNch_deta_ALICE.dat"))
 dNDataArr.append(dNdata[:dNcenCut, 1])
 dNDataStatErr.append(np.sqrt(statFrac)*dNdata[:dNcenCut, 2])
-dNDataSysErr.append((np.sqrt(1. - statFrac)*dNdata[:dNcenCut, 2])
+dNDataSysErr.append(np.sqrt(1. - statFrac)*dNdata[:dNcenCut, 2])
 dNDataCovList.append(computeCovarianceMatrix(
         np.sqrt(statFrac)*dNdata[:dNcenCut, 2],
         np.sqrt(1. - statFrac)*dNdata[:dNcenCut, 2]))
