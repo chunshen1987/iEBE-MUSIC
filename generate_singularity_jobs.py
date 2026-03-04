@@ -12,8 +12,9 @@ import argparse
 from math import ceil
 from glob import glob
 
-support_cluster_list = ["wsugrid", "osg", "local", "stampede2", "anvil",
-                        "csd3", "nersc"]
+support_cluster_list = [
+    "wsugrid", "osg", "local", "stampede2", "anvil", "csd3", "nersc"
+]
 
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
@@ -188,13 +189,12 @@ source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/venv/bin/activate
 cd event_$SLURM_ARRAY_TASK_ID
 bash submit_job.script
 
-""".format(queueName, walltime, n_threads, mem, n_jobs-1))
+""".format(queueName, walltime, n_threads, mem, n_jobs - 1))
     script.close()
 
 
-def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes,
-                                  nTasks, n_threads, walltime,
-                                  singularityImage):
+def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTasks,
+                                  n_threads, walltime, singularityImage):
     """This function generates job script for NERSC"""
     working_folder = folder_name
 
@@ -263,8 +263,8 @@ then
 
     shifter ./{0} {1} {2} {3} {4} {5} {6} {7} {8}
 
-""".format(executeScriptName, workFolderPath,
-           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads, seed,
+""".format(executeScriptName, workFolderPath, parameterFileName, eventId0,
+           nHydroEvents, nUrQMD, nThreads, seed,
            bayesParamFile.split('/')[-1]))
     else:
         script.write("""
@@ -449,9 +449,9 @@ def main():
         event_id0 = job_id0 + i_job*n_hydro_per_job
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
-                               parameterFile, args.bayes_file,
-                               event_id0, n_hydro_per_job, nUrQMD,
-                               n_threads, seed, wallTime)
+                               parameterFile, args.bayes_file, event_id0,
+                               n_hydro_per_job, nUrQMD, n_threads, seed,
+                               wallTime)
     sys.stdout.write("\n")
     sys.stdout.flush()
 
@@ -520,9 +520,8 @@ def main():
             n_nodes += 1
 
         generate_nersc_mpi_job_script(working_folder_name,
-                                      args.node_type.lower(), n_nodes,
-                                      n_jobs, n_threads, wallTime,
-                                      args.singularity)
+                                      args.node_type.lower(), n_nodes, n_jobs,
+                                      n_threads, wallTime, args.singularity)
         shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
@@ -530,9 +529,8 @@ def main():
 
     if cluster_name == "csd3":
         generate_csd3_job_array_script(working_folder_name,
-                                       args.node_type.lower(),
-                                       n_jobs, n_threads, wallTime)
-
+                                       args.node_type.lower(), n_jobs,
+                                       n_threads, wallTime)
 
 
 if __name__ == "__main__":

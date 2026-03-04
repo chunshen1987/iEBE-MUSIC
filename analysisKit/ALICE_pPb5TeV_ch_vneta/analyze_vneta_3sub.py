@@ -27,9 +27,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_vneta_3sub(etaArr, dataArr, dataRef,
-                         etaRef1, etaRef2, etaRef3, etaRef4,
-                         nOrder: int, outputFileName: str) -> None:
+def calculate_vneta_3sub(etaArr, dataArr, dataRef, etaRef1, etaRef2, etaRef3,
+                         etaRef4, nOrder: int, outputFileName: str) -> None:
     """
         this function calculates the rapidity distribution of Vn with
         the 3x2PC method
@@ -45,10 +44,14 @@ def calculate_vneta_3sub(etaArr, dataArr, dataRef,
     etaRef2Interp = np.linspace(etaRef2[0], etaRef2[1], 16)
     etaRef3Interp = np.linspace(etaRef3[0], etaRef3[1], 16)
     etaRef4Interp = np.linspace(etaRef4[0], etaRef4[1], 16)
-    QnRef1 = []; dNRef1 = [];
-    QnRef2 = []; dNRef2 = [];
-    QnRef3 = []; dNRef3 = [];
-    QnRef4 = []; dNRef4 = [];
+    QnRef1 = []
+    dNRef1 = []
+    QnRef2 = []
+    dNRef2 = []
+    QnRef3 = []
+    dNRef3 = []
+    QnRef4 = []
+    dNRef4 = []
     for iev in range(nev):
         Qn1_interp = np.interp(etaRef1Interp, etaArr,
                                dataRef[iev, -1, :]*dataRef[iev, nOrder + 1, :])
@@ -86,20 +89,20 @@ def calculate_vneta_3sub(etaArr, dataArr, dataRef,
     vnNum = np.zeros([nev, nEta])
     n2Num = np.zeros([nev, nEta])
     poiIdx = np.abs(etaArr) < 1.5
-    vnNum[:, poiIdx] = np.real(
-        Qneta[:, poiIdx]*np.conj(QnRef3)*Qneta[:, poiIdx]*np.conj(QnRef4))
-    n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef3 * dNeta[:, poiIdx]*dNRef4) + 1e-16)
+    vnNum[:, poiIdx] = np.real(Qneta[:, poiIdx]*np.conj(QnRef3)*Qneta[:, poiIdx]
+                               *np.conj(QnRef4))
+    n2Num[:, poiIdx] = (np.real(dNeta[:, poiIdx]*dNRef3*dNeta[:, poiIdx]*dNRef4)
+                        + 1e-16)
     poiIdx = etaArr < -1.5
-    vnNum[:, poiIdx] = np.real(
-        Qneta[:, poiIdx]*np.conj(QnRef2)*Qneta[:, poiIdx]*np.conj(QnRef4))
-    n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef2 * dNeta[:, poiIdx]*dNRef4) + 1e-16)
+    vnNum[:, poiIdx] = np.real(Qneta[:, poiIdx]*np.conj(QnRef2)*Qneta[:, poiIdx]
+                               *np.conj(QnRef4))
+    n2Num[:, poiIdx] = (np.real(dNeta[:, poiIdx]*dNRef2*dNeta[:, poiIdx]*dNRef4)
+                        + 1e-16)
     poiIdx = etaArr > 1.5
-    vnNum[:, poiIdx] = np.real(
-        Qneta[:, poiIdx]*np.conj(QnRef1)*Qneta[:, poiIdx]*np.conj(QnRef3))
-    n2Num[:, poiIdx] = (
-        np.real(dNeta[:, poiIdx]*dNRef1 * dNeta[:, poiIdx]*dNRef3) + 1e-16)
+    vnNum[:, poiIdx] = np.real(Qneta[:, poiIdx]*np.conj(QnRef1)*Qneta[:, poiIdx]
+                               *np.conj(QnRef3))
+    n2Num[:, poiIdx] = (np.real(dNeta[:, poiIdx]*dNRef1*dNeta[:, poiIdx]*dNRef3)
+                        + 1e-16)
 
     vnDenMid = np.real(QnRef3*np.conj(QnRef4))
     n2DenMid = np.real(dNRef3*dNRef4) + 1e-16
@@ -118,25 +121,19 @@ def calculate_vneta_3sub(etaArr, dataArr, dataRef,
         # average weighted by number of particle pairs
         poiIdx = np.abs(etaArr) < 1.5
         vnEta_array[iev, poiIdx] = np.sqrt(
-            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
-            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
-            / (np.mean(vnDenMid[array_idx])
-               / np.mean(n2DenMid[array_idx]))
-        )
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)/np.mean(
+                (n2Num[array_idx, :])[:, poiIdx], axis=0))/
+            (np.mean(vnDenMid[array_idx])/np.mean(n2DenMid[array_idx])))
         poiIdx = etaArr < -1.5
         vnEta_array[iev, poiIdx] = np.sqrt(
-            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
-            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
-            / (np.mean(vnDenBack[array_idx])
-               / np.mean(n2DenBack[array_idx]))
-        )
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)/np.mean(
+                (n2Num[array_idx, :])[:, poiIdx], axis=0))/
+            (np.mean(vnDenBack[array_idx])/np.mean(n2DenBack[array_idx])))
         poiIdx = etaArr > 1.5
         vnEta_array[iev, poiIdx] = np.sqrt(
-            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)
-            / np.mean((n2Num[array_idx, :])[:, poiIdx], axis=0))
-            / (np.mean(vnDenFoward[array_idx])
-               / np.mean(n2DenFoward[array_idx]))
-        )
+            (np.mean((vnNum[array_idx, :])[:, poiIdx], axis=0)/np.mean(
+                (n2Num[array_idx, :])[:, poiIdx], axis=0))/
+            (np.mean(vnDenFoward[array_idx])/np.mean(n2DenFoward[array_idx])))
     vnEta_array = np.nan_to_num(vnEta_array)
     vnMean, vnErr = computeJKMeanandErr(vnEta_array)
 
@@ -162,8 +159,7 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_-5p1_-2p8_pT_0_4'][0])
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_-5p1_-2p8_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")
@@ -204,6 +200,6 @@ for icen in range(len(centralityCutList) - 1):
 
     QnArrEta = np.array(QnArrEta)
 
-    calculate_vneta_3sub(etaArr, QnArrEta, QnArrEta,
-                         [-0.4, 0], [0, 0.4], [-3.1, -2.9], [2.9, 3.1],
-                         2, f"ALICE_v2eta_3sub_C{cenLabel}.txt")
+    calculate_vneta_3sub(etaArr, QnArrEta, QnArrEta, [-0.4, 0], [0, 0.4],
+                         [-3.1, -2.9], [2.9, 3.1], 2,
+                         f"ALICE_v2eta_3sub_C{cenLabel}.txt")

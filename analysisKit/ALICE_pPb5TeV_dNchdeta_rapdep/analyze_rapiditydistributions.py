@@ -78,9 +78,7 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_-5p1_-2p8_pT_0_4'][0]
-        )
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_-5p1_-2p8_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")

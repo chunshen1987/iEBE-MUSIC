@@ -181,8 +181,8 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                       f"binaryCollisions_event_{event_id}.dat"))
         return status, file_name
     elif initial_type == "3DMCGlauber_consttau":
-        status, file_name = fecth_an_3DMCGlauber_smooth_event(database,
-                                                              event_id)
+        status, file_name = fecth_an_3DMCGlauber_smooth_event(
+            database, event_id)
         if status:
             print(f"Using initial file: {file_name}")
         else:
@@ -855,7 +855,7 @@ if __name__ == "__main__":
         COMP_POLARIZATION = (sys.argv[12].lower() == "true")
         COMP_PHOTONS = (sys.argv[13].lower() == "true")
         CHECK_POINT = (sys.argv[14].lower() == "true")
-        AFTERBURNER_TYPE = str(sys.argv[15])
+        AFTERBURNER_TYPE = str(sys.argv[15]).lower()
     except IndexError:
         print_usage()
         sys.exit(0)

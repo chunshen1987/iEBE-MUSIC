@@ -78,11 +78,9 @@ def calculate_vnSP(pTArr, poiSpVn1, poiSpVn2, etaArr, dataRef, etaRef,
         array_idx = np.array(array_idx)
 
         vnpT_arr[iev, :] = (np.mean(vnpTNum[array_idx, :], axis=0)
-                            /np.mean(n2Num[array_idx, :], axis=0)
-                            /(np.sqrt(
+                            /np.mean(n2Num[array_idx, :], axis=0)/(np.sqrt(
                                 np.mean(vnpTDen[array_idx], axis=0)
-                                /np.mean(n2Den[array_idx], axis=0)) + 1e-16)
-        )
+                                /np.mean(n2Den[array_idx], axis=0)) + 1e-16))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
 
@@ -94,8 +92,8 @@ def calculate_vnSP(pTArr, poiSpVn1, poiSpVn2, etaArr, dataRef, etaRef,
                header="pT (GeV)  vn{SP}(pT)  vn{SP}(pT)_err")
 
 
-def calculate_vn2PC(pTArr, poiSpVn1, poiSpVn2,
-                    nOrder: int, outputFileName: str) -> None:
+def calculate_vn2PC(pTArr, poiSpVn1, poiSpVn2, nOrder: int,
+                    outputFileName: str) -> None:
     """
         this function compute the v_n[2](p_T) according to the 2PC method
     """
@@ -114,10 +112,10 @@ def calculate_vn2PC(pTArr, poiSpVn1, poiSpVn2,
         array_idx[iev] = False
         array_idx = np.array(array_idx)
 
-        vnpT_arr[iev, :] = np.nan_to_num(np.sqrt(
-                np.mean(vnpTNum[array_idx, :], axis=0)
-                /(np.mean(n2Num[array_idx, :], axis=0) + 1e-16)
-        ))
+        vnpT_arr[iev, :] = np.nan_to_num(
+            np.sqrt(
+                np.mean(vnpTNum[array_idx, :], axis=0)/
+                (np.mean(n2Num[array_idx, :], axis=0) + 1e-16)))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
 
@@ -140,10 +138,8 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
-            + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0]
-        )
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
+                      + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")
@@ -191,13 +187,11 @@ for icen in range(len(centralityCutList) - 1):
     chargedpTDiff2 = np.array(chargedpTDiff2)
     QnArrEta = np.array(QnArrEta)
 
-    calculate_vnSP(pTArr, chargedpTDiff1, chargedpTDiff2,
-                   etaArr, QnArrEta, [0.6, 0.8],
-                   2, f"v2pT_SP_ChargedHadron_C{cenLabel}.dat")
-    calculate_vn2PC(pTArr, chargedpTDiff1, chargedpTDiff2,
-                    2, f"v2pT_2PC_ChargedHadron_C{cenLabel}.dat")
-    calculate_vnSP(pTArr, chargedpTDiff1, chargedpTDiff2,
-                   etaArr, QnArrEta, [0.6, 0.8],
-                   3, f"v3pT_SP_ChargedHadron_C{cenLabel}.dat")
-    calculate_vn2PC(pTArr, chargedpTDiff1, chargedpTDiff2,
-                    3, f"v3pT_2PC_ChargedHadron_C{cenLabel}.dat")
+    calculate_vnSP(pTArr, chargedpTDiff1, chargedpTDiff2, etaArr, QnArrEta,
+                   [0.6, 0.8], 2, f"v2pT_SP_ChargedHadron_C{cenLabel}.dat")
+    calculate_vn2PC(pTArr, chargedpTDiff1, chargedpTDiff2, 2,
+                    f"v2pT_2PC_ChargedHadron_C{cenLabel}.dat")
+    calculate_vnSP(pTArr, chargedpTDiff1, chargedpTDiff2, etaArr, QnArrEta,
+                   [0.6, 0.8], 3, f"v3pT_SP_ChargedHadron_C{cenLabel}.dat")
+    calculate_vn2PC(pTArr, chargedpTDiff1, chargedpTDiff2, 3,
+                    f"v3pT_2PC_ChargedHadron_C{cenLabel}.dat")

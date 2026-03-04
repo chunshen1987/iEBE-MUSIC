@@ -28,8 +28,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_rnpT(pTArr, dataTrig, dataAsso,
-                   nOrder: int, outputFileName: str) -> None:
+def calculate_rnpT(pTArr, dataTrig, dataAsso, nOrder: int,
+                   outputFileName: str) -> None:
     """
         this function calculates the flow pT decorrelation
         r_n(pTa, pTb) = <Qn(pTa)Qn(pTb)^*>/sqrt(<|Qn(pTa)|^2><|Qn(pTb|^2>)
@@ -54,16 +54,13 @@ def calculate_rnpT(pTArr, dataTrig, dataAsso,
                 if jpT == ipT:
                     rnpT_array[iev, pTidx] = 1.
                 else:
-                    rnpT_array[iev, pTidx] = (
-                        np.real(np.mean(
-                            QnTrigArr[array_idx, ipT]
-                            *np.conj(QnAssoArr[array_idx, jpT]), axis=0))
-                        / np.sqrt(
-                            np.mean(np.abs(QnTrigArr[array_idx, ipT])**2,
-                                    axis=0)
-                            *np.mean(np.abs(QnAssoArr[array_idx, jpT])**2,
-                                     axis=0))
-                    )
+                    rnpT_array[iev, pTidx] = (np.real(
+                        np.mean(QnTrigArr[array_idx, ipT]
+                                *np.conj(QnAssoArr[array_idx, jpT]),
+                                axis=0)
+                    )/np.sqrt(
+                        np.mean(np.abs(QnTrigArr[array_idx, ipT])**2, axis=0)
+                        *np.mean(np.abs(QnAssoArr[array_idx, jpT])**2, axis=0)))
                 pTidx += 1
 
     rnMean, rnErr = computeJKMeanandErr(rnpT_array)
@@ -75,9 +72,9 @@ def calculate_rnpT(pTArr, dataTrig, dataAsso,
         f.write("# pT^trig (GeV)  pT^asso (GeV)  r_n  r_n_err\n")
     pTidx = 0
     for ipT in range(npTbins - 1):
-        pTtrigMid = (pTArr[ipT] + pTArr[ipT + 1]) / 2.
+        pTtrigMid = (pTArr[ipT] + pTArr[ipT + 1])/2.
         for jpT in range(0, ipT + 1):
-            pTassoMid = (pTArr[jpT] + pTArr[jpT + 1]) / 2.
+            pTassoMid = (pTArr[jpT] + pTArr[jpT + 1])/2.
             f.write("{:.3f}  {:.3f}  {:.5e}  {:.5e}\n".format(
                 pTtrigMid, pTassoMid, rnMean[pTidx], rnErr[pTidx]))
             pTidx += 1
@@ -95,10 +92,8 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
-            + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0]
-        )
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
+                      + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")
@@ -142,7 +137,7 @@ for icen in range(len(centralityCutList) - 1):
     QnArrTrig = np.array(QnArrTrig)
     QnArrAsso = np.array(QnArrAsso)
 
-    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso,
-                   2, f"ALICE_r2pT_C{cenLabel}.txt")
-    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso,
-                   3, f"ALICE_r3pT_C{cenLabel}.txt")
+    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso, 2,
+                   f"ALICE_r2pT_C{cenLabel}.txt")
+    calculate_rnpT(rn_pTArr, QnArrTrig, QnArrAsso, 3,
+                   f"ALICE_r3pT_C{cenLabel}.txt")

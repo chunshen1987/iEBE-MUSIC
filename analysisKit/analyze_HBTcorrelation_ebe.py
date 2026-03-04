@@ -11,7 +11,6 @@ import h5py
 import pickle
 from scipy.optimize import curve_fit
 
-
 invFlag = False
 HBARC = 0.19733
 EPS = 1e-15
@@ -39,7 +38,6 @@ q3DArr = np.array(q3DArr)
 header = ("# q_cut[GeV]  lambda  lambda_err  R_out[fm]  R_out_err[fm]  "
           + "R_side[fm]  R_side_err[fm]  R_long [fm]  R_long_err[fm]  "
           + "R_os[fm]  R_os_err[fm]  R_ol[fm]  R_ol_err[fm]")
-
 
 try:
     databaseFile = path.abspath(argv[1])

@@ -28,7 +28,7 @@ known_initial_types = [
 ]
 
 known_afterburner_types = [
-    "UrQMD",
+    "urqmd",
     "decay",
 ]
 
@@ -496,7 +496,7 @@ do
     fi
     """)
 
-    if afterburner_type == "UrQMD":
+    if afterburner_type == "urqmd":
         script.write("""
     cd ../osc2u
     ./osc2u.e < ../iSS/OSCAR.DAT > run.log
@@ -757,7 +757,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                                        'iSS_code/{}'.format(link_i))),
                 path.join(sub_event_folder, "iSS/{}".format(link_i))),
                             shell=True)
-        if afterburner_type == "UrQMD":
+        if afterburner_type == "urqmd":
             shutil.copytree(path.join(code_path, 'osc2u'),
                             path.join(sub_event_folder, 'osc2u'))
             shutil.copytree(path.join(code_path, 'urqmd'),
@@ -945,9 +945,10 @@ def main():
         exit(1)
 
     try:
-        afterburner_type = parameter_dict.control_dict['afterburner_type']
+        afterburner_type = parameter_dict.control_dict[
+            'afterburner_type'].lower()
     except KeyError:
-        afterburner_type = "UrQMD"
+        afterburner_type = "urqmd"
     if afterburner_type not in known_afterburner_types:
         print("\U0001F6AB  "
               + f"Do not recognize the afterburner type: {afterburner_type}")

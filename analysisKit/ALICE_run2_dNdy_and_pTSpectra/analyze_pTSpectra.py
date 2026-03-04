@@ -29,11 +29,13 @@ def calculate_pTSpectra(pTArr, poiSP, outputFileName: str) -> None:
     pTSp_mean = np.mean(poiSP, axis=0)
     pTSp_err = np.sqrt(pTSp_mean)/np.sqrt(nev)
     results = np.real(np.array([pTArr, pTSp_mean, pTSp_err]).transpose())
-    np.savetxt(outputFileName,
-               results,
-               fmt="%.4e",
-               delimiter="  ",
-               header="pT (GeV)  dN/(2pi pT dpT dy)  dN/(2pi pT dpT dy)err",)
+    np.savetxt(
+        outputFileName,
+        results,
+        fmt="%.4e",
+        delimiter="  ",
+        header="pT (GeV)  dN/(2pi pT dpT dy)  dN/(2pi pT dpT dy)err",
+    )
 
 
 try:
@@ -47,10 +49,8 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
-            + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0]
-        )
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
+                      + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")
@@ -105,9 +105,6 @@ for icen in range(len(centralityCutList) - 1):
 
     calculate_pTSpectra(pTArr, charged_Sp,
                         f"pTSp_ChargedHadron_C{cenLabel}.dat")
-    calculate_pTSpectra(pTArr, pion_Sp,
-                        f"pTSp_pion_C{cenLabel}.dat")
-    calculate_pTSpectra(pTArr, kaon_Sp,
-                        f"pTSp_kaon_C{cenLabel}.dat")
-    calculate_pTSpectra(pTArr, proton_Sp,
-                        f"pTSp_proton_C{cenLabel}.dat")
+    calculate_pTSpectra(pTArr, pion_Sp, f"pTSp_pion_C{cenLabel}.dat")
+    calculate_pTSpectra(pTArr, kaon_Sp, f"pTSp_kaon_C{cenLabel}.dat")
+    calculate_pTSpectra(pTArr, proton_Sp, f"pTSp_proton_C{cenLabel}.dat")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
     This script contains all the default parameters in the iEBE-MUSIC package.
 """
@@ -116,8 +115,10 @@ ipglasma_dict = {
     'bmax': 20.,
     'rotateReactionPlane': 0,
     'lightNucleusOption': 1,
-    'polariztionProjectile': 0,     # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
-    'polariztionTarget': 0,         # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'polariztionProjectile':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'polariztionTarget':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
     'polarizationProjectileJz': 0,
     'polarizationTargetJz': 0,
     'useFixedNpart': 0,
@@ -159,18 +160,20 @@ mcglauber_dict = {
     'nucleon_configuration_from_file': 0,
     'light_nucleus_option':
         0,  # light nucleus configurations from different nuclear structure theory
-    'ProjPolarizationFlag': 0,      # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
-    'TargPolarizationFlag': 0,      # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
-    'Proj_polJz': 0,                # polarized Jz for projectile
-    'Targ_polJz': 0,                # polarized Jz for target
-    'resetProjWS': 0,               # 1: reset W_S for projectile
-    'resetTargWS': 0,               # 1: reset W_S for projectile
+    'ProjPolarizationFlag':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'TargPolarizationFlag':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'Proj_polJz': 0,  # polarized Jz for projectile
+    'Targ_polJz': 0,  # polarized Jz for target
+    'resetProjWS': 0,  # 1: reset W_S for projectile
+    'resetTargWS': 0,  # 1: reset W_S for projectile
     'roots': 17.3,  # collision energy (GeV)
     'useQuarks': 1,  # switch to use valence quarks
     'Q2': 1.,  # the scale when evaluating the pdf
     'b_min': 0.,  # minimum impact parameter (fm)
     'b_max': 20.,  # maximum impact parameter (fm)
-    'NpartMin': 1,     # minimum number of participants
+    'NpartMin': 1,  # minimum number of participants
     'NpartMax': 1000,  # maximum number of participants
     'randomRPflag': 0,  # 1: randomize reaction plane rangle
     'cenMin': 0,  # centrality cut lower bound (%)
@@ -182,26 +185,26 @@ mcglauber_dict = {
     'outputInitialEst': 1,  # flag to output initial state var vs. eta_s
     'cache_tables': 1,  # 1: use pre-generated tables for valence quark x
     # 0: re-generate tables for valence quark x
-
-    'ISBaryonInStringJunction': 0,  # 1: initial state baryon in the string junction
-                                    # 0: initial state baryon in valence quark hotspots
-
+    'ISBaryonInStringJunction':
+        0,  # 1: initial state baryon in the string junction
+    # 0: initial state baryon in valence quark hotspots
     'FSBaryonFluctStringBreaking': 0,  # 0: baryon charge follow initial state
-                                       # 1: baryon charge fluctuates in the string breaking
-    'lambdaB': 1.0,    # parameter the controls the strength of the baryon string breaking
-    'lambdaBs': 1.0,   # Fraction of single-to-double string stopping
+    # 1: baryon charge fluctuates in the string breaking
+    'lambdaB':
+        1.0,  # parameter the controls the strength of the baryon string breaking
+    'lambdaBs': 1.0,  # Fraction of single-to-double string stopping
     # the relative probility to put a baryon charge in the string
     # rather than at the wounded nucleon remnant
     'FSbaryonInStringProb': 0.2,
-
-    'FSElectricQFluctStringBreaking': 0,  # 0: electric charge follow initial state
-                                          # 1: electric charge fluctuates in the string breaking
-    'lambdaQ': 1.0,    # parameter the controls the strength of the electric Q fluctuation at string breaking
-    'lambdaQs': 1.0,   # Fraction of single-to-double string stopping
+    'FSElectricQFluctStringBreaking':
+        0,  # 0: electric charge follow initial state
+    # 1: electric charge fluctuates in the string breaking
+    'lambdaQ':
+        1.0,  # parameter the controls the strength of the electric Q fluctuation at string breaking
+    'lambdaQs': 1.0,  # Fraction of single-to-double string stopping
     # the relative probility to put an electric charge in the string
     # rather than at the wounded nucleon remnant
     'FSelectricChargeInStringProb': 0.2,
-
     'BG': 4.,  # Gaussian width for sampling the valence quark positions
     'shadowing_factor':
         1.0,  # a shadowning factor for producing strings from multiple scatterings
@@ -225,7 +228,7 @@ mcglauber_dict = {
     'yloss_param_fluct_var_RHIC':
         0.60,  # the variance of the logit-normal parameterized y_loss fluctuation
     'yloss_param_fluct_var_LHC':
-        0.6,   # the variance of the logit-normal parameterized y_loss fluctuation
+        0.6,  # the variance of the logit-normal parameterized y_loss fluctuation
     'ylossParam4At2': 1.60,  # rapidity_loss_method == 4: yloss at y_init = 2
     'ylossParam4At4': 2.15,  # rapidity_loss_method == 4: yloss at y_init = 4
     'ylossParam4At6': 2.45,  # rapidity_loss_method == 4: yloss at y_init = 6
@@ -296,13 +299,14 @@ music_dict = {
     'Eta_plateau_size':
         5.4,  # [-Eta_plateau_size/2, Eta_plateau_size/2] for entropy density
     'Eta_fall_off': 0.3,  # Gaussian width fall off for entropy density
-    'eta_m': 5.0,             # parameter for tilded longitudinal profile
-    'yL_frac': 0.0,           # shifted source model only yL = yL_frac*y_CM
-    'tilted_fraction': 0.,    # fraction of tilted vs. shifted longitudinal profiles
+    'eta_m': 5.0,  # parameter for tilded longitudinal profile
+    'yL_frac': 0.0,  # shifted source model only yL = yL_frac*y_CM
+    'tilted_fraction':
+        0.,  # fraction of tilted vs. shifted longitudinal profiles
     'eta_rhob_0': 1.5,  # peak position of the net baryon density
     'eta_rhob_width_1': 0.2,  # Gaussian width for |eta| > |eta_0|
     'eta_rhob_width_2': 1.0,  # Gaussian width for |eta| < |eta_0|
-    'omega_rhob': 0.,         # participant fraction in the net baryon density
+    'omega_rhob': 0.,  # participant fraction in the net baryon density
 
     # parameters for Initial_profile == 13 or 131
     'string_source_sigma_x': 0.5,  # the transverse size of the hotspot [fm]
@@ -346,8 +350,9 @@ music_dict = {
     'FlagResumTransportCoeff': 0,  # switch to use resummed transport coeff.
     'FlagResetCausality': 0,
     'resumTransCoeffAlpha': 1.5,  # resummed transport coeff. control parameter
-    'turn_on_bulk_chem': 0,         # flag to include chemical equilibration as an effective bulk viscosity
-    'chem_rate_C': 1,               # coefficient for chemical equilibration rate R = CT
+    'turn_on_bulk_chem':
+        0,  # flag to include chemical equilibration as an effective bulk viscosity
+    'chem_rate_C': 1,  # coefficient for chemical equilibration rate R = CT
     'Viscosity_Flag_Yes_1_No_0': 1,  # turn on viscosity in the evolution
     'Include_Shear_Visc_Yes_1_No_0': 1,  # include shear viscous effect
     'Shear_to_S_ratio': 0.12,  # value of \eta/s
@@ -795,9 +800,10 @@ def update_parameters_dict(par_dict_path, ran_seed):
         photon_dict.update(parameters_dict.photon_dict)
 
     try:
-        afterburner_type = parameters_dict.control_dict['afterburner_type']
+        afterburner_type = parameters_dict.control_dict[
+            'afterburner_type'].lower()
     except KeyError:
-        afterburner_type = "UrQMD"
+        afterburner_type = "urqmd"
     iss_dict.update(parameters_dict.iss_dict)
     iss_dict['randomSeed'] = ran_seed
     iss_dict['number_of_particles_needed'] = (int(
@@ -843,7 +849,6 @@ def update_parameters_bayesian(bayes_file):
 
         if not paramApplied:
             print(f"Parameter {key} is not set! Please check your input file")
-
 
 
 def output_parameters_to_files(workfolder="."):

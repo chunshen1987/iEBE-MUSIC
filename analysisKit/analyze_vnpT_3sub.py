@@ -28,9 +28,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_vnpT(pTArr, poiSpVn, etaArr, EPD_QnArr, etaRef,
-                   QnArr_C, QnArr_D, nOrder,
-                   outputFileName: str) -> None:
+def calculate_vnpT(pTArr, poiSpVn, etaArr, EPD_QnArr, etaRef, QnArr_C, QnArr_D,
+                   nOrder, outputFileName: str) -> None:
     """
         this function compute the v_n(p_T) according to the scalar product
         method
@@ -41,8 +40,9 @@ def calculate_vnpT(pTArr, poiSpVn, etaArr, EPD_QnArr, etaRef,
     etaRef1Interp = np.linspace(etaRef[0], etaRef[1], 16)
     QnRef1 = []
     for iev in range(nev):
-        Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               EPD_QnArr[iev, -1, :]*EPD_QnArr[iev, nOrder + 1, :])
+        Qn1_interp = np.interp(
+            etaRef1Interp, etaArr,
+            EPD_QnArr[iev, -1, :]*EPD_QnArr[iev, nOrder + 1, :])
         QnRef1.append(np.sum(Qn1_interp))
 
     QnRef1 = np.array(QnRef1).reshape((nev, 1))
@@ -66,11 +66,10 @@ def calculate_vnpT(pTArr, poiSpVn, etaArr, EPD_QnArr, etaRef,
         array_idx = np.array(array_idx)
 
         vnpT_arr[iev, :] = (np.mean(vnpTNum[array_idx, :], axis=0)
-                            /np.mean(dNpT[array_idx, :], axis=0)
-                            /(np.sqrt(np.mean(vnBC[array_idx], axis=0)
-                                      *np.mean(vnBD[array_idx], axis=0)
-                                      /np.mean(vnCD[array_idx], axis=0)))
-        )
+                            /np.mean(dNpT[array_idx, :], axis=0)/(np.sqrt(
+                                np.mean(vnBC[array_idx], axis=0)
+                                *np.mean(vnBD[array_idx], axis=0)
+                                /np.mean(vnCD[array_idx], axis=0))))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
     dNpT_mean = np.mean(dNpT/(pTArr + 1e-16), axis=0)
@@ -84,8 +83,9 @@ def calculate_vnpT(pTArr, poiSpVn, etaArr, EPD_QnArr, etaRef,
                header=("pT (GeV)  dN/(pTdpT)  dN/(pTdpT)_err  "
                        + f"vn(pT)  vn(pT)_err (n = {nOrder})"))
 
-def calculate_vnpT_3sub(pTArr, poiSpVn, etaArr, QnRefArr,
-                        etaRef1, etaRef2, etaRef3, nOrder: int, method: int,
+
+def calculate_vnpT_3sub(pTArr, poiSpVn, etaArr, QnRefArr, etaRef1, etaRef2,
+                        etaRef3, nOrder: int, method: int,
                         outputFileName: str) -> None:
     """
         this function compute the v_n(p_T) according to
@@ -103,14 +103,17 @@ def calculate_vnpT_3sub(pTArr, poiSpVn, etaArr, QnRefArr,
     QnRef2 = []
     QnRef3 = []
     for iev in range(nev):
-        Qn1_interp = np.interp(etaRef1Interp, etaArr,
-                               QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
+        Qn1_interp = np.interp(
+            etaRef1Interp, etaArr,
+            QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
         QnRef1.append(np.sum(Qn1_interp))
-        Qn2_interp = np.interp(etaRef2Interp, etaArr,
-                               QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
+        Qn2_interp = np.interp(
+            etaRef2Interp, etaArr,
+            QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
         QnRef2.append(np.sum(Qn2_interp))
-        Qn3_interp = np.interp(etaRef3Interp, etaArr,
-                               QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
+        Qn3_interp = np.interp(
+            etaRef3Interp, etaArr,
+            QnRefArr[iev, -1, :]*QnRefArr[iev, nOrder + 1, :])
         QnRef3.append(np.sum(Qn3_interp))
 
     QnRef1 = np.array(QnRef1).reshape((nev, 1))
@@ -139,11 +142,10 @@ def calculate_vnpT_3sub(pTArr, poiSpVn, etaArr, QnRefArr,
         array_idx = np.array(array_idx)
 
         vnpT_arr[iev, :] = (np.mean(vnpTNum[array_idx, :], axis=0)
-                            /np.mean(dNpT[array_idx, :], axis=0)
-                            /(np.sqrt(np.mean(resPsi1[array_idx], axis=0)
-                                      *np.mean(resPsi2[array_idx], axis=0)
-                                      /np.mean(resPsi3[array_idx], axis=0)))
-        )
+                            /np.mean(dNpT[array_idx, :], axis=0)/(np.sqrt(
+                                np.mean(resPsi1[array_idx], axis=0)
+                                *np.mean(resPsi2[array_idx], axis=0)
+                                /np.mean(resPsi3[array_idx], axis=0))))
 
     vnpT_mean, vnpT_err = computeJKMeanandErr(vnpT_arr)
     dNpT_mean = np.mean(dNpT/(pTArr + 1e-16), axis=0)
@@ -156,6 +158,7 @@ def calculate_vnpT_3sub(pTArr, poiSpVn, etaArr, QnRefArr,
                delimiter="  ",
                header=("pT (GeV)  dN/(pTdpT)  dN/(pTdpT)_err  "
                        + f"vn(pT)  vn(pT)_err (n = {nOrder})"))
+
 
 try:
     database_file = str(sys.argv[1])
@@ -223,17 +226,17 @@ for icen in range(len(centralityCutList) - 1):
     QnArrD = np.array(QnArrD)
 
     # STAR
-    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, EPDQnArr,
-                        [-5.1, -2.13], [-1.5, -0.5], [0.5, 1.5], 2, 0,
+    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, EPDQnArr, [-5.1, -2.13],
+                        [-1.5, -0.5], [0.5, 1.5], 2, 0,
                         f"v2pT_SP_TPCEPDE_ChargedHadron_C{cenLabel}.dat")
-    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, EPDQnArr,
-                        [-5.1, -2.13], [-1.5, -0.5], [0.5, 1.5], 3, 0,
+    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, EPDQnArr, [-5.1, -2.13],
+                        [-1.5, -0.5], [0.5, 1.5], 3, 0,
                         f"v3pT_SP_TPCEPDE_ChargedHadron_C{cenLabel}.dat")
 
     # PHENIX
-    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, chQnEtaArr,
-                        [-3.9, -3.1], [-3., -1], [-0.35, 0.35], 2, 1,
+    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, chQnEtaArr, [-3.9, -3.1],
+                        [-3., -1], [-0.35, 0.35], 2, 1,
                         f"v2pT_EP_PHENIX_ChargedHadron_C{cenLabel}.dat")
-    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, chQnEtaArr,
-                        [-3.9, -3.1], [-3., -1], [-0.35, 0.35], 3, 1,
+    calculate_vnpT_3sub(pTArr, chargedpTDiff, etaArr, chQnEtaArr, [-3.9, -3.1],
+                        [-3., -1], [-0.35, 0.35], 3, 1,
                         f"v3pT_EP_PHENIX_ChargedHadron_C{cenLabel}.dat")

@@ -17,12 +17,14 @@ Reg_centrality_cut_list = [
     0., 5., 10., 20., 30., 40., 50., 60., 70., 80., 90., 100.
 ]
 #centralityCutList = Reg_centrality_cut_list
-centralityCutList = [0, 0.1, 0, 1, 2, 4, 6, 8, 10, 15, 20, 25, 30, 40, 50, 60,
-                     70, 80, 90, 100]
+centralityCutList = [
+    0, 0.1, 0, 1, 2, 4, 6, 8, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100
+]
 dNcutList = []  # pre-defined Nch cut if simulation is not minimum bias
 
 
-def calcualte_eccn_2(eccn_data_array, outputFileName: str, cenLabel: str) -> None:
+def calcualte_eccn_2(eccn_data_array, outputFileName: str,
+                     cenLabel: str) -> None:
     """
         this function computes ecc_n{2} and its stat. err.
     """
@@ -46,7 +48,8 @@ def calcualte_eccn_2(eccn_data_array, outputFileName: str, cenLabel: str) -> Non
     return
 
 
-def calcualte_eccn_4(eccn_data_array, outputFileName: str, cenLabel: str) -> None:
+def calcualte_eccn_4(eccn_data_array, outputFileName: str,
+                     cenLabel: str) -> None:
     """
         this function computes ecc_n{4} and its stat. err.
     """
@@ -58,7 +61,7 @@ def calcualte_eccn_4(eccn_data_array, outputFileName: str, cenLabel: str) -> Non
     Cen4 = np.mean(corr4, axis=0) - 2.*np.mean(corr2, axis=0)**2
     Cen4_err = np.std(corr4, axis=0)/np.sqrt(nev)
 
-    en4 = np.nan_to_num((- Cen4)**0.25)
+    en4 = np.nan_to_num((-Cen4)**0.25)
     en4_err = np.nan_to_num(Cen4_err/4./(en4**3.))
 
     if path.isfile(outputFileName):
@@ -68,8 +71,8 @@ def calcualte_eccn_4(eccn_data_array, outputFileName: str, cenLabel: str) -> Non
         f.write("# cen  en{4}  en{2}_err  Cen{4}  Cen{4}_err (n = 1-6)\n")
     f.write("{:.3f}".format(cenLabel))
     for i in range(len(en4)):
-        f.write("  {:.5e}  {:.5e}  {:.5e}  {:.5e}".format(en4[i], en4_err[i],
-                                                          Cen4[i], Cen4_err[i]))
+        f.write("  {:.5e}  {:.5e}  {:.5e}  {:.5e}".format(
+            en4[i], en4_err[i], Cen4[i], Cen4_err[i]))
     f.write("\n")
     f.close()
     return

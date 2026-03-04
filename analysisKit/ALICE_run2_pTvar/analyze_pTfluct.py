@@ -28,8 +28,8 @@ def computeJKMeanandErr(dataArr):
     return dataMean, dataErr
 
 
-def calculate_pTfluct(dataArr1, dataArr2,
-                      outputFileHeader: str, cenLabel: str) -> None:
+def calculate_pTfluct(dataArr1, dataArr2, outputFileHeader: str,
+                      cenLabel: str) -> None:
     """
         paper: https://arxiv.org/pdf/2411.09334v2
         this function calculates the moments of pT fluctuation
@@ -67,7 +67,10 @@ def calculate_pTfluct(dataArr1, dataArr2,
     varPTMean, varPTErr = computeJKMeanandErr(varPT_array)
 
     pTfluctResults = [
-        meanPTMean, meanPTErr, varPTMean, varPTErr,
+        meanPTMean,
+        meanPTErr,
+        varPTMean,
+        varPTErr,
     ]
 
     dN_mean = np.real(np.mean(dataArr1[:, 0] + dataArr2[:, 0]))
@@ -97,10 +100,8 @@ with open(database_file, "rb") as pf:
 dNdyDict = {}
 for event_name in data.keys():
     if 'global' not in event_name:
-        Nch = np.real(
-              data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
-            + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0]
-        )
+        Nch = np.real(data[event_name]['ALICE_V0A_eta_2p8_5p1_pT_0_4'][0]
+                      + data[event_name]['ALICE_V0C_eta_-3p7_-1p7_pT_0_4'][0])
         dNdyDict[event_name] = Nch
 dNdyList = -np.sort(-np.array(list(dNdyDict.values())))
 print(f"Number of good events: {len(dNdyList)}")
