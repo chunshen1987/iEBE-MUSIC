@@ -6,7 +6,8 @@
 
 ## Kinematic cuts
 1. Particles measured in the $\eta$ range between -5.4 and 5.4.
-2. The event plane is constructed using $0.1 <|\eta| < 3$. For the positive $\eta$ particles the event plane is constructed using particles in the negative pseudorapidity range and for the negative particles the event plane is constructed using particles in the positive pseudorapidity part. 
+2. The event plane is constructed using $0.1 <|\eta| < 3$. For the positive $\eta$ particles the event plane is constructed using particles in the negative pseudorapidity range and for the negative particles the event plane is constructed using particles in the positive pseudorapidity part.
+3. There are three types of data: minimum bias measurements 0-40\% and data for the centralities 3-15\%, 15-25\%, 25-40\%.  
 
 ## Notes
 
