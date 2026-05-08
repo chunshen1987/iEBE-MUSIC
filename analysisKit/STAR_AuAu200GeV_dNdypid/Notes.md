@@ -10,7 +10,7 @@
 
 
 ## Notes
-1. The data for identified particle dN/dy and mean pT is in the paper itself.
+1. The data for identified particle dN/dy and mean pT is in the paper itself. To get dN/dy, extrapolation using hydrodynamics inspired Blast Wave fit was used for higher pT.
 
 
 
