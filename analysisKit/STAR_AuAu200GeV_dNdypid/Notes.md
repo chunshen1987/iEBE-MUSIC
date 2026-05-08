@@ -4,6 +4,8 @@
 [data](https://inspirehep.net/literature/793126)
 
 ## Kinematic cuts
+1. Full azimuthal angle $\phi$ from 0 to $2\pi$ coverage.
+2. $|\eta|$ covered from -1.8 to 1.8.
 
 
 ## Notes
