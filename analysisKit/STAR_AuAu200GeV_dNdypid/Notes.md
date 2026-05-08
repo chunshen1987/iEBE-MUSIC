@@ -5,7 +5,8 @@
 
 ## Kinematic cuts
 1. Full azimuthal angle $\phi$ from 0 to $2\pi$ coverage.
-2. $|\eta|$ covered from -1.8 to 1.8.
+2. $|\eta|$ < 0.1
+3. Minimum $p_T$ 0.2 GeV.
 
 
 ## Notes
