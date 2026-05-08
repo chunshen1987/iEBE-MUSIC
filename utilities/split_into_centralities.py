@@ -24,11 +24,15 @@ try:
     hydro_folder = path.join(data_path, "HYDRO_RESULTS")
     urqmd_folder = path.join(data_path, "URQMD_RESULTS")
     if path.exists(hydro_folder):
-        print("This run has hydro surface!")
-        hydro_surface_flag = True
+        fileList = glob(path.join(hydro_folder, "*"))
+        if len(fileList) > 0:
+            print("This run has hydro surface!")
+            hydro_surface_flag = True
     if path.exists(urqmd_folder):
-        print("This run has UrQMD outputs!")
-        urqmd_flag = True
+        fileList = glob(path.join(urqmd_folder, "*"))
+        if len(fileList) > 0:
+            print("This run has UrQMD outputs!")
+            urqmd_flag = True
     if not hydro_surface_flag and not urqmd_flag:
         exit(0)
 except IndexError:
@@ -100,6 +104,6 @@ for icen in range(len(centrality_cut_list) - 1):
             shutil.move(path.join(hydro_folder, hydro_event_name),
                         hydro_directory_path)
         if urqmd_flag:
-            urqmd_event_name = "particle_list_{}.gz".format(event_id)
+            urqmd_event_name = "particle_list_{}.bin".format(event_id)
             shutil.move(path.join(urqmd_folder, urqmd_event_name),
                         urqmd_directory_path)
