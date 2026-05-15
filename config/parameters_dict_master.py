@@ -539,7 +539,8 @@ iss_dict = {
         0,  # output particle samples into individual files
     'store_samples_in_memory': 1,  # flag to store particle samples in memory
     'use_OSCAR_format': 1,  # output results in OSCAR format
-    'use_OSCAR2013': 0,              # output results in OSCAR 2013 format (need use_OSCAR_format == 1)
+    'use_OSCAR2013':
+        0,  # output results in OSCAR 2013 format (need use_OSCAR_format == 1)
     'use_gzip_format': 0,  # output results in gzip format (only works with
     # store_samples_in_memory = 1)
     'use_binary_format': 0,
@@ -637,7 +638,8 @@ hadronic_afterburner_toolkit_dict = {
     # turn on only for Lambda (monval=3122)
     # for Sigma^0 -> Lambda + gamma
     'net_particle_flag': 0,  # flag to collect net particle yield distribution
-    'collect_neutral_particles': 0, # flag to collect neutral particle observables
+    'collect_neutral_particles':
+        0,  # flag to collect neutral particle observables
     # Parameters for single particle spectra and vn
     'rapidity_shift': 0.,
     'readRapidityShiftFromFile': 0,

@@ -132,14 +132,14 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
             call(
                 "mv 3dMCGlauber/rapidity_shift.dat hadronic_afterburner_toolkit/",
                 shell=True)
-            call("mv 3dMCGlauber/ed_etas_*.dat {}".format(
-                                    final_results_folder), shell=True)
-            call("mv 3dMCGlauber/nB_etas_*.dat {}".format(
-                                    final_results_folder), shell=True)
-            call("mv 3dMCGlauber/nQ_etas_*.dat {}".format(
-                                    final_results_folder), shell=True)
-            call("mv 3dMCGlauber/ecc_ed*.dat {}".format(
-                                    final_results_folder), shell=True)
+            call("mv 3dMCGlauber/ed_etas_*.dat {}".format(final_results_folder),
+                 shell=True)
+            call("mv 3dMCGlauber/nB_etas_*.dat {}".format(final_results_folder),
+                 shell=True)
+            call("mv 3dMCGlauber/nQ_etas_*.dat {}".format(final_results_folder),
+                 shell=True)
+            call("mv 3dMCGlauber/ecc_ed*.dat {}".format(final_results_folder),
+                 shell=True)
             return status, file_name
         else:
             file_name = fecth_an_3DMCGlauber_event(database, event_id)
