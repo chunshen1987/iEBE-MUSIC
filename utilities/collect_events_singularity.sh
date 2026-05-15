@@ -24,7 +24,7 @@ echo "collecting events from " $fromFolder " to " $toFolder
 folderName=`echo $fromFolder | rev | cut -d "/" -f 1 | rev`
 target_folder=${toFolder}/${folderName}
 mkdir -p ${target_folder}
-cp ${fromFolder}/parameter* ${target_folder}/
+cp ${fromFolder}/*parameter* ${target_folder}/
 target_hydro_folder=${target_folder}/HYDRO_RESULTS
 mkdir -p ${target_hydro_folder}
 target_urqmd_folder=${target_folder}/URQMD_RESULTS
@@ -36,15 +36,21 @@ hydro_folder_name="hydro_results_"
 UrQMD_file_name="particle_list_"
 spvn_folder_name="spvn_results_"
 
-for ijob in `ls --color=none $fromFolder | grep "event" `;
+for ijob in `ls --color=none $fromFolder | grep "event_" `;
 do
     eventsPath=${fromFolder}/${ijob}
-    for iev in `ls --color=none ${eventsPath} | grep "RESULTS"`
-    do
-        mv ${eventsPath}/${iev} $target_spvn_folder
-    done
-    mv ${eventsPath}/temp/playground/HYDRO_RESULTS/${hydro_folder_name}* $target_hydro_folder 2>/dev/null
-    mv ${eventsPath}/temp/playground/URQMD_RESULTS/${UrQMD_file_name}* $target_urqmd_folder 2>/dev/null
+    evId=`echo $ijob | cut -f 2 -d _`
+    if [ ! -f ${eventsPath}/RESULTS_${evId}.h5 ]; then
+        (cd ${eventsPath}
+        mkdir -p temp
+        simFolder=`ls | grep "playground"`
+        ./collect_events.sh ${simFolder} temp
+        mv temp/${simFolder}/${simFolder}.h5 RESULTS_${evId}.h5
+        )
+    fi
+    mv ${eventsPath}/RESULTS_${evId}.h5 $target_spvn_folder
+    mv ${eventsPath}/temp/playground*/HYDRO_RESULTS/${hydro_folder_name}* $target_hydro_folder 2>/dev/null
+    mv ${eventsPath}/temp/playground*/URQMD_RESULTS/${UrQMD_file_name}* $target_urqmd_folder 2>/dev/null
 done
 
 if [ -f ${target_folder}/${folderName}.h5 ]; then

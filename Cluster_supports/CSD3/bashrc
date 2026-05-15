@@ -1,0 +1,3 @@
+module purge
+
+module load rhel8/default-ccl              # REQUIRED - loads the basic environment

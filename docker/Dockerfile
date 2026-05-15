@@ -36,7 +36,16 @@ RUN cd ${HOME} && \
     git clone --depth=1 https://github.com/chunshen1987/iEBE-MUSIC -b 4DEoS && \
     cd iEBE-MUSIC/codes && \
     ./get_code_packages.sh && \
-    ./compile_code_packages.sh
+    ./compile_code_packages.sh && \
+    cd ../EOS_database && \
+    bash download_EOSdatabase1D.sh && \
+    bash download_QGPViscositydatabase1D.sh && \
+    cd ../initialcondition_database && \
+    bash download_smoothTATB.sh && \
+    cd ../config/arXiv_2507.11394 && \
+    bash download_posteriorChains.sh && \
+    cd ../arXiv_2408.00537 && \
+    bash download_posteriorChain.sh
 
 # Cleaning caches to reduce size of image
 RUN yum clean all

@@ -12,7 +12,9 @@ import argparse
 from math import ceil
 from glob import glob
 
-support_cluster_list = ["wsugrid", "osg", "local", "stampede2", "anvil"]
+support_cluster_list = [
+    "wsugrid", "osg", "local", "stampede2", "anvil", "csd3", "nersc"
+]
 
 
 def write_script_header(cluster, script, n_threads, event_id, walltime,
@@ -23,7 +25,7 @@ def write_script_header(cluster, script, n_threads, event_id, walltime,
         script.write("""#!/usr/bin/env bash
 #SBATCH --job-name event_{0}
 #SBATCH -q primary
-##SBATCH --exclude=asx[1-20],wsu[1-117]
+#SBATCH --exclude=asx[1-20],wsu[1-67,71-117]
 #SBATCH -N 1
 #SBATCH -n {1}
 #SBATCH --mem={2:.0f}G
@@ -44,6 +46,14 @@ source $WORK/iEBE-MUSIC/Cluster_supports/Stampede2/bashrc
         script.write("""#!/usr/bin/env bash
 
 module purge
+""")
+    elif cluster == "csd3":
+        script.write("""#!/usr/bin/env bash
+
+""")
+    elif cluster == "nersc":
+        script.write("""#!/usr/bin/env bash
+
 """)
     else:
         print("\U0001F6AB  unrecoginzed cluster name :", cluster)
@@ -99,8 +109,8 @@ rm -fr `pwd`
     script.close()
 
 
-def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes,
-                                  nTaskPerNode, n_threads, walltime):
+def generate_Anvil_mpi_job_script(folder_name, queueName, n_nodes, nTaskPerNode,
+                                  n_threads, walltime):
     """This function generates job script for Anvil"""
     working_folder = folder_name
 
@@ -140,6 +150,89 @@ rm -fr `pwd`
     script.close()
 
 
+def generate_csd3_job_array_script(folder_name, queueName, n_jobs, n_threads,
+                                   walltime):
+    """This function generates job script for csd3"""
+    working_folder = folder_name
+
+    if queueName not in ["icelake", "icelake-himem", "cclake", "cclake-himem"]:
+        queueName = "cclake"
+
+    mem = 3420
+    if queueName == "icelake":
+        mem = 3380
+    elif queueName == 'icelake-himem':
+        mem = 6760
+    elif queueName == 'cclake-himem':
+        mem = 6840
+
+    mem *= n_threads
+
+    script = open(path.join(working_folder, "submit_jobArr.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH --job-name iEBEMUSIC
+#SBATCH -A iris-ip012-CPU
+#SBATCH --output=job_%A_%a.output
+#SBATCH --error=job_%A_%a.error
+#SBATCH -p {0:s}
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --time={1:s}
+#SBATCH --cpus-per-task={2:d}
+#SBATCH --mem={3:d}mb
+#SBATCH --array=0-{4:d}
+
+. /etc/profile.d/modules.sh                # Leave this line (enables the module command)
+source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/iEBE-MUSIC/Cluster_supports/CSD3/bashrc
+source /home/ir-shen2/rds/rds-iris-ip012-hCZCEbPdvZ8/chun/venv/bin/activate
+
+cd event_$SLURM_ARRAY_TASK_ID
+bash submit_job.script
+
+""".format(queueName, walltime, n_threads, mem, n_jobs - 1))
+    script.close()
+
+
+def generate_nersc_mpi_job_script(folder_name, queueName, n_nodes, nTasks,
+                                  n_threads, walltime, singularityImage):
+    """This function generates job script for NERSC"""
+    working_folder = folder_name
+
+    if queueName not in ["regular", "shared"]:
+        queueName = "regular"
+
+    script = open(path.join(working_folder, "submit_MPI_jobs.script"), "w")
+    script.write("""#!/bin/bash -l
+#SBATCH --image=docker:{0:s}
+#SBATCH -J iEBEMUSIC
+#SBATCH -o job.o%j
+#SBATCH -e job.e%j
+#SBATCH --qos={1:s}
+#SBATCH -C cpu
+#SBATCH --nodes={2:d}
+#SBATCH --ntasks={3:d}
+#SBATCH --cpus-per-task={5:d}
+#SBATCH --time={4:s}
+
+export OMP_PROC_BIND=true
+export OMP_PLACES=threads
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+srun -n $SLURM_NTASKS python3 job_MPI_wrapper.py
+
+# after all runs finish, collect results into one hdf5 file
+# and transfer it to $PROJECT
+rm -fr temp
+mkdir temp
+./collect_events_singularity.sh `pwd` temp
+mkdir -p $SCRATCH/RESULTS
+cp -r temp/* $SCRATCH/RESULTS/
+rm -fr `pwd`
+
+""".format(singularityImage, queueName, n_nodes, nTasks, walltime, n_threads))
+    script.close()
+
+
 def generate_event_folders(workingFolder, clusterName, eventId,
                            singularityRepoPath, executeScript, parameterFile,
                            bayesParamFile, eventId0, nHydroEvents, nUrQMD,
@@ -153,14 +246,29 @@ def generate_event_folders(workingFolder, clusterName, eventId,
     workFolderPath = "playground_{0}_{1}".format(workingFolderName, eventId)
     if clusterName == "stampede2":
         workFolderPath = "/tmp/" + workFolderPath
+    if clusterName == "csd3":
+        workFolderPath = "/local/" + workFolderPath
     workFolderName = workFolderPath.split('/')[-1]
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
     script = open(path.join(eventFolder, "submit_job.script"), "w")
     write_script_header(clusterName, script, nThreads, eventId, wallTime,
                         eventFolder)
-    script.write("""
-h5Stat=`ls *.h5`
+    if clusterName == "nersc":
+        script.write("""
+h5Stat=`ls *.h5 2>/dev/null`
+
+if [ -z "$h5Stat" ]
+then
+
+    shifter ./{0} {1} {2} {3} {4} {5} {6} {7} {8}
+
+""".format(executeScriptName, workFolderPath, parameterFileName, eventId0,
+           nHydroEvents, nUrQMD, nThreads, seed,
+           bayesParamFile.split('/')[-1]))
+    else:
+        script.write("""
+h5Stat=`ls *.h5 2>/dev/null`
 
 if [ -z "$h5Stat" ]
 then
@@ -168,8 +276,8 @@ then
     singularity exec {0} ./{1} {2} {3} {4} {5} {6} {7} {8} {9}
 
 """.format(singularityRepoPath, executeScriptName, workFolderPath,
-           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads,
-           seed, bayesParamFile))
+           parameterFileName, eventId0, nHydroEvents, nUrQMD, nThreads, seed,
+           bayesParamFile.split('/')[-1]))
     if clusterName == "anvil":
         script.write("""
 
@@ -188,7 +296,6 @@ fi
     shutil.copy(parameterFile, eventFolder)
     if bayesParamFile != "":
         shutil.copy(bayesParamFile, eventFolder)
-
 
 
 def create_a_working_folder(workfolder_path):
@@ -227,7 +334,7 @@ def main():
                         metavar='',
                         type=str,
                         default='SKX',
-                        help='node type (work on stampede2 and Anvil)')
+                        help='node type (work on stampede2, Anvil, and CSD3)')
     parser.add_argument('-n',
                         '--n_jobs',
                         metavar='',
@@ -276,6 +383,12 @@ def main():
                         type=int,
                         default='-1',
                         help='Random Seed (-1: according to system time)')
+    parser.add_argument('-id',
+                        '--job_process_id',
+                        metavar='',
+                        type=int,
+                        default='0',
+                        help='Job process id number')
     args = parser.parse_args()
 
     if len(sys.argv) < 2:
@@ -300,6 +413,7 @@ def main():
         singularityRepoPath = path.abspath(args.singularity)
         executeScript = args.executeScript
         parameterFile = args.par_dict
+        job_id0 = args.job_process_id
     except:
         parser.print_help()
         exit(0)
@@ -332,10 +446,10 @@ def main():
         for ii in range(progress_i):
             sys.stdout.write("#")
             sys.stdout.flush()
+        event_id0 = job_id0 + i_job*n_hydro_per_job
         generate_event_folders(working_folder_name, cluster_name, i_job,
                                singularityRepoPath, executeScript,
-                               parameterFile, args.bayes_file,
-                               i_job*n_hydro_per_job,
+                               parameterFile, args.bayes_file, event_id0,
                                n_hydro_per_job, nUrQMD, n_threads, seed,
                                wallTime)
     sys.stdout.write("\n")
@@ -369,8 +483,8 @@ def main():
             n_nodes += 1
 
         generate_Stampede2_mpi_job_script(working_folder_name,
-                                          args.node_type.lower(),
-                                          n_nodes, n_jobs, n_threads, wallTime)
+                                          args.node_type.lower(), n_nodes,
+                                          n_jobs, n_threads, wallTime)
         shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
@@ -394,6 +508,29 @@ def main():
                     working_folder_name)
         shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
                     working_folder_name)
+
+    if cluster_name == "nersc":
+        nThreadsPerNode = 256
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/NERSC/job_MPI_wrapper.py'),
+            working_folder_name)
+        n_nodes = max(1, int(n_jobs*n_threads/nThreadsPerNode))
+        if n_nodes*nThreadsPerNode < n_jobs*n_threads:
+            n_nodes += 1
+
+        generate_nersc_mpi_job_script(working_folder_name,
+                                      args.node_type.lower(), n_nodes, n_jobs,
+                                      n_threads, wallTime, args.singularity)
+        shutil.copy(path.join(script_path, 'collect_events_singularity.sh'),
+                    working_folder_name)
+        shutil.copy(path.join(script_path, 'combine_multiple_hdf5.py'),
+                    working_folder_name)
+
+    if cluster_name == "csd3":
+        generate_csd3_job_array_script(working_folder_name,
+                                       args.node_type.lower(), n_jobs,
+                                       n_threads, wallTime)
 
 
 if __name__ == "__main__":

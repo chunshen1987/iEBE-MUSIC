@@ -1,0 +1,47 @@
+# https://arxiv.org/abs/1612.08966
+#: table_doi: 10.17182/hepdata.78365.v1/t1
+#: name: DN/DETARAP
+#: description: Charged-particle pseudorapidity density for ten centrality classes over a broad $\eta$ range in Pb-Pb collisions at $\sqrt{s_{_{\mathrm{NN}}}}=5.02\  \mathrm{TeV}$. Boxes around the points reflect the total uncorrelated systematic uncertainties   while the filled squares on the right reflect the correlated systematic uncertainty (evaluated at $\eta=0$). Statistical errors are generally insignificant and smaller than the markers.  Also shown is the reflection of the $3.5<\eta<5$ values around $\eta=0$ (open circles).  The line corresponds to fits of the difference between two Gaussians centred at $\eta=0$ ($f_{\text{GG}}$) [PLB754.373] to the data.
+#: data_file: Table1.yaml
+#: keyword reactions: PB PB --> CHARGED X
+#: keyword observables: DN/DETARAP
+#: keyword cmenergies: 5023.0
+#: SYS      Centrality        
+#: Centrality [PCT]      6.0
+#: EM contamination [PCT]      0
+#: CENTRALITY [PCT]      60.0-70.0
+#$\eta$  $\eta$ LOW  $\eta$ HIGH  $\mathrm{d}N_{\mathrm{ch}}/\mathrm{d}\eta$  stat +  stat -  sys +  sys -
+-3.375  -3.5  -3.25  94.9  0.4  -0.4  4.3  -4.3
+-3.125  -3.25  -3.0  96.1  0.2  -0.2  4.3  -4.3
+-2.875  -3.0  -2.75  96.8  0.2  -0.2  4.4  -4.4
+-2.625  -2.75  -2.5  98.3  0.2  -0.2  4.4  -4.4
+-2.375  -2.5  -2.25  98.8  0.2  -0.2  4.5  -4.5
+-2.125  -2.25  -2.0  99.1  0.2  -0.2  4.5  -4.5
+-1.875  -2.0  -1.75  101.2  0.2  -0.2  2.3  -2.3
+-1.625  -1.75  -1.5  102.7  0.3  -0.3  2.5  -2.5
+-1.375  -1.5  -1.25  103.1  0.2  -0.2  2.3  -2.3
+-1.125  -1.25  -1.0  102.0  0.2  -0.2  2.2  -2.2
+-0.875  -1.0  -0.75  100.3  0.2  -0.2  2.1  -2.1
+-0.625  -0.75  -0.5  98.0  0.2  -0.2  2.0  -2.0
+-0.375  -0.5  -0.25  96.1  0.1  -0.1  1.9  -1.9
+-0.125  -0.25  0.0  95.2  0.1  -0.1  1.9  -1.9
+0.125  0.0  0.25  95.2  0.1  -0.1  1.9  -1.9
+0.375  0.25  0.5  96.1  0.1  -0.1  1.9  -1.9
+0.625  0.5  0.75  98.0  0.2  -0.2  2.0  -2.0
+0.875  0.75  1.0  100.3  0.2  -0.2  2.1  -2.1
+1.125  1.0  1.25  102.0  0.2  -0.2  2.2  -2.2
+1.375  1.25  1.5  103.1  0.2  -0.2  2.3  -2.3
+1.625  1.5  1.75  102.7  0.3  -0.3  2.5  -2.5
+1.875  1.75  2.0  101.2  0.2  -0.2  2.3  -2.3
+2.125  2.0  2.25  99.1  0.2  -0.2  4.5  -4.5
+2.375  2.25  2.5  98.8  0.2  -0.2  4.5  -4.5
+2.625  2.5  2.75  98.3  0.2  -0.2  4.4  -4.4
+2.875  2.75  3.0  96.8  0.2  -0.2  4.4  -4.4
+3.125  3.0  3.25  96.1  0.2  -0.2  4.3  -4.3
+3.375  3.25  3.5  94.9  0.4  -0.4  4.3  -4.3
+3.625  3.5  3.75  86.8  0.2  -0.2  5.7  -5.9
+3.875  3.75  4.0  81.9  0.1  -0.1  5.4  -5.6
+4.125  4.0  4.25  77.3  0.1  -0.1  5.1  -5.3
+4.375  4.25  4.5  75.8  0.1  -0.1  5.0  -5.2
+4.625  4.5  4.75  75.1  0.1  -0.1  4.9  -5.1
+4.875  4.75  5.0  73.8  0.2  -0.2  4.8  -5.0

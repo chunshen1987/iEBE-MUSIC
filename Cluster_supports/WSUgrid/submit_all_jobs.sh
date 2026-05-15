@@ -3,7 +3,7 @@
 
 usage="./submite_all_jobs.sh workFolder [queue_name]"
 
-workFolder=$1
+workFolder=${1%/}
 queue=$2
 
 if [ -z "$workFolder" ]

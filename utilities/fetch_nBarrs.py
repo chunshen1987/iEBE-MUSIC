@@ -21,12 +21,12 @@ def calcualte_yield_and_meanpT(pT_low, pT_high, data):
     dpT = pT_inte_array[1] - pT_inte_array[0]
     dN_event = data[:, 1]
     pT_event = data[:, 0]
-    dN_interp = np.exp(np.interp(pT_inte_array, pT_event,
-                                 np.log(dN_event+1e-30)))
+    dN_interp = np.exp(
+        np.interp(pT_inte_array, pT_event, np.log(dN_event + 1e-30)))
     N = 2.*np.pi*np.sum(dN_interp*pT_inte_array)*dpT
     meanpT = np.sum(dN_interp*pT_inte_array**2.)/np.sum(dN_interp*pT_inte_array)
     res_array = [N, meanpT]
-    return(res_array)
+    return (res_array)
 
 
 try:
@@ -55,7 +55,8 @@ for ievent, event_i in enumerate(eventList):
     outdata[event_i]["ini_nB"] = ini_nB
     outdata[event_i]["FO_nB"] = FO_nB
     dNdy_p = np.nan_to_num(eventGroup.get("particle_2212_dNdy_pT_0.2_3.dat"))
-    dNdy_pbar = np.nan_to_num(eventGroup.get("particle_-2212_dNdy_pT_0.2_3.dat"))
+    dNdy_pbar = np.nan_to_num(
+        eventGroup.get("particle_-2212_dNdy_pT_0.2_3.dat"))
     outdata[event_i]["proton"] = dNdy_p[:, :2]
     outdata[event_i]["anti-proton"] = dNdy_pbar[:, :2]
 

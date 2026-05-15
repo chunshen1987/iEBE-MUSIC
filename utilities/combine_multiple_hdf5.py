@@ -8,14 +8,17 @@ import h5py
 import string
 import random
 
+
 def randomString(stringLength=1):
     """Generate a random string of fixed length """
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
+
 def print_help():
     """This function outpus help messages"""
     print("{0} results_folder".format(sys.argv[0]))
+
 
 if len(sys.argv) < 2:
     print_help()
@@ -52,4 +55,3 @@ for ievent, event_path in enumerate(EVENT_LIST):
         exist_group_keys.append(gtemp2)
         system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
             event_path, RESULTS_NAME, gtemp, gtemp2))
-
