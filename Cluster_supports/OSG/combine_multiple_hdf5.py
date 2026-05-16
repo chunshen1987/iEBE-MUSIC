@@ -92,6 +92,7 @@ EVENT_LIST = glob(path.join(RESULTS_PATH, "*.h5"))
 exist_group_keys = []
 
 h5Res = h5py.File("{}.h5".format(RESULTS_NAME), "a")
+exist_group_keys = list(h5Res.keys())
 for ievent, event_path in enumerate(EVENT_LIST):
     print("processing {0} ... ".format(event_path))
     event_folder = "/".join(event_path.split("/")[0:-1])
