@@ -248,6 +248,8 @@ def generate_event_folders(workingFolder, clusterName, eventId,
         workFolderPath = "/tmp/" + workFolderPath
     if clusterName == "csd3":
         workFolderPath = "/local/" + workFolderPath
+    if clusterName == "wsugrid":
+        workFolderPath = "/tmp/" + workFolderPath
     workFolderName = workFolderPath.split('/')[-1]
     executeScriptName = executeScript.split('/')[-1]
     parameterFileName = parameterFile.split('/')[-1]
