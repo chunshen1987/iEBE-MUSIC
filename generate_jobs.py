@@ -454,8 +454,8 @@ rm -fr ../hydro_event
     script.close()
 
 
-def generate_script_afterburner(folder_name, HBT_flag, afterburner_type,
-                                logfile):
+def generate_script_afterburner(folder_name, HBT_flag, afterburner_type: str,
+                                nIter: int, logfile: str):
     """This function generates script for hadronic afterburner"""
     working_folder = folder_name
 
@@ -473,7 +473,9 @@ mkdir -p UrQMD_results
 rm -fr UrQMD_results/*
 
 surfaceFile=`ls hydro_event | grep "surface"`
-for iev in {0..9}
+""")
+    script.write(f"for iev in {{0..{nIter}}}\n")
+    script.write("""
 do
     export OMP_NUM_THREADS=1
     cd iSS
@@ -572,8 +574,9 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
                            package_root_path, code_path, working_folder,
                            cluster_name, event_id, event_id_offset,
                            n_hydro_per_job, n_urqmd_per_hydro, n_threads,
-                           para_dict, afterburner_type, EOSType: int,
-                           EOSId: int, EOSFileName: str, debugFlag: bool):
+                           para_dict, afterburner_type: str,
+                           EOSType: int, EOSId: int, EOSFileName: str,
+                           debugFlag: bool):
     """This function creates the event folder structure"""
     event_folder = path.join(working_folder, 'event_%d' % event_id)
     param_folder = path.join(working_folder, 'model_parameters')
@@ -708,11 +711,15 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
         if para_dict.hadronic_afterburner_toolkit_dict['analyze_HBT'] == 1:
             HBT_flag = True
 
+    afterburner_nIter = 10
+    if 'afterburner_nIter' in para_dict.control_dict:
+        afterburner_nIter = para_dict.control_dict['afterburner_nIter']
+
     if para_dict.control_dict['compute_polarization']:
         generate_script_spinPol(event_folder, n_threads, logfile)
 
     generate_script_afterburner(event_folder, HBT_flag, afterburner_type,
-                                logfile)
+                                afterburner_nIter, logfile)
 
     generate_script_analyze_spvn(event_folder, HBT_flag, logfile)
 

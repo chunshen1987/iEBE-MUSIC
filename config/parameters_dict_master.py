@@ -15,6 +15,7 @@ control_dict = {
         "3DMCGlauber_dynamical",  # options: IPGlasma, IPGlasma+KoMPoST,
     #          3DMCGlauber_dynamical, 3DMCGlauber_consttau
     'afterburner_type': "UrQMD",  # options: UrQMD, decay
+    'afterburner_nIter': 10,      # number of iterations for afterburner (default: 10)
     'save_ipglasma_results': False,  # flag to save IPGlasma results
     'save_kompost_results': False,  # flag to save kompost results
     'save_hydro_surfaces': False,  # flag to save hydro surfaces
