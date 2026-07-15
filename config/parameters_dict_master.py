@@ -406,6 +406,7 @@ music_dict = {
     'eps_switch': 0.18,
     'eps_freeze_max': 0.18,
     'eps_freeze_min': 0.18,
+    'epsFO_low': 0.05,
     'freeze_eps_flag': 0,  #0: use eps_freeze_max and eps_freeze_min
     #1: read eps_freeze from an external file
 }
