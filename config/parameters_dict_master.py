@@ -318,7 +318,7 @@ music_dict = {
 
     # read in initial conditions from external file (Initial_profile == 9x)
     'Initial_Distribution_input_filename': 'initial/epsilon-u-Hydro.dat',
-    's_factor': 0.190,  # normalization factor read in initial data file
+    's_factor': 1.000,  # normalization factor read in initial data file
     'preEqVisFactor': 1.0,  # additional scale factor for initial viscous tensor
     'Initial_time_tau_0':
         0.4,  # starting time of the hydrodynamic evolution (fm/c)
