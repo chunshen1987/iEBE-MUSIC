@@ -347,7 +347,7 @@ music_dict = {
     # 14: neos_BQS lattice EoS at finite mu_B
     # 17: BEST lattice EoS at finite mu_B
     # transport coefficients
-    'quest_revert_strength': 10.0,  # the strength of the viscous regulation
+    'quest_revert_strength': 1.0,  # the strength of the viscous regulation
     'FlagResumTransportCoeff': 0,  # switch to use resummed transport coeff.
     'FlagResetCausality': 0,
     'resumTransCoeffAlpha': 1.5,  # resummed transport coeff. control parameter
