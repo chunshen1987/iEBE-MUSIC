@@ -19,5 +19,7 @@
 #wget --no-check-certificate 'https://www.dropbox.com/scl/fi/kpf1t103g774wfit0dde6/EoS_v0.pkl?rlkey=q85bn8l1sjffdz4m7fiohvc4c&dl=0' -O EoS_v0.pkl
 
 # v1.4
-wget --no-check-certificate 'https://www.dropbox.com/scl/fi/sht7whebogekatgmhuoqh/EoS.pkl?rlkey=74xj92mn0k856oynsshi8ub6e&dl=0' -O EoS.pkl
+#wget --no-check-certificate 'https://www.dropbox.com/scl/fi/sht7whebogekatgmhuoqh/EoS.pkl?rlkey=74xj92mn0k856oynsshi8ub6e&dl=0' -O EoS.pkl
 
+# v1.5
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/a840rs1t4xdoxrk1tuxxw/EoS.pkl?rlkey=ql88wx4el5wu2d4ffg88k5rxd&dl=0' -O EoS.pkl

@@ -18,5 +18,9 @@
 #wget --no-check-certificate 'https://www.dropbox.com/scl/fi/enlum5m55f2m9djuj0ppj/zeta_s.pkl?rlkey=6nmdczzrnp23iylefeud9p7rt&dl=0' -O zeta_s.pkl
 
 # v1.4
-wget --no-check-certificate 'https://www.dropbox.com/scl/fi/cztmxx98b8aj6u0y33t36/eta_s.pkl?rlkey=1bu9mtljtf3i9ndyon306txwd&dl=0' -O eta_s.pkl
-wget --no-check-certificate 'https://www.dropbox.com/scl/fi/alxh8o4eym6g35qel09og/zeta_s.pkl?rlkey=xgvx9obvzwt10akew2n91ao9p&dl=0' -O zeta_s.pkl
+#wget --no-check-certificate 'https://www.dropbox.com/scl/fi/cztmxx98b8aj6u0y33t36/eta_s.pkl?rlkey=1bu9mtljtf3i9ndyon306txwd&dl=0' -O eta_s.pkl
+#wget --no-check-certificate 'https://www.dropbox.com/scl/fi/alxh8o4eym6g35qel09og/zeta_s.pkl?rlkey=xgvx9obvzwt10akew2n91ao9p&dl=0' -O zeta_s.pkl
+
+# v1.5
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/pu6czfhrhvengwjhhqbue/eta_s.pkl?rlkey=6q6vwrqb1m4fv3jwl9824hzrg&dl=0' -O eta_s.pkl
+wget --no-check-certificate 'https://www.dropbox.com/scl/fi/9qtemznza33j3mgmigvwu/zeta_s.pkl?rlkey=8db7cy8yun946efrpyn22vhom&dl=0' -O zeta_s.pkl
