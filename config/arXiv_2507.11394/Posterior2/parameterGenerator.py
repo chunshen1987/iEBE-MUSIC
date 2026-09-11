@@ -23,7 +23,8 @@ parameterName = [
 
 outputParameterName = [
     'BG', 'shadowing_factor', 'ylossParam4At2', 'ylossParam4At4',
-    'ylossParam4At6', 'ylossParam4var', 'remnant_energy_loss_fraction',
+    'ylossParam4At6', 'ylossParam4At10', 'ylossParam4var',
+    'remnant_energy_loss_fraction',
     'FSbaryonInStringProb', 'string_source_sigma_x', 'string_source_sigma_eta',
     'stringTransverseShiftFrac', 'stringPreEqFlowFactor', 'Shear_to_S_ratio',
     'shear_muBf0p2', 'shear_muBf0p4', 'bulk_viscosity_10_max',
@@ -61,6 +62,8 @@ paramDict['shear_muBf0p2'] = (paramDict['shear_muB_0p2']
                               /paramDict['Shear_to_S_ratio'])
 paramDict['shear_muBf0p4'] = (paramDict['shear_muB_0p4']
                               /paramDict['Shear_to_S_ratio'])
+paramDict['ylossParam4At10'] = (paramDict['ylossParam4At6']
+    + 2 * (paramDict['ylossParam4At6'] - paramDict['ylossParam4At4']))
 if ecm < 7.7:
     paramDict['string_source_sigma_x'] = paramDict['string_source_sigma_x_7p7']
     paramDict['string_source_sigma_eta'] = (
