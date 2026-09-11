@@ -497,6 +497,7 @@ do
         ./iSS.e randomSeed=$RANDOMSEED 2>&1 > run.log
     fi
     """)
+    script.write(f"echo nIter: $iev 2>&1 {logfile}")
 
     if afterburner_type == "urqmd":
         script.write("""
