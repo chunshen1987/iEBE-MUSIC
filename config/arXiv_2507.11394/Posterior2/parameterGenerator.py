@@ -24,7 +24,7 @@ parameterName = [
 outputParameterName = [
     'BG', 'shadowing_factor', 'ylossParam4At2', 'ylossParam4At4',
     'ylossParam4At6', 'ylossParam4var', 'remnant_energy_loss_fraction',
-    'lambdaB', 'string_source_sigma_x', 'string_source_sigma_eta',
+    'FSbaryonInStringProb', 'string_source_sigma_x', 'string_source_sigma_eta',
     'stringTransverseShiftFrac', 'stringPreEqFlowFactor', 'Shear_to_S_ratio',
     'shear_muBf0p2', 'shear_muBf0p4', 'bulk_viscosity_10_max',
     'bulk_viscosity_10_T_peak', 'bulk_viscosity_10_width_high',
@@ -56,6 +56,7 @@ paramDict = {}
 for i, param_i in enumerate(parameterName):
     paramDict[param_i] = paramSet[i]
 
+paramDict['FSbaryonInStringProb'] = paramDict['lambdaB']
 paramDict['shear_muBf0p2'] = (paramDict['shear_muB_0p2']
                               /paramDict['Shear_to_S_ratio'])
 paramDict['shear_muBf0p4'] = (paramDict['shear_muB_0p4']
