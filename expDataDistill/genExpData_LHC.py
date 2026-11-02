@@ -332,6 +332,42 @@ dNchdetaDataSysErr.append(dNchdetaData[:, 6])
 dNchdetaDataCovList.append(
     computeCovarianceMatrix(dNchdetaData[:, 4], dNchdetaData[:, 6]))
 
+# 50-60%
+dNchdetaData = np.loadtxt(path.join(exp_path,
+                                    "HEPData-ins1507090-v1-DN_DETARAP.csv"),
+                          delimiter=',',
+                          skiprows=253,
+                          max_rows=34)
+dNchdetaDataArr.append(dNchdetaData[:, 3])
+dNchdetaDataStatErr.append(dNchdetaData[:, 4])
+dNchdetaDataSysErr.append(dNchdetaData[:, 6])
+dNchdetaDataCovList.append(
+    computeCovarianceMatrix(dNchdetaData[:, 4], dNchdetaData[:, 6]))
+
+# 60-70%
+dNchdetaData = np.loadtxt(path.join(exp_path,
+                                    "HEPData-ins1507090-v1-DN_DETARAP.csv"),
+                          delimiter=',',
+                          skiprows=293,
+                          max_rows=34)
+dNchdetaDataArr.append(dNchdetaData[:, 3])
+dNchdetaDataStatErr.append(dNchdetaData[:, 4])
+dNchdetaDataSysErr.append(dNchdetaData[:, 6])
+dNchdetaDataCovList.append(
+    computeCovarianceMatrix(dNchdetaData[:, 4], dNchdetaData[:, 6]))
+
+# 70-80
+dNchdetaData = np.loadtxt(path.join(exp_path,
+                                    "HEPData-ins1507090-v1-DN_DETARAP.csv"),
+                          delimiter=',',
+                          skiprows=333,
+                          max_rows=34)
+dNchdetaDataArr.append(dNchdetaData[:, 3])
+dNchdetaDataStatErr.append(dNchdetaData[:, 4])
+dNchdetaDataSysErr.append(dNchdetaData[:, 6])
+dNchdetaDataCovList.append(
+    computeCovarianceMatrix(dNchdetaData[:, 4], dNchdetaData[:, 6]))
+
 dNchdetaDataArr = np.array(dNchdetaDataArr).reshape(-1)
 dNchdetaDataStatErr = np.array(dNchdetaDataStatErr).reshape(-1)
 dNchdetaDataSysErr = np.array(dNchdetaDataSysErr).reshape(-1)
@@ -417,6 +453,18 @@ vnchdetaDataSysErr.append(vnchdetaData[:, 6])
 vnchdetaDataCovList.append(
     computeCovarianceMatrix(vnchdetaData[:, 4], vnchdetaData[:, 6]))
 
+# v2(eta) 50-60%
+vnchdetaData = np.loadtxt(path.join(exp_path,
+                                    "HEPData-ins2679248-v1-Table_1.csv"),
+                          delimiter=',',
+                          skiprows=236,
+                          max_rows=30)
+vnchdetaDataArr.append(vnchdetaData[:, 3])
+vnchdetaDataStatErr.append(vnchdetaData[:, 4])
+vnchdetaDataSysErr.append(vnchdetaData[:, 6])
+vnchdetaDataCovList.append(
+    computeCovarianceMatrix(vnchdetaData[:, 4], vnchdetaData[:, 6]))
+
 if includev3eta:
     # v3(eta) 0-5%
     vnchdetaData = np.loadtxt(path.join(exp_path,
@@ -483,6 +531,18 @@ if includev3eta:
                                         "HEPData-ins2679248-v1-Table_2.csv"),
                               delimiter=',',
                               skiprows=199,
+                              max_rows=30)
+    vnchdetaDataArr.append(vnchdetaData[:, 3])
+    vnchdetaDataStatErr.append(vnchdetaData[:, 4])
+    vnchdetaDataSysErr.append(vnchdetaData[:, 6])
+    vnchdetaDataCovList.append(
+        computeCovarianceMatrix(vnchdetaData[:, 4], vnchdetaData[:, 6]))
+
+    # v3(eta) 50-60%
+    vnchdetaData = np.loadtxt(path.join(exp_path,
+                                        "HEPData-ins2679248-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=236,
                               max_rows=30)
     vnchdetaDataArr.append(vnchdetaData[:, 3])
     vnchdetaDataStatErr.append(vnchdetaData[:, 4])
