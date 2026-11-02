@@ -65,18 +65,28 @@ def packMultipleObs(obsList, statErrList, sysErrList, covList):
 
 
 logdNFlag = False  # for future implementation if needed
-includev3 = True
+includev3eta = True
+protonFlag = True
+includepTVar = False
+includepPbdNdeta = True
 
 nameTag = "ALICE"
 if logdNFlag:
     nameTag += "_logdN"
-if includev3:
-    nameTag += "_wv3"
+if protonFlag:
+    nameTag += "_wproton"
+if includepTVar:
+    nameTag += "_wpTVar"
+if includev3eta:
+    nameTag += "_wv3eta"
+if includepPbdNdeta:
+    nameTag += "_wpPbNdeta"
 
 #%% ALICE dNch/deta and pid dN/dy
-dNcenCut = 6
-vncenCut = 6
-statFrac = 0.1
+dNcenCut = 9
+vncenCut = 9
+v3cenCut = 8
+statFrac = 1.0
 
 dNDataArr = []
 dNDataStatErr = []
@@ -111,24 +121,36 @@ dNDataSysErr.append(dNdata[:dNcenCut, 3]/2.)
 dNDataCovList.append(
     computeCovarianceMatrix(dNdata[:dNcenCut, 2]/2., dNdata[:dNcenCut, 3]/2.))
 
-# dN/dy (p + pbar)/2 for protons
-dNdata = np.loadtxt(path.join(exp_path, "PbPb5020_ALICE_proton_dNdy.dat"))
-dNDataArr.append(dNdata[:dNcenCut, 1]/2.)
-dNDataStatErr.append(dNdata[:dNcenCut, 2]/2.)
-dNDataSysErr.append(dNdata[:dNcenCut, 3]/2.)
-dNDataCovList.append(
-    computeCovarianceMatrix(dNdata[:dNcenCut, 2]/2., dNdata[:dNcenCut, 3]/2.))
+if protonFlag:
+    # dN/dy (p + pbar)/2
+    dNdata = np.loadtxt(path.join(exp_path, "PbPb5020_ALICE_proton_dNdy.dat"))
+    dNDataArr.append(dNdata[:dNcenCut, 1]/2.)
+    dNDataStatErr.append(dNdata[:dNcenCut, 2]/2.)
+    dNDataSysErr.append(dNdata[:dNcenCut, 3]/2.)
+    dNDataCovList.append(
+        computeCovarianceMatrix(dNdata[:dNcenCut, 2]/2., dNdata[:dNcenCut, 3]/2.))
 
-# dN/dy (p + pbar)/2 for anti-protons
-dNDataArr.append(dNdata[:dNcenCut, 1]/2.)
-dNDataStatErr.append(dNdata[:dNcenCut, 2]/2.)
-dNDataSysErr.append(dNdata[:dNcenCut, 3]/2.)
-dNDataCovList.append(
-    computeCovarianceMatrix(dNdata[:dNcenCut, 2]/2., dNdata[:dNcenCut, 3]/2.))
+    # dN/dy pbar/p ratios
+    pbarpRatio = []
+    pbarpRatioStatErr = []
+    pbarpRatioSysErr = []
+    for itable in range(1, 6):
+        with open(path.join(exp_path, f"HEPData-ins2725426-v1-Ratios_{itable}.csv"), "r") as f:
+            for line in f.readlines():
+                if "mathrm{p}" in line:
+                    pbarpRatio.append(float(line.split(",")[1]))
+                    pbarpRatioStatErr.append(float(line.split(",")[2]))
+                    pbarpRatioSysErr.append(float(line.split(",")[4]))
+    dNDataArr.append(np.array(pbarpRatio))
+    dNDataStatErr.append(np.array(pbarpRatioStatErr))
+    dNDataSysErr.append(np.array(pbarpRatioSysErr))
+    dNDataCovList.append(
+        computeCovarianceMatrix(np.array(pbarpRatioStatErr),
+                                np.array(pbarpRatioSysErr)))
 
-dNDataArr = np.array(dNDataArr).reshape(-1)
-dNDataStatErr = np.array(dNDataStatErr).reshape(-1)
-dNDataSysErr = np.array(dNDataSysErr).reshape(-1)
+dNDataArr = np.concatenate([np.array(arr_i) for arr_i in dNDataArr])
+dNDataStatErr = np.concatenate([np.array(arr_i) for arr_i in dNDataStatErr])
+dNDataSysErr = np.concatenate([np.array(arr_i) for arr_i in dNDataSysErr])
 dNDataCov = packMultipleCov(dNDataCovList)
 
 # mean pT
@@ -164,13 +186,14 @@ pTDataSysErr.append(pTdata[:dNcenCut, 3])
 pTDataCovList.append(
     computeCovarianceMatrix(pTdata[:dNcenCut, 2], pTdata[:dNcenCut, 3]))
 
-# proton <pT>
-pTdata = np.loadtxt(path.join(exp_path, "PbPb_5020_meanpT_proton.txt"))
-pTDataArr.append(pTdata[:dNcenCut, 1])
-pTDataStatErr.append(pTdata[:dNcenCut, 2])
-pTDataSysErr.append(pTdata[:dNcenCut, 3])
-pTDataCovList.append(
-    computeCovarianceMatrix(pTdata[:dNcenCut, 2], pTdata[:dNcenCut, 3]))
+if protonFlag:
+    # proton <pT>
+    pTdata = np.loadtxt(path.join(exp_path, "PbPb_5020_meanpT_proton.txt"))
+    pTDataArr.append(pTdata[:dNcenCut, 1])
+    pTDataStatErr.append(pTdata[:dNcenCut, 2])
+    pTDataSysErr.append(pTdata[:dNcenCut, 3])
+    pTDataCovList.append(
+        computeCovarianceMatrix(pTdata[:dNcenCut, 2], pTdata[:dNcenCut, 3]))
 
 pTDataArr = np.array(pTDataArr).reshape(-1)
 pTDataStatErr = np.array(pTDataStatErr).reshape(-1)
@@ -199,15 +222,15 @@ v3data = np.loadtxt(path.join(exp_path, "HEPData-ins1419244-v2-Table_2.csv"),
                     delimiter=',',
                     skiprows=14,
                     max_rows=8)
-vnDataArr.append(v3data[:vncenCut, 3])
-vnDataStatErr.append(v3data[:vncenCut, 4])
-vnDataSysErr.append(v3data[:vncenCut, 6])
+vnDataArr.append(v3data[:v3cenCut, 3])
+vnDataStatErr.append(v3data[:v3cenCut, 4])
+vnDataSysErr.append(v3data[:v3cenCut, 6])
 vnDataCovList.append(
-    computeCovarianceMatrix(v3data[:vncenCut, 4], v3data[:vncenCut, 6]))
+    computeCovarianceMatrix(v3data[:v3cenCut, 4], v3data[:v3cenCut, 6]))
 
-vnDataArr = np.array(vnDataArr).reshape(-1)
-vnDataStatErr = np.array(vnDataStatErr).reshape(-1)
-vnDataSysErr = np.array(vnDataSysErr).reshape(-1)
+vnDataArr = np.concatenate([np.array(arr_i) for arr_i in vnDataArr])
+vnDataStatErr = np.concatenate([np.array(arr_i) for arr_i in vnDataStatErr])
+vnDataSysErr = np.concatenate([np.array(arr_i) for arr_i in vnDataSysErr])
 vnDataCov = packMultipleCov(vnDataCovList)
 
 # pT variance at mid-rapidity
@@ -394,7 +417,7 @@ vnchdetaDataSysErr.append(vnchdetaData[:, 6])
 vnchdetaDataCovList.append(
     computeCovarianceMatrix(vnchdetaData[:, 4], vnchdetaData[:, 6]))
 
-if includev3:
+if includev3eta:
     # v3(eta) 0-5%
     vnchdetaData = np.loadtxt(path.join(exp_path,
                                         "HEPData-ins2679248-v1-Table_2.csv"),
@@ -472,6 +495,87 @@ vnchdetaDataStatErr = np.array(vnchdetaDataStatErr).reshape(-1)
 vnchdetaDataSysErr = np.array(vnchdetaDataSysErr).reshape(-1)
 vnchdetaDataCov = packMultipleCov(vnchdetaDataCovList)
 
+if includepPbdNdeta:
+    # pPb dNch/deta vs eta
+    exp_path = path.abspath('../analysisKit/ALICE_pPb5TeV_dNchdeta_rapdep')
+
+    pPbdNchdetaDataArr = []
+    pPbdNchdetaDataStatErr = []
+    pPbdNchdetaDataSysErr = []
+    pPbdNchdetaDataCovList = []
+
+    # 0-5%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=13,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+    # 5-10%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=83,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+    # 10-20%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=153,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+    # 20-40%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=223,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+    # 40-60%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=293,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+    # 60-80%
+    pPbdNchdetaData = np.loadtxt(path.join(exp_path,
+                                           "HEPData-ins2070408-v1-Table_2.csv"),
+                              delimiter=',',
+                              skiprows=363,
+                              max_rows=64)
+    pPbdNchdetaDataArr.append(pPbdNchdetaData[:, 3])
+    pPbdNchdetaDataStatErr.append(pPbdNchdetaData[:, 4])
+    pPbdNchdetaDataSysErr.append(pPbdNchdetaData[:, 6])
+    pPbdNchdetaDataCovList.append(
+        computeCovarianceMatrix(pPbdNchdetaData[:, 4], pPbdNchdetaData[:, 6]))
+
+    pPbdNchdetaDataArr = np.array(pPbdNchdetaDataArr).reshape(-1)
+    pPbdNchdetaDataStatErr = np.array(pPbdNchdetaDataStatErr).reshape(-1)
+    pPbdNchdetaDataSysErr = np.array(pPbdNchdetaDataSysErr).reshape(-1)
+    pPbdNchdetaDataCov = packMultipleCov(pPbdNchdetaDataCovList)
+
 #################
 ### Save data ###
 #################
@@ -480,7 +584,6 @@ outputDataList = [
     dNDataArr,
     pTDataArr,
     vnDataArr,
-    pTVarDataArr,
     dNchdetaDataArr,
     vnchdetaDataArr,
 ]
@@ -488,7 +591,6 @@ outputDataStatErrList = [
     dNDataStatErr,
     pTDataStatErr,
     vnDataStatErr,
-    pTVarDataStatErr,
     dNchdetaDataStatErr,
     vnchdetaDataStatErr,
 ]
@@ -496,7 +598,6 @@ outputDataSysErrList = [
     dNDataSysErr,
     pTDataSysErr,
     vnDataSysErr,
-    pTVarDataSysErr,
     dNchdetaDataSysErr,
     vnchdetaDataSysErr,
 ]
@@ -504,10 +605,21 @@ outputDataCovList = [
     dNDataCov,
     pTDataCov,
     vnDataCov,
-    pTVarDataCov,
     dNchdetaDataCov,
     vnchdetaDataCov,
 ]
+
+if includepTVar:
+    outputDataList.append(pTVarDataArr)
+    outputDataStatErrList.append(pTVarDataStatErr)
+    outputDataSysErrList.append(pTVarDataSysErr)
+    outputDataCovList.append(pTVarDataCov)
+
+if includepPbdNdeta:
+    outputDataList.append(pPbdNchdetaDataArr)
+    outputDataStatErrList.append(pPbdNchdetaDataStatErr)
+    outputDataSysErrList.append(pPbdNchdetaDataSysErr)
+    outputDataCovList.append(pPbdNchdetaDataCov)
 
 outputDict = packMultipleObs(outputDataList, outputDataStatErrList,
                              outputDataSysErrList, outputDataCovList)

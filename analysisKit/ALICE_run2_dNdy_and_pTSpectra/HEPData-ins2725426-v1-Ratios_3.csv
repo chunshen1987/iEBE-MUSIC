@@ -1,0 +1,15 @@
+#: table_doi: 10.17182/hepdata.151650.v1/t3
+#: name: Ratios 3
+#: description: Antiparticle-to-particle yield ratio, 10-30% centrality
+#: data_file: Ratios_2.yaml
+#: keyword reactions: PB PB --> CHARGED X
+#: keyword cmenergies: 5020.0
+#: keyword observables: RATIO
+Species,Antimatter / matter,Total uncorrelated uncertainty +,Total uncorrelated uncertainty -,Total correlated uncertainty +,Total correlated uncertainty -
+$$\pi^+$$,0.998966,0.000593,-0.000593,0.007658,-0.007658
+$$\mathrm{p}$$,0.987998,0.000722,-0.000722,0.005886,-0.005886
+$^{3}_{\Lambda}\mathrm{H}$,0.858531,0.220757,-0.220757,0.008827,-0.008827
+$^{3}\mathrm{He}$,0.986488,0.035311,-0.035311,0.010497,-0.010497
+$\Omega^-$,1.001664,0.011341,-0.011341,0,0
+$^{3}\mathrm{H}$,0.839687,0.087763,-0.087763,0.091724,-0.091724
+

@@ -10,6 +10,9 @@ Measurement of mean $p_T$ in PbPb collisions at 5.02 TeV
 [paper](https://arxiv.org/pdf/1805.04399)
 [hepdata](https://www.hepdata.net/record/ins1672790)
 
+Measurement of anti-proton to proton yield ratio in PbPb collisions at 5.02 TeV
+[paper](https://arxiv.org/pdf/2311.13332)
+[hepdata](https://www.hepdata.net/record/ins2725426)
 
 ## Kinematic cuts
 Centrality: V0A ($\eta \in [2.8, 5.1]$) + V0C ($\eta \in [-3.7, -1.7]$)
@@ -19,4 +22,4 @@ Particle of interest: $|\eta| < 0.8$
 - dN/dy and mean $p_T$ results are extrapolated to $p_T = 0$.
 - The values from the tables are extracted from the paper pdf.
 - The pT-differential spectra are downloaded from the hepdata.
-
+- The anti-proton to proton yield ratios are extrapolated to $p_T = 0$.
