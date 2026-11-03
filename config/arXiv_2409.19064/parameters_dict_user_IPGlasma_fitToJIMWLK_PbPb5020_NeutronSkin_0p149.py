@@ -19,32 +19,33 @@ ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
     'nucleonPositionsFromFile': 0,
-    'bmin': 0.,
-    'bmax': 25.,
+    'bMin': 0.,
+    'bMax': 25.,
     'size': 800,              # number of grid points of IP-Glasma computation
-    'Projectile': "Pb",
-    'Target': "Pb",
-    'roots': 5020.,
-    'SigmaNN': 67.,
-    'setWSDeformParams': 1,
-    'R_WS': 6.68,     # from Guiliano
-    'a_WS': 0.448,
+    'projectile': "Pb",
+    'target': "Pb",
+    'sqrtS': 5020.,
+    'sigmaNN': 67.,
+    'useInputWSParams': 1,
+    'radiusWS': 6.68,     # from Guiliano
+    'diffusenessWS': 0.448,
     'beta2': 0.006,
     'beta3': 0.,
     'beta4': 0.,
     'gamma': 0.,
-    'dR_np': 0.01,
-    'da_np': 0.119,
-    'SubNucleonParamType': 4,    # 0: do not use posterior parameter sets
+    'deltaRnp': 0.01,
+    'deltaAnp': 0.119,
+    'subNucleonParamType': 4,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
                                  # 3: use subnucleon parameters from variant Nq posterior distribution (fit to LHC x)
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution (fit to LHC x)
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
-    'useConstituentQuarkProton': 3,
-    'maxtime': 0.4,
+    'nucleonModel': "hotspots",
+    'Nq': 3,
+    'maxTime': 0.4,
     'LOutput': 34,
     'sizeOutput': 340,
 }

@@ -18,13 +18,14 @@ control_dict = {
 ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
-    'bmin': 0.,
-    'bmax': 20.,
-    'Projectile': "Au",
-    'Target': "Au",
-    'roots': 200.,
-    'SigmaNN': 42.,
-    'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'bMin': 0.,
+    'bMax': 20.,
+    'projectile': "Au",
+    'target': "Au",
+    'sqrtS': 200.,
+    'sigmaNN': 42.,
+    'nucleonModel': "hotspots",   # gaussian: round proton; hotspots: fluctuating proton
+    'Nq': 3,
     'LOutput': 34,
     'sizeOutput': 512,
 }

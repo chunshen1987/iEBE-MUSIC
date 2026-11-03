@@ -19,30 +19,37 @@ ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
     'nucleonPositionsFromFile': 0,
-    'bmin': 0.,
-    'bmax': 25.,
+    'bMin': 0.,
+    'bMax': 25.,
     'size': 800,              # number of grid points of IP-Glasma computation
-    'Projectile': "Xe",
-    'Target': "Xe",
-    'roots': 5440.,
-    'SigmaNN': 68.45,
-    'setWSDeformParams': 1,
-    'R_WS': 5.601,     # 5.42
-    'a_WS': 0.492,     # 0.57
+    'projectile': "Xe",
+    'target': "Xe",
+    'sqrtS': 5440.,
+    'sigmaNN': 68.45,
+    'useInputWSParams': 1,
+    'radiusWS': 5.601,     # 5.42
+    'diffusenessWS': 0.492,     # 0.57
     'beta2': 0.207,
     'beta3': 0.,
     'beta4': -0.003,
     'gamma': 0.,
-    'SubNucleonParamType': 4,    # 0: do not use posterior parameter sets
+    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
                                  # 3: use subnucleon parameters from variant Nq posterior distribution (fit to LHC x)
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution (fit to LHC x)
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
-    'useConstituentQuarkProton': 0,
-    'maxtime': 0.4,
+    'nucleonModel': "gaussian",
+    # round protons with the MAP set of type 4 (tables/posterior5020_Nq3.csv),
+    # as IP-Glasma before 2.0 ran this file; 2.0 uses posterior sets only
+    # with nucleonModel hotspots
+    'm': 0.1791,
+    'BG': 5.1470,
+    'smearingWidth': 0.5684,
+    'QsMuRatio': 0.5505,
+    'maxTime': 0.4,
     'LOutput': 34,
     'sizeOutput': 340,
 }

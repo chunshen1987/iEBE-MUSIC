@@ -34,7 +34,8 @@ control_dict = {
     # 1: choose from parameter clusters
 }
 
-# IPGlasma
+# IPGlasma (input keys of IP-Glasma 2.0, in the order of its parameter table;
+# keys whose feature is switched off are accepted and ignored by IP-Glasma)
 ipglasma_dict = {
     'type': "self",  # minimumbias or fixed (pre-generated)
     # self (generate on the fly)
@@ -43,114 +44,105 @@ ipglasma_dict = {
     'database_name_pattern': "IPGlasma_database/AuAu_C{0:s}.h5",
 
     # all parameters below are for (type == self)
-    'mode': 1,  # run mode
-    'readMultFromFile': 0,
+    'runEvolution': 1,  # 1: evolve the glasma to maxTime
     'size': 800,  # number of grid points of IP-Glasma computation
     'L': 30.,  # grid size in the transverse plane
-    'Nc': 3,  # number of color
-    'm': 0.2,  # infrared cut-off mass (GeV)
-    'rmax': 100.,
-    'UVdamp': 0.,
-    'Jacobianm': 0.35,
+    'Ny': 50,
     'g': 1.,  # strong coupling constant
-    'SubNucleonParamType': 0,  # 0: do not use posterior parameter sets
-    # 1: use subnucleon parameters from variant Nq posterior distribution
-    # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
-    'SubNucleonParamSet':
-        -1,  # -1: choose a random set from the posterior distribution
-    # 0: choose the MAP parameter set
-    # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
-    'BG': 4.,
-    'BGq': 0.3,
-    'BGqVar': 0.0,
-    'dqMin': 0.0,
-    'omega': 1.0,
+    'maxTime': 0.4,
+    'inverseQsForMaxTime': 0,
+    'seed': -1,  # set by generate_jobs.py -seed; -1 draws a random seed
+    'useSeedList': 0,
+    'projectile': "Au",
+    'target': "Au",
+    'sigmaNN': 42.,
+    'useNucleus': 1,
+    'readInitialWilsonLines': 0,
+    'bMin': 0.,
+    'bMax': 20.,
+    'sampleBFromLinearDistribution': 1,
+    'rotateReactionPlane': 0,
     'useSmoothNucleus': 0,
-    'useConstituentQuarkProton': 0,
-    'NqFluc': 0.0,
-    'shiftConstituentQuarkProtonOrigin': 1,
-    'runningCoupling': 0,
-    'muZero': 0.3,
-    'minimumQs2ST': 0.,
-    'setWSDeformParams': 0,
-    'R_WS': 6.6,
-    'a_WS': 0.52,
-    'dR_np': 0.,
-    'da_np': 0.,
+    'useFixedNpart': 0,
+    'nucleiToAverage': 1,
+    'gaussianWounding': 1,
+    'nucleonPositionsFromFile': 0,
+    'polarizationProjectile':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'polarizationTarget':
+        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
+    'polarizationProjectileJz': 0.,
+    'polarizationTargetJz': 0.,
+    'lightNucleusOption': 1,
+    'useInputWSParams': 0,
+    'radiusWS': 6.6,
+    'diffusenessWS': 0.52,
     'beta2': 0.0,
     'beta3': 0.0,
     'beta4': 0.0,
     'gamma': 0.0,
-    'force_dmin_flag': 1,  # flag to force d_min for deformed nuclei
-    'd_min': 0.9,  # fm
-    'c': 0.2,
-    'g2mu': 0.1,
-    'useFatTails': 0,
-    'tDistNu': 3,
+    'deltaRnp': 0.,
+    'deltaAnp': 0.,
+    'forceDMin': 1,  # flag to force dMin for deformed nuclei
+    'dMin': 0.9,  # fm
+    'nucleonModel': "gaussian",  # gaussian, hotspots or strings
+    'subNucleonParamType': 0,  # 0: do not use posterior parameter sets
+    # 1: use subnucleon parameters from variant Nq posterior distribution
+    # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
+    'subNucleonParamSet':
+        -1,  # -1: choose a random set from the posterior distribution
+    # 0: choose the MAP parameter set
+    # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
+    'm': 0.2,  # infrared cut-off mass (GeV)
+    'BG': 4.,
+    'protonAnisotropy': 0.,
+    'BGq': 0.3,
+    'BGqVar': 0.0,
+    'dqMin': 0.0,
+    'omega': 1.0,
+    'Nq': 3.,  # number of hot spots (nucleonModel hotspots)
+    'NqFluc': 0.0,
+    'shiftConstituentQuarkProtonOrigin': 1,
+    'QsMuRatio': 0.8,
     'smearQs': 1,
     'smearingWidth': 0.6,
-    'protonAnisotropy': 0,
-    'roots': 200.,
+    'UVDamp': 0.,
+    'minimumQs2ST': 0.,
+    'nucleusQsTableFileName': "qs2Adj_vs_Tp_vs_Y_240.in",
+    'rapidity': 0.,  # rapidity of the gluon and hadron spectra
     'usePseudoRapidity': 0,
-    'RapidityA': 0.,
-    'RapidityB': 0.,
-    'useFluctuatingx': 1,
-    'xFromThisFactorTimesQs': 1,
-    'useNucleus': 1,
-    'useGaussian': 0,
-    'nucleonPositionsFromFile': 0,
-    'NucleusQsTableFileName': "qs2Adj_vs_Tp_vs_Y_200.in",
-    'QsmuRatio': 0.8,
-    'samplebFromLinearDistribution': 1,
-    'runWith0Min1Avg2MaxQs': 2,
-    'runWithThisFactorTimesQs': 0.5,
+    'jacobianMass': 0.35,
+    'useFluctuatingX': 1,
+    'sqrtS': 200.,
+    'projectileX': 0.01,  # Bjorken x of the projectile (useFluctuatingX 0;
+    'targetX': 0.01,      # the final x with JIMWLK)
+    'xQsFactor': 1.,
+    'runningCoupling': 0,
+    'mu0': 0.3,
+    'c': 0.2,
+    'runWithQs': 2,
+    'runningCouplingQsFactor': 0.5,
     'runWithLocalQs': 0,
-    'runWithkt': 0,
-    'Ny': 50,
-    'useSeedList': 0,
-    'seed': 3,
-    'useTimeForSeed': 0,
-    'Projectile': "Au",
-    'Target': "Au",
-    'bmin': 0.,
-    'bmax': 20.,
-    'rotateReactionPlane': 0,
-    'lightNucleusOption': 1,
-    'polariztionProjectile':
-        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
-    'polariztionTarget':
-        0,  # 0: unpolarized; 1: longitudinal polarized; 2: transverse polarized
-    'polarizationProjectileJz': 0,
-    'polarizationTargetJz': 0,
-    'useFixedNpart': 0,
-    'averageOverThisManyNuclei': 1,
-    'SigmaNN': 42.,
-    'gaussianWounding': 1,
-    'inverseQsForMaxTime': 0,
-    'maxtime': 0.4,
-    'dtau': 0.1,
-    'LOutput': 30,
-    'sizeOutput': 512,
+    'runWithKt': 0,
     'computeGluonMultiplicity': 0,
-    'etaSizeOutput': 1,
-    'detaOutput': 0,
-    'writeOutputs': 1,
-    'writeEvolution': 0,
-    'readInitialWilsonLines': 0,
-    'writeWilsonLines': 0,
+    'computeEccentricities': 0,
+    'writeHydro': 1,  # epsilon-u-Hydro file for MUSIC
+    'writeJazma': 0,
+    'writeTmunu': 0,  # Tmunu file for KoMPoST
+    'writeTmunuBinary': 0,  # KoMPoST reads the text file
     'writeOutputsToHDF5': 0,
+    'LOutput': 30.,
+    'sizeOutput': 512,
+    'writeWilsonLines': 0,
     'useJIMWLK': 0,
-    'mu0_jimwlk': 0.28,
-    'simpleLangevin': 1,
-    'alphas_jimwlk': 0,
-    'jimwlk_ic_x': 0.01,
-    'x_projectile_jimwlk': 0.001,
-    'x_target_jimwlk': 0.001,
-    'Ds_jimwlk': 0.005,
-    'Lambda_QCD_jimwlk': 0.040,
-    'm_jimwlk': 0.4,
-    'saveSnapshots': 0,
-    'xSnapshotList': [5e-3, 2e-3, 0.0001, 0.00005, 0.00001]
+    'jimwlkMu0': 0.28,
+    'jimwlkLambdaQCD': 0.040,
+    'jimwlkMass': 0.4,
+    'jimwlkAlphaS': 0.,  # 0: running coupling
+    'jimwlkDs': 0.005,
+    'jimwlkInitialX': 0.01,
+    'jimwlkSaveSnapshots': 0,
+    'jimwlkXSnapshotList': [5e-3, 2e-3, 0.0001, 0.00005, 0.00001]
 }
 
 # 3DMCGlauber model
@@ -737,17 +729,8 @@ def update_parameters_dict(par_dict_path, ran_seed):
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
 
-        # set random seed
-        if ran_seed == -1:
-            ipglasma_dict['useTimeForSeed'] = 1
-        else:
-            ipglasma_dict['seed'] = ran_seed
-            ipglasma_dict['useTimeForSeed'] = 0
-
-        if 'Rapidity' in ipglasma_dict:
-            # for backward compatibility
-            ipglasma_dict['RapidityA'] = ipglasma_dict['Rapidity']
-            ipglasma_dict['RapidityB'] = ipglasma_dict['Rapidity']
+        # set random seed (-1 draws a random seed)
+        ipglasma_dict['seed'] = ran_seed
 
         if 'Initial_profile' not in parameters_dict.music_dict:
             parameters_dict.music_dict['Initial_profile'] = 9
@@ -820,6 +803,61 @@ def update_parameters_dict(par_dict_path, ran_seed):
         hadronic_afterburner_toolkit_dict['read_in_mode'] = 9
 
 
+# IP-Glasma parameters in parameter files may use the names of IP-Glasma
+# before 2.0
+ipglasma_old_key_names = {
+    'Projectile': 'projectile', 'Target': 'target', 'bmin': 'bMin',
+    'bmax': 'bMax', 'SigmaNN': 'sigmaNN', 'roots': 'sqrtS',
+    'maxtime': 'maxTime', 'UVdamp': 'UVDamp', 'Jacobianm': 'jacobianMass',
+    'QsmuRatio': 'QsMuRatio', 'SubNucleonParamType': 'subNucleonParamType',
+    'SubNucleonParamSet': 'subNucleonParamSet',
+    'useFluctuatingx': 'useFluctuatingX', 'xFromThisFactorTimesQs': 'xQsFactor',
+    'muZero': 'mu0', 'runWith0Min1Avg2MaxQs': 'runWithQs',
+    'runWithThisFactorTimesQs': 'runningCouplingQsFactor',
+    'runWithkt': 'runWithKt',
+    'samplebFromLinearDistribution': 'sampleBFromLinearDistribution',
+    'averageOverThisManyNuclei': 'nucleiToAverage',
+    'setWSDeformParams': 'useInputWSParams', 'R_WS': 'radiusWS',
+    'a_WS': 'diffusenessWS', 'dR_np': 'deltaRnp', 'da_np': 'deltaAnp',
+    'force_dmin_flag': 'forceDMin', 'd_min': 'dMin',
+    'mu0_jimwlk': 'jimwlkMu0', 'Lambda_QCD_jimwlk': 'jimwlkLambdaQCD',
+    'm_jimwlk': 'jimwlkMass', 'alphas_jimwlk': 'jimwlkAlphaS',
+    'Ds_jimwlk': 'jimwlkDs', 'jimwlk_ic_x': 'jimwlkInitialX',
+    'useConstituentQuarkProton': 'Nq',
+}
+
+
+# IP-Glasma parameters with integer values (from the defaults above, before a
+# user dictionary changes them)
+ipglasma_integer_keys = [
+    key for key, val in ipglasma_dict.items() if isinstance(val, int)]
+
+
+def set_ipglasma_parameter(key, val, bayes_file):
+    """Sets an IP-Glasma parameter from a parameter file, with the type of
+    its default (IP-Glasma 2.0 rejects 1.0 for an integer)."""
+    if key == 'nucleonModel':
+        sys.exit("\U0001F6AB  The parameter file {} sets nucleonModel. Choose "
+                 "the nucleon model in the user dictionary.".format(bayes_file))
+    if key == 'Nq':
+        # Nq (useConstituentQuarkProton before 2.0) no longer switches the
+        # nucleon model: it is chosen with nucleonModel in the user dictionary
+        model = ipglasma_dict['nucleonModel']
+        if (model == "gaussian") != (float(val) <= 0):
+            sys.exit("\U0001F6AB  Nq {} in the parameter file {} does not fit "
+                     "nucleonModel {}. Set nucleonModel in the user "
+                     "dictionary.".format(val, bayes_file, model))
+        if model == "gaussian":
+            return
+    if key in ipglasma_integer_keys:
+        if not float(val).is_integer():
+            sys.exit("\U0001F6AB  {} {} in the parameter file {} must be an "
+                     "integer.".format(key, val, bayes_file))
+        ipglasma_dict[key] = int(float(val))
+    else:
+        ipglasma_dict[key] = float(val)
+
+
 def update_parameters_bayesian(bayes_file):
     parfile = open(bayes_file, "r")
     for line in parfile:
@@ -829,8 +867,9 @@ def update_parameters_bayesian(bayes_file):
             control_dict[key] = int(val)
             paramApplied = True
 
-        if key in ipglasma_dict.keys():
-            ipglasma_dict[key] = float(val)
+        ipglasma_key = ipglasma_old_key_names.get(key, key)
+        if ipglasma_key in ipglasma_dict.keys():
+            set_ipglasma_parameter(ipglasma_key, val, bayes_file)
             paramApplied = True
 
         if key in mcglauber_dict.keys():

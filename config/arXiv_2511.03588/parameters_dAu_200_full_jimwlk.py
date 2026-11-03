@@ -18,50 +18,48 @@ control_dict = {
 ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
-    'bmin': 0.,
-    'bmax': 20.,
-    'Projectile': "d",
-    'Target': "Au",
+    'bMin': 0.,
+    'bMax': 20.,
+    'projectile': "d",
+    'target': "Au",
     'nucleonPositionsFromFile': 1,
     'lightNucleusOption': 2,
-    'roots': 200.,
-    'SigmaNN': 42.,
-    'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'sqrtS': 200.,
+    'sigmaNN': 42.,
+    'nucleonModel': "hotspots",   # gaussian: round proton; hotspots: fluctuating proton
+    'Nq': 3,
     'LOutput':20.,
     'L':20.,
     'size': 600,
     'sizeOutput': 512,
     'writeWilsonLines': 0,
-    'useTimeForSeed': 1,
-    'setWSDeformParams': 0,
-    'SubNucleonParamType': 0,    # 0: do not use posterior parameter sets
+    'useInputWSParams': 0,
+    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution fitting HERA data
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution fiiting JIMWLK data at LHC xp
 
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'm': 0.4,
     'BG': 3.3,
     'BGq': 0.3,
     'omega': 1.0, 
-    'UVdamp': 0.0,
+    'UVDamp': 0.0,
     'smearingWidth': 0.7,
-    'QsmuRatio': 0.643,
-    'useFluctuatingx': 0,
-    'Rapidity': 0.0,
+    'QsMuRatio': 0.643,
+    'useFluctuatingX': 0,
     'useJIMWLK': 1,
-    'mu0_jimwlk': 0.28,
-    'simpleLangevin': 1,
-    'alphas_jimwlk': 0,
-    'jimwlk_ic_x':  0.01,
-    'x_projectile_jimwlk': 0.0025,
-    'x_target_jimwlk': 0.0025,
-    'Ds_jimwlk': 0.005,
-    'Lambda_QCD_jimwlk': 0.040,
-    'm_jimwlk': 0.4,
-    'saveSnapshots': 0,
+    'jimwlkMu0': 0.28,
+    'jimwlkAlphaS': 0,
+    'jimwlkInitialX':  0.01,
+    'projectileX': 0.0025,
+    'targetX': 0.0025,
+    'jimwlkDs': 0.005,
+    'jimwlkLambdaQCD': 0.040,
+    'jimwlkMass': 0.4,
+    'jimwlkSaveSnapshots': 0,
 
 }
 
