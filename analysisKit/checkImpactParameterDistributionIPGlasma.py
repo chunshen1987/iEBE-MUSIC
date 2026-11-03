@@ -7,9 +7,15 @@ h5File = str(sys.argv[1])
 
 data = h5py.File(h5File, 'r')
 
+# the lines of usedParameters<id>.dat are stored as attributes; the impact
+# parameter is the line "b = <b> fm" ("# b = <b> fm" since IP-Glasma 2.0)
 b = []
 for iev in data.keys():
-    b.append(float(data[iev].attrs['39'].decode("utf-8").split(" ")[2]))
+    for line in data[iev].attrs.values():
+        words = line.decode("utf-8").lstrip("# ").split()
+        if words[:2] == ["b", "="]:
+            b.append(float(words[2]))
+            break
 
 data.close()
 

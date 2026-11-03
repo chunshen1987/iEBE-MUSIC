@@ -297,8 +297,19 @@ export OMP_NUM_THREADS={0:d}
 """.format(nthreads))
 
     script.write("""
+# with a fixed seed N, each event gets its own seed N*1000000 + event id
+# (all events of a job use the same input file); -1 draws a random seed
+seed=$(awk '$1 == "seed" {print $2}' input)
+if [ "$seed" -ge 0 ]; then
+    sed "s/^seed .*/seed  $((seed*1000000 + evid))/" input > input_event
+else
+    cp input input_event
+fi
+""")
+
+    script.write("""
 # IPGlasma evolution (run 1 event)
-./ipglasma input 2>&1 {0}
+./ipglasma input_event 2>&1 {0}
 """.format(logfile))
 
     script.write("""
@@ -615,7 +626,7 @@ def generate_event_folders(initial_condition_database, initial_condition_type,
             shutil.copyfile(path.join(param_folder, 'IPGlasma/input'),
                             path.join(event_folder, 'ipglasma/input'))
             link_list = [
-                'qs2Adj_vs_Tp_vs_Y_200.in',
+                'qs2Adj_vs_Tp_vs_Y_240.in',
                 'utilities',
                 'ipglasma',
                 'nucleusConfigurations',

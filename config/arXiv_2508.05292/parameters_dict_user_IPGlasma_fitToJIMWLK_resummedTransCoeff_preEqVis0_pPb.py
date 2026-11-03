@@ -20,31 +20,32 @@ ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
     'nucleonPositionsFromFile': 0,
-    'bmin': 0.,
-    'bmax': 15.,
+    'bMin': 0.,
+    'bMax': 15.,
     'size': 800,              # number of grid points of IP-Glasma computation
     'L': 30,
-    'Projectile': "p",
-    'Target': "Pb",
-    'roots': 5020.,
-    'SigmaNN': 67.,
-    'setWSDeformParams': 1,
-    'R_WS': 6.647,     # 2108.09578
-    'a_WS': 0.537,
+    'projectile': "p",
+    'target': "Pb",
+    'sqrtS': 5020.,
+    'sigmaNN': 67.,
+    'useInputWSParams': 1,
+    'radiusWS': 6.647,     # 2108.09578
+    'diffusenessWS': 0.537,
     'beta2': 0.006,
     'beta3': 0.,
     'beta4': 0.,
     'gamma': 0.,
-    'SubNucleonParamType': 4,    # 0: do not use posterior parameter sets
+    'subNucleonParamType': 4,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
                                  # 3: use subnucleon parameters from variant Nq posterior distribution (fit to LHC x)
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution (fit to LHC x)
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
-    'useConstituentQuarkProton': 3,
-    'maxtime': 0.4,
+    'nucleonModel': "hotspots",
+    'Nq': 3,
+    'maxTime': 0.4,
     'LOutput': 30,
     'sizeOutput': 300,
 }

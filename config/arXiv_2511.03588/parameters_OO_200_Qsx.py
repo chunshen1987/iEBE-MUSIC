@@ -18,34 +18,36 @@ control_dict = {
 ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
-    'bmin': 0.,
-    'bmax': 20.,
-    'Projectile': "O",
-    'Target': "O",
-    'roots': 200.,
-    'SigmaNN': 42.,
-    'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'bMin': 0.,
+    'bMax': 20.,
+    'projectile': "O",
+    'target': "O",
+    'sqrtS': 200.,
+    'sigmaNN': 42.,
+    'nucleonModel': "hotspots",   # gaussian: round proton; hotspots: fluctuating proton
+    'Nq': 3,
     'LOutput':30.,
     'L':30.,
-    'SubNucleonParamType': 0,    # 0: do not use posterior parameter sets
+    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution fitting HERA data
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution fiiting JIMWLK data at LHC xp
 
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'm': 0.4,
     'BG': 3.3,
     'BGq': 0.3,
     'smearingWidth': 0.7,
-    'QsmuRatio': 0.643,
+    'QsMuRatio': 0.643,
     'dqMin': 0.27344888,
     'omega': 1.0,
     'dqMin': 0.2582,
-    'UVdamp': 0.0,
-    'useFluctuatingx': 0,
-    'Rapidity': 1.3862943611198906,
+    'UVDamp': 0.0,
+    'useFluctuatingX': 0,
+    'projectileX': 0.0025,
+    'targetX': 0.0025,
     'lightNucleusOption': 2,
     'nucleonPositionsFromFile': 1,
 

@@ -18,28 +18,28 @@ control_dict = {
 ipglasma_dict = {
     'type': "self",
     # all parameters below are for (type == self)
-    'bmin': 0.,
-    'bmax': 20.,
-    'Projectile': "O",
-    'Target': "O",
+    'bMin': 0.,
+    'bMax': 20.,
+    'projectile': "O",
+    'target': "O",
     'nucleonPositionsFromFile': 1,
     'lightNucleusOption': 2,
-    'roots': 6800,
-    'SigmaNN': 71.,
-    'useConstituentQuarkProton': 3,   # 0: round proton; 3: fluctuating proton
+    'sqrtS': 6800,
+    'sigmaNN': 71.,
+    'nucleonModel': "hotspots",   # gaussian: round proton; hotspots: fluctuating proton
+    'Nq': 3,
     'L': 30.,
     'size': 800,
     'LOutput': 30.,
     'sizeOutput': 300,
     'writeWilsonLines': 0,
-    'useTimeForSeed': 1,
-    'setWSDeformParams': 0,
-    'SubNucleonParamType': 0,    # 0: do not use posterior parameter sets
+    'useInputWSParams': 0,
+    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
                                  # 1: use subnucleon parameters from variant Nq posterior distribution
                                  # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution fitting HERA data
                                  # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution fiiting JIMWLK data at LHC xp
 
-    'SubNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
+    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
                                  # 0: choose the MAP parameter set
                                  # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'm': 0.4,
@@ -47,22 +47,20 @@ ipglasma_dict = {
     'BGq': 0.3,
     'omega': 1.0, 
     'dqMin': 0.2582,
-    'UVdamp': 0.0,
+    'UVDamp': 0.0,
     'smearingWidth': 0.7,
-    'QsmuRatio': 0.643,
-    'useFluctuatingx': 0,
-    'RapidityA': 4.912654885736052,     # x = 0.00007352941176
-    'RapidityB': 4.912654885736052,     # x = 0.00007352941176
+    'QsMuRatio': 0.643,
+    'useFluctuatingX': 0,
+    'projectileX': 7.352941176e-05,
+    'targetX': 7.352941176e-05,
     'useJIMWLK': 0,
-    'mu0_jimwlk': 0.28,
-    'alphas_jimwlk': 0,
-    'jimwlk_ic_x':  0.01,
-    'x_projectile_jimwlk': 0.00007352941176,
-    'x_target_jimwlk': 0.00007352941176,
-    'Ds_jimwlk': 0.003,
-    'Lambda_QCD_jimwlk': 0.040,
-    'm_jimwlk': 0.4,
-    'saveSnapshots': 0,
+    'jimwlkMu0': 0.28,
+    'jimwlkAlphaS': 0,
+    'jimwlkInitialX':  0.01,
+    'jimwlkDs': 0.003,
+    'jimwlkLambdaQCD': 0.040,
+    'jimwlkMass': 0.4,
+    'jimwlkSaveSnapshots': 0,
 }
 
 

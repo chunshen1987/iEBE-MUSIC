@@ -98,9 +98,7 @@ if __name__ == "__main__":
         print_help()
         exit(1)
 
-    time_stamp_str = "0.4"
     if type_flag == 0:
-        fecth_an_IPGlasma_event(database_filename, time_stamp_str, event_id)
+        fecth_an_IPGlasma_event(database_filename, event_id)
     elif type_flag == 1:
-        fecth_an_IPGlasma_event_Tmunu(database_filename, time_stamp_str,
-                                      event_id)
+        fecth_an_IPGlasma_event_Tmunu(database_filename, event_id)
