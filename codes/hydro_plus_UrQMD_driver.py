@@ -70,6 +70,8 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
             if not path.exists(path.join(res_path, file_name)):
                 run_ipglasma(event_id)
                 collect_ipglasma_event(res_path)
+                if "KoMPoST" in initial_type:
+                    rename_final_Tmunu_file(res_path, event_id, file_name)
                 if not path.exists(path.join(res_path, file_name)):
                     # IPGlasma event failed
                     print("IPGlasma event failed ... ")
@@ -206,6 +208,20 @@ def collect_ipglasma_event(final_results_folder):
     if path.exists(final_results_folder):
         shutil.rmtree(final_results_folder)
     shutil.move("ipglasma/ipglasma_results", final_results_folder)
+
+
+def rename_final_Tmunu_file(res_path, event_id, file_name):
+    """IPGlasma names the Tmunu file after its time (Tmunu-t<tau>-<id>.dat).
+    This function renames the one at the final time to file_name."""
+    suffix = f"-{event_id}.dat"
+    file_list = glob(path.join(res_path, f"Tmunu-t*{suffix}"))
+    if file_list:
+        tau_list = [
+            float(path.basename(file_i)[len("Tmunu-t"):-len(suffix)])
+            for file_i in file_list
+        ]
+        shutil.move(file_list[np.argmax(tau_list)],
+                    path.join(res_path, file_name))
 
 
 def connect_ipglasma_event(res_path, initial_type, filename):
@@ -489,7 +505,7 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
     initial_state_filelist1 = [
         f'NcollList{event_id}.dat',
         f'NpartList{event_id}.dat',
-        f'NpartdNdy-t0.6-{event_id}.dat',
+        f'NpartdNdy-t*-{event_id}.dat',
         f'NgluonEstimators{event_id}.dat',
         f'usedParameters{event_id}.dat',
     ]
@@ -547,8 +563,8 @@ def zip_results_into_hdf5(final_results_folder, event_id, para_dict):
                 initial_folder = path.join(final_results_folder,
                                            f"ipglasma_results_{event_id}")
                 for inifilename in initial_state_filelist1:
-                    inifile = path.join(initial_folder, inifilename)
-                    if path.isfile(inifile):
+                    for inifile in glob(path.join(initial_folder,
+                                                  inifilename)):
                         shutil.move(inifile, spvnfolder)
                 if para_dict['save_ipglasma']:
                     for inifilename in initial_state_filelist2:
