@@ -50,8 +50,8 @@ ipglasma_dict = {
     'smearingWidth': 0.7,
     'QsMuRatio': 0.643,
     'useFluctuatingX': 0,
-    'projectileX': 0.0001212686567,  # = 0.01 exp(-4.41233198416921), as with IP-Glasma before 2.0; x_projectile_jimwlk was 0.0001294820717
-    'targetX': 0.0001212686567,  # = 0.01 exp(-4.41233198416921), as with IP-Glasma before 2.0; x_target_jimwlk was 0.0001294820717
+    'projectileX': 0.0001294820717,  # 0.65/5020
+    'targetX': 0.0001294820717,  # 0.65/5020
     'useJIMWLK': 0,
     'jimwlkMu0': 0.28,
     'jimwlkAlphaS': 0,
