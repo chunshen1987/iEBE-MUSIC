@@ -10,11 +10,13 @@ import h5py
 
 
 def print_help():
-    print("{0} database_filename event_id output_type".format(argv[0]))
+    print("{0} database_filename event_id output_type [Tmunu_time]".format(
+        argv[0]))
 
 
-def fecth_an_IPGlasma_event_Tmunu(database_path, event_idx):
-    time_stamp = "0.4"
+def fecth_an_IPGlasma_event_Tmunu(database_path, event_idx, time_stamp="0.4"):
+    """time_stamp: the time of the Tmunu file in the database, as in its name
+    Tmunu-t<time_stamp>-<id>.dat; KoMPoST starts from it (tIn)"""
     print(("fectching an IP-Glasma event Tmunu with "
            + "event id: {} at tau = {} fm from {}".format(
                event_idx, time_stamp, database_path)))
@@ -101,4 +103,7 @@ if __name__ == "__main__":
     if type_flag == 0:
         fecth_an_IPGlasma_event(database_filename, event_id)
     elif type_flag == 1:
-        fecth_an_IPGlasma_event_Tmunu(database_filename, event_id)
+        if len(argv) > 4:
+            fecth_an_IPGlasma_event_Tmunu(database_filename, event_id, argv[4])
+        else:
+            fecth_an_IPGlasma_event_Tmunu(database_filename, event_id)
