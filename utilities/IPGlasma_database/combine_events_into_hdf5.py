@@ -24,7 +24,7 @@ def collect_one_IPGlasma_event(results_path, event_path, hf):
     parafile = open(path.join(results_path, file_name))
     for iline, rawline in enumerate(parafile.readlines()):
         paraline = rawline.strip('\n')
-        gtemp.attrs.create("{0}".format(iline), np.string_(paraline))
+        gtemp.attrs.create("{0}".format(iline), np.bytes_(paraline))
 
     file_name = "NcollList{0}.dat".format(event_id)
     filepath = path.join(results_path, file_name)
@@ -67,8 +67,25 @@ def collect_one_IPGlasma_event(results_path, event_path, hf):
     filelist = glob(
         path.join(results_path, "{0}*-{1}.dat".format(file_name_pattern,
                                                       event_id)))
+    # IP-Glasma 2.0 names the file at the final time
+    # epsilon-u-Hydro-TauHydro-<id>.dat and writes its time in the header
+    # ("... tau= <tau>"); it is stored as epsilon-u-Hydro-t<tau>-<id>.dat
+    filelist += glob(
+        path.join(results_path,
+                  "epsilon-u-Hydro-TauHydro-{0}.dat".format(event_id)))
     for ifile, filepath in enumerate(filelist):
         filename = filepath.split("/")[-1]
+        f = open(filepath)
+        header = f.readline().strip('\n')
+        f.close()
+        if "TauHydro" in filename:
+            tmp = header.split()
+            if "tau=" not in tmp:
+                print("{0} has no tau in its header, skipped".format(
+                    filename))
+                continue
+            filename = "epsilon-u-Hydro-t{0}-{1}.dat".format(
+                tmp[tmp.index("tau=") + 1], event_id)
         dtemp = np.loadtxt(filepath)
         dtemp = np.nan_to_num(dtemp)
         x_size = abs(dtemp[0, 1])*2.
@@ -78,9 +95,7 @@ def collect_one_IPGlasma_event(results_path, event_path, hf):
                                     data=data_cut,
                                     compression="gzip",
                                     compression_opts=9)
-        f = open(filepath)
-        header = f.readline().strip('\n')
-        dset.attrs.create("header", np.string_(header))
+        dset.attrs.create("header", np.bytes_(header))
         tmp = header.split()
         dx = float(tmp[12])
         dy = float(tmp[14])
@@ -110,7 +125,7 @@ def collect_one_IPGlasma_event(results_path, event_path, hf):
                                     compression_opts=9)
         f = open(filepath)
         header = f.readline().strip('\n')
-        dset.attrs.create("header", np.string_(header))
+        dset.attrs.create("header", np.bytes_(header))
         tmp = header.split()
         dx = float(tmp[12])
         dy = float(tmp[14])
