@@ -60,6 +60,14 @@ done
 if [ -f ${target_folder}/${folderName}.h5 ]; then
     mv ${target_folder}/${folderName}.h5 ${target_spvn_folder}
 fi
-./combine_multiple_hdf5.py ${target_spvn_folder}
-mv SPVN_RESULTS.h5 ${target_folder}/${folderName}.h5
+# combine in the target folder, so that several runs can be collected at the
+# same time; if this fails, the results stay in SPVN_RESULTS, and collecting
+# again retries
+combineScript=`pwd`/combine_multiple_hdf5.py
+rm -f ${target_folder}/SPVN_RESULTS.h5
+if ! (cd ${target_folder} && ${combineScript} SPVN_RESULTS); then
+    echo "combining the results failed; they are kept in ${target_spvn_folder}"
+    exit 1
+fi
+mv ${target_folder}/SPVN_RESULTS.h5 ${target_folder}/${folderName}.h5 || exit 1
 rm -fr $target_spvn_folder

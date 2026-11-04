@@ -13,7 +13,8 @@
 # RESULTS/<run folder>/<run folder>.h5, and the parameter files of the run
 # folder are copied next to it. The results of an event folder are moved
 # into this file, so collecting again adds only the event folders that have
-# finished since.
+# finished since. If the collection fails, the results are kept in
+# RESULTS/<run folder>/SPVN_RESULTS, and collecting again retries.
 
 usage="usage: $0 <image> <run folder> [<run folder> ...]"
 
@@ -43,13 +44,25 @@ for runFolder in "$@"; do
         status=1
         continue
     fi
-    if [ "$nResults" -eq 0 ]; then
+    # results of an earlier collection that failed
+    kept=RESULTS/$runName/SPVN_RESULTS
+    if [ "$nResults" -eq 0 ] && [ ! -d $kept ]; then
         echo "$runFolder: no new results"
         continue
     fi
-    echo "$runFolder: collecting $nResults of $nFolders event folders"
-    apptainer exec --bind="/scratch,/projappl" "$image" \
-        ./collect_events_singularity.sh $runFolder RESULTS
+    if [ -d $kept ]; then
+        echo "$runFolder: collecting $nResults of $nFolders event folders" \
+             "and the results kept from a failed collection"
+    else
+        echo "$runFolder: collecting $nResults of $nFolders event folders"
+    fi
+    if ! apptainer exec --bind="/scratch,/projappl" "$image" \
+            ./collect_events_singularity.sh $runFolder RESULTS; then
+        echo "$runFolder: collection failed, no results were deleted;" \
+             "collect again to retry"
+        status=1
+        continue
+    fi
     # the parameter files of the run, next to its results
     find $runFolder -maxdepth 1 -type f ! -name "*.script" \
         -exec cp {} RESULTS/$runName/ \;

@@ -16,7 +16,6 @@ from os import path, listdir, makedirs
 from glob import glob
 import subprocess
 import argparse
-from math import ceil
 
 code_package_path = path.abspath(
     path.join(path.dirname(path.abspath(__file__)), "..", ".."))
@@ -40,10 +39,8 @@ def write_hq_job_script(campaign_folder, job_index, design_points, args):
         memory = "--mem-per-cpu=2G"
     cleanup = ""
     if args.cleanup:
-        cleanup = """
-        if [ -f RESULTS/$dp/$dp.h5 ]; then
-            rm -fr $dp
-        fi"""
+        # only after a successful collection
+        cleanup = " && rm -fr $dp"
     script_name = "hq_job_{:03d}.script".format(job_index)
     script = open(path.join(campaign_folder, script_name), "w")
     script.write("""#!/bin/bash
@@ -77,10 +74,11 @@ srun --overlap --cpu-bind=none --mpi=none hq worker start --manager slurm \\
     --on-server-lost finish-running --cpus="$SLURM_CPUS_PER_TASK" &
 hq worker wait "$SLURM_NTASKS"
 
-# event folders without results of the design points not collected yet
+# event folders without results of the design points not collected yet; a
+# design point with results kept from a failed collection was complete
 taskList="$HQ_SERVER_DIR/event_folders.txt"
 for dp in $designPoints; do
-    if [ -f RESULTS/$dp/$dp.h5 ]; then
+    if [ -f RESULTS/$dp/$dp.h5 ] || [ -d RESULTS/$dp/SPVN_RESULTS ]; then
         continue
     fi
     for eventFolder in $dp/event_*; do
@@ -100,14 +98,15 @@ fi
 hq worker stop all
 hq server stop
 
-# collect the design points whose event folders all have results
+# collect the design points whose event folders all have results, and retry
+# failed collections
 for dp in $designPoints; do
     if [ -f RESULTS/$dp/$dp.h5 ]; then
         continue
     fi
     nFolders=`ls -d $dp/event_* | wc -l`
     nResults=`ls $dp/event_*/RESULTS_*.h5 2> /dev/null | wc -l`
-    if [ "$nFolders" -eq "$nResults" ]; then
+    if [ "$nFolders" -eq "$nResults" ] || [ -d RESULTS/$dp/SPVN_RESULTS ]; then
         ./collect_results.sh "$image" $dp{11}
     else
         echo "$dp: $nResults of $nFolders event folders finished"
@@ -171,12 +170,15 @@ def main():
     parser.add_argument('-seed', '--random_seed', type=int, default=-1,
                         help='random seed (-1: random)')
     args = parser.parse_args()
+    if args.n_events % args.n_events_per_folder != 0:
+        parser.error("-nev ({}) must be a multiple of -n_hydro ({})".format(
+            args.n_events, args.n_events_per_folder))
     if args.cpus_per_task <= 0:
         args.cpus_per_task = args.n_threads
 
     campaign_folder = path.abspath(args.campaign_folder)
     makedirs(campaign_folder, exist_ok=True)
-    n_folders = ceil(args.n_events/args.n_events_per_folder)
+    n_folders = args.n_events//args.n_events_per_folder
 
     new_design_points = []
     for design_file in args.design_points:

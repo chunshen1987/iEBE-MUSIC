@@ -59,7 +59,7 @@ The login nodes have no Python with h5py, so the results are collected in the co
 
 This adds the results of the finished jobs to `RESULTS/RUN_NAME/RUN_NAME.h5`, copies the parameter files next to it, and prints the number of events in the file.
 
-Collect when all jobs are done, and rerun failed jobs (section 3) before. The collection moves the results of each job from its event folder into this file: a job resubmitted after its results were collected runs again, and collecting again adds only the jobs that have finished since.
+Collect when all jobs are done, and rerun failed jobs (section 3) before. The collection moves the results of each job from its event folder into this file: a job resubmitted after its results were collected runs again, and collecting again adds only the jobs that have finished since. A failed collection (e.g. a damaged file or a full disk) deletes nothing: the results stay in `RESULTS/RUN_NAME/SPVN_RESULTS`, and collecting again retries.
 
 ## 5. Campaigns: many design points with HyperQueue
 
@@ -74,13 +74,13 @@ Collect when all jobs are done, and rerun failed jobs (section 3) before. The co
     cd CAMPAIGN
     for job in hq_job_*.script; do sbatch $job; done
 
-- `-nev`: events per design point, in event folders of `-n_hydro` events (one task each); `-n_th`: threads per event.
+- `-nev`: events per design point, in event folders of `-n_hydro` events (one task each; `-nev` must be a multiple of `-n_hydro`); `-n_th`: threads per event.
 - `--cpus_per_task`: cores reserved per task (default `-n_th`). A full node has about 1.9 GiB of memory and 1.5 GiB of `$TMPDIR` per core; reserve more cores for events that need more.
 - `--designs_per_job`, `--nodes` (1–6) and `--time` (at most 36 h): the size of each HyperQueue job. `--task_time`: the expected time of one task; HyperQueue starts a task only if the job has that much time left.
 - `--partition test --cores_per_node 4 --time 00:15:00`: for trying a setup with a few small events on 4 cores (2 GiB each) instead of a full node.
 - The name of a parameter file (without extension) names its design point. Calling the script again with more parameter files adds design points and job scripts; existing design points are skipped. Generating the design points in batches keeps the number of files on `/scratch` within the quota (`csc-workspaces`).
 
-Each job runs the event folders of its design points that have no results yet, then collects every finished design point into `RESULTS/<design point>/<design point>.h5`, together with its parameter files, with `collect_results.sh` (section 4). The output of each task is in `job.log` in its event folder, the output of the job in `hq_job_<n>_<job id>.out`. If a job ends before all its events are done, submit the same script again: finished event folders and collected design points are skipped. Do not run two jobs of the same script at the same time. With `--cleanup`, the working folder of a design point is deleted after its results are collected, which frees its files on `/scratch`.
+Each job runs the event folders of its design points that have no results yet, then collects every finished design point into `RESULTS/<design point>/<design point>.h5`, together with its parameter files, with `collect_results.sh` (section 4). The output of each task is in `job.log` in its event folder, the output of the job in `hq_job_<n>_<job id>.out`. If a job ends before all its events are done, submit the same script again: finished event folders and collected design points are skipped, and a failed collection is retried without running its events again. Do not run two jobs of the same script at the same time. With `--cleanup`, the working folder of a design point is deleted after its results are collected successfully, which frees its files on `/scratch`.
 
 A design point is collected only when all its event folders have results. To collect one by hand, e.g. when an event folder keeps failing, run in the campaign folder:
 

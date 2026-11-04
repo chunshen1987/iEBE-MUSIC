@@ -32,6 +32,7 @@ RESULTS_PATH = path.abspath(path.join(".", RESULTS_FOLDER))
 EVENT_LIST = glob(path.join(RESULTS_PATH, "*.h5"))
 
 exist_group_keys = []
+status = 0
 
 for ievent, event_path in enumerate(EVENT_LIST):
     print("processing {0} ... ".format(event_path))
@@ -53,5 +54,10 @@ for ievent, event_path in enumerate(EVENT_LIST):
         if gtemp2 != gtemp:
             print("Conflict in mergeing {0}, use {1}".format(gtemp, gtemp2))
         exist_group_keys.append(gtemp2)
-        system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
-            event_path, RESULTS_NAME, gtemp, gtemp2))
+        if system('h5copy -i {0} -o {1}.h5 -s {2} -d {3}'.format(
+                event_path, RESULTS_NAME, gtemp, gtemp2)) != 0:
+            print("failed to copy {0} from {1}".format(gtemp, event_path))
+            status = 1
+
+# a failed copy leaves an incomplete file
+sys.exit(status)
