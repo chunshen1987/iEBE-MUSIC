@@ -10,6 +10,7 @@ import sys
 import time
 import shutil
 import re
+import configparser
 import h5py
 import numpy as np
 from fetch_IPGlasma_event_from_hdf5_database import fecth_an_IPGlasma_event, fecth_an_IPGlasma_event_Tmunu
@@ -81,7 +82,8 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
                 print("No need to rerun ...")
         else:
             if "KoMPoST" in initial_type:
-                file_temp = fecth_an_IPGlasma_event_Tmunu(database, event_id)
+                file_temp = fecth_an_IPGlasma_event_Tmunu(
+                    database, event_id, get_kompost_start_time())
             else:
                 file_temp = fecth_an_IPGlasma_event(database, event_id)
             makedirs(ipglasma_local_folder, exist_ok=True)
@@ -195,6 +197,14 @@ def get_initial_condition(database, initial_type, iev, event_id, seed_add,
               + "Do not recognize the initial condition type: {}".format(
                   initial_type))
         sys.exit(1)
+
+
+def get_kompost_start_time():
+    """This function returns the time KoMPoST starts from (tIn in
+    kompost/setup.ini), written as in the names of the IPGlasma Tmunu files"""
+    setup = configparser.ConfigParser()
+    setup.read("kompost/setup.ini")
+    return "{:g}".format(setup.getfloat("KoMPoSTInputs", "tIn"))
 
 
 def run_ipglasma(event_id):
