@@ -641,6 +641,10 @@ def main():
                                         args.node_type.lower(), n_jobs,
                                         n_threads, args.mem_per_cpu, wallTime,
                                         account)
+        # collects the results in the container
+        shutil.copy(
+            path.join(code_package_path,
+                      'Cluster_supports/Roihu/collect_results.sh'), pwd)
         print("🚀  Submit with: sbatch {}".format(
             path.join(working_folder_name, "submit_jobArr.script")))
 

@@ -67,7 +67,7 @@ export LC_CTYPE=en_US.UTF8
 
 ## Running on Roihu (CSC)
 
-Roihu runs the iEBE-MUSIC container with Apptainer as a Slurm job array; see [Cluster_supports/Roihu/README.md](Cluster_supports/Roihu/README.md).
+Roihu runs the iEBE-MUSIC container with Apptainer, as a Slurm job array or, for campaigns over many design points, with HyperQueue on full nodes; see [Cluster_supports/Roihu/README.md](Cluster_supports/Roihu/README.md).
 
 ## Docker Support
 

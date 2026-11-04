@@ -41,9 +41,13 @@ do
     eventsPath=${fromFolder}/${ijob}
     evId=`echo $ijob | cut -f 2 -d _`
     if [ ! -f ${eventsPath}/RESULTS_${evId}.h5 ]; then
+        simFolder=`ls --color=none ${eventsPath} | grep "playground"`
+        if [ -z "${simFolder}" ]; then
+            # no results: not finished, or collected before
+            continue
+        fi
         (cd ${eventsPath}
         mkdir -p temp
-        simFolder=`ls | grep "playground"`
         ./collect_events.sh ${simFolder} temp
         mv temp/${simFolder}/${simFolder}.h5 RESULTS_${evId}.h5
         )
