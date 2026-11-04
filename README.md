@@ -65,6 +65,10 @@ export PYTHONIOENCODING=utf-8
 export LC_CTYPE=en_US.UTF8
 ```
 
+## Running on Roihu (CSC)
+
+Roihu runs the iEBE-MUSIC container with Apptainer as a Slurm job array; see [Cluster_supports/Roihu/README.md](Cluster_supports/Roihu/README.md).
+
 ## Docker Support
 
 The iEBE-MUSIC has its official docker image on docker hub [iebe-music](https://hub.docker.com/r/chunshen1987/iebe-music).
