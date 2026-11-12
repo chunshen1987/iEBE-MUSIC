@@ -34,6 +34,12 @@ The dictionaries of the modules in `parameters_dict_user.py` may also set parame
 
 A parameter file (`-b`, e.g. a design point of a Bayesian analysis) has one `name value` per line, and can only set parameters that `parameters_dict_user.py` sets. To vary a parameter, set it in the user dictionary too, e.g. with its default value. A name that the user dictionary does not set, e.g. a misspelled one, stops the job generation, and so does a `control_dict` parameter.
 
+Some settings follow from others, because KoMPoST and MUSIC take the grid and the time of their initial condition from their own parameters, not from the files they read:
+- **IPGlasma events generated in the job:** KoMPoST's grid (`EventInput`) and `tIn` follow from `LOutput`, `sizeOutput` and `maxTime` of IPGlasma. Without KoMPoST, MUSIC's `Initial_time_tau_0` follows from `maxTime`.
+- **With KoMPoST:** MUSIC's `Initial_time_tau_0` follows from `tOut`, with `s_factor` 1.
+- **Setting them anyway:** a design point that changes e.g. `maxTime` moves the settings that follow from it. The user dictionary or a parameter file may still set such a setting, but only to the value that follows; any other value stops the job generation. `inverseQsForMaxTime` must be 0, since KoMPoST and MUSIC start all events at the same time.
+- **Pre-generated IPGlasma events:** their `maxTime` is not known when the jobs are generated, so `Initial_time_tau_0` (without KoMPoST) or `tIn` (with KoMPoST) has to be set to it in the user dictionary.
+
 #### initial_dict
 The `initial_dict` dictionary specify the type of the initial condition to use,
 
