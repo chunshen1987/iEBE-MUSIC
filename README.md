@@ -30,6 +30,10 @@ type `./generate_jobs.py -h` for help information
 ## Parameters:
 Users can pass model parameters through a python script `parameters_dict_user.py`. It contains multiple dictionaries, which are related to each code module inside the iEBE-MUSIC framework. This script will update the master parameters dictionaries in `config/parameters_dict_master.py`. One can read `config/parameters_dict_master.py` for all the available parameters options for each module. If a user want to modify any parameters, he can add it in the `parameters_dict_user.py`.
 
+The dictionaries of the modules in `parameters_dict_user.py` may also set parameters that the master does not have; they are passed to the module as they are. `control_dict` holds the parameters of the framework, so it may only set those of the master.
+
+A parameter file (`-b`, e.g. a design point of a Bayesian analysis) has one `name value` per line, and can only set parameters that `parameters_dict_user.py` sets. To vary a parameter, set it in the user dictionary too, e.g. with its default value. A name that the user dictionary does not set, e.g. a misspelled one, stops the job generation, and so does a `control_dict` parameter.
+
 #### initial_dict
 The `initial_dict` dictionary specify the type of the initial condition to use,
 

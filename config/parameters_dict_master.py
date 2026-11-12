@@ -757,8 +757,16 @@ def set_kompost_grid_from_ipglasma():
         kompost_dict[subdict][key] = val
 
 
-# the keys of all dictionaries of the user file, including keys the master
-# does not have (set by update_parameters_dict)
+# the dictionaries of the modules, whose parameters a user file may set even
+# if the master does not have them; control_dict holds the parameters of the
+# framework, and a user file may only set those of the master
+module_dict_names = ("ipglasma_dict", "kompost_dict", "mcglauber_dict",
+                     "music_dict", "photon_dict", "iss_dict",
+                     "hadronic_afterburner_toolkit_dict")
+
+# the user file and the keys of its module dictionaries (set by
+# update_parameters_dict), which a parameter file may set
+user_file = ""
 user_parameter_keys = set()
 
 
@@ -780,9 +788,19 @@ def update_parameters_dict(par_dict_path, ran_seed):
     sys.path.insert(0, par_diretory)
     print(par_diretory)
     parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
+    unknown_control_keys = sorted(
+        set(parameters_dict.control_dict) - set(control_dict))
+    if unknown_control_keys:
+        sys.exit("\U0001F6AB  {} in control_dict of {} {} no parameter of "
+                 "the framework (control_dict of "
+                 "config/parameters_dict_master.py).".format(
+                     ", ".join(unknown_control_keys), par_dict_path,
+                     "is" if len(unknown_control_keys) == 1 else "are"))
+    global user_file
+    user_file = par_dict_path
     user_parameter_keys.update(dictionary_keys(
-        val for name, val in vars(parameters_dict).items()
-        if not name.startswith("__") and isinstance(val, dict)))
+        getattr(parameters_dict, name) for name in module_dict_names
+        if isinstance(getattr(parameters_dict, name, None), dict)))
     initial_condition_type = parameters_dict.control_dict['initial_state_type']
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
@@ -804,7 +822,7 @@ def update_parameters_dict(par_dict_path, ran_seed):
         if initial_condition_type == "IPGlasma+KoMPoST":
             # update KoMPoST parameters
             for subdict in parameters_dict.kompost_dict:
-                kompost_dict[subdict].update(
+                kompost_dict.setdefault(subdict, {}).update(
                     parameters_dict.kompost_dict[subdict])
             if ipglasma_dict['type'] == "self":
                 global user_kompost_dict
@@ -933,20 +951,35 @@ def set_ipglasma_parameter(key, val, bayes_file):
         ipglasma_dict[key] = float(val)
 
 
+def parameter_value(key, val, default, bayes_file):
+    """The value of a parameter file, with the type of the parameter's
+    current value (KoMPoST and photon parameters)"""
+    if isinstance(default, str):
+        return val
+    if isinstance(default, int):
+        if not float(val).is_integer():
+            sys.exit("\U0001F6AB  {} {} in the parameter file {} must be an "
+                     "integer.".format(key, val, bayes_file))
+        return int(float(val))
+    return float(val)
+
+
 def update_parameters_bayesian(bayes_file):
-    known_keys = user_parameter_keys | dictionary_keys([
-        control_dict, ipglasma_dict, kompost_dict, mcglauber_dict, music_dict,
-        photon_dict, iss_dict, hadronic_afterburner_toolkit_dict])
-    unknown_keys = []
+    """Sets the parameters of a parameter file, one "key value" per line.
+    Each key must be a parameter of a module dictionary of the user file, so
+    that a misspelled key cannot leave its parameter unchanged for every
+    design point"""
+    not_in_user_file = []
+    framework_keys = []
     parfile = open(bayes_file, "r")
     for line in parfile:
         if line.strip() == "":
             continue
-        paramApplied = False
         key, val = line.split()
-        if key in control_dict.keys():
-            control_dict[key] = int(val)
-            paramApplied = True
+        if key in control_dict:
+            # the job scripts read these from the user file itself
+            framework_keys.append(key)
+            continue
 
         if key in ipglasma_old_keys_without_equivalent:
             sys.exit("\U0001F6AB  {} in the parameter file {} is a parameter "
@@ -954,6 +987,12 @@ def update_parameters_bayesian(bayes_file):
                          key, bayes_file,
                          ipglasma_old_keys_without_equivalent[key]))
         ipglasma_key = ipglasma_old_key_names.get(key, key)
+        if (key not in user_parameter_keys
+                and ipglasma_key not in user_parameter_keys):
+            not_in_user_file.append(key)
+            continue
+
+        paramApplied = False
         if ipglasma_key in ipglasma_dict.keys():
             set_ipglasma_parameter(ipglasma_key, val, bayes_file)
             paramApplied = True
@@ -962,8 +1001,19 @@ def update_parameters_bayesian(bayes_file):
             mcglauber_dict[key] = float(val)
             paramApplied = True
 
+        for section in kompost_dict.values():
+            if key in section:
+                section[key] = parameter_value(key, val, section[key],
+                                               bayes_file)
+                paramApplied = True
+
         if key in music_dict.keys():
             music_dict[key] = float(val)
+            paramApplied = True
+
+        if key in photon_dict.keys():
+            photon_dict[key] = parameter_value(key, val, photon_dict[key],
+                                               bayes_file)
             paramApplied = True
 
         if key in iss_dict.keys():
@@ -975,21 +1025,32 @@ def update_parameters_bayesian(bayes_file):
             paramApplied = True
 
         if not paramApplied:
-            if key in known_keys:
-                # a parameter, but not one a parameter file can set (e.g.
-                # of KoMPoST or of control_dict)
-                print(f"Parameter {key} is not set! Please check your "
-                      "input file")
-            else:
-                unknown_keys.append(key)
-    # a key that is no parameter at all, e.g. a misspelled one, would
-    # otherwise leave its parameter at the value of the user dictionary for
-    # every design point
-    if unknown_keys:
-        sys.exit("\U0001F6AB  {} in the parameter file {} {} no parameter of "
-                 "the master or the user dictionary.".format(
-                     ", ".join(unknown_keys), bayes_file,
-                     "is" if len(unknown_keys) == 1 else "are"))
+            # a parameter of a module this run does not use, e.g. of
+            # 3D-Glauber in an IP-Glasma run
+            print(f"Parameter {key} is not used by this run.")
+
+    messages = []
+    if not_in_user_file:
+        messages.append(
+            "{} {} not in the user file {}. A parameter file can only set "
+            "parameters that the user file sets: add {} there (e.g. with "
+            "the default value), or correct the name.".format(
+                ", ".join(not_in_user_file),
+                "is" if len(not_in_user_file) == 1 else "are", user_file,
+                "it" if len(not_in_user_file) == 1 else "them"))
+    if len(framework_keys) == 1:
+        messages.append(
+            "{} is a framework parameter (control_dict), which a parameter "
+            "file cannot set: set it in the user file.".format(
+                framework_keys[0]))
+    elif framework_keys:
+        messages.append(
+            "{} are framework parameters (control_dict), which a parameter "
+            "file cannot set: set them in the user file.".format(
+                ", ".join(framework_keys)))
+    if messages:
+        sys.exit("\U0001F6AB  The parameter file {}: {}".format(
+            bayes_file, " ".join(messages)))
 
 
 def output_parameters_to_files(workfolder="."):

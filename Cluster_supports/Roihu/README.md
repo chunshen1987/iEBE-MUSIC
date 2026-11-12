@@ -33,7 +33,9 @@ Generate the jobs in the scratch area of the project:
 
 - `-n`: number of jobs (array tasks); `-n_hydro`: events per job; `-n_th`: cores per job.
 - `-b`: the parameter file of a design point, as on the other clusters.
-- **Parameter check:** before writing any job, the generator applies the user dictionary and the parameter file as each job will. A key of the parameter file that no dictionary has, e.g. a misspelled one, stops it. The user dictionary only needs the parameters it changes; the master (`config/parameters_dict_master.py`) has the defaults.
+- **Parameter check:** before writing any job, the generator applies the user dictionary and the parameter file as each job will, and stops on an error:
+  - **User dictionary:** it only needs the parameters it changes; the master (`config/parameters_dict_master.py`) has the defaults. Its module dictionaries (IP-Glasma, KoMPoST, 3D-Glauber, MUSIC, photons, iSS, afterburner) may also set parameters that the master does not have. `control_dict` holds the parameters of the framework, so it may only set those of the master.
+  - **Parameter file:** it can only set parameters that the user dictionary sets, so that a misspelled name stops the generation instead of being ignored. To vary a parameter, set it in the user dictionary too, e.g. with its default value. A parameter file cannot set `control_dict` parameters.
 - `--node_type`: the partition, `small` (default; up to 72 h), `longrun` (up to 10 days and 192 cores) or `test` (15 min, for trying a setup).
 - The time limit of each job is `walltime` of the `control_dict` in the parameter file.
 - `--mem_per_cpu`: memory per core in GiB (default 2). Up to 2 GiB per core costs no extra billing units on Roihu; more memory is billed instead of the cores.
@@ -81,8 +83,8 @@ When `generate_campaign.py` writes the jobs, it prints how the tasks fill a job:
 | Option | What it controls | How to choose it |
 |---|---|---|
 | `-w` | the campaign folder: working folders of the design points, job scripts, `RESULTS/` | one per campaign |
-| `-par` | the user dictionary, the same for all design points | it only needs the parameters it changes |
-| `-b` | the parameter files, one per design point | a key that no dictionary has stops the generation |
+| `-par` | the user dictionary, the same for all design points | it only needs the parameters it changes, and must set every parameter that the design points vary (section 2) |
+| `-b` | the parameter files, one per design point | each key must be a parameter that the user dictionary sets |
 | `-singularity` | the Apptainer image of the events and of the collection | the same image for all runs that are compared |
 | `-nev` | events per design point | a multiple of `-n_hydro` |
 | `-n_hydro` | events per event folder, i.e. per task | **1**: the shortest tasks fill the slots most evenly, and a failure costs one event. 2 halves the number of folders and files on `/scratch`. |

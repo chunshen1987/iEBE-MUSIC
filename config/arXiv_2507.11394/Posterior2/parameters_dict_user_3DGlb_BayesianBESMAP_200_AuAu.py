@@ -41,6 +41,8 @@ mcglauber_dict = {
     'ylossParam4At2': 1.467,
     'ylossParam4At4': 1.759,
     'ylossParam4At6': 2.260,
+    'ylossParam4At10': 2.95,      # set by the posterior parameter set
+    'FSbaryonInStringProb': 0.2,  # set by the posterior parameter set (= lambdaB)
     'ylossParam4var': 0.356,
     'evolve_QCD_string_mode': 4,        # string evolution mode
                                         # 1: deceleration with fixed rapidity loss (m/sigma = 1 fm, dtau = 0.5 fm)
