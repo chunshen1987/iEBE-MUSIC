@@ -33,14 +33,8 @@ ipglasma_dict = {
     'beta3': 0.,
     'beta4': 0.,
     'gamma': 0.,
-    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
-                                 # 1: use subnucleon parameters from variant Nq posterior distribution
-                                 # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
-                                 # 3: use subnucleon parameters from variant Nq posterior distribution (fit to LHC x)
-                                 # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution (fit to LHC x)
-    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
-                                 # 0: choose the MAP parameter set
-                                 # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
+    'posteriorFile': "none",  # no posterior parameter sets
+    'posteriorSet': 0,  # 0: the MAP set; -1: a random set every event
     'nucleonModel': "gaussian",
     # round protons with the MAP set of type 4 (tables/posterior5020_Nq3.csv),
     # as IP-Glasma before 2.0 ran this file; 2.0 uses posterior sets only

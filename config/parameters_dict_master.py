@@ -51,6 +51,13 @@ ipglasma_dict = {
     'g': 1.,  # strong coupling constant
     'maxTime': 0.4,
     'inverseQsForMaxTime': 0,
+    # posterior parameter sets (CSV table with the input keys of its columns
+    # in a header), which replace the values below every event, e.g.
+    # tables/posterior5020_Nq3.csv (Nq = 3, fit to JIMWLK at LHC x; needs
+    # nucleonModel hotspots and smearQs 1); none: no posterior
+    'posteriorFile': "none",
+    'posteriorSet': -1,  # set of the posterior file; -1: a random set every
+    # event, 0: the MAP set of the tables of IP-Glasma
     'seed': -1,  # set by generate_jobs.py -seed; -1 draws a random seed
     'useSeedList': 0,
     'projectile': "Au",
@@ -86,13 +93,6 @@ ipglasma_dict = {
     'forceDMin': 1,  # flag to force dMin for deformed nuclei
     'dMin': 0.9,  # fm
     'nucleonModel': "gaussian",  # gaussian, hotspots or strings
-    'subNucleonParamType': 0,  # 0: do not use posterior parameter sets
-    # 1: use subnucleon parameters from variant Nq posterior distribution
-    # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution
-    'subNucleonParamSet':
-        -1,  # -1: choose a random set from the posterior distribution
-    # 0: choose the MAP parameter set
-    # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
     'm': 0.2,  # infrared cut-off mass (GeV)
     'BG': 4.,
     'protonAnisotropy': 0.,
@@ -799,6 +799,18 @@ def update_parameters_dict(par_dict_path, ran_seed):
                  "config/parameters_dict_master.py).".format(
                      ", ".join(unknown_control_keys), par_dict_path,
                      "is" if len(unknown_control_keys) == 1 else "are"))
+    # IP-Glasma rejects its old names, but only when a job runs
+    old_names = []
+    for key in getattr(parameters_dict, "ipglasma_dict", {}):
+        if key in ipglasma_old_keys_without_equivalent:
+            old_names.append("{} (replaced by {})".format(
+                key, ipglasma_old_keys_without_equivalent[key]))
+        elif key in ipglasma_old_key_names:
+            old_names.append("{} (renamed to {})".format(
+                key, ipglasma_old_key_names[key]))
+    if old_names:
+        sys.exit("\U0001F6AB  ipglasma_dict of {} uses old names of IP-Glasma "
+                 "parameters: {}.".format(par_dict_path, "; ".join(old_names)))
     global user_file, initial_state_type
     user_file = par_dict_path
     initial_state_type = parameters_dict.control_dict['initial_state_type']
@@ -892,8 +904,8 @@ ipglasma_old_key_names = {
     'Projectile': 'projectile', 'Target': 'target', 'bmin': 'bMin',
     'bmax': 'bMax', 'SigmaNN': 'sigmaNN', 'roots': 'sqrtS',
     'maxtime': 'maxTime', 'UVdamp': 'UVDamp', 'Jacobianm': 'jacobianMass',
-    'QsmuRatio': 'QsMuRatio', 'SubNucleonParamType': 'subNucleonParamType',
-    'SubNucleonParamSet': 'subNucleonParamSet',
+    'QsmuRatio': 'QsMuRatio', 'SubNucleonParamSet': 'posteriorSet',
+    'subNucleonParamSet': 'posteriorSet',
     'useFluctuatingx': 'useFluctuatingX', 'xFromThisFactorTimesQs': 'xQsFactor',
     'muZero': 'mu0', 'runWith0Min1Avg2MaxQs': 'runWithQs',
     'runWithThisFactorTimesQs': 'runningCouplingQsFactor',
@@ -912,6 +924,10 @@ ipglasma_old_key_names = {
 
 # IP-Glasma parameters of the versions before 2.0 that have no one-to-one
 # equivalent; a parameter file that sets them stops the job generation
+# the posterior tables of IP-Glasma replaced subNucleonParamType
+posterior_file_hint = ("posteriorFile (0: none, 1: tables/posterior.csv, "
+                       "2: tables/posterior_Nq3.csv, "
+                       "4: tables/posterior5020_Nq3.csv)")
 ipglasma_old_keys_without_equivalent = {
     'Rapidity': "projectileX and targetX (= 0.01*exp(-Rapidity) for fixed x)",
     'RapidityA': "projectileX (= 0.01*exp(-RapidityA) for fixed x)",
@@ -921,6 +937,8 @@ ipglasma_old_keys_without_equivalent = {
     'writeOutputs': "writeHydro, writeJazma and writeTmunu",
     'useTimeForSeed': "the -seed argument (-1 draws a random seed)",
     'g2mu': "g2muGeV (in GeV)",
+    'SubNucleonParamType': posterior_file_hint,
+    'subNucleonParamType': posterior_file_hint,
 }
 
 
@@ -928,6 +946,9 @@ ipglasma_old_keys_without_equivalent = {
 # user dictionary changes them)
 ipglasma_integer_keys = [
     key for key, val in ipglasma_dict.items() if isinstance(val, int)]
+# and with text values (e.g. posteriorFile), which parameter files cannot set
+ipglasma_text_keys = [
+    key for key, val in ipglasma_dict.items() if isinstance(val, str)]
 
 
 def set_ipglasma_parameter(key, val, bayes_file):
@@ -946,6 +967,8 @@ def set_ipglasma_parameter(key, val, bayes_file):
                      "dictionary.".format(val, bayes_file, model))
         if model == "gaussian":
             return
+    if key in ipglasma_text_keys:
+        text_parameter_error(key, bayes_file)
     if key in ipglasma_integer_keys:
         if not float(val).is_integer():
             sys.exit("\U0001F6AB  {} {} in the parameter file {} must be an "
@@ -955,15 +978,28 @@ def set_ipglasma_parameter(key, val, bayes_file):
         ipglasma_dict[key] = float(val)
 
 
+def text_parameter_error(key, bayes_file):
+    """Stops for a text parameter (e.g. a file name) in a parameter file,
+    which sets numbers; the job scripts read e.g. the KoMPoST file names
+    from the user file"""
+    sys.exit("\U0001F6AB  {} in the parameter file {} is a text parameter, "
+             "which a parameter file cannot set: set it in the user "
+             "file.".format(key, bayes_file))
+
+
+def number_value(key, val, current, bayes_file):
+    """The value of a parameter file as a float (3D-Glauber, MUSIC, iSS and
+    the afterburner), unless the parameter is text"""
+    if isinstance(current, str):
+        text_parameter_error(key, bayes_file)
+    return float(val)
+
+
 def parameter_value(key, val, default, bayes_file):
     """The value of a parameter file, with the type of the parameter's
     current value (KoMPoST and photon parameters)"""
     if isinstance(default, str):
-        # e.g. the KoMPoST file names, which the job scripts read from the
-        # user file
-        sys.exit("\U0001F6AB  {} in the parameter file {} is a text "
-                 "parameter, which a parameter file cannot set: set it in the "
-                 "user file.".format(key, bayes_file))
+        text_parameter_error(key, bayes_file)
     if isinstance(default, int):
         if not float(val).is_integer():
             sys.exit("\U0001F6AB  {} {} in the parameter file {} must be an "
@@ -991,8 +1027,8 @@ def update_parameters_bayesian(bayes_file):
             continue
 
         if key in ipglasma_old_keys_without_equivalent:
-            sys.exit("\U0001F6AB  {} in the parameter file {} is a parameter "
-                     "of IP-Glasma before 2.0. Use {} instead.".format(
+            sys.exit("\U0001F6AB  {} in the parameter file {} is no longer a "
+                     "parameter of IP-Glasma. Use {} instead.".format(
                          key, bayes_file,
                          ipglasma_old_keys_without_equivalent[key]))
         ipglasma_key = ipglasma_old_key_names.get(key, key)
@@ -1008,7 +1044,8 @@ def update_parameters_bayesian(bayes_file):
             paramApplied = True
 
         if key in mcglauber_dict.keys():
-            mcglauber_dict[key] = float(val)
+            mcglauber_dict[key] = number_value(key, val, mcglauber_dict[key],
+                                               bayes_file)
             paramApplied = True
 
         for section_name, section in kompost_dict.items():
@@ -1023,7 +1060,8 @@ def update_parameters_bayesian(bayes_file):
                 paramApplied = True
 
         if key in music_dict.keys():
-            music_dict[key] = float(val)
+            music_dict[key] = number_value(key, val, music_dict[key],
+                                           bayes_file)
             paramApplied = True
 
         if key in photon_dict.keys():
@@ -1032,11 +1070,12 @@ def update_parameters_bayesian(bayes_file):
             paramApplied = True
 
         if key in iss_dict.keys():
-            iss_dict[key] = float(val)
+            iss_dict[key] = number_value(key, val, iss_dict[key], bayes_file)
             paramApplied = True
 
         if key in hadronic_afterburner_toolkit_dict.keys():
-            hadronic_afterburner_toolkit_dict[key] = float(val)
+            hadronic_afterburner_toolkit_dict[key] = number_value(
+                key, val, hadronic_afterburner_toolkit_dict[key], bayes_file)
             paramApplied = True
 
         if not paramApplied:
