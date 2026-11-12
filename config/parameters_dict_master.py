@@ -56,8 +56,9 @@ ipglasma_dict = {
     # tables/posterior5020_Nq3.csv (Nq = 3, fit to JIMWLK at LHC x; needs
     # nucleonModel hotspots and smearQs 1); none: no posterior
     'posteriorFile': "none",
-    'posteriorSet': -1,  # set of the posterior file; -1: a random set every
-    # event, 0: the MAP set of the tables of IP-Glasma
+    'posteriorSet': -1,  # set of the posterior file, counted from 0; -1: a
+    # random set every event, 0: the MAP set (row 0 of the tables of
+    # IP-Glasma)
     'seed': -1,  # set by generate_jobs.py -seed; -1 draws a random seed
     'useSeedList': 0,
     'projectile': "Au",

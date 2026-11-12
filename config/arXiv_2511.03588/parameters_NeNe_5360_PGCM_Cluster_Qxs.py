@@ -32,7 +32,7 @@ ipglasma_dict = {
     'L':30.,
     'posteriorFile': "none",  # no posterior parameter sets
 
-    'posteriorSet': 0,  # 0: the MAP set; -1: a random set every event
+    'posteriorSet': 0,  # only used with a posterior file
     'm': 0.4,
     'BG': 3.3,
     'BGq': 0.3,

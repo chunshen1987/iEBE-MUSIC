@@ -34,7 +34,7 @@ ipglasma_dict = {
     'beta4': -0.003,
     'gamma': 0.,
     'posteriorFile': "none",  # no posterior parameter sets
-    'posteriorSet': 0,  # 0: the MAP set; -1: a random set every event
+    'posteriorSet': 0,  # only used with a posterior file
     'nucleonModel': "gaussian",
     # round protons with the MAP set of type 4 (tables/posterior5020_Nq3.csv),
     # as IP-Glasma before 2.0 ran this file; 2.0 uses posterior sets only
