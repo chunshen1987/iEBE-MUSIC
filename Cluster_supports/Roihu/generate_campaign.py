@@ -13,6 +13,7 @@
 
 import sys
 import re
+import shlex
 from os import path, makedirs
 from glob import glob
 from math import ceil
@@ -60,7 +61,9 @@ def write_hq_job_script(campaign_folder, job_index, design_points, args):
         account = "#SBATCH --account={}\n".format(args.account)
     time_request = ""
     if args.task_time != "":
-        time_request = "--time-request={} ".format(args.task_time)
+        # quoted, so that e.g. 1h 30m stays one argument
+        time_request = "--time-request={} ".format(
+            shlex.quote(args.task_time))
     # full nodes: all their memory; fewer cores (test partition): 2 GiB per
     # core, the most that costs no extra billing units
     memory = "--mem=0"
