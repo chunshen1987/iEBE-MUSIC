@@ -148,7 +148,9 @@ for dp in $designPoints; do
         fi
     done
 done | sort -n | LC_ALL=C awk '{{t[NR] = $1}}
-    END {{if (NR > 0) printf "%d finished tasks took %.2f h (median), %.2f h at most\\n", NR, t[int((NR + 1)/2)]/3600, t[NR]/3600}}'
+    END {{if (NR > 0) {{
+        median = (NR % 2) ? t[(NR + 1)/2] : (t[NR/2] + t[NR/2 + 1])/2
+        printf "%d finished tasks took %.2f h (median), %.2f h at most\\n", NR, median/3600, t[NR]/3600}}}}'
 
 # collect the design points whose event folders all have results, and retry
 # failed collections; for the others, show why their tasks have no results

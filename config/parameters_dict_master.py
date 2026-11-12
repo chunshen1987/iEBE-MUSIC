@@ -751,7 +751,8 @@ def set_kompost_grid_from_ipglasma():
         if user_val is not None and abs(user_val - val) > 1e-6*abs(val):
             sys.exit("\U0001F6AB  KoMPoST {} {} does not fit the IPGlasma "
                      "output ({}; from LOutput {}, sizeOutput {} and maxTime "
-                     "{}). Remove it from the user dictionary.".format(
+                     "{}). Remove it from the user dictionary or the "
+                     "parameter file.".format(
                          key, user_val, val, ipglasma_dict['LOutput'], ns,
                          ipglasma_dict['maxTime']))
         kompost_dict[subdict][key] = val
@@ -764,21 +765,23 @@ module_dict_names = ("ipglasma_dict", "kompost_dict", "mcglauber_dict",
                      "music_dict", "photon_dict", "iss_dict",
                      "hadronic_afterburner_toolkit_dict")
 
-# the user file and the keys of its module dictionaries (set by
-# update_parameters_dict), which a parameter file may set
+# the user file, its initial state and the keys of its module dictionaries
+# (set by update_parameters_dict), which a parameter file may set
 user_file = ""
+initial_state_type = ""
 user_parameter_keys = set()
 
 
 def dictionary_keys(dictionaries):
-    """The keys of the dictionaries, and of the dictionaries in them (the
-    sections of kompost_dict)"""
+    """The parameter names of the dictionaries: their keys, and for the
+    sections of kompost_dict the keys in the section, not its name"""
     keys = set()
     for dictionary in dictionaries:
         for key, val in dictionary.items():
-            keys.add(key)
             if isinstance(val, dict):
                 keys.update(val.keys())
+            else:
+                keys.add(key)
     return keys
 
 
@@ -796,8 +799,9 @@ def update_parameters_dict(par_dict_path, ran_seed):
                  "config/parameters_dict_master.py).".format(
                      ", ".join(unknown_control_keys), par_dict_path,
                      "is" if len(unknown_control_keys) == 1 else "are"))
-    global user_file
+    global user_file, initial_state_type
     user_file = par_dict_path
+    initial_state_type = parameters_dict.control_dict['initial_state_type']
     user_parameter_keys.update(dictionary_keys(
         getattr(parameters_dict, name) for name in module_dict_names
         if isinstance(getattr(parameters_dict, name, None), dict)))
@@ -955,7 +959,11 @@ def parameter_value(key, val, default, bayes_file):
     """The value of a parameter file, with the type of the parameter's
     current value (KoMPoST and photon parameters)"""
     if isinstance(default, str):
-        return val
+        # e.g. the KoMPoST file names, which the job scripts read from the
+        # user file
+        sys.exit("\U0001F6AB  {} in the parameter file {} is a text "
+                 "parameter, which a parameter file cannot set: set it in the "
+                 "user file.".format(key, bayes_file))
     if isinstance(default, int):
         if not float(val).is_integer():
             sys.exit("\U0001F6AB  {} {} in the parameter file {} must be an "
@@ -971,6 +979,7 @@ def update_parameters_bayesian(bayes_file):
     design point"""
     not_in_user_file = []
     framework_keys = []
+    keys_set = set()
     parfile = open(bayes_file, "r")
     for line in parfile:
         if line.strip() == "":
@@ -992,6 +1001,7 @@ def update_parameters_bayesian(bayes_file):
             not_in_user_file.append(key)
             continue
 
+        keys_set.add(key)
         paramApplied = False
         if ipglasma_key in ipglasma_dict.keys():
             set_ipglasma_parameter(ipglasma_key, val, bayes_file)
@@ -1001,10 +1011,15 @@ def update_parameters_bayesian(bayes_file):
             mcglauber_dict[key] = float(val)
             paramApplied = True
 
-        for section in kompost_dict.values():
+        for section_name, section in kompost_dict.items():
             if key in section:
                 section[key] = parameter_value(key, val, section[key],
                                                bayes_file)
+                if user_kompost_dict is not None:
+                    # checked against the IPGlasma output like the user's
+                    # values (set_kompost_grid_from_ipglasma)
+                    user_kompost_dict.setdefault(section_name, {})[key] = (
+                        section[key])
                 paramApplied = True
 
         if key in music_dict.keys():
@@ -1051,6 +1066,18 @@ def update_parameters_bayesian(bayes_file):
     if messages:
         sys.exit("\U0001F6AB  The parameter file {}: {}".format(
             bayes_file, " ".join(messages)))
+
+    if initial_state_type == "IPGlasma+KoMPoST":
+        # MUSIC starts from KoMPoST (update_parameters_dict), also with a
+        # tOut of the parameter file
+        derived = sorted(keys_set & {"s_factor", "Initial_time_tau_0"})
+        if derived:
+            sys.exit("\U0001F6AB  {} in the parameter file {}: with "
+                     "IPGlasma+KoMPoST, MUSIC starts from KoMPoST, with "
+                     "s_factor 1 at its tOut. Vary tOut instead.".format(
+                         ", ".join(derived), bayes_file))
+        music_dict['Initial_time_tau_0'] = (
+            kompost_dict['KoMPoSTInputs']['tOut'])
 
 
 def output_parameters_to_files(workfolder="."):
