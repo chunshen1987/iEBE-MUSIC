@@ -757,12 +757,32 @@ def set_kompost_grid_from_ipglasma():
         kompost_dict[subdict][key] = val
 
 
+# the keys of all dictionaries of the user file, including keys the master
+# does not have (set by update_parameters_dict)
+user_parameter_keys = set()
+
+
+def dictionary_keys(dictionaries):
+    """The keys of the dictionaries, and of the dictionaries in them (the
+    sections of kompost_dict)"""
+    keys = set()
+    for dictionary in dictionaries:
+        for key, val in dictionary.items():
+            keys.add(key)
+            if isinstance(val, dict):
+                keys.update(val.keys())
+    return keys
+
+
 def update_parameters_dict(par_dict_path, ran_seed):
     """This function update the parameters dictionaries with user's settings"""
     par_diretory = path.dirname(par_dict_path)
     sys.path.insert(0, par_diretory)
     print(par_diretory)
     parameters_dict = __import__(par_dict_path.split('.py')[0].split('/')[-1])
+    user_parameter_keys.update(dictionary_keys(
+        val for name, val in vars(parameters_dict).items()
+        if not name.startswith("__") and isinstance(val, dict)))
     initial_condition_type = parameters_dict.control_dict['initial_state_type']
     if initial_condition_type in ("IPGlasma", "IPGlasma+KoMPoST"):
         ipglasma_dict.update(parameters_dict.ipglasma_dict)
@@ -914,6 +934,9 @@ def set_ipglasma_parameter(key, val, bayes_file):
 
 
 def update_parameters_bayesian(bayes_file):
+    known_keys = user_parameter_keys | dictionary_keys([
+        control_dict, ipglasma_dict, kompost_dict, mcglauber_dict, music_dict,
+        photon_dict, iss_dict, hadronic_afterburner_toolkit_dict])
     unknown_keys = []
     parfile = open(bayes_file, "r")
     for line in parfile:
@@ -952,9 +975,16 @@ def update_parameters_bayesian(bayes_file):
             paramApplied = True
 
         if not paramApplied:
-            unknown_keys.append(key)
-    # a misspelled key would otherwise leave its parameter at the value of
-    # the user dictionary for every design point
+            if key in known_keys:
+                # a parameter, but not one a parameter file can set (e.g.
+                # of KoMPoST or of control_dict)
+                print(f"Parameter {key} is not set! Please check your "
+                      "input file")
+            else:
+                unknown_keys.append(key)
+    # a key that is no parameter at all, e.g. a misspelled one, would
+    # otherwise leave its parameter at the value of the user dictionary for
+    # every design point
     if unknown_keys:
         sys.exit("\U0001F6AB  {} in the parameter file {} {} no parameter of "
                  "the master or the user dictionary.".format(
