@@ -33,6 +33,9 @@ Generate the jobs in the scratch area of the project:
 
 - `-n`: number of jobs (array tasks); `-n_hydro`: events per job; `-n_th`: cores per job.
 - `-b`: the parameter file of a design point, as on the other clusters.
+- **Parameter check:** before writing any job, the generator applies the user dictionary and the parameter file as each job will, and stops on an error:
+  - **User dictionary:** it only needs the parameters it changes; the master (`config/parameters_dict_master.py`) has the defaults. Its module dictionaries (IP-Glasma, KoMPoST, 3D-Glauber, MUSIC, photons, iSS, afterburner) may also set parameters that the master does not have. `control_dict` holds the parameters of the framework, so it may only set those of the master.
+  - **Parameter file:** it can only set parameters that the user dictionary sets, so that a misspelled name stops the generation instead of being ignored. To vary a parameter, set it in the user dictionary too, e.g. with its default value. A parameter file cannot set `control_dict` parameters.
 - `--node_type`: the partition, `small` (default; up to 72 h), `longrun` (up to 10 days and 192 cores) or `test` (15 min, for trying a setup).
 - The time limit of each job is `walltime` of the `control_dict` in the parameter file.
 - `--mem_per_cpu`: memory per core in GiB (default 2). Up to 2 GiB per core costs no extra billing units on Roihu; more memory is billed instead of the cores.
@@ -63,24 +66,97 @@ Collect when all jobs are done, and rerun failed jobs (section 3) before. The co
 
 ## 5. Campaigns: many design points with HyperQueue
 
-`Cluster_supports/Roihu/generate_campaign.py` makes one working folder per design point (parameter file) in a campaign folder, and HyperQueue jobs that each run the event folders of a group of design points on full `medium` nodes (384 cores each), one HyperQueue task per event folder:
+`Cluster_supports/Roihu/generate_campaign.py` runs many events of one or many design points on full `medium` nodes. It uses [HyperQueue](https://docs.csc.fi/apps/hyperqueue/), which runs many small tasks inside one Slurm job.
+
+### 5.1 How a campaign runs
+
+- **Design point:** one parameter file (`-b`), applied on top of the user dictionary (`-par`). Its file name without extension names its working folder in the campaign folder and its results.
+- **Event folder = task:** each design point has `-nev` / `-n_hydro` event folders of `-n_hydro` events. Each event folder is one HyperQueue task. A task runs its events one after another on `--cpus_per_task` cores, with `-n_th` threads per event.
+- **Slots:** a node has 384 cores, so it runs 384 / `--cpus_per_task` tasks at the same time, e.g. 192 tasks of 2 cores. When a task ends, its cores take the next task.
+- **Job:** a job script `hq_job_<n>.script` reserves `--nodes` full nodes for up to `--time`, and runs the tasks of `--designs_per_job` design points as one queue. The tasks run in "rounds" (tasks / slots). The job takes about rounds × the time of a task.
+- **Cost:** a job is billed for its full nodes while it runs, whether its cores are busy or not. The settings below keep them busy.
+
+When `generate_campaign.py` writes the jobs, it prints how the tasks fill a job: slots, rounds and the share of cores used.
+
+### 5.2 The options
+
+| Option | What it controls | How to choose it |
+|---|---|---|
+| `-w` | the campaign folder: working folders of the design points, job scripts, `RESULTS/` | one per campaign |
+| `-par` | the user dictionary, the same for all design points | it only needs the parameters it changes, and must set every parameter that the design points vary (section 2) |
+| `-b` | the parameter files, one per design point | each key must be a parameter that the user dictionary sets |
+| `-singularity` | the Apptainer image of the events and of the collection | the same image for all runs that are compared |
+| `-nev` | events per design point | a multiple of `-n_hydro` |
+| `-n_hydro` | events per event folder, i.e. per task | **1**: the shortest tasks fill the slots most evenly, and a failure costs one event. 2 halves the number of folders and files on `/scratch`. |
+| `-n_th` | threads per event (IP-Glasma, MUSIC), and UrQMD runs per event | the transport runs on one core, so 1 or 2 |
+| `--cpus_per_task` | cores reserved per task (default `-n_th`) | each core of a full node comes with 1.9 GiB of memory and 1.5 GiB of `$TMPDIR`; reserve more cores for events that need more |
+| `--task_time` | HyperQueue starts a task only if the job has this much time left, so no task is cut off at the end of a job | about the longest task time, e.g. twice the median |
+| `--designs_per_job` | design points per job; their tasks form one queue, so the cores stay busy between design points | as many as fit into `--time` (5.4) |
+| `--nodes` | full nodes per job (1–6 on `medium`) | **1**: more nodes finish sooner at the same cost, but wait longer in the queue |
+| `--time` | time limit of a job (at most 36 h on `medium`) | about rounds × median task time, plus a margin. A job that reaches it is simply submitted again. |
+| `--cleanup` | delete a design point's working folder after its results are collected | for many design points, to stay within the file quota |
+| `--account` | the Slurm account (CSC project) | |
+| `--partition test --cores_per_node 4 --time 00:15:00` | a test on 4 cores (2 GiB each) instead of a full node | for trying a setup with a few small events |
+
+### 5.3 Example: one design point with 1000 events
+
+With 2 threads per event and events of about 1.5 h (measure them, see 5.5):
+
+    cd /scratch/<project folder>/$USER
+    python3 iEBE-MUSIC/Cluster_supports/Roihu/generate_campaign.py \
+        -w RUN_NAME -par parameters_dict_user.py -b designs/0000.dat \
+        -singularity <image> --account <account> \
+        -nev 1000 -n_hydro 1 -n_th 2 \
+        --nodes 1 --time 12:00:00 --task_time 3h
+    cd RUN_NAME
+    sbatch hq_job_000.script
+
+- **Layout:** 1000 tasks of one event on 192 slots run in 6 rounds, about 9 h with 1.5 h events.
+- **Use of the cores:** 87%, since the last round fills only 40 of the 192 slots. This holds for any number of nodes: 2 nodes run 3 rounds in half the time at the same cost. If the number of events is free, a multiple of 192 per node (e.g. 1152) fills every round.
+- **`--time 12:00:00`:** 6 rounds of 1.5 h plus a margin. A shorter limit usually starts sooner.
+
+### 5.4 Example: many design points
+
+Put several design points into each 1-node job, so that the cores stay busy between them:
 
     cd /scratch/<project folder>/$USER
     python3 iEBE-MUSIC/Cluster_supports/Roihu/generate_campaign.py \
         -w CAMPAIGN -par parameters_dict_user.py -b designs/*.dat \
         -singularity <image> --account <account> \
-        -nev 1000 -n_hydro 10 -n_th 1 \
-        --designs_per_job 10 --nodes 2 --time 36:00:00 --task_time 10h
+        -nev 1000 -n_hydro 1 -n_th 2 \
+        --designs_per_job 3 --nodes 1 --time 36:00:00 --task_time 3h --cleanup
     cd CAMPAIGN
     for job in hq_job_*.script; do sbatch $job; done
 
-- `-nev`: events per design point, in event folders of `-n_hydro` events (one task each; `-nev` must be a multiple of `-n_hydro`); `-n_th`: threads per event.
-- `--cpus_per_task`: cores reserved per task (default `-n_th`). A full node has about 1.9 GiB of memory and 1.5 GiB of `$TMPDIR` per core; reserve more cores for events that need more.
-- `--designs_per_job`, `--nodes` (1–6) and `--time` (at most 36 h): the size of each HyperQueue job. `--task_time`: the expected time of one task; HyperQueue starts a task only if the job has that much time left.
-- `--partition test --cores_per_node 4 --time 00:15:00`: for trying a setup with a few small events on 4 cores (2 GiB each) instead of a full node.
-- The name of a parameter file (without extension) names its design point. Calling the script again with more parameter files adds design points and job scripts; existing design points are skipped. Generating the design points in batches keeps the number of files on `/scratch` within the quota (`csc-workspaces`).
+- **Layout:** with 1.5 h events, a job runs 3000 tasks in 16 rounds, about 24 h, with 98% of its cores in use.
+- **Jobs:** the jobs of the design points run side by side, up to the project's limit of running jobs (100 on `medium`; `sacctmgr show assoc user=$USER format=account,partition,maxjobs,maxsubmit`).
+- **`--designs_per_job` by event time:** from the median task time, for 1000 one-event tasks per design point on one node, 2 cores per task, and 36 h with a 15% margin:
+
+  | Median event time | `--designs_per_job` | Rounds | Job length | Cores used |
+  |---|---|---|---|---|
+  | 0.5 h | 11 | 58 | 29 h | 99% |
+  | 1 h | 5 | 27 | 27 h | 96% |
+  | 1.5 h | 3 | 16 | 24 h | 98% |
+  | 2 h | 2 | 11 | 22 h | 95% |
+  | 3–5 h | 1 | 6 | 18–30 h | 87% |
+  | more than 5 h | 1, with `--nodes 2` | 3 | 3 × event time | 87% |
+
+  In general: `--designs_per_job` = 0.85 × 36 h × 192 / (1000 × median event time), rounded down.
+- **Files on `/scratch`:** with `-n_hydro 1`, each design point has 1000 event folders. Generate the design points in batches, e.g. 50 at a time with `--cleanup`, and check the file count with `csc-workspaces`.
+
+### 5.5 Measure, then adjust
+
+- **Task times:** each job prints the median and the longest time of its finished tasks in `hq_job_<n>_<job id>.out`. Use the median as the event time for `--designs_per_job` (5.4) and `--time`, and about the longest for `--task_time`.
+- **Memory:** `seff <job id>` shows the memory a finished job used of the node's 744 GiB. An event must stay within `--cpus_per_task` × 1.9 GiB: 3.9 GiB with 2 cores. IP-Glasma needs 2.4 GiB at 800² and 3.9 GiB at 1024² (`validations/` of IP-Glasma), so use `--cpus_per_task 3` from about 1000².
+- **Disk:** a job has 600 GiB of `$TMPDIR` per node, i.e. 3.1 GiB per task with 192 tasks. Saving hydro surfaces or UrQMD files (`control_dict`) can exceed this.
+
+The settings apply to the jobs written next. To change them for design points that are already generated, delete their folders and job scripts, and generate them again.
+
+### 5.6 Restarts, failures and collection
 
 Each job runs the event folders of its design points that have no results yet, then collects every finished design point into `RESULTS/<design point>/<design point>.h5`, together with its parameter files, with `collect_results.sh` (section 4). The output of each task is in `job.log` in its event folder, the output of the job in `hq_job_<n>_<job id>.out`. If a job ends before all its events are done, submit the same script again: finished event folders and collected design points are skipped, and a failed collection is retried without running its events again. Do not run two jobs of the same script at the same time. With `--cleanup`, the working folder of a design point is deleted after its results are collected successfully, which frees its files on `/scratch`.
+
+If tasks end without results, the job's `.out` names the design point, says how many of its tasks ran without results, and shows the end of the `job.log` of one of them.
 
 A design point is collected only when all its event folders have results. To collect one by hand, e.g. when an event folder keeps failing, run in the campaign folder:
 

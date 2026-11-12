@@ -9,6 +9,7 @@ from os import path, mkdir
 import shutil
 import subprocess
 import argparse
+import tempfile
 from math import ceil
 from glob import glob
 
@@ -386,6 +387,27 @@ def create_a_working_folder(workfolder_path):
             exit(0)
 
 
+def check_parameters(code_package_path, par_dict, bayes_file):
+    """Applies the user dictionary and the parameter file with the master,
+    as every job does when it starts, so that an error in them stops the job
+    generation instead of every job"""
+    command = [sys.executable, "parameters_dict_master.py",
+               "-par", path.abspath(par_dict), "-seed", "1"]
+    if bayes_file != "":
+        command += ["-b", path.abspath(bayes_file)]
+    with tempfile.TemporaryDirectory() as output_folder:
+        result = subprocess.run(command + ["-path", output_folder],
+                                cwd=path.join(code_package_path, "config"),
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.STDOUT,
+                                universal_newlines=True)
+    if result.returncode != 0:
+        sys.exit("{}\U0001F6AB  The parameters of {}{} cannot be used, no "
+                 "jobs are generated.".format(
+                     result.stdout, par_dict,
+                     " and " + bayes_file if bayes_file != "" else ""))
+
+
 def main():
     """This is the main funciton"""
     parser = argparse.ArgumentParser(
@@ -528,6 +550,7 @@ def main():
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
     wallTime = parameter_dict.control_dict['walltime']
+    check_parameters(code_package_path, args.par_dict, args.bayes_file)
 
     working_folder_name = path.abspath(working_folder_name)
     create_a_working_folder(working_folder_name)

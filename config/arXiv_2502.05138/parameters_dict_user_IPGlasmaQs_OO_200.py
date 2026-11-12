@@ -34,14 +34,9 @@ ipglasma_dict = {
     'sizeOutput': 300,
     'writeWilsonLines': 0,
     'useInputWSParams': 0,
-    'subNucleonParamType': 0,    # 0: do not use posterior parameter sets
-                                 # 1: use subnucleon parameters from variant Nq posterior distribution
-                                 # 2: use subnucleon parameters from fixed Nq = 3 posterior distribution fitting HERA data
-                                 # 4: use subnucleon parameters from fixed Nq = 3 posterior distribution fiiting JIMWLK data at LHC xp
+    'posteriorFile': "none",  # no posterior parameter sets
 
-    'subNucleonParamSet': 0,     # -1: choose a random set from the posterior distribution
-                                 # 0: choose the MAP parameter set
-                                 # positive intergers: choose a fixed set of parameter for sub-nucleonic structure
+    'posteriorSet': 0,  # only used with a posterior file
     'm': 0.4,
     'BG': 3.3,
     'BGq': 0.3,
