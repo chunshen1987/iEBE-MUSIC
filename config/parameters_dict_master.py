@@ -974,9 +974,10 @@ ipglasma_old_key_names = {
 # IP-Glasma parameters of the versions before 2.0 that have no one-to-one
 # equivalent; a parameter file that sets them stops the job generation
 # the posterior tables of IP-Glasma replaced subNucleonParamType
-posterior_file_hint = ("posteriorFile (0: none, 1: tables/posterior.csv, "
-                       "2: tables/posterior_Nq3.csv, "
-                       "4: tables/posterior5020_Nq3.csv)")
+posterior_file_hint = (
+    "posteriorFile (0: none, 1: tables/posterior_jpsi_2202.01998_Nq_free.csv, "
+    "2: tables/posterior_jpsi_2202.01998_Nq_3.csv, "
+    "4: tables/posterior5020_Nq3.csv)")
 ipglasma_old_keys_without_equivalent = {
     'Rapidity': "projectileX and targetX (= 0.01*exp(-Rapidity) for fixed x)",
     'RapidityA': "projectileX (= 0.01*exp(-RapidityA) for fixed x)",
