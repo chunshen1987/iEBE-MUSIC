@@ -3,6 +3,7 @@
 
 import sys
 import re
+import importlib.util
 from os import path, mkdir, remove, listdir, makedirs, symlink
 import shutil
 import subprocess
@@ -836,6 +837,26 @@ def create_a_working_folder(workfolder_path):
             exit(0)
 
 
+# output flags of control_dict that the job scripts read from the user
+# dictionary itself, not from the master merged with it
+output_flags = ("save_ipglasma_results", "save_kompost_results",
+                "save_hydro_surfaces", "save_UrQMD_files")
+
+
+def set_default_output_flags(parameter_dict, code_package_path):
+    """Sets the output flags the user dictionary does not set to the
+    defaults of the master, since a user dictionary only needs the
+    parameters it changes"""
+    spec = importlib.util.spec_from_file_location(
+        "parameters_dict_master",
+        path.join(code_package_path, "config", "parameters_dict_master.py"))
+    master = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(master)
+    for flag in output_flags:
+        parameter_dict.control_dict.setdefault(flag,
+                                               master.control_dict[flag])
+
+
 def main():
     """This is the main funciton"""
     parser = argparse.ArgumentParser(
@@ -948,6 +969,7 @@ def main():
     par_diretory = path.dirname(path.abspath(args.par_dict))
     sys.path.insert(0, par_diretory)
     parameter_dict = __import__(args.par_dict.split('.py')[0].split("/")[-1])
+    set_default_output_flags(parameter_dict, code_package_path)
 
     if cluster_name == "osg":
         if seed == -1:
@@ -1036,26 +1058,33 @@ def main():
 
     if args.bayes_file != "":
         args.bayes_file = path.join(path.abspath("."), args.bayes_file)
-        subprocess.call("(cd {}/config; ".format(code_package_path)
-                        + "python3 parameters_dict_master.py "
-                        + "-path {} -par {} -b {} -seed {};)".format(
-                            working_folder_name, path.abspath(args.par_dict),
-                            args.bayes_file, seed),
-                        shell=True)
+        status = subprocess.call(
+            "(cd {}/config; ".format(code_package_path)
+            + "python3 parameters_dict_master.py "
+            + "-path {} -par {} -b {} -seed {};)".format(
+                working_folder_name, path.abspath(args.par_dict),
+                args.bayes_file, seed),
+            shell=True)
     elif usePosteriorParameters:
-        subprocess.call("(cd {}/config; ".format(code_package_path)
-                        + "python3 parameters_dict_master.py "
-                        + "-path {} -par {} -b {} -seed {};)".format(
-                            working_folder_name, path.abspath(args.par_dict),
-                            paramFile, seed),
-                        shell=True)
+        status = subprocess.call(
+            "(cd {}/config; ".format(code_package_path)
+            + "python3 parameters_dict_master.py "
+            + "-path {} -par {} -b {} -seed {};)".format(
+                working_folder_name, path.abspath(args.par_dict),
+                paramFile, seed),
+            shell=True)
     else:
-        subprocess.call(
+        status = subprocess.call(
             "(cd {}/config; ".format(code_package_path)
             + "python3 parameters_dict_master.py "
             + "-path {} -par {} -seed {};)".format(
                 working_folder_name, path.abspath(args.par_dict), seed),
             shell=True)
+    if status != 0:
+        # the master has printed the reason
+        print("\U0001F6AB  The parameters could not be set, no jobs are "
+              "generated.")
+        exit(1)
 
     if (initial_condition_type not in ("IPGlasma", "IPGlasma+KoMPoST")
             or initial_condition_database != "self"):

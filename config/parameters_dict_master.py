@@ -914,8 +914,11 @@ def set_ipglasma_parameter(key, val, bayes_file):
 
 
 def update_parameters_bayesian(bayes_file):
+    unknown_keys = []
     parfile = open(bayes_file, "r")
     for line in parfile:
+        if line.strip() == "":
+            continue
         paramApplied = False
         key, val = line.split()
         if key in control_dict.keys():
@@ -949,7 +952,14 @@ def update_parameters_bayesian(bayes_file):
             paramApplied = True
 
         if not paramApplied:
-            print(f"Parameter {key} is not set! Please check your input file")
+            unknown_keys.append(key)
+    # a misspelled key would otherwise leave its parameter at the value of
+    # the user dictionary for every design point
+    if unknown_keys:
+        sys.exit("\U0001F6AB  {} in the parameter file {} {} no parameter of "
+                 "the master or the user dictionary.".format(
+                     ", ".join(unknown_keys), bayes_file,
+                     "is" if len(unknown_keys) == 1 else "are"))
 
 
 def output_parameters_to_files(workfolder="."):
