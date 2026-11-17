@@ -45,7 +45,7 @@ get_pinned https://Chunshen1987@bitbucket.org/Chunshen1987/urqmd_afterburner.git
 
 # download hadronic afterner (main branch)
 get_pinned https://github.com/chunshen1987/hadronic_afterburner_toolkit \
-    2326ba21a76d7bb533aa1d39a50f3dca298ef9c3 hadronic_afterburner_toolkit_code
+    85d748bc4f22cfca94e84aa45b6f918c767924a9 hadronic_afterburner_toolkit_code
 
 # download nucleus configurations for 3D-Glauber
 (cd 3dMCGlauber_code/tables; bash download_nucleusTables.sh;)
