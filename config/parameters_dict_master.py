@@ -53,8 +53,11 @@ ipglasma_dict = {
     'inverseQsForMaxTime': 0,
     # posterior parameter sets (CSV table with the input keys of its columns
     # in a header), which replace the values below every event, e.g.
-    # tables/posterior5020_Nq3.csv (Nq = 3, fit to JIMWLK at LHC x; needs
-    # nucleonModel hotspots and smearQs 1); none: no posterior
+    # tables/posterior_jpsi_2507.14087_Kfactor.csv (the J/psi fit of
+    # arXiv:2507.14087; needs nucleonModel hotspots, smearQs 1 and
+    # useJIMWLK 1); tables/posterior5020_Nq3.csv is that of the configs of
+    # arXiv:2409.19064 and later, not for new calculations; none: no
+    # posterior
     'posteriorFile': "none",
     'posteriorSet': -1,  # set of the posterior file, counted from 0; -1: a
     # random set every event, 0: the MAP set (row 0 of the tables of
@@ -104,6 +107,10 @@ ipglasma_dict = {
     'Nq': 3.,  # number of hot spots (nucleonModel hotspots)
     'NqFluc': 0.0,
     'shiftConstituentQuarkProtonOrigin': 1,
+    # nucleonModel strings: density (k + 1) t^k of the hot spots along
+    # their strings, from the junction (t = 0) to the ends (t = 1), k > -1;
+    # 0: uniform, > 0: towards the ends, < 0: towards the junction
+    'stringHotSpotPower': 0.,
     'QsMuRatio': 0.8,
     'smearQs': 1,
     'smearingWidth': 0.6,

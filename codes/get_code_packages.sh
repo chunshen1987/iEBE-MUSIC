@@ -21,7 +21,7 @@ get_pinned https://github.com/chunshen1987/3dMCGlauber \
 
 # download IPGlasma (devel branch)
 get_pinned https://github.com/schenke/ipglasma \
-    8b3b2014b5e4526b410ab7c8888fef3709dfd52a ipglasma_code
+    d3088aa8de19a5cb78135f6e9e46dc6989c9fa48 ipglasma_code
 
 # download KoMPoST
 get_pinned https://github.com/chunshen1987/KoMPoST \
